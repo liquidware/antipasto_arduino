@@ -1,0 +1,40 @@
+9
+
+dir
+537
+svn://svn.berlios.de/arduino/trunk/hardware/bootloaders
+svn://svn.berlios.de/arduino
+
+
+
+2008-11-26T14:34:24.291287Z
+536
+mellis
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+fdd99716-2cf5-0310-8ea1-e7fa11872f6a
+
+bt
+dir
+
+atmega8
+dir
+
+atmega168
+dir
+
+lilypad
+dir
+

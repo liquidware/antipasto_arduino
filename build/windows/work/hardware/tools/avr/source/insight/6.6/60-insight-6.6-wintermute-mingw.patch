@@ -1,0 +1,1103 @@
+Patch set from Dave Murphy [wintermute2k4@ntlworld.com]
+==============================================================
+diff -Nbaur insight-6.6/configure insight-6.6-mingw/configure
+--- configure	Tue Nov 14 23:26:39 2006
++++ configure	Thu Jun  7 00:50:35 2007
+@@ -3271,7 +3271,7 @@
+ 
+ # Host dirs don't like to share a cache file either, horribly enough.
+ # This seems to be due to autoconf 2.5x stupidity.
+-host_configargs="--cache-file=./config.cache --build=${build_alias} --host=${host_alias} --target=${target_alias} ${extra_host_args} ${baseargs}"
++host_configargs="${cache_file_option} --build=${build_alias} --host=${host_alias} --target=${target_alias} ${extra_host_args} ${baseargs}"
+ 
+ target_configargs=${baseargs}
+ 
+diff -Nbaur insight-6.6/configure.in insight-6.6-mingw/configure.in
+--- configure.in	Fri Feb  9 05:29:46 2007
++++ configure.in	Thu Jun  7 00:50:35 2007
+@@ -2024,7 +2024,7 @@
+ 
+ # Host dirs don't like to share a cache file either, horribly enough.
+ # This seems to be due to autoconf 2.5x stupidity.
+-host_configargs="--cache-file=./config.cache --build=${build_alias} --host=${host_alias} --target=${target_alias} ${extra_host_args} ${baseargs}"
++host_configargs="${cache_file_option} --build=${build_alias} --host=${host_alias} --target=${target_alias} ${extra_host_args} ${baseargs}"
+ 
+ target_configargs=${baseargs}
+ 
+diff -Nbaur insight-6.6/gdb/Makefile.in insight-6.6-mingw/gdb/Makefile.in
+--- gdb/Makefile.in	Fri Nov 24 19:54:14 2006
++++ gdb/Makefile.in	Thu Jun  7 00:50:35 2007
+@@ -2983,7 +2983,7 @@
+ insight$(EXEEXT): gdbtk-main.o libgdb.a $(ADD_DEPS) \
+ 		$(CDEPS) $(TDEPLIBS)
+ 	rm -f insight$(EXEEXT)
+-	$(CC_LD) $(INTERNAL_LDFLAGS) $(WIN32LDAPP) \
++	$(CC_LD) -mwindows $(INTERNAL_LDFLAGS) $(WIN32LDAPP) \
+ 		-o insight$(EXEEXT) gdbtk-main.o libgdb.a \
+ 		$(TDEPLIBS) $(TUI_LIBRARY) $(CLIBS) $(LOADLIBES)
+ 
+diff -Nbaur insight-6.6/gdb/config/i386/mingw.mh insight-6.6-mingw/gdb/config/i386/mingw.mh
+--- gdb/config/i386/mingw.mh	Thu Jan  1 00:00:00 1970
++++ gdb/config/i386/mingw.mh	Thu Jun  7 00:50:35 2007
+@@ -0,0 +1,5 @@
++MH_CFLAGS=-D_POSIX_
++XM_FILE=xm-mingw32.h
++NATDEPFILES= i386-nat.o win32-nat.o corelow.o
++NAT_FILE=nm-mingw32.h
++XM_CLIBS=
+diff -Nbaur insight-6.6/gdb/config/i386/mingw.mt insight-6.6-mingw/gdb/config/i386/mingw.mt
+--- gdb/config/i386/mingw.mt	Thu Jan  1 00:00:00 1970
++++ gdb/config/i386/mingw.mt	Thu Jun  7 00:50:35 2007
+@@ -0,0 +1,4 @@
++# Target: Intel x86 running Win32 (MinGW)
++TDEPFILES= i386-tdep.o i386-win32-tdep.o i387-tdep.o
++DEPRECATED_TM_FILE= tm-mingw32.h
++GDBSERVER_DEPFILES=
+diff -Nbaur insight-6.6/gdb/config/i386/nm-mingw32.h insight-6.6-mingw/gdb/config/i386/nm-mingw32.h
+--- gdb/config/i386/nm-mingw32.h	Thu Jan  1 00:00:00 1970
++++ gdb/config/i386/nm-mingw32.h	Thu Jun  7 00:50:35 2007
+@@ -0,0 +1,38 @@
++/* Native definitions for Intel x86 running MinGW.
++   Copyright (C) 2002 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software
++   Foundation, Inc., 59 Temple Place - Suite 330,
++   Boston, MA 02111-1307, USA.  */
++
++#define NO_PTRACE_H
++
++#define I386_USE_GENERIC_WATCHPOINTS
++
++#include "i386/nm-i386.h"
++
++/* Support for hardware-assisted breakpoints and watchpoints.  */
++
++#define I386_DR_LOW_SET_CONTROL(VAL)	cygwin_set_dr7 (VAL)
++extern void cygwin_set_dr7 (unsigned);
++
++#define I386_DR_LOW_SET_ADDR(N,ADDR)	cygwin_set_dr (N,ADDR)
++extern void cygwin_set_dr (int, CORE_ADDR);
++
++#define I386_DR_LOW_RESET_ADDR(N)
++
++#define I386_DR_LOW_GET_STATUS()	cygwin_get_dr6 ()
++extern unsigned cygwin_get_dr6 (void);
+diff -Nbaur insight-6.6/gdb/config/i386/tm-mingw32.h insight-6.6-mingw/gdb/config/i386/tm-mingw32.h
+--- gdb/config/i386/tm-mingw32.h	Thu Jan  1 00:00:00 1970
++++ gdb/config/i386/tm-mingw32.h	Thu Jun  7 00:50:35 2007
+@@ -0,0 +1,21 @@
++/* Macro definitions for i386 running under Win32.
++   Copyright 1999 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software
++   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
++
++#include "i386/tm-cygwin.h"
++
+diff -Nbaur insight-6.6/gdb/config/i386/xm-mingw32.h insight-6.6-mingw/gdb/config/i386/xm-mingw32.h
+--- gdb/config/i386/xm-mingw32.h	Thu Jan  1 00:00:00 1970
++++ gdb/config/i386/xm-mingw32.h	Thu Jun  7 00:50:35 2007
+@@ -0,0 +1,25 @@
++/* Definitions for hosting on WIN32, building with MinGW, for GDB.
++   Copyright 1999 Free Software Foundation, Inc.
++
++This file is part of GDB.
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program; if not, write to the Free Software
++Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
++
++#include "fopen-bin.h"
++#define getkey getch
++#define DIRNAME_SEPARATOR ';'
++
++/* Define this if source files use \r\n rather than just \n.  */
++#define CRLF_SOURCE_FILES
+diff -Nbaur insight-6.6/gdb/defs.h insight-6.6-mingw/gdb/defs.h
+--- gdb/defs.h	Thu Sep 21 14:50:51 2006
++++ gdb/defs.h	Thu Jun  7 00:50:35 2007
+@@ -1167,7 +1167,7 @@
+ /* FIXME, this doesn't work very well if host and executable
+    filesystems conventions are different.  */
+ 
+-#ifdef __MSDOS__
++#if defined(__MSDOS__) || (!defined (__CYGWIN__) && defined (_WIN32))
+ # define CANT_FORK
+ # define GLOBAL_CURDIR
+ # define DIRNAME_SEPARATOR ';'
+diff -Nbaur insight-6.6/gdb/gdbtk/generic/gdbtk-cmds.c insight-6.6-mingw/gdb/gdbtk/generic/gdbtk-cmds.c
+--- gdb/gdbtk/generic/gdbtk-cmds.c	Fri Aug 25 17:09:48 2006
++++ gdb/gdbtk/generic/gdbtk-cmds.c	Thu Jun  7 00:50:35 2007
+@@ -56,7 +56,9 @@
+ 
+ #include <signal.h>
+ #include <fcntl.h>
++#ifndef __MINGW32__
+ #include <sys/ioctl.h>
++#endif
+ #include <sys/time.h>
+ #include <sys/stat.h>
+ 
+diff -Nbaur insight-6.6/gdb/gdbtk/generic/gdbtk-hooks.c insight-6.6-mingw/gdb/gdbtk/generic/gdbtk-hooks.c
+--- gdb/gdbtk/generic/gdbtk-hooks.c	Fri Dec 23 18:23:16 2005
++++ gdb/gdbtk/generic/gdbtk-hooks.c	Thu Jun  7 00:50:35 2007
+@@ -51,7 +51,9 @@
+ 
+ #include <signal.h>
+ #include <fcntl.h>
++#ifndef __MINGW32__
+ #include <sys/ioctl.h>
++#endif
+ #include <sys/time.h>
+ 
+ #include "gdb_string.h"
+diff -Nbaur insight-6.6/gdb/gdbtk/generic/gdbtk-interp.c insight-6.6-mingw/gdb/gdbtk/generic/gdbtk-interp.c
+--- gdb/gdbtk/generic/gdbtk-interp.c	Fri Dec 23 18:23:16 2005
++++ gdb/gdbtk/generic/gdbtk-interp.c	Thu Jun  7 00:50:35 2007
+@@ -34,6 +34,11 @@
+ #include "tk.h"
+ #include "gdbtk.h"
+ 
++#ifdef _WIN32
++	#define		WIN32_LEAN_AND_MEAN
++	#include <windows.h>
++#endif
++
+ static void gdbtk_command_loop (void);
+ static void hack_disable_interpreter_exec (char *, int);
+ 
+diff -Nbaur insight-6.6/gdb/gdbtk/generic/gdbtk.c insight-6.6-mingw/gdb/gdbtk/generic/gdbtk.c
+--- gdb/gdbtk/generic/gdbtk.c	Fri Dec  8 04:16:39 2006
++++ gdb/gdbtk/generic/gdbtk.c	Thu Jun  7 00:50:35 2007
+@@ -49,7 +49,9 @@
+ 
+ #include <fcntl.h>
+ #include <sys/stat.h>
++#ifndef __MINGW32__
+ #include <sys/ioctl.h>
++#endif
+ #include <sys/time.h>
+ #include <signal.h>
+ 
+@@ -63,6 +65,7 @@
+ 
+ extern void _initialize_gdbtk (void);
+ 
++#ifndef __MINGW32__
+ /* For unix natives, we use a timer to periodically keep the gui alive.
+    See comments before x_event. */
+ static sigset_t nullsigmask;
+@@ -74,6 +77,7 @@
+ {
+   x_event (signo);
+ }
++#endif
+ 
+ /*
+  * This variable controls the interaction with an external editor.
+@@ -261,6 +265,7 @@
+   if (first)
+     {
+       /* first time called, set up all the structs */
++#ifndef __MINGW32__
+       first = 0;
+       sigemptyset (&nullsigmask);
+ 
+@@ -281,14 +286,17 @@
+       it_off.it_interval.tv_usec = 0;
+       it_off.it_value.tv_sec = 0;
+       it_off.it_value.tv_usec = 0;
++#endif
+     }
+ 
+   if (target_should_use_timer (&current_target))
+     {
+       if (!gdbtk_timer_going)
+ 	{
++#ifndef __MINGW32__
+ 	  sigaction (SIGALRM, &act1, NULL);
+ 	  setitimer (ITIMER_REAL, &it_on, NULL);
++#endif
+ 	  gdbtk_timer_going = 1;
+ 	}
+     }
+@@ -302,8 +310,10 @@
+   if (gdbtk_timer_going)
+     {
+       gdbtk_timer_going = 0;
++#ifndef __MINGW32__
+       setitimer (ITIMER_REAL, &it_off, NULL);
+       sigaction (SIGALRM, &act2, NULL);
++#endif
+     }
+   return;
+ }
+@@ -510,7 +520,7 @@
+    * These are the commands to do some Windows Specific stuff...
+    */
+ 
+-#ifdef __CYGWIN32__
++#ifdef __WIN32__
+   if (ide_create_messagebox_command (gdbtk_interp) != TCL_OK)
+     error ("messagebox command initialization failed");
+   /* On Windows, create a sizebox widget command */
+@@ -522,6 +532,8 @@
+     error ("windows print code initialization failed");
+   if (ide_create_win_grab_command (gdbtk_interp) != TCL_OK)
+     error ("grab support command initialization failed");
++#endif
++#ifdef __CYGWIN__
+   /* Path conversion functions.  */
+   if (ide_create_cygwin_path_command (gdbtk_interp) != TCL_OK)
+     error ("cygwin path command initialization failed");
+diff -Nbaur insight-6.6/gdb/gdbtk/library/download.itb insight-6.6-mingw/gdb/gdbtk/library/download.itb
+--- gdb/gdbtk/library/download.itb	Fri Dec 23 18:26:50 2005
++++ gdb/gdbtk/library/download.itb	Thu Jun  7 00:50:35 2007
+@@ -207,7 +207,7 @@
+     }
+   }
+ 
+-  if {[string compare $tcl_platform(platform) "windows"] == 0} {
++  if {[string compare $tcl_platform(platform) "windows"] == 0 && [llength [info commands ide_cygwin_path]]} {
+     set f [ide_cygwin_path to_win32 $gdb_exe_name]
+   } else {
+     set f $gdb_exe_name
+diff -Nbaur insight-6.6/gdb/gdbtk/library/interface.tcl insight-6.6-mingw/gdb/gdbtk/library/interface.tcl
+--- gdb/gdbtk/library/interface.tcl	Fri Dec 23 18:26:50 2005
++++ gdb/gdbtk/library/interface.tcl	Thu Jun  7 00:50:35 2007
+@@ -962,7 +962,7 @@
+   }
+   # Add the base dir for this file to the source search path.
+   set root [file dirname $file]
+-  if {$tcl_platform(platform) == "windows"} {
++  if {$tcl_platform(platform) == "windows" && [llength [info commands ide_cygwin_path]]} {
+     set root [ide_cygwin_path to_posix $root]
+     set file [ide_cygwin_path to_posix $file]
+   }
+diff -Nbaur insight-6.6/gdb/gdbtk/library/prefs.tcl insight-6.6-mingw/gdb/gdbtk/library/prefs.tcl
+--- gdb/gdbtk/library/prefs.tcl	Tue Sep 19 19:39:38 2006
++++ gdb/gdbtk/library/prefs.tcl	Fri Jun  8 02:59:42 2007
+@@ -35,7 +35,7 @@
+   global tcl_platform
+ 
+   if {[info exists env(HOME)]} {
+-    if {$tcl_platform(platform) == "windows"} {
++    if {$tcl_platform(platform) == "windows" && [llength [info commands ide_cygwin_path]]} {
+       set home [ide_cygwin_path to_win32 $env(HOME)]
+     } else {
+       set home $env(HOME)
+@@ -319,7 +319,7 @@
+   pref define gdb/load/bp_func ""
+   pref define gdb/load/baud 38400
+   if {$tcl_platform(platform) == "windows"}  {
+-    pref define gdb/load/port com1
++    pref define gdb/load/port COM1
+   } else {
+     pref define gdb/load/port "/dev/ttyS0"
+   }
+diff -Nbaur insight-6.6/gdb/gdbtk/library/session.tcl insight-6.6-mingw/gdb/gdbtk/library/session.tcl
+--- gdb/gdbtk/library/session.tcl	Fri Dec 23 18:26:50 2005
++++ gdb/gdbtk/library/session.tcl	Thu Jun  7 00:50:35 2007
+@@ -21,7 +21,7 @@
+     global tcl_platform
+ 
+     # Get real directory.
+-    if {[string compare $tcl_platform(platform) "windows"] == 0} {
++    if {[string compare $tcl_platform(platform) "windows"] == 0 && [llength [info commands ide_cygwin_path]]} {
+       set path [ide_cygwin_path to_win32 $path]
+     }
+     set save [pwd]
+diff -Nbaur insight-6.6/gdb/gdbtk/library/srctextwin.itb insight-6.6-mingw/gdb/gdbtk/library/srctextwin.itb
+--- gdb/gdbtk/library/srctextwin.itb	Fri Dec 23 18:26:50 2005
++++ gdb/gdbtk/library/srctextwin.itb	Thu Jun  7 00:50:35 2007
+@@ -891,7 +891,7 @@
+   } elseif {$f == ""} {
+     set r 1
+   } else {
+-    if {[string compare $tcl_platform(platform) "windows"] == 0} {
++    if {[string compare $tcl_platform(platform) "windows"] == 0 && [llength [info commands ide_cygwin_path]]} {
+       set f [ide_cygwin_path to_win32 $f]
+     }
+     if {[catch {file mtime $f} mtime]} {
+@@ -2715,7 +2715,7 @@
+     # out.
+ 
+     if {$loadingSource} {
+-      if {[string compare $tcl_platform(platform) "windows"] == 0} {
++      if {[string compare $tcl_platform(platform) "windows"] == 0 && [llength [info commands ide_cygwin_path]]} {
+         set f [ide_cygwin_path to_win32 $name]
+       } else {
+         set f $name
+diff -Nbaur insight-6.6/gdb/gdbtk/library/targetselection.itb insight-6.6-mingw/gdb/gdbtk/library/targetselection.itb
+--- gdb/gdbtk/library/targetselection.itb	Fri Dec  8 04:16:39 2006
++++ gdb/gdbtk/library/targetselection.itb	Fri Jun  8 03:06:28 2007
+@@ -76,7 +76,7 @@
+   set gdb_target(sds,pretty-name) "SDS"
+   set gdb_target(sds,defbaud) "38400"
+   set gdb_target(sds,baud-rates) {9600 38400}
+-  set gdb_target(sds,cmd) "sds com1"
++  set gdb_target(sds,cmd) "sds COM1"
+   set gdb_target(sds,runlist) {1 1 0 1}
+   set gdb_target(sds,after_attaching) {}
+ 
+@@ -93,7 +93,7 @@
+   set gdb_target(remote,pretty-name) "Remote/Serial"
+   set gdb_target(remote,defbaud) "9600"
+   set gdb_target(remote,baud-rates) {9600 19200 38400 57600 115200}
+-  set gdb_target(remote,cmd) "remote com1"
++  set gdb_target(remote,cmd) "remote COM1"
+   set gdb_target(remote,runlist) {1 1 0 1}
+   set gdb_target(remote,after_attaching) {}
+   set gdb_target(remotetcp,pretty-name) "Remote/TCP"
+@@ -107,7 +107,7 @@
+   set gdb_target(rdi,pretty-name) "ARM Angel/Serial"
+   set gdb_target(rdi,defbaud) "9600"
+   set gdb_target(rdi,baud-rates) {9600 19200 38400 57600 115200}
+-  set gdb_target(rdi,cmd) "rdi com1"
++  set gdb_target(rdi,cmd) "rdi COM1"
+   set gdb_target(rdi,runlist) {1 1 0 1}
+   set gdb_target(rdi,after_attaching) {}
+ 
+@@ -123,7 +123,7 @@
+   set gdb_target(rdp,pretty-name) "ARM Remote/Serial"
+   set gdb_target(rdp,defbaud) "9600"
+   set gdb_target(rdp,baud-rates) {9600}
+-  set gdb_target(rdp,cmd) "rdp com1"
++  set gdb_target(rdp,cmd) "rdp COM1"
+   set gdb_target(rdp,runlist) {1 1 0 1}
+   set gdb_target(rdp,after_attaching) {}
+   set gdb_target(rdptcp,pretty-name) "ARM Remote/TCP"
+@@ -137,7 +137,7 @@
+   set gdb_target(m32r,pretty-name) "M32R/Serial"
+   set gdb_target(m32r,defbaud) "9600"
+   set gdb_target(m32r,baud-rates) {9600}
+-  set gdb_target(m32r,cmd) "m32r com1"
++  set gdb_target(m32r,cmd) "m32r COM1"
+   set gdb_target(m32r,runlist) {1 1 0 1}
+   set gdb_target(m32r,after_attaching) {}
+   set gdb_target(m32rtcp,pretty-name) "M32R/TCP"
+@@ -151,7 +151,7 @@
+   set gdb_target(mon2000,pretty-name) "MON2000/Serial"
+   set gdb_target(mon2000,defbaud) "9600"
+   set gdb_target(mon2000,baud-rates) {9600}
+-  set gdb_target(mon2000,cmd) "mon2000 com1"
++  set gdb_target(mon2000,cmd) "mon2000 COM1"
+   set gdb_target(mon2000,runlist) {1 1 0 1}
+   set gdb_target(mon2000,after_attaching) {}
+   set gdb_target(mon2000tcp,pretty-name) "MON2000/TCP"
+@@ -165,7 +165,7 @@
+   set gdb_target(sparclite,pretty-name) "SPARClite/Serial"
+   set gdb_target(sparclite,defbaud) "9600"
+   set gdb_target(sparclite,baud-rates) {9600}
+-  set gdb_target(sparclite,cmd) "sparclite com1"
++  set gdb_target(sparclite,cmd) "sparclite COM1"
+   set gdb_target(sparclite,runlist) {1 1 0 1}
+   set gdb_target(sparclite,after_attaching) {}
+   set gdb_target(sparclitetcp,pretty-name) "SPARClite/TCP"
+@@ -187,7 +187,7 @@
+   set gdb_target(mips,pretty-name) "MIPS/Serial"
+   set gdb_target(mips,defbaud) "9600"
+   set gdb_target(mips,baud-rates) {9600}
+-  set gdb_target(mips,cmd) "mips com1"
++  set gdb_target(mips,cmd) "mips COM1"
+   set gdb_target(mips,runlist) {1 1 0 1}
+   set gdb_target(mips,after_attaching) {}
+   set gdb_target(mipstcp,pretty-name) "MIPS/TCP"
+@@ -201,7 +201,7 @@
+   set gdb_target(pmon,pretty-name) "PMON/Serial"
+   set gdb_target(pmon,defbaud) "9600"
+   set gdb_target(pmon,baud-rates) {9600 19200 38400}
+-  set gdb_target(pmon,cmd) "pmon com1"
++  set gdb_target(pmon,cmd) "pmon COM1"
+   set gdb_target(pmon,runlist) {1 1 0 1}
+   set gdb_target(pmon,after_attaching) {}
+   set gdb_target(pmontcp,pretty-name) "PMON/TCP"
+@@ -215,7 +215,7 @@
+   set gdb_target(ddb,pretty-name) "DDB/Serial"
+   set gdb_target(ddb,defbaud) "19200"
+   set gdb_target(ddb,baud-rates) {9600 19200 38400}
+-  set gdb_target(ddb,cmd) "ddb com1"
++  set gdb_target(ddb,cmd) "ddb COM1"
+   set gdb_target(ddb,runlist) {1 1 0 1}
+   set gdb_target(ddb,after_attaching) {}
+   set gdb_target(ddbtcp,pretty-name) "DDB/TCP"
+@@ -229,7 +229,7 @@
+   set gdb_target(picobug,pretty-name) "Picobug/Serial"
+   set gdb_target(picobug,defbaud) "19200"
+   set gdb_target(picobug,baud-rates) {19200}
+-  set gdb_target(picobug,cmd) "picobug com1"
++  set gdb_target(picobug,cmd) "picobug COM1"
+   set gdb_target(picobug,runlist) {1 1 0 1}
+   set gdb_target(picobug,after_attaching) {}
+   set gdb_target(picobugtcp,pretty-name) "Picobug/TCP"
+@@ -243,7 +243,7 @@
+   set gdb_target(cisco,pretty-name) "Cisco/Serial"
+   set gdb_target(cisco,defbaud) "38400"
+   set gdb_target(cisco,baud-rates) {9600 19200 38400 56000}
+-  set gdb_target(cisco,cmd) "cisco com1"
++  set gdb_target(cisco,cmd) "cisco COM1"
+   set gdb_target(cisco,runlist) {1 0 0 0}
+   set gdb_target(cisco,after_attaching) "set os cisco"
+   set gdb_target(ciscotcp,pretty-name) "Cisco/TCP"
+@@ -266,7 +266,7 @@
+   set gdb_target(gdbserver,pretty-name) "GDBserver/Serial"
+   set gdb_target(gdbserver,defbaud) "9600"
+   set gdb_target(gdbserver,baud-rates) {9600 19200 38400 57600 115200}
+-  set gdb_target(gdbserver,cmd) "remote com1"
++  set gdb_target(gdbserver,cmd) "remote COM1"
+   set gdb_target(gdbserver,runlist) {1 0 0 1}
+   set gdb_target(gdbserver,after_attaching) {}
+   set gdb_target(gdbservertcp,pretty-name) "GDBserver/TCP"
+@@ -280,7 +280,7 @@
+ itcl::body TargetSelection::default_port {} {
+   global tcl_platform
+   switch -regexp $tcl_platform(os) {
+-    Windows { set port com1 }
++    Windows { set port COM1 }
+     Linux   { set port /dev/ttyS0 }
+     SunOS   { set port /dev/ttya }
+     AIX     { set port /dev/foo1 }
+@@ -885,7 +885,7 @@
+       # Failed.  Find out why.
+       if {[string first "permission denied" $msg] != -1} {
+ 	# Port is there, but busy right now. That's OK.
+-	lappend plist /dev/com$i
++	lappend plist COM$i
+       } elseif {$i > 4} {
+ 	# if we've scanned the first 4 ports, then quit when we find no more 
+ 	set quit 1
+@@ -893,7 +893,7 @@
+     } else {
+       # We got it.  Now close it and add to list.
+       close $fd
+-      lappend plist /dev/com$i
++      lappend plist COM$i
+     }
+   }
+   return $plist
+diff -Nbaur insight-6.6/gdb/tui/tui-io.c insight-6.6-mingw/gdb/tui/tui-io.c
+--- gdb/tui/tui-io.c	Fri Dec 23 19:10:02 2005
++++ gdb/tui/tui-io.c	Thu Jun  7 00:50:35 2007
+@@ -113,8 +113,11 @@
+ 
+ /* For gdb 5.3, prefer to continue the pipe hack as a backup wheel.  */
+ #define TUI_USE_PIPE_FOR_READLINE
+-/*#undef TUI_USE_PIPE_FOR_READLINE*/
+ 
++/* but remove for mingw host */
++#ifdef __MINGW32__
++#undef TUI_USE_PIPE_FOR_READLINE
++#endif
+ /* TUI output files.  */
+ static struct ui_file *tui_stdout;
+ static struct ui_file *tui_stderr;
+diff -Nbaur insight-6.6/gdb/win32-nat.c insight-6.6-mingw/gdb/win32-nat.c
+--- gdb/win32-nat.c	Mon May 22 00:04:39 2006
++++ gdb/win32-nat.c	Thu Jun  7 00:50:35 2007
+@@ -43,7 +43,11 @@
+ #include <stdlib.h>
+ #include <windows.h>
+ #include <imagehlp.h>
++
++#if defined (__CYGWIN__)
+ #include <sys/cygwin.h>
++#endif /* __CYGWIN__ */
++
+ #include <signal.h>
+ 
+ #include "buildsym.h"
+@@ -81,7 +85,65 @@
+     CONTEXT_DEBUGGER = (CONTEXT_FULL | CONTEXT_FLOATING_POINT)
+   };
+ #endif
+-#include <sys/procfs.h>
++#ifndef __MINGW32__
++  #include <sys/procfs.h>
++#else
++  #define	NOTE_INFO_PROCESS	1
++  #define	NOTE_INFO_THREAD	2
++  #define	NOTE_INFO_MODULE	3
++
++  struct win32_core_process_info
++  {
++    DWORD pid;
++    int signal;
++    int command_line_size;
++    char command_line[1];
++  }
++  #ifdef __GNUC__
++    __attribute__ ((packed))
++  #endif
++  ;
++
++  struct win32_core_thread_info
++  {
++    DWORD tid;
++    BOOL is_active_thread;
++    CONTEXT thread_context;
++  }
++  #ifdef __GNUC__
++    __attribute__ ((packed))
++  #endif
++  ;
++
++  struct win32_core_module_info
++  {
++    void* base_address;
++    int module_name_size;
++    char module_name[1];
++  }
++  #ifdef __GNUC__
++    __attribute__ ((packed))
++  #endif
++  ;
++
++  struct win32_pstatus
++  {
++    unsigned long data_type;
++    union
++      {
++        struct win32_core_process_info process_info;
++        struct win32_core_thread_info thread_info;
++        struct win32_core_module_info module_info;
++      } data ;
++  }
++  #ifdef __GNUC__
++    __attribute__ ((packed))
++  #endif
++  ;
++
++  typedef struct win32_pstatus win32_pstatus_t ;
++
++#endif
+ #include <psapi.h>
+ 
+ #define CONTEXT_DEBUGGER_DR CONTEXT_DEBUGGER | CONTEXT_DEBUG_REGISTERS \
+@@ -446,30 +508,23 @@
+ static BOOL WINAPI (*psapi_GetModuleInformation) (HANDLE, HMODULE, LPMODULEINFO, DWORD) = NULL;
+ static DWORD WINAPI (*psapi_GetModuleFileNameExA) (HANDLE, HMODULE, LPSTR, DWORD) = NULL;
+ 
+-static int
+-psapi_get_dll_name (DWORD BaseAddress, char *dll_name_ret)
+-{
+-  DWORD len;
+-  MODULEINFO mi;
+-  int i;
+-  HMODULE dh_buf[1];
+-  HMODULE *DllHandle = dh_buf;
+-  DWORD cbNeeded;
+-  BOOL ok;
+ 
++BOOL
++load_psapi ()
++{
+   if (!psapi_loaded ||
+       psapi_EnumProcessModules == NULL ||
+       psapi_GetModuleInformation == NULL ||
+       psapi_GetModuleFileNameExA == NULL)
+     {
+       if (psapi_loaded)
+-	goto failed;
++        return FALSE;
+       psapi_loaded = 1;
+       psapi_module_handle = LoadLibrary ("psapi.dll");
+       if (!psapi_module_handle)
+ 	{
+ 	  /* printf_unfiltered ("error loading psapi.dll: %u", GetLastError ()); */
+-	  goto failed;
++	  return FALSE;
+ 	}
+       psapi_EnumProcessModules = GetProcAddress (psapi_module_handle, "EnumProcessModules");
+       psapi_GetModuleInformation = GetProcAddress (psapi_module_handle, "GetModuleInformation");
+@@ -478,8 +533,24 @@
+       if (psapi_EnumProcessModules == NULL ||
+ 	  psapi_GetModuleInformation == NULL ||
+ 	  psapi_GetModuleFileNameExA == NULL)
+-	goto failed;
++	    return FALSE;
+     }
++  return TRUE;
++}
++
++int
++psapi_get_dll_name (DWORD BaseAddress, char *dll_name_ret)
++{
++  DWORD len;
++  MODULEINFO mi;
++  int i;
++  HMODULE dh_buf[1];
++  HMODULE *DllHandle = dh_buf;
++  DWORD cbNeeded;
++  BOOL ok;
++
++  if (!load_psapi ())
++    goto failed;
+ 
+   cbNeeded = 0;
+   ok = (*psapi_EnumProcessModules) (current_process_handle,
+@@ -507,14 +578,14 @@
+ 					  DllHandle[i],
+ 					  &mi,
+ 					  sizeof (mi)))
+-	error (_("Can't get module info"));
++	error ("Can't get module info");
+ 
+       len = (*psapi_GetModuleFileNameExA) (current_process_handle,
+ 					   DllHandle[i],
+ 					   dll_name_ret,
+ 					   MAX_PATH);
+       if (len == 0)
+-	error (_("Error getting dll name: %u."), (unsigned) GetLastError ());
++	error ("Error getting dll name: %u\n", (unsigned) GetLastError ());
+ 
+       if ((DWORD) (mi.lpBaseOfDll) == BaseAddress)
+ 	return 1;
+@@ -525,6 +596,30 @@
+   return 0;
+ }
+ 
++int
++psapi_get_module_filename (HANDLE hProcess,
++                           HMODULE hModule,
++                           LPTSTR lpFilename,
++                           DWORD nSize)
++{
++  DWORD len;
++
++  if (!load_psapi ())
++    goto failed;
++
++  len = (*psapi_GetModuleFileNameExA) (hProcess,
++                                       hModule,
++                                       lpFilename,
++                                       nSize);
++  if (len == 0)
++    error ("Error getting file name: %u\n", (unsigned) GetLastError ());
++
++failed:
++  lpFilename[0] = '\0';
++  return 0;
++}
++
++
+ /* Encapsulate the information required in a call to
+    symbol_file_add_args */
+ struct safe_symbol_file_add_args
+@@ -753,7 +848,13 @@
+   so = XZALLOC (struct so_list);
+   so->lm_info = (struct lm_info *) xmalloc (sizeof (struct lm_info));
+   so->lm_info->load_addr = load_addr;
++
++#ifdef __CYGWIN__
+   cygwin_conv_to_posix_path (buf, so->so_name);
++#else
++  strcpy( so->so_name, buf);
++#endif
++
+   strcpy (so->so_original_name, so->so_name);
+ 
+   solib_end->next = so;
+@@ -1734,6 +1835,7 @@
+ 
+   if (!ok)
+     {
++#ifdef __CYGWIN__
+       /* Try fall back to Cygwin pid */
+       pid = cygwin_internal (CW_CYGWIN_PID_TO_WINPID, pid);
+ 
+@@ -1741,6 +1843,7 @@
+ 	ok = DebugActiveProcess (pid);
+ 
+       if (!ok)
++#endif /* __CYGWIN__ */
+ 	error (_("Can't attach to process."));
+     }
+ 
+@@ -1800,13 +1903,14 @@
+ static char *
+ win32_pid_to_exec_file (int pid)
+ {
++  static char path[MAX_PATH + 1];
++  char *path_ptr = NULL;
++#ifdef __CYGWIN__
+   /* Try to find the process path using the Cygwin internal process list
+      pid isn't a valid pid, unfortunately.  Use current_event.dwProcessId
+      instead.  */
+   /* TODO: Also find native Windows processes using CW_GETPINFO_FULL.  */
+ 
+-  static char path[MAX_PATH + 1];
+-  char *path_ptr = NULL;
+   int cpid;
+   struct external_pinfo *pinfo;
+ 
+@@ -1824,6 +1928,13 @@
+        }
+     }
+   cygwin_internal (CW_UNLOCK_PINFO);
++#else
++  if (!psapi_get_module_filename (current_process_handle, NULL, path, MAX_PATH))
++    printf_unfiltered ("error reading the process's file name: %lu",
++                       GetLastError ());
++  else
++    path_ptr = path;
++#endif
+   return path_ptr;
+ }
+ 
+@@ -1873,8 +1984,16 @@
+   char *toexec;
+   char shell[MAX_PATH + 1]; /* Path to shell */
+   const char *sh;
++#if defined (__MINGW32__)
++  /* BEGIN: Fragment of Al Stevens's patch for GDB on Win9x */
++  HANDLE hStdInput = 0;
++  HANDLE hStdOutput = 0;
++  HANDLE hStdError = 0;
++  /* END: Fragment of Al Stevens's patch for GDB on Win9x */
++#else /* !__MINGW32__ */
+   int tty;
+   int ostdin, ostdout, ostderr;
++#endif /* !__MINGW32__ */
+   const char *inferior_io_terminal = get_inferior_io_terminal ();
+ 
+   if (!exec_file)
+@@ -1886,7 +2005,12 @@
+   if (!useshell)
+     {
+       flags = DEBUG_ONLY_THIS_PROCESS;
++#ifdef __CYGWIN__
+       cygwin_conv_to_win32_path (exec_file, real_path);
++#else
++      strcpy (real_path, exec_file);
++#endif
++
+       toexec = real_path;
+     }
+   else
+@@ -1895,7 +2019,11 @@
+       sh = getenv ("SHELL");
+       if (!sh)
+ 	sh = "/bin/sh";
++#ifdef __CYGWIN__
+       cygwin_conv_to_win32_path (sh, shell);
++#else
++      strcpy (shell, sh);
++#endif
+       newallargs = alloca (sizeof (" -c 'exec  '") + strlen (exec_file)
+ 			   + strlen (allargs) + 2);
+       sprintf (newallargs, " -c 'exec %s %s'", exec_file, allargs);
+@@ -1946,10 +2074,12 @@
+ 	    len = strlen (conv_path_names[j]);
+ 	    if (strncmp (conv_path_names[j], in_env[i], len) == 0)
+ 	      {
+-		if (cygwin_posix_path_list_p (in_env[i] + len))
++#ifdef __CYGWIN__
++		if (cygwin_posix_path_list_p (env[i] + len))
+ 		  envlen += len
+-		    + cygwin_posix_to_win32_path_list_buf_size (in_env[i] + len);
++		    + cygwin_posix_to_win32_path_list_buf_size (env[i] + len);
+ 		else
++#endif
+ 		  envlen += strlen (in_env[i]) + 1;
+ 		break;
+ 	      }
+@@ -1976,12 +2106,14 @@
+ 	    len = strlen (conv_path_names[j]);
+ 	    if (strncmp (conv_path_names[j], env[i], len) == 0)
+ 	      {
++#ifdef __CYGWIN__
+ 		if (cygwin_posix_path_list_p (env[i] + len))
+ 		  {
+ 		    memcpy (temp, env[i], len);
+ 		    cygwin_posix_to_win32_path_list (env[i] + len, temp + len);
+ 		  }
+ 		else
++#endif
+ 		  strcpy (temp, env[i]);
+ 		break;
+ 	      }
+@@ -1996,6 +2128,20 @@
+     *temp = 0;
+   }
+ 
++#if defined (__MINGW32__)
++  /* BEGIN: Fragment of Al Stevens's patch for GDB on Win9x */
++  if ( new_console)
++    {
++      hStdInput = GetStdHandle( STD_INPUT_HANDLE);
++      hStdOutput = GetStdHandle( STD_OUTPUT_HANDLE);
++      hStdError = GetStdHandle( STD_ERROR_HANDLE);
++
++      SetStdHandle( STD_INPUT_HANDLE, INVALID_HANDLE_VALUE);
++      SetStdHandle( STD_OUTPUT_HANDLE, INVALID_HANDLE_VALUE);
++      SetStdHandle( STD_ERROR_HANDLE, INVALID_HANDLE_VALUE);
++    }
++  /* END: Fragment of Al Stevens's patch for GDB on Win9x */
++#else /* !__MINGW32__ */
+   if (!inferior_io_terminal)
+     tty = ostdin = ostdout = ostderr = -1;
+   else
+@@ -2016,6 +2162,7 @@
+ 	  dup2 (tty, 2);
+ 	}
+     }
++#endif /* !__MINGW32__ */
+ 
+   win32_init_thread_list ();
+   ret = CreateProcess (0,
+@@ -2028,6 +2175,16 @@
+ 		       NULL,	/* current directory */
+ 		       &si,
+ 		       &pi);
++#if defined (__MINGW32__)
++  /* BEGIN: Fragment of Al Stevens's patch for GDB on Win9x */
++  if ( new_console)
++    {
++      SetStdHandle( STD_INPUT_HANDLE, hStdInput);
++      SetStdHandle( STD_OUTPUT_HANDLE, hStdOutput);
++      SetStdHandle( STD_ERROR_HANDLE, hStdError);
++    }
++  /* END: Fragment of Al Stevens's patch for GDB on Win9x */
++#else /* !__MINGW32__ */
+   if (tty >= 0)
+     {
+       close (tty);
+@@ -2038,6 +2195,7 @@
+       close (ostdout);
+       close (ostderr);
+     }
++#endif /* !__MINGW32__ */
+ 
+   if (!ret)
+     error (_("Error creating process %s, (error %d)."),
+diff -Nbaur insight-6.6/tcl/win/tclWin32Dll.c insight-6.6-mingw/tcl/win/tclWin32Dll.c
+--- tcl/win/tclWin32Dll.c	Fri Feb  9 03:55:41 2007
++++ tcl/win/tclWin32Dll.c	Thu Jun  7 00:50:35 2007
+@@ -12,6 +12,10 @@
+  * RCS: @(#) $Id: tclWin32Dll.c,v 1.16 2002/06/13 09:40:01 vincentdarley Exp $
+  */
+ 
++/* The following is a workaround for a w32api problem.
++   See http://sources.redhat.com/ml/insight/2004-q4/msg00039.html */
++#define __INSIDE_CYGWIN__
++
+ #include "tclWinInt.h"
+ #ifdef __CYGWIN__
+ #include <sys/cygwin.h>
+@@ -41,8 +45,25 @@
+ static int platformId;		/* Running under NT, or 95/98? */
+ 
+ #ifdef HAVE_NO_SEH
+-static void *ESP;
+-static void *EBP;
++/*
++ * Unlike Borland and Microsoft, we don't register exception handlers by
++ * pushing registration records onto the runtime stack. Instead, we register
++ * them by creating an EXCEPTION_REGISTRATION within the activation record.
++ */
++
++typedef struct EXCEPTION_REGISTRATION {
++    struct EXCEPTION_REGISTRATION *link;
++    EXCEPTION_DISPOSITION (*handler)(
++	    struct _EXCEPTION_RECORD*, void*, struct _CONTEXT*, void*);
++    void *ebp;
++    void *esp;
++    int status;
++} EXCEPTION_REGISTRATION;
++#endif
++
++#ifdef HAVE_NO_SEH
++static void *ESP __attribute__ ((used));
++static void *EBP __attribute__ ((used));
+ #endif /* HAVE_NO_SEH */
+ 
+ /*
+@@ -358,51 +379,113 @@
+ int
+ TclpCheckStackSpace()
+ {
++
++#ifdef HAVE_NO_SEH
++    EXCEPTION_REGISTRATION registration;
++#endif
+     int retval = 0;
+ 
+     /*
+-     * We can recurse only if there is at least TCL_WIN_STACK_THRESHOLD
+-     * bytes of stack space left.  alloca() is cheap on windows; basically
+-     * it just subtracts from the stack pointer causing the OS to throw an
+-     * exception if the stack pointer is set below the bottom of the stack.
++     * We can recurse only if there is at least TCL_WIN_STACK_THRESHOLD bytes
++     * of stack space left. alloca() is cheap on windows; basically it just
++     * subtracts from the stack pointer causing the OS to throw an exception
++     * if the stack pointer is set below the bottom of the stack.
+      */
+ 
+ #ifdef HAVE_NO_SEH
+     __asm__ __volatile__ (
+-            "movl  %esp, _ESP" "\n\t"
+-            "movl  %ebp, _EBP");
+ 
++	/*
++	 * Construct an EXCEPTION_REGISTRATION to protect the call to __alloca
++	 */
++
++	"leal	%[registration], %%edx"		"\n\t"
++	"movl	%%fs:0,		%%eax"		"\n\t"
++	"movl	%%eax,		0x0(%%edx)"	"\n\t" /* link */
++	"leal	1f,		%%eax"		"\n\t"
++	"movl	%%eax,		0x4(%%edx)"	"\n\t" /* handler */
++	"movl	%%ebp,		0x8(%%edx)"	"\n\t" /* ebp */
++	"movl	%%esp,		0xc(%%edx)"	"\n\t" /* esp */
++	"movl	%[error],	0x10(%%edx)"	"\n\t" /* status */
++
++	/*
++	 * Link the EXCEPTION_REGISTRATION on the chain
++	 */
++
++	"movl	%%edx,		%%fs:0"		"\n\t"
++
++	/*
++	 * Attempt a call to __alloca, to determine whether there's sufficient
++	 * memory to be had.
++	 */
++
++	"movl	%[size],	%%eax"		"\n\t"
++	"pushl	%%eax"				"\n\t"
++	"call	__alloca"			"\n\t"
++
++	/*
++	 * Come here on a normal exit. Recover the EXCEPTION_REGISTRATION and
++	 * store a TCL_OK status
++	 */
++
++	"movl	%%fs:0,		%%edx"		"\n\t"
++	"movl	%[ok],		%%eax"		"\n\t"
++	"movl	%%eax,		0x10(%%edx)"	"\n\t"
++	"jmp	2f"				"\n"
++
++	/*
++	 * Come here on an exception. Get the EXCEPTION_REGISTRATION that we
++	 * previously put on the chain.
++	 */
++
++	"1:"					"\t"
++	"movl	%%fs:0,		%%edx"		"\n\t"
++	"movl	0x8(%%edx),	%%edx"		"\n\t"
++
++	/*
++	 * Come here however we exited. Restore context from the
++	 * EXCEPTION_REGISTRATION in case the stack is unbalanced.
++	 */
++
++	"2:"					"\t"
++	"movl	0xc(%%edx),	%%esp"		"\n\t"
++	"movl	0x8(%%edx),	%%ebp"		"\n\t"
++	"movl	0x0(%%edx),	%%eax"		"\n\t"
++	"movl	%%eax,		%%fs:0"		"\n\t"
++
++	:
++	/* No outputs */
++	:
++	[registration]	"m"	(registration),
++	[ok]		"i"	(TCL_OK),
++	[error]		"i"	(TCL_ERROR),
++	[size]		"i"	(TCL_WIN_STACK_THRESHOLD)
++	:
++	"%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi", "memory"
++	);
++    retval = (registration.status == TCL_OK);
++
++#else /* !HAVE_NO_SEH */
++    __try {
++#ifdef HAVE_ALLOCA_GCC_INLINE
+     __asm__ __volatile__ (
+-            "pushl $__except_checkstackspace_handler" "\n\t"
+-            "pushl %fs:0" "\n\t"
+-            "mov   %esp, %fs:0");
++	    "movl  %0, %%eax" "\n\t"
++	    "call  __alloca" "\n\t"
++	    :
++	    : "i"(TCL_WIN_STACK_THRESHOLD)
++	    : "%eax");
+ #else
+-    __try {
+-#endif /* HAVE_NO_SEH */
+ 	alloca(TCL_WIN_STACK_THRESHOLD);
++#endif /* HAVE_ALLOCA_GCC_INLINE */
+ 	retval = 1;
+-#ifdef HAVE_NO_SEH
+-    __asm__ __volatile__ (
+-            "jmp   checkstackspace_pop" "\n"
+-            "checkstackspace_reentry:" "\n\t"
+-            "movl  _ESP, %esp" "\n\t"
+-            "movl  _EBP, %ebp");
+-
+-    __asm__ __volatile__ (
+-            "checkstackspace_pop:" "\n\t"
+-            "mov   (%esp), %eax" "\n\t"
+-            "mov   %eax, %fs:0" "\n\t"
+-            "add   $8, %esp");
+-#else
+     } __except (EXCEPTION_EXECUTE_HANDLER) {}
+ #endif /* HAVE_NO_SEH */
+ 
+-    /*
+-     * Avoid using control flow statements in the SEH guarded block!
+-     */
+     return retval;
+ }
++
+ #ifdef HAVE_NO_SEH
++/*
+ static
+ __attribute__ ((cdecl,used))
+ EXCEPTION_DISPOSITION
+@@ -414,8 +497,9 @@
+ {
+     __asm__ __volatile__ (
+             "jmp checkstackspace_reentry");
+-    return 0; /* Function does not return */
+-}
++*/
++//    return 0; /* Function does not return */
++//}
+ #endif /* HAVE_NO_SEH */
+ 
+ /*

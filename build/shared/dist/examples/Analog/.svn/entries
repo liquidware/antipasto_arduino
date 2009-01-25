@@ -1,0 +1,40 @@
+9
+
+dir
+537
+svn://svn.berlios.de/arduino/trunk/build/shared/dist/examples/Analog
+svn://svn.berlios.de/arduino
+
+
+
+2008-11-01T18:03:07.253654Z
+521
+mellis
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+fdd99716-2cf5-0310-8ea1-e7fa11872f6a
+
+AnalogInput
+dir
+
+Calibration
+dir
+
+Smoothing
+dir
+
+Fading
+dir
+

@@ -1,0 +1,9 @@
+<cp-and-translate
+   dest="reference.zip"
+   name=".svn/text-base/reference.zip.svn-base"/>
+<modify-entry
+   name="reference.zip"
+   text-time="working"/>
+<modify-entry
+   name="reference.zip"
+   working-size="working"/>
