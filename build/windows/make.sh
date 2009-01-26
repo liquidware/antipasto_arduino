@@ -98,8 +98,6 @@ zip -0rq ../lib/pde.jar .
 # back to build/windows
 cd ../..
 
-
-
-echo
+echo 
 echo Done.
 

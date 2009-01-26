@@ -1,6 +1,6 @@
 #!/bin/sh
 
-REVISION=`head -c 4 ../../todo.txt`
+REVISION=`head -c 5 ../../todo.txt`
 
 # check to see if the version number in the app is correct
 # so that mikkel doesn't kick my ass
@@ -103,26 +103,34 @@ find arduino -name ".svn" -exec rm -rf {} ';' 2> /dev/null
 # zip it all up for release
 echo Packaging standard release...
 echo
-P5=arduino-$REVISION
-mv arduino $P5
-zip -rq $P5.zip $P5
+#P5=arduino-$REVISION
+#mv arduino $P5
+#zip -rq $P5.zip $P5
 # nah, keep the new directory around
 #rm -rf $P5
 
+#package the build
+PACKAGER="AdvancedInstaller.com"   #the packager
+rm -rf Arduino-*                   #clean
+mv arduino Arduino                 #uppercase, we're growing up :-)
+cp Arduino.aip Arduino-$REVISION.aip
+./packager/$PACKAGER /edit Arduino-$REVISION.aip /AddFolder ProgramFilesFolder Arduino
+./packager/$PACKAGER /edit Arduino-$REVISION.aip /SetVersion $REVISION
+./packager/$PACKAGER /build Arduino-$REVISION.aip
 # zip up another for experts
-echo Packaging expert release...
-echo
+#echo Packaging expert release...
+#echo
 
-cp -a $P5 $P5-expert
+#cp -a $P5 $P5-expert
 
 # can't use the run.bat that's tied to a local jre
-rm $P5-expert/run.bat
-cp dist/run-expert.bat $P5-expert/run.bat
-chmod +x $P5-expert/run.bat
+#rm $P5-expert/run.bat
+#cp dist/run-expert.bat $P5-expert/run.bat
+#chmod +x $P5-expert/run.bat
 
 # remove enormous java runtime
-rm -rf $P5-expert/java
-zip -rq $P5-expert.zip $P5-expert
+#rm -rf $P5-expert/java
+#zip -rq $P5-expert.zip $P5-expert
 
 echo Done.
 
