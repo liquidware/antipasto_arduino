@@ -1,43 +1,0 @@
-9
-
-dir
-537
-svn://svn.berlios.de/arduino/trunk/build/shared/dist/examples/Communication
-svn://svn.berlios.de/arduino
-
-
-
-2007-06-20T21:58:14.662236Z
-270
-mellis
-
-
-svn:special svn:externals svn:needs-lock
-
-
-
-
-
-
-
-
-
-
-
-fdd99716-2cf5-0310-8ea1-e7fa11872f6a
-
-ASCIITable
-dir
-
-Graph
-dir
-
-VirtualColorMixer
-dir
-
-Dimmer
-dir
-
-PhysicalPixel
-dir
-

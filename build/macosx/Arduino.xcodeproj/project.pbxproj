@@ -138,8 +138,6 @@
 /* Begin PBXBuildFile section */
 		33055EFF0CB8187700824CD9 /* SerialException.java in Sources */ = {isa = PBXBuildFile; fileRef = 33055EFE0CB8187600824CD9 /* SerialException.java */; };
 		332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
-		335A28F50C8CCB0A00D8A7F4 /* quaqua.jar in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 335A28F30C8CCAF700D8A7F4 /* quaqua.jar */; };
-		335A28FE0C8CCB4000D8A7F4 /* libquaqua.jnilib in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */; };
 		335A29140C8CCC0900D8A7F4 /* PApplet.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29070C8CCC0900D8A7F4 /* PApplet.java */; };
 		335A29150C8CCC0900D8A7F4 /* PConstants.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29080C8CCC0900D8A7F4 /* PConstants.java */; };
 		335A29160C8CCC0900D8A7F4 /* PFont.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29090C8CCC0900D8A7F4 /* PFont.java */; };
@@ -230,6 +228,18 @@
 		33FF07310965C1E30016AC38 /* tab-unsel-menu.gif in Resources */ = {isa = PBXBuildFile; fileRef = 33FF02860965BD160016AC38 /* tab-unsel-menu.gif */; };
 		33FF07320965C1E30016AC38 /* tab-unsel-mid.gif in Resources */ = {isa = PBXBuildFile; fileRef = 33FF02870965BD160016AC38 /* tab-unsel-mid.gif */; };
 		33FF07330965C1E30016AC38 /* tab-unsel-right.gif in Resources */ = {isa = PBXBuildFile; fileRef = 33FF02880965BD160016AC38 /* tab-unsel-right.gif */; };
+		3A1221F00F2D91F900F72906 /* RXTXcomm.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620F0965D67A00B514A9 /* RXTXcomm.jar */; };
+		3A1221F10F2D920700F72906 /* mrj.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620C0965D67900B514A9 /* mrj.jar */; };
+		3A1221F20F2D920700F72906 /* oro.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; };
+		3A1221F30F2D920700F72906 /* quaqua.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AE93F3A0F2D793E00B94BD9 /* quaqua.jar */; };
+		3A1221F40F2D920700F72906 /* registry.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; };
+		3A1221F70F2D921200F72906 /* antlr.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; };
+		3AE93F3C0F2D793E00B94BD9 /* arduino.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F340F2D793E00B94BD9 /* arduino.icns */; };
+		3AE93F3D0F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F360F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg */; };
+		3AE93F3E0F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F370F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */; };
+		3AE93F3F0F2D793E00B94BD9 /* libquaqua.jnilib in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F380F2D793E00B94BD9 /* libquaqua.jnilib */; };
+		3AE93F400F2D793E00B94BD9 /* librxtxSerial.jnilib in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F390F2D793E00B94BD9 /* librxtxSerial.jnilib */; };
+		3AE93F410F2D793E00B94BD9 /* quaqua.jar in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F3A0F2D793E00B94BD9 /* quaqua.jar */; };
 		A337296F0D22505C00E82412 /* librxtxSerial.jnilib in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = A33729630D224FA700E82412 /* librxtxSerial.jnilib */; };
 		A3688DF40D284554003CBAA1 /* applet.html in Resources */ = {isa = PBXBuildFile; fileRef = 33AF620B0965D67900B514A9 /* applet.html */; };
 /* End PBXBuildFile section */
@@ -278,14 +288,14 @@
 			dstPath = "";
 			dstSubfolderSpec = 15;
 			files = (
-				335A28F50C8CCB0A00D8A7F4 /* quaqua.jar in Copy Java Resources */,
+				A337296F0D22505C00E82412 /* librxtxSerial.jnilib in Copy Java Resources */,
+				3AE93F3F0F2D793E00B94BD9 /* libquaqua.jnilib in Copy Java Resources */,
+				3AE93F410F2D793E00B94BD9 /* quaqua.jar in Copy Java Resources */,
 				33CF03CC09662DC000F2C9A9 /* mrj.jar in Copy Java Resources */,
 				33CF03CD09662DC000F2C9A9 /* RXTXcomm.jar in Copy Java Resources */,
 				33CF03CE09662DC000F2C9A9 /* antlr.jar in Copy Java Resources */,
 				33CF03CF09662DC000F2C9A9 /* registry.jar in Copy Java Resources */,
 				33CF03D009662DC000F2C9A9 /* oro.jar in Copy Java Resources */,
-				335A28FE0C8CCB4000D8A7F4 /* libquaqua.jnilib in Copy Java Resources */,
-				A337296F0D22505C00E82412 /* librxtxSerial.jnilib in Copy Java Resources */,
 			);
 			name = "Copy Java Resources";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,12 +349,12 @@
 		3378B75F0D82FDE900FE72F7 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_2_9_Intel.dmg; sourceTree = "<group>"; };
 		337CD3F309EFC183002B890C /* fetch.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
 		3383BF8B0CB7C71200A8FB57 /* hardware */ = {isa = PBXFileReference; lastKnownFileType = folder; name = hardware; path = ../../hardware; sourceTree = SOURCE_ROOT; };
-		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = antlr.jar; sourceTree = "<group>"; };
+		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; explicitFileType = archive.jar; name = antlr.jar; path = ../../../shared/lib/antlr.jar; sourceTree = BUILT_PRODUCTS_DIR; };
 		33AF620B0965D67900B514A9 /* applet.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = applet.html; sourceTree = "<group>"; };
-		33AF620C0965D67900B514A9 /* mrj.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = mrj.jar; sourceTree = "<group>"; };
-		33AF620D0965D67900B514A9 /* oro.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = oro.jar; sourceTree = "<group>"; };
-		33AF620E0965D67A00B514A9 /* registry.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = registry.jar; sourceTree = "<group>"; };
-		33AF620F0965D67A00B514A9 /* RXTXcomm.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = RXTXcomm.jar; sourceTree = "<group>"; };
+		33AF620C0965D67900B514A9 /* mrj.jar */ = {isa = PBXFileReference; explicitFileType = archive.jar; name = mrj.jar; path = ../../../shared/lib/mrj.jar; sourceTree = BUILT_PRODUCTS_DIR; };
+		33AF620D0965D67900B514A9 /* oro.jar */ = {isa = PBXFileReference; explicitFileType = archive.jar; name = oro.jar; path = ../../../shared/lib/oro.jar; sourceTree = BUILT_PRODUCTS_DIR; };
+		33AF620E0965D67A00B514A9 /* registry.jar */ = {isa = PBXFileReference; explicitFileType = archive.jar; name = registry.jar; path = ../../../shared/lib/registry.jar; sourceTree = BUILT_PRODUCTS_DIR; };
+		33AF620F0965D67A00B514A9 /* RXTXcomm.jar */ = {isa = PBXFileReference; explicitFileType = archive.jar; name = RXTXcomm.jar; path = ../../../shared/lib/RXTXcomm.jar; sourceTree = BUILT_PRODUCTS_DIR; };
 		33BEDDB009D6DC1300430D5B /* LibraryManager.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = LibraryManager.java; sourceTree = "<group>"; };
 		33BEDDD309D6E8D800430D5B /* Archiver.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Archiver.java; sourceTree = "<group>"; };
 		33BEDDD409D6E8D800430D5B /* ExportFolder.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = ExportFolder.java; sourceTree = "<group>"; };
@@ -418,7 +428,14 @@
 		33FFFE810965BD110016AC38 /* howto.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = howto.txt; sourceTree = "<group>"; };
 		33FFFE930965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		33FFFE940965BD110016AC38 /* Arduino.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Arduino.xcodeproj; sourceTree = "<group>"; };
-		A33729630D224FA700E82412 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
+		3AE93F340F2D793E00B94BD9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = arduino.icns; sourceTree = "<group>"; };
+		3AE93F360F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_9.dmg; sourceTree = "<group>"; };
+		3AE93F370F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_2_9_Intel.dmg; sourceTree = "<group>"; };
+		3AE93F380F2D793E00B94BD9 /* libquaqua.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libquaqua.jnilib; path = ../../dist/libquaqua.jnilib; sourceTree = BUILT_PRODUCTS_DIR; };
+		3AE93F390F2D793E00B94BD9 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
+		3AE93F3A0F2D793E00B94BD9 /* quaqua.jar */ = {isa = PBXFileReference; explicitFileType = archive.jar; name = quaqua.jar; path = ../../dist/quaqua.jar; sourceTree = BUILT_PRODUCTS_DIR; };
+		3AE93F3B0F2D793E00B94BD9 /* tools-universal.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = "tools-universal.zip"; sourceTree = "<group>"; };
+		A33729630D224FA700E82412 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = librxtxSerial.jnilib; path = ../../dist/librxtxSerial.jnilib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -426,6 +443,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A1221F00F2D91F900F72906 /* RXTXcomm.jar in Frameworks */,
+				3A1221F10F2D920700F72906 /* mrj.jar in Frameworks */,
+				3A1221F20F2D920700F72906 /* oro.jar in Frameworks */,
+				3A1221F30F2D920700F72906 /* quaqua.jar in Frameworks */,
+				3A1221F40F2D920700F72906 /* registry.jar in Frameworks */,
+				3A1221F70F2D921200F72906 /* antlr.jar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -525,6 +548,7 @@
 		33FFFD3D0965B1E40016AC38 = {
 			isa = PBXGroup;
 			children = (
+				3AE93F330F2D793E00B94BD9 /* dist */,
 				33CF03B009662CA800F2C9A9 /* arduino.icns */,
 				33FFFE220965BD100016AC38 /* app */,
 				335A29060C8CCC0800D8A7F4 /* core */,
@@ -673,6 +697,28 @@
 			path = drivers;
 			sourceTree = "<group>";
 		};
+		3AE93F330F2D793E00B94BD9 /* dist */ = {
+			isa = PBXGroup;
+			children = (
+				3AE93F340F2D793E00B94BD9 /* arduino.icns */,
+				3AE93F350F2D793E00B94BD9 /* drivers */,
+				3AE93F380F2D793E00B94BD9 /* libquaqua.jnilib */,
+				3AE93F390F2D793E00B94BD9 /* librxtxSerial.jnilib */,
+				3AE93F3A0F2D793E00B94BD9 /* quaqua.jar */,
+				3AE93F3B0F2D793E00B94BD9 /* tools-universal.zip */,
+			);
+			path = dist;
+			sourceTree = "<group>";
+		};
+		3AE93F350F2D793E00B94BD9 /* drivers */ = {
+			isa = PBXGroup;
+			children = (
+				3AE93F360F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg */,
+				3AE93F370F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */,
+			);
+			path = drivers;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXJavaArchiveBuildPhase section */
@@ -731,6 +777,10 @@
 				33FF07310965C1E30016AC38 /* tab-unsel-menu.gif in Resources */,
 				33FF07320965C1E30016AC38 /* tab-unsel-mid.gif in Resources */,
 				33FF07330965C1E30016AC38 /* tab-unsel-right.gif in Resources */,
+				3AE93F3C0F2D793E00B94BD9 /* arduino.icns in Resources */,
+				3AE93F3D0F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg in Resources */,
+				3AE93F3E0F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg in Resources */,
+				3AE93F400F2D793E00B94BD9 /* librxtxSerial.jnilib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -761,7 +811,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd $BUILT_PRODUCTS_DIR/../../\n\nREVISION=`head -1 ../../todo.txt | cut -c 1-4`\nSHORT_REVISION=`head -1 ../../todo.txt | cut -c 3-4`\nVERSIONED=`cat ../../app/Base.java | grep $REVISION`\n\nif [ -z \"$VERSIONED\" ]\nthen\n  echo Fix the revision number in Base.java\n  exit\nfi\n\nrm -rf arduino\nrm -rf arduino-*\n\nmv $BUILT_PRODUCTS_DIR arduino\n\nfind arduino -name \"*~\" -exec rm -f {} ';'\n# need to leave ds store stuff cuz one of those is important\n#find arduino -name \".DS_Store\" -exec rm -f {} ';'\nfind arduino -name \"._*\" -exec rm -f {} ';'\nfind arduino -name \"Thumbs.db\" -exec rm -f {} ';'\n\n# clean out the cvs entries\nfind arduino -name \"CVS\" -exec rm -rf {} ';' 2> /dev/null\nfind arduino -name \".cvsignore\" -exec rm -rf {} ';'\n\n# clean out the svn entries\nfind arduino -name \".svn\" -exec rm -rf {} ';' 2> /dev/null\n\n#mv arduino/Arduino.app/Contents/MacOS/Arduino \"arduino/Arduino.app/Contents/MacOS/Arduino $SHORT_REVISION\"\nmv arduino/Arduino.app \"arduino/Arduino $SHORT_REVISION.app\"\nmv arduino arduino-$REVISION\nzip -r arduino-$REVISION-mac.zip arduino-$REVISION\n";
+			shellScript = "cd $BUILT_PRODUCTS_DIR/../../\n\nREVISIONLW=\"LW\"\nREVISION=`head -1 ../../todo.txt | cut -c 1-4`\nSHORT_REVISION=`head -1 ../../todo.txt | cut -c 3-4`\nVERSIONED=`cat ../../app/Base.java | grep $REVISION`\n\nif [ -z \"$VERSIONED\" ]\nthen\n  echo Fix the revision number in Base.java\n  exit\nfi\n\nrm -rf arduino\nrm -rf arduino-*\nrm -rf ./package/Applications/arduino*    #clear package\n\nmv $BUILT_PRODUCTS_DIR arduino\n\nfind arduino -name \"*~\" -exec rm -f {} ';'\n# need to leave ds store stuff cuz one of those is important\n#find arduino -name \".DS_Store\" -exec rm -f {} ';'\nfind arduino -name \"._*\" -exec rm -f {} ';'\nfind arduino -name \"Thumbs.db\" -exec rm -f {} ';'\n\n# clean out the cvs entries\nfind arduino -name \"CVS\" -exec rm -rf {} ';' 2> /dev/null\nfind arduino -name \".cvsignore\" -exec rm -rf {} ';'\n\n# clean out the svn entries\nfind arduino -name \".svn\" -exec rm -rf {} ';' 2> /dev/null\n\n#mv arduino/Arduino.app/Contents/MacOS/Arduino \"arduino/Arduino.app/Contents/MacOS/Arduino $SHORT_REVISION\"\nmv arduino/Arduino.app \"arduino/Arduino $SHORT_REVISION.app\"\nmv arduino arduino-$REVISION\n#zip -r arduino-$REVISION-mac.zip arduino-$REVISION dont zip anymore\n\n#copy build to package\ncp -RP arduino-${REVISION} package/Applications/arduino-${REVISION}${REVISIONLW}\n\n#remove temp build\nrm -rf arduino\nrm -rf arduino-* \n";
 		};
 		33FF07170965BFFE0016AC38 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -884,11 +934,15 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "";
-				JAVA_CLASS_SEARCH_PATHS = "../shared/lib/registry.jar ../shared/lib/antlr.jar ../shared/lib/mrj.jar ../shared/lib/RXTXcomm.jar ../shared/lib/oro.jar";
+				JAVA_CLASS_SEARCH_PATHS = "../Shared/lib/registry.jar ../Shared/lib/antlr.jar ../Shared/lib/mrj.jar ../Shared/lib/RXTXcomm.jar ../Shared/lib/oro.jar";
 				JAVA_COMPILER_SOURCE_VERSION = 1.4;
 				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_ONLY = YES;
 				JAVA_SOURCE_SUBDIR = .;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/dist",
+				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";

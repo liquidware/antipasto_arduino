@@ -1,46 +1,0 @@
-9
-
-dir
-537
-svn://svn.berlios.de/arduino/trunk/hardware/libraries/Firmata/examples
-svn://svn.berlios.de/arduino
-
-
-
-2008-09-16T17:18:41.775665Z
-505
-eighthave
-
-
-svn:special svn:externals svn:needs-lock
-
-
-
-
-
-
-
-
-
-
-
-fdd99716-2cf5-0310-8ea1-e7fa11872f6a
-
-SimpleAnalogFirmata
-dir
-
-ServoFirmata
-dir
-
-StandardFirmata
-dir
-
-AnalogFirmata
-dir
-
-EchoString
-dir
-
-SimpleDigitalFirmata
-dir
-

@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: pins_arduino.c 522 2008-11-01 22:06:13Z mellis $
+  $Id: pins_arduino.c 254 2007-04-20 23:17:38Z mellis $
 */
 
 #include <avr/io.h>
@@ -134,28 +134,28 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
 	// on the ATmega168, digital pin 3 has hardware pwm
-#if defined(__AVR_ATmega8__)
-	NOT_ON_TIMER,
-#else
+#if defined(__AVR_ATmega168__)
 	TIMER2B,
+#else
+	NOT_ON_TIMER,
 #endif
 	NOT_ON_TIMER,
 	// on the ATmega168, digital pins 5 and 6 have hardware pwm
-#if defined(__AVR_ATmega8__)
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
-#else
+#if defined(__AVR_ATmega168__)
 	TIMER0B,
 	TIMER0A,
+#else
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
 #endif
 	NOT_ON_TIMER,
 	NOT_ON_TIMER, /* 8 - port B */
 	TIMER1A,
 	TIMER1B,
-#if defined(__AVR_ATmega8__)
-	TIMER2,
-#else
+#if defined(__AVR_ATmega168__)
 	TIMER2A,
+#else
+	TIMER2,
 #endif
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,

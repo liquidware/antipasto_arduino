@@ -1,40 +1,0 @@
-9
-
-dir
-537
-svn://svn.berlios.de/arduino/trunk/build/shared/dist/examples/Sensors
-svn://svn.berlios.de/arduino
-
-
-
-2008-11-08T21:58:24.455744Z
-528
-mellis
-
-
-svn:special svn:externals svn:needs-lock
-
-
-
-
-
-
-
-
-
-
-
-fdd99716-2cf5-0310-8ea1-e7fa11872f6a
-
-Knock
-dir
-
-Memsic2125
-dir
-
-ADXL3xx
-dir
-
-Ping
-dir
-

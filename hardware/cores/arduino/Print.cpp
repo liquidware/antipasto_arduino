@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
-#include <math.h>
 #include "wiring.h"
 
 #include "Print.h"
@@ -79,11 +78,6 @@ void Print::print(long n, int base)
     printNumber(n, base);
 }
 
-void Print::print(double n)
-{
-  printFloat(n*100, 2);
-}
-
 void Print::println(void)
 {
   print('\r');
@@ -138,12 +132,6 @@ void Print::println(long n, int base)
   println();
 }
 
-void Print::println(double n)
-{
-  print(n);
-  println();
-}
-
 // Private Methods /////////////////////////////////////////////////////////////
 
 void Print::printNumber(unsigned long n, uint8_t base)
@@ -166,21 +154,3 @@ void Print::printNumber(unsigned long n, uint8_t base)
       '0' + buf[i - 1] :
       'A' + buf[i - 1] - 10));
 }
-
-void Print::printFloat(double number, uint8_t scale) 
-{ 
-  double mult = pow(10,scale); 
-  double rounded = floor(number /mult); 
-  double biground = rounded * mult; 
-  double remainder = (number - biground);  
-  remainder = remainder / mult; 
-  print(long(rounded)); 
-  print("."); 
-
-  while (scale--) {  
-    double toPrint = floor(remainder * 10); 
-    print(int(toPrint)); 
-    remainder -= (toPrint/10); 
-    remainder *= 10; 
-  } 
-} 

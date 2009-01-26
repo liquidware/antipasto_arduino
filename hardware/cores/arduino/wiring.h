@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.h 534 2008-11-26 14:14:59Z mellis $
+  $Id: wiring.h 387 2008-03-08 21:30:00Z mellis $
 */
 
 #ifndef Wiring_h
@@ -66,6 +66,13 @@ extern "C"{
 #undef abs
 #endif
 
+#define int(x)     ((int)(x))
+#define char(x)    ((char)(x))
+#define long(x)    ((long)(x))
+#define byte(x)    ((uint8_t)(x))
+#define float(x)   ((float)(x))
+#define boolean(x) ((uint8_t)((x)==0?0:1))
+
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
 #define abs(x) ((x)>0?(x):-(x))
@@ -81,18 +88,6 @@ extern "C"{
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
 #define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
-
-#define lowByte(w) ((w) & 0xff)
-#define highByte(w) ((w) >> 8)
-
-#define bitRead(value, bit) (((value) >> (bit)) & 0x01)
-#define bitSet(value, bit) ((value) |= (1UL << (bit)))
-#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
-#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
-
-typedef unsigned int word;
-
-#define bit(b) (1 << (b))
 
 typedef uint8_t boolean;
 typedef uint8_t byte;
@@ -111,9 +106,17 @@ void serialWrite(unsigned char);
 int serialAvailable(void);
 int serialRead(void);
 void serialFlush(void);
+void printMode(int);
+void printByte(unsigned char c);
+void printNewline(void);
+void printString(const char *s);
+void printInteger(long n);
+void printHex(unsigned long n);
+void printOctal(unsigned long n);
+void printBinary(unsigned long n);
+void printIntegerInBase(unsigned long n, unsigned long base);
 
 unsigned long millis(void);
-unsigned long micros(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
