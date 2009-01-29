@@ -80,24 +80,27 @@ cd ../..
 
 ### -- BUILD PDE ------------------------------------------------
 
-cd app
+cd processing/app
 
-CLASSPATH="..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\build\\windows\\work\\lib\\mrj.jar;..\\build\\windows\\work\\lib\antlr.jar;..\\build\\windows\\work\\lib\\oro.jar;..\\build\\windows\\work\\lib\\registry.jar;..\\build\\windows\\work\\java\\lib\\rt.jar"
+CLASSPATH="..\\..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\..\\build\\windows\\work\\lib\\mrj.jar;..\\..\\build\\windows\\work\\lib\antlr.jar;..\\..\\build\\windows\\work\\lib\\oro.jar;..\\..\\build\\windows\\work\\lib\\registry.jar;..\\..\\build\\windows\\work\\java\\lib\\rt.jar"
 
 # compile the code as java 1.3, so that the application will run and
 # show the user an error, rather than crapping out with some strange
 # "class not found" crap
 # need to do this twice because otherwise dependencies aren't resolved right.
-../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes ../core/*.java preproc/*.java syntax/*.java tools/*.java *.java
-../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes ../core/*.java preproc/*.java syntax/*.java tools/*.java *.java
+../../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\..\\build\\windows\\work\\classes" -d ..\\..\\build\\windows\\work\\classes ../../core/*.java preproc/*.java syntax/*.java tools/*.java *.java ../../antipasto/Util/*.java ../../antipasto/*.java ../../antipasto/Interfaces/*.java  ../../antipasto/GUI/GadgetListView/*.java ../../antipasto/GUI/GadgetListView/GadgetPanelEvents/*.java ../../antipasto/GUI/GadgetListView/AddGadgetActions/*.java ../../antipasto/ModuleRules/*.java ../../antipasto/GUI/ImageListView/*.java
+#../../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\..\\build\\windows\\work\\classes" -d ..\\..\\build\\windows\\work\\classes ../../core/*.java preproc/*.java syntax/*.java tools/*.java *.java ../../antipasto/Util/*.java ../../antipasto/*.java ../../antipasto/Interfaces/*.java  ../../antipasto/GUI/GadgetListView/*.java ../../antipasto/GUI/GadgetListView/GadgetPanelEvents/*.java ../../antipasto/GUI/GadgetListView/AddGadgetActions/*.java ../../antipasto/ModuleRules/*.java ../../antipasto/GUI/ImageListView/*.java
+#../../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\..\\build\\windows\\work\\classes" -d ..\\..\\build\\windows\\work\\classes ../../core/*.java preproc/*.java syntax/*.java tools/*.java *.java
 
-cd ../build/windows/work/classes
+cd ../../build/windows/work/classes
 rm -f ../lib/pde.jar
 zip -0rq ../lib/pde.jar .
 
 # back to build/windows
 cd ../..
 
-echo 
+
+
+echo
 echo Done.
 
