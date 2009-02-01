@@ -66,7 +66,7 @@ public class Editor extends JFrame
              MRJOpenDocumentHandler, IActiveGadgetChangedEventListener //, MRJOpenApplicationHandler
 {
   // yeah
-  static final String WINDOW_TITLE = "Arduino" + " - " + Base.VERSION_NAME;
+  static final String WINDOW_TITLE = "Antipasto Arduino";
 
   // p5 icon for the window
   Image icon;
@@ -1247,7 +1247,7 @@ public class Editor extends JFrame
 
           g.setFont(new Font("SansSerif", Font.PLAIN, 11));
           g.setColor(Color.white);
-          g.drawString(Base.VERSION_NAME, 50, 30);
+          g.drawString(Base.DIST_NAME + " v" + Base.VERSION_NAME, 50, 30);
         }
       };
     window.addMouseListener(new MouseAdapter() {
