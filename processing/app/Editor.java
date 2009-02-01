@@ -106,6 +106,7 @@ public class Editor extends JFrame
   public Sketch sketch;
 
   EditorLineStatus lineStatus;
+  String curBoard;
 
   public JEditTextArea textarea;
   EditorListener listener;
@@ -812,6 +813,7 @@ public class Editor extends JFrame
       String board = (String) i.next();
       Action action = new BoardMenuAction(board);
       item = new JRadioButtonMenuItem(action);
+      String selectedBoard = Preferences.get("board");
       if (board.equals(Preferences.get("board")))
         item.setSelected(true);
       boardGroup.add(item);
@@ -1468,31 +1470,15 @@ public class Editor extends JFrame
 	              if(gadgetPanel != null){
 	                if(gadgetPanel.getActiveModule() != null){
 	                    IGadget book = gadgetPanel.getActiveGadget();
-
-	                    System.out.println("Sketch book loaded");
-
-	                    IModule[] gadgets = book.getModules();
-	                    System.out.println("Get number of gadgets: " + gadgets.length);
-	  	                IModule gadget = gadgetPanel.getActiveModule();
-	                    System.out.println("Attempting to load gadget and boards file");
-	                    File boardsFile = gadget.getBoardsFile();
-	                    File sketchFile = gadget.getSketchFile();
-	                    System.out.println("Creating new sketch");
-	                    Sketch currentSketch = new Sketch(new Editor(), sketchFile.getPath());
-
-	                    File backUp = backUpBoardsFile();
-	                    File ourBoards = writeBoardsToStandardLocation(boardsFile);
 	                    
-
-	                    gadget.copyCoreToDirectory(System.getProperty("user.dir") + File.separator + "hardware" +
-	                    File.separator + "cores");
-
-	                    System.out.println(System.getProperty("user.dir") + File.separator + "hardware" +
-	                     File.separator + "cores");
+	                    IModule[] gadgets = book.getModules();
+	                    IModule gadget = gadgetPanel.getActiveModule();
+	                    File sketchFile = gadget.getSketchFile();
+	                    Sketch currentSketch = new Sketch(new Editor(), sketchFile.getPath());
 
 	                    String target = gadget.getTarget();
 
-	                    Preferences.set("board", target);
+	                    
 	                    System.out.println("Running file with target : " + target);
 	                    String boardName = Preferences.get("board");
 	                    System.out.println(boardName);
@@ -1921,6 +1907,7 @@ public class Editor extends JFrame
       String pdeName = parentName + ".pde";
       File altFile = new File(file.getParent(), pdeName);
 
+      boolean isGadgetFile = false;
       //System.out.println("path = " + file.getParent());
       //System.out.println("name = " + file.getName());
       //System.out.println("pname = " + parentName);
@@ -1941,11 +1928,17 @@ public class Editor extends JFrame
         return;
       } else if (path.endsWith(".gadget")){
     	  this.gadgetPanel.loadGadget(new File(path));
+    	  path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
+    	  this.loadGadget(this.gadgetPanel.getActiveGadget());
+    	  isGadgetFile = true;
       }else {
           try{
         	  this.gadgetPanel.loadGadget(new File(path));
+        	  path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
+        	  this.loadGadget(this.gadgetPanel.getActiveGadget());
+        	  isGadgetFile = true;
           }catch(Exception ex){
-	        	  this.gadgetPanel.closeActiveGadget();
+	        isGadgetFile = false;
 	        String properParent =
 	          file.getName().substring(0, file.getName().length() - 4);
 	        Object[] options = { "OK", "Cancel" };
@@ -1992,6 +1985,23 @@ public class Editor extends JFrame
       }
       }
 
+      //do one last check
+      if(this.gadgetPanel.getActiveGadget() != null){
+    	  for(int i = 0; i < gadgetPanel.getActiveGadget().getModules().length; i++){
+    		  if(gadgetPanel.getActiveGadget().getModules()[i].getSketchFile().getPath().equalsIgnoreCase(path)){
+    			 isGadgetFile = true;
+    			 break;
+    		  }
+    	  }
+      }
+      
+      this.gadgetPanel.setVisible(isGadgetFile);
+      if(isGadgetFile){
+    	  gadgetPanel.show();
+      }else{
+    	  gadgetPanel.hide();
+      }
+      
       sketch = new Sketch(this, path);
       // TODO re-enable this once export application works
       //exportAppItem.setEnabled(false);
@@ -2524,7 +2534,11 @@ public class Editor extends JFrame
 	        System.out.println("Sketch file = " + sketchFile.getName());
 	        System.out.println("Boards file = " + boardFile.getName());
 	        this.handleOpen2(sketchFile.getPath());
+	        String board = gadgetPanel.getActiveModule().getTarget();
+	        this.curBoard = board;
+	        Preferences.set("board", board);
 	        this.buildToolsMenu();
+	        this.repaint();
         }
     }
 
@@ -2572,6 +2586,107 @@ public class Editor extends JFrame
         Preferences.init();
         this.buildToolsMenu();
         return copyFile;
+    }
+    
+    private void importBoardsFile(File boardsFile, String target){
+    	String boardExists = Preferences.get("boards." + target + ".build.core");
+    	String originalBoardsFile = System.getProperty("user.dir") + File.separator + "hardware" +
+        File.separator + "boards.txt";
+    	
+    	if(boardExists != null && boardExists.length() > 0){
+    		//don't do anything?
+    	}else{
+    		String originalBoards = getContents(new File(originalBoardsFile));
+    		String importedBoards = getContents(boardsFile);
+    		originalBoards = originalBoards.concat("##############################################################");
+    		originalBoards = originalBoards.concat("\r\n");
+    		originalBoards = originalBoards.concat(importedBoards);
+    		
+    		try {
+				this.setContents(new File(originalBoardsFile), originalBoards);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    }
+    
+    public String getContents(File aFile) {
+        //...checks on aFile are elided
+        StringBuffer contents = new StringBuffer();
+        
+        try {
+          //use buffering, reading one line at a time
+          //FileReader always assumes default encoding is OK!
+          BufferedReader input =  new BufferedReader(new FileReader(aFile));
+          try {
+            String line = null; //not declared within while loop
+            /*
+            * readLine is a bit quirky :
+            * it returns the content of a line MINUS the newline.
+            * it returns null only for the END of the stream.
+            * it returns an empty String if two newlines appear in a row.
+            */
+            while (( line = input.readLine()) != null){
+              contents.append(line);
+              contents.append(System.getProperty("line.separator"));
+            }
+          }
+          finally {
+            input.close();
+          }
+        }
+        catch (IOException ex){
+          ex.printStackTrace();
+        }
+        
+        return contents.toString();
+      }
+    
+    public void setContents(File aFile, String aContents) throws FileNotFoundException, 
+    IOException {
+		if (aFile == null) {
+			throw new IllegalArgumentException("File should not be null.");
+		}
+		if (!aFile.exists()) {
+			throw new FileNotFoundException ("File does not exist: " + aFile);
+		}
+		if (!aFile.isFile()) {
+			throw new IllegalArgumentException("Should not be a directory: " + aFile);
+		}
+		if (!aFile.canWrite()) {
+			throw new IllegalArgumentException("File cannot be written: " + aFile);
+		}
+		
+		//use buffering
+		Writer output = new BufferedWriter(new FileWriter(aFile));
+		try {
+	//		System.out.print( aContents);
+			output.write( aContents );
+		}finally {
+			output.close();
+		}
+    }
+    
+    private void loadGadget(IGadget gadget){
+    	for(int i = 0; i < gadget.getModules().length; i++){
+    		this.importModule(gadget.getModules()[i]);
+    	}
+    }
+    
+    private void importModule(IModule module){
+    	String target = module.getTarget();
+    	String boardExists = Preferences.get("boards." + target + ".build.core");
+    	System.out.println(System.getProperty("user.dir"));
+    	if(boardExists == null || boardExists.length() == 0){
+    		this.importBoardsFile(module.getBoardsFile(), target);
+    		String cpyDir = System.getProperty("user.dir") + File.separator + "hardware" +
+            File.separator + "cores" + File.separator + target;
+    		module.copyCoreToDirectory(cpyDir);
+    	}
     }
 }
 
