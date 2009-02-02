@@ -121,8 +121,13 @@ PACKAGE_FOLDER=package                          #dest for our created package
 PACKAGE_PROJ=$PACKAGE_FOLDER/Antipasto_Arduino_$REVISION.aip   #packager project file
 PACKAGE_DIST_DIR=$PACKAGE_FOLDER/$PACKAGE_DIST
 
-#cleanup previous packages
-rm -rf package/*
+#cleanup package directory
+if test -d package
+then
+  rm -rf package/*
+else
+ mkdir $PACKAGE_FOLDER
+fi
 
 #build the package
 mv arduino $PACKAGE_NAME                      #rename
@@ -130,9 +135,9 @@ mkdir $PACKAGE_DIST_DIR                       #create distribution dir
 mv $PACKAGE_NAME $PACKAGE_DIST_DIR            #move  directory
 cp Antipasto-package.aip $PACKAGE_PROJ                        #copy the packager project file
 
-./packager/$PACKAGER /edit $PACKAGE_PROJ /AddFolder ProgramFilesFolder $PACKAGE_FOLDER/$PACKAGE_DIST
+./packager/$PACKAGER /edit $PACKAGE_PROJ /AddFolder ProgramFilesFolder $PACKAGE_FOLDER'\'$PACKAGE_DIST
 ./packager/$PACKAGER /edit $PACKAGE_PROJ /SetVersion $REVISION
-./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name Arduino.exe -target 'APPDIR\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\Antipasto'
+./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name Arduino.exe -target 'ProgramFilesFolder\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\Antipasto'
 ./packager/$PACKAGER /build $PACKAGE_PROJ
 
 
