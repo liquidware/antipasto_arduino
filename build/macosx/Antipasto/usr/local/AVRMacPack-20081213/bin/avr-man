@@ -1,0 +1,2 @@
+#!/bin/sh
+exec man -M "/usr/local/AVRMacPack-20081213/man" "$@"

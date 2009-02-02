@@ -1,0 +1,2 @@
+#!/bin/sh
+exec info -d "/usr/local/AVRMacPack-20081213/info" "$@"

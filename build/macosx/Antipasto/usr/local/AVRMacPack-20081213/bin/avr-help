@@ -1,0 +1,2 @@
+#!/bin/sh
+exec open "/usr/local/AVRMacPack-20081213/manual/index.html"

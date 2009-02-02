@@ -1,0 +1,6 @@
+#!/bin/sh
+if readlink "/usr/local/AVRMacPack-20081213/etc/options/gcc-version" | grep 3 >/dev/null 2>&1; then
+exec -a "$0" "/usr/local/AVRMacPack-20081213/avr-3/bin/cpp" "$@"
+else
+exec -a "$0" "/usr/local/AVRMacPack-20081213/avr-4/bin/cpp" "$@"
+fi
