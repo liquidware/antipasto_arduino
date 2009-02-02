@@ -4,7 +4,7 @@ REVISION=`head -c 5 ../../todo.txt`
  
 # check to see if the version number in the app is correct
 # so that mikkel doesn't kick my ass
-VERSIONED=`cat ../../app/Base.java | grep $REVISION`
+VERSIONED=`cat ../../processing/app/Base.java | grep $REVISION`
 if [ -z "$VERSIONED" ]
 then
 echo Fix the revision number in Base.java
@@ -18,7 +18,7 @@ echo
  
 # remove any old boogers
 rm -rf arduino
-rm -rf arduino-*
+rm -rf arduino-* 
  
 # use 'shared' files as starting point
 cp -r ../shared arduino
@@ -74,7 +74,7 @@ cp work/*.dll arduino
 chmod +x arduino/*.dll
  
 # get platform-specific goodies from the dist dir
-cp launcher/arduino.exe arduino/
+cp launcher/Arduino.exe arduino/
 cp dist/run.bat arduino/
 chmod +x arduino/run.bat
  
@@ -108,15 +108,35 @@ echo
 #zip -rq $P5.zip $P5
 # nah, keep the new directory around
 #rm -rf $P5
- 
-#package the build
-PACKAGER="AdvancedInstaller.com" #the packager
-rm -rf Arduino-* #clean
-mv arduino Arduino #uppercase, we're growing up :-)
-cp Arduino.aip Arduino-$REVISION.aip
-./packager/$PACKAGER /edit Arduino-$REVISION.aip /AddFolder ProgramFilesFolder Arduino
-./packager/$PACKAGER /edit Arduino-$REVISION.aip /SetVersion $REVISION
-./packager/$PACKAGER /build Arduino-$REVISION.aip
+
+##################################### 
+#Package the build
+#<CML> renamed the package to Antipasto
+
+#define the package
+PACKAGER="AdvancedInstaller.com"                #the packager
+PACKAGE_DIST=Antipasto                          #The distribution
+PACKAGE_NAME=Arduino                            #uppercase, we're growing up :-)
+PACKAGE_FOLDER=package                          #dest for our created package
+PACKAGE_PROJ=$PACKAGE_FOLDER/Antipasto_Arduino_$REVISION.aip   #packager project file
+PACKAGE_DIST_DIR=$PACKAGE_FOLDER/$PACKAGE_DIST
+
+#cleanup previous packages
+rm -rf package/*
+
+#build the package
+mv arduino $PACKAGE_NAME                      #rename
+mkdir $PACKAGE_DIST_DIR                       #create distribution dir
+mv $PACKAGE_NAME $PACKAGE_DIST_DIR            #move  directory
+cp Antipasto-package.aip $PACKAGE_PROJ                        #copy the packager project file
+
+./packager/$PACKAGER /edit $PACKAGE_PROJ /AddFolder ProgramFilesFolder $PACKAGE_FOLDER/$PACKAGE_DIST
+./packager/$PACKAGER /edit $PACKAGE_PROJ /SetVersion $REVISION
+./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name Arduino.exe -target 'APPDIR\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\Antipasto'
+./packager/$PACKAGER /build $PACKAGE_PROJ
+
+
+
 # zip up another for experts
 #echo Packaging expert release...
 #echo
