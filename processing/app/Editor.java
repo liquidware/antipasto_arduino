@@ -223,16 +223,18 @@ public class Editor extends JFrame
 
     Box box = Box.createVerticalBox();
     Box upper = Box.createVerticalBox();
-    
 
+    JPanel editorSection = new JPanel(new BorderLayout());
 
     buttons = new EditorButtons(this);
     upper.add(buttons);
+    
 
     header = new EditorHeader(this);
     //header.setBorder(null);
     upper.add(header);
 
+    
     textarea = new JEditTextArea(new PdeTextAreaDefaults());
     textarea.setRightClickPopup(new TextAreaPopup());
     //textarea.setTokenMarker(new PdeKeywords());
@@ -252,11 +254,44 @@ public class Editor extends JFrame
 
     lineStatus = new EditorLineStatus(textarea);
     consolePanel.add(lineStatus, BorderLayout.SOUTH);
+    
+    JPanel leftWing = new JPanel();
+    leftWing.setBackground(new Color(0x54, 0x91, 0x9e));
+    leftWing.setSize(15, 0);
+    leftWing.setPreferredSize(new Dimension(15, 0));
 
-    upper.add(textarea);
+    leftWing.addMouseListener(new MouseListener(){
+		public void mouseClicked(MouseEvent arg0) {
+			gadgetPanel.setVisible(!gadgetPanel.isVisible());
+		}
+		public void mouseEntered(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+		public void mouseExited(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+		public void mousePressed(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+		public void mouseReleased(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+    });
+    
+    JPanel rightWing = new JPanel();
+    rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
+    rightWing.setSize(15, 0);
+    rightWing.setPreferredSize(new Dimension(15, 0));
+    
+    editorSection.add(leftWing, BorderLayout.WEST);
+    editorSection.add(textarea, BorderLayout.CENTER);
+    editorSection.add(rightWing, BorderLayout.EAST);
+    
+    upper.add(editorSection);
     gadgetPanel = new GadgetPanel("");
     gadgetPanel.addActiveGadgetChangedEventListener(this);
 
+    leftWing.setVisible(true);
       //upper.add(gadgetPanel);
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                upper, consolePanel);
@@ -2531,15 +2566,15 @@ public class Editor extends JFrame
 	        this.handleSave(true);
 	        File sketchFile = obj.getSketch();
 	        File boardFile = obj.getBoards();
-	        System.out.println("Sketch file = " + sketchFile.getName());
-	        System.out.println("Boards file = " + boardFile.getName());
 	        this.handleOpen2(sketchFile.getPath());
 	        String board = gadgetPanel.getActiveModule().getTarget();
 	        this.curBoard = board;
 	        Preferences.set("board", board);
+	        Preferences.save();
+	        Preferences.init();
 	        this.buildToolsMenu();
 	        this.repaint();
-        }
+        }        
     }
 
     /*

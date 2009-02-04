@@ -18,6 +18,7 @@ import antipasto.Interfaces.IModule;
 import antipasto.Interfaces.IPackedFile;
 import antipasto.Interfaces.ITemporary;
 
+import processing.app.Editor;
 import processing.app.Serial;
 
 import java.io.File;
@@ -27,7 +28,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 
-public class GadgetPanel extends JFrame implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener {
+public class GadgetPanel extends JWindow implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener {
 
  
     //JList list;
@@ -56,8 +57,11 @@ public class GadgetPanel extends JFrame implements ListSelectionListener, IActiv
     
     public void loadGadget(File gadget){
     	if(gadget  != null){
-	    	this.setLayout(new BorderLayout());
-	
+	    	this.getContentPane().setLayout(new BorderLayout());
+	    	JPanel top = new JPanel();
+	    	top.setBackground(Color.GREEN);
+	    	this.getContentPane().add(top, BorderLayout.NORTH);
+	    	
 	        JButton button;
 	        GadgetFactory fact = skbFact;
 	        String dir = System.getProperty("java.io.tmpdir") + File.separator + gadget.getName();
@@ -73,7 +77,7 @@ public class GadgetPanel extends JFrame implements ListSelectionListener, IActiv
 	
 	        list.addListSelectionListener(this);
 	        JScrollPane scrollPanel = new JScrollPane((JList) list);
-	        this.add(scrollPanel, BorderLayout.CENTER);
+	        this.getContentPane().add(scrollPanel, BorderLayout.CENTER);
 	
 	        JPopupMenu menu = new JPopupMenu();
 	
@@ -88,9 +92,10 @@ public class GadgetPanel extends JFrame implements ListSelectionListener, IActiv
 	        button = new JButton("Remove Gadget");
 	        panel.add(button);
 	        */
-	        this.add(panel, BorderLayout.PAGE_START);
+	        this.getContentPane().add(panel, BorderLayout.PAGE_START);
 	        panel.setVisible(true);
 	
+	        top.setVisible(true);
 	        this.setVisible(true);
     	}else{
     		this.setVisible(false);
@@ -210,7 +215,9 @@ public class GadgetPanel extends JFrame implements ListSelectionListener, IActiv
 	}
 
 	public void componentMoved(ComponentEvent arg0) {
-		this.setLocation(arg0.getComponent().getX() - this.getWidth(), arg0.getComponent().getY());	
+		Editor editor = (Editor) arg0.getComponent();
+        this.setSize(this.getWidth(), editor.textarea.getHeight());
+        this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
 	}
 
 	public void componentResized(ComponentEvent arg0) {
