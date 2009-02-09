@@ -102,7 +102,9 @@ public class ModuleFactory {
                 configFile = files[i];
             }else if(files[i].getName().equalsIgnoreCase("boards.txt")){
                 boardsFile = files[i];
-            }else if(files[i].getName().equalsIgnoreCase("preview.jpeg") || files[i].getName().equalsIgnoreCase("preview.png")){
+            }else if(files[i].getName().equalsIgnoreCase("preview.jpeg") ||
+            		files[i].getName().equalsIgnoreCase("preview.png") || 
+            		files[i].getName().equalsIgnoreCase("preview.jpg")){
                 img = files[i];
             }else if(files[i].getName().equalsIgnoreCase("rules.xml")){
             	rulesFile = files[i];
@@ -157,7 +159,8 @@ public class ModuleFactory {
                boardsFile = moduleFiles[i];
            }else if(moduleFiles[i].getName().equalsIgnoreCase("preview.gif") ||
         		    moduleFiles[i].getName().equalsIgnoreCase("preview.png") ||
-        		    moduleFiles[i].getName().equalsIgnoreCase("preview.jpeg") )
+        		    moduleFiles[i].getName().equalsIgnoreCase("preview.jpeg")||
+        		    moduleFiles[i].getName().equalsIgnoreCase("preview.jpg"))
            {
                previewImage = moduleFiles[i];
            }else if(moduleFiles[i].getName().equalsIgnoreCase("rules.xml")){
@@ -307,7 +310,8 @@ public class ModuleFactory {
             }
             else if(files[i].getName().equalsIgnoreCase("preview.gif") || 
             		files[i].getName().equalsIgnoreCase("preview.png") ||
-            		files[i].getName().equalsIgnoreCase("preview.jpeg"))
+            		files[i].getName().equalsIgnoreCase("preview.jpeg") || 
+            		files[i].getName().equalsIgnoreCase("preview.jpg"))
             {
                 img = files[i];
             }

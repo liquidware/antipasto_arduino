@@ -9,6 +9,12 @@ import antipasto.CoreFactory;
 public class CorePackerCommandLine {
     public static void main(String args[])
     {
+    	/*
+    	 * Arg 1 : source directory
+    	 * Arg 2 : destination Directory
+    	 * Arg 3 : name 
+    	 * Arg 4 : version
+    	 * */
         if(args.length < 4)
         {
             System.out.println("Error with args");

@@ -105,6 +105,8 @@ public class Editor extends JFrame
   // currently opened program
   public Sketch sketch;
 
+  public String lastActiveGadgetPath;
+  
   EditorLineStatus lineStatus;
   String curBoard;
 
@@ -1685,7 +1687,11 @@ public class Editor extends JFrame
     // focus the PDE again after quitting presentation mode
     _frame.toFront();
     
-    this.gadgetPanel.saveCurrentSketch();
+    if(this.gadgetPanel.isActive()){
+    	this.gadgetPanel.saveCurrentSketch();
+    	Preferences.set("gadget.active", "true");
+    	Preferences.set("last.active.gadget", ((IPackedFile)this.gadgetPanel.getActiveGadget()).getPackedFile().getPath());
+    }
   }
 
 
@@ -1966,12 +1972,14 @@ public class Editor extends JFrame
     	  path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
     	  this.loadGadget(this.gadgetPanel.getActiveGadget());
     	  isGadgetFile = true;
+    	  this.lastActiveGadgetPath = path;
       }else {
           try{
         	  this.gadgetPanel.loadGadget(new File(path));
         	  path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
         	  this.loadGadget(this.gadgetPanel.getActiveGadget());
         	  isGadgetFile = true;
+        	  this.lastActiveGadgetPath = path;
           }catch(Exception ex){
 	        isGadgetFile = false;
 	        String properParent =

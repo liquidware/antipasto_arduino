@@ -8,17 +8,9 @@ import java.io.File;
 
 import antipasto.CoreFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Omar
- */
 public class CoreUnpackerCommandLine {
     public static void main(String args[])
     {
-        /*
-        * Todo: Determine the core extension
-        * ToDo: Determine how we're going to hook this into the current IDE (from the sketchbook load?)
-        * */
         if(args.length < 2)
         {
             System.out.println("Incorrect number of command line arguements");

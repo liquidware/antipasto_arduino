@@ -9,6 +9,13 @@ import antipasto.ModuleFactory;
 public class ModulePackerCommandLine {
     public static void main(String args[])
     {
+    	/*
+    	 * Arg 1: Source Directory
+    	 * Arg 2: Destination Directory
+    	 * Arg 3: Name 
+    	 * Arg 4: TargetBoard
+    	 * Arg 5: Version
+    	 */
         if(args.length < 5)
             {
                 System.out.println("Error with args");
