@@ -258,7 +258,8 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 
 	public void componentMoved(ComponentEvent arg0) {
 		Editor editor = (Editor) arg0.getComponent();
-        this.setSize(this.getWidth(), editor.textarea.getHeight());
+		int width = 300;
+        this.setSize(width, editor.textarea.getHeight());
         this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
 	}
 
