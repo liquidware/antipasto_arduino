@@ -27,12 +27,6 @@ import javax.imageio.*;
 
 import antipasto.Interfaces.IModule;
 
-
-
-/**
- * @author Omar
- *
- */
 public class GadgetViewer extends JComponent implements MouseListener, ImageObserver{
 	BufferedImage originalIcon;
 	

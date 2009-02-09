@@ -1,5 +1,6 @@
 package antipasto.GUI.GadgetListView;
 
+import javax.imageio.ImageIO;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -18,11 +19,14 @@ import antipasto.Interfaces.IModule;
 import antipasto.Interfaces.IPackedFile;
 import antipasto.Interfaces.ITemporary;
 
+import processing.app.Base;
 import processing.app.Editor;
 import processing.app.Serial;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -58,11 +62,47 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
     public void loadGadget(File gadget){
     	if(gadget  != null){
 	    	this.getContentPane().setLayout(new BorderLayout());
-	    	JPanel top = new JPanel();
-	    	top.setBackground(Color.GREEN);
-	    	this.getContentPane().add(top, BorderLayout.NORTH);
 	    	
-	        JButton button;
+	    	JPanel top = new JPanel();
+	    	top.setBackground(new Color(0x04, 0x4F, 0x6F));
+	    	this.getContentPane().add(top, BorderLayout.NORTH);
+	    	top.setSize(new Dimension(this.getWidth(), 15));
+	        top.setLayout(new FlowLayout());
+	        
+	        try {
+	        	ImageIcon upperRight = new ImageIcon("..\\lib\\upperleftgadget.png");
+	    		upperRight.setImage(Base.getImage("..\\lib\\upperleftgadget.png", this));
+	    		JLabel upperImageLabel = new JLabel(upperRight);
+				top.add(upperImageLabel);
+				upperImageLabel.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	        
+	    	JPanel bottom = new JPanel();
+	    	bottom.setBackground(new Color(0x04, 0x4F, 0x6F));
+	    	this.getContentPane().add(bottom, BorderLayout.SOUTH);
+	    	bottom.setSize(new Dimension(this.getWidth(), 15));
+	    	bottom.setLayout(new FlowLayout());
+	    	ImageIcon lowerRight = new ImageIcon();
+	    	try {
+	    		ImageIcon lowerRightImage = new ImageIcon("\\lib\\upperleftgadget.png");
+				JLabel lowerImageLabel = new JLabel(lowerRightImage);
+				top.add(lowerImageLabel);
+				lowerImageLabel.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	        
+	        
+	    	
+	    	JPanel right = new JPanel();
+	    	right.setBackground(new Color(0x04, 0x4F, 0x6F));
+	    	this.getContentPane().add(right, BorderLayout.WEST);
+	    	right.setSize(new Dimension(15, this.getHeight()));
+	        
+	    	
+	    	JButton button;
 	        GadgetFactory fact = skbFact;
 	        String dir = System.getProperty("java.io.tmpdir") + File.separator + gadget.getName();
 	        IGadget book = fact.loadGadget(gadget, dir);
@@ -95,7 +135,9 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 	        this.getContentPane().add(panel, BorderLayout.PAGE_START);
 	        panel.setVisible(true);
 	
+	        right.setVisible(true);
 	        top.setVisible(true);
+	        bottom.setVisible(true);
 	        this.setVisible(true);
     	}else{
     		this.setVisible(false);
