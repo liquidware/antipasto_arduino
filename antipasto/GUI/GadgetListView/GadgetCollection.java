@@ -7,47 +7,54 @@ import antipasto.GUI.GadgetListView.GadgetPanelEvents.IGadgetCollectionChangedLi
 import antipasto.Interfaces.IGadget;
 import antipasto.Interfaces.IModule;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class GadgetCollection {
-    IModule[] _gadgets;
+    List _gadgets;
     IGadget _sketchBook;
 
     EventListenerList changeListenerList = new EventListenerList();
 
-    public GadgetCollection(IGadget sketchBook){
-        _gadgets = sketchBook.getModules();
-        _sketchBook = sketchBook;
+    public GadgetCollection(IGadget gadget){
+        _gadgets = new ArrayList();
+        
+        for(int i = 0; i < gadget.getModules().length; i ++){
+        	_gadgets.add(gadget.getModules()[i]);
+        }
+        _sketchBook = gadget;
         onGadgetCollectionChanged();
+    }
+    
+    public GadgetCollection(){
+    	_gadgets = new ArrayList();
     }
 
     public void AddGadget(IModule gadget){
-        IModule[] gadgetArr = new IModule[_gadgets.length + 1];
-        Arrays.fill(_gadgets, gadgetArr);
-        gadgetArr[_gadgets.length] = gadget;
-        _gadgets = gadgetArr;
-        onGadgetCollectionChanged();
+    	this._gadgets.add(gadget);
+    	onGadgetCollectionChanged();
     }
 
     public void RemoveGadget(IModule gadget){
         int gadIndex = -1;
-        for(int i = 0; i < _gadgets.length; i++)
+        for(int i = 0; i < _gadgets.size(); i++)
         {
-            if(gadget.getName().equalsIgnoreCase(_gadgets[i].getName()))
+            if(gadget.getName().equalsIgnoreCase(((IModule) _gadgets.get(i)).getName()))
             {
                 gadIndex = i;
                 break;
             }
         }
 
-        IModule[] gadArr = new IModule[_gadgets.length - 1];
+        IModule[] gadArr = new IModule[_gadgets.size() - 1];
 
         int x = 0;
-        for(int i = 0; i < _gadgets.length; i++)
+        for(int i = 0; i < _gadgets.size(); i++)
         {
             if(i != gadIndex)
             {
-                gadArr[x] = _gadgets[i];
+                gadArr[x] = (IModule) _gadgets.get(i);
                 x++;
             }
         }
@@ -55,11 +62,11 @@ public class GadgetCollection {
     }
 
     public int getLength(){
-        return _gadgets.length;
+        return _gadgets.size();
     }
 
     public IModule getItem(int index){
-        return _gadgets[index];
+        return (IModule) _gadgets.get(index);
     }
 
     public void addGadgetCollectionEventListener(IGadgetCollectionChangedListener listener){

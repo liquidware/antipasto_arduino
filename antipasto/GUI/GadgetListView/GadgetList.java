@@ -43,7 +43,6 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 
     public void loadGadget(IGadget gaj){
         this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
         gadget = gaj;
         _collection = new GadgetCollection(gaj);
         

@@ -58,7 +58,7 @@ public class GadgetViewer extends JComponent implements MouseListener, ImageObse
 		// TODO Auto-generated method stub
 		
 	}
-	
+	/*
 	public void paintComponent( Graphics g ) {
         Graphics2D g2d = (Graphics2D)g;
         int width = getWidth();
@@ -90,7 +90,7 @@ public class GadgetViewer extends JComponent implements MouseListener, ImageObse
         rg.dispose();
         g2d.drawRenderedImage( reflection, null );
     }
-    
+    */
     public Dimension getPreferredSize() {
         return new Dimension(this.originalIcon.getWidth(), (this.originalIcon.getHeight() * 2));
     }

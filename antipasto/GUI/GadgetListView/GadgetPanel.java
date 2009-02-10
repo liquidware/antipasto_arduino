@@ -252,8 +252,7 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
     }
 
 	public void componentHidden(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		this.hide();
 	}
 
 	public void componentMoved(ComponentEvent arg0) {
@@ -264,13 +263,15 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 	}
 
 	public void componentResized(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
+		Editor editor = (Editor) arg0.getComponent();
+		int width = 300;
+        this.setSize(width, editor.textarea.getHeight());
+        this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
 		
 	}
 
 	public void componentShown(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		this.show();
 	}
 	
 	public void closeActiveGadget(){
