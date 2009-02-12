@@ -235,7 +235,7 @@ public class GadgetFactory {
     }
 
     public IGadget AddModuleToGadget(IGadget gadget, IModule module) throws Exception {
-        if(gadget instanceof Gadget){
+        if(gadget instanceof IGadget){
             if(module instanceof Module){
                 int hasAlreadyCount = 0;
                 for(int i = 0; i < gadget.getModules().length; i++){

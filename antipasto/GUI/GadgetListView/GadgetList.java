@@ -1,5 +1,17 @@
 package antipasto.GUI.GadgetListView;
 
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 
 import javax.swing.*;
@@ -20,12 +32,13 @@ import antipasto.Interfaces.ITemporary;
 import java.io.*;
 import java.util.Arrays;
 
-public class GadgetList extends JList implements IGadgetWindowTransferFileEventListener {
+public class GadgetList extends JList implements IGadgetWindowTransferFileEventListener, MouseListener{
 
     IGadget gadget;
     JList jList;
     GadgetCollection _collection;
-    private String gadgetDirectory;
+    private String moduleDirectory;
+    private boolean mouseIsOver = false;
 
     private EventListenerList activeGadgetChangedEventList = new EventListenerList();
     private EventListenerList activeSketchChangedEventList = new EventListenerList();
@@ -33,12 +46,14 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
     public GadgetList(IGadget gadget, String gadgetDirectory){
         super();
         this.loadGadget(gadget);
-        this.gadgetDirectory = gadgetDirectory;
+        this.moduleDirectory = gadgetDirectory;
+        this.addMouseListener(this);
     }
 
     public GadgetList(String gajDirectory){
         super();
-        this.gadgetDirectory = gajDirectory;
+        this.moduleDirectory = gajDirectory;
+        this.addMouseListener(this);
     }
 
     public void loadGadget(IGadget gaj){
@@ -127,11 +142,11 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
     }
 
     public String getSketchBookDirectory() {
-        return gadgetDirectory;
+        return moduleDirectory;
     }
 
     public void setSketchBookDirectory(String sketchBookDirectory) {
-        this.gadgetDirectory = sketchBookDirectory;
+        this.moduleDirectory = sketchBookDirectory;
     }
 
     public void addSketchChangingeListener(IActiveSketchChangingListener listener){
@@ -152,4 +167,126 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
                         }
                     }
     }
+
+	public void doImportDragDrop(IModule module){
+		System.out.println("Attempting import");
+		if(module instanceof IPackedFile){
+			IPackedFile file = (IPackedFile)module;
+			String name = module.getName();
+			int x = 0;
+			while(this.checkName(this.gadget, name)){
+				x++;
+				name = name + "(" + x +")";
+			}
+			File dest = new File(this.getSketchBookDirectory() + File.separator + name + IModule.moduleExtension);
+			try {
+				GadgetList.copyFile(file.getPackedFile(), dest);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			IModule[] modules = this.gadget.getModules();
+			IModule[] modules2 = new IModule[modules.length + 1];
+			int i = 0;
+			for(; i < modules.length; i++){
+				modules2[i] = modules[i];
+			}
+			ITemporary tempFile = (ITemporary)(module);
+			ModuleFactory fact = new ModuleFactory();
+			String directory = tempFile.getTempDirectory();
+			try {
+				modules2[i] = fact.loadModule(dest, directory, false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			GadgetFactory gadgetFactory = new GadgetFactory();
+			try {
+				gadgetFactory.AddModuleToGadget(gadget, modules2[i]);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			this.saveCurrentGadget();
+			this.loadGadget(gadget);
+		}else{
+			System.out.println("Error trying to import the module...");
+		}
+	}
+	
+	private boolean checkName(IGadget gadget, String name){
+		IModule[] modules = gadget.getModules();
+		int ret = 0;
+		for(int i = 0; i < modules.length; i++){
+			if(name.equalsIgnoreCase(modules[i].getName()))
+				return true;
+		}
+		return false;
+	}
+
+	//Todo: clean up all of this mouse listener crap....
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void mouseEntered(MouseEvent arg0) {
+		System.out.println("Mouse enetered");
+		this.mouseIsOver = true;
+		int x = arg0.getLocationOnScreen().x;
+		int y = arg0.getLocationOnScreen().y;
+		if(this.bounds().inside(x, y)){
+			
+		}
+	}
+
+	public void mouseExited(MouseEvent arg0) {
+		System.out.println("Mouse exited");
+		this.mouseIsOver = false;
+	}
+
+	public void mousePressed(MouseEvent arg0) {
+		
+	}
+
+	public void mouseReleased(MouseEvent arg0) {
+	}
+	//This code was copied and pasted directly from
+	//http://www.codeandcoffee.com/2006/08/22/quick-snippets-copy-a-file-with-java/
+	public static void copyFile(File fSource, File fDest) throws IOException
+	{
+		// Declare variables
+		InputStream sIn = null;
+		OutputStream sOut = null;
+	
+		try
+		{
+		// Declare variables
+		int nLen = 0;
+		sIn = new FileInputStream(fSource);
+		sOut = new FileOutputStream(fDest);
+	
+		// Transfer bytes from in to out
+		byte[] bBuffer = new byte[1024];
+		while ((nLen = sIn.read(bBuffer)) > 0)
+		{
+		sOut.write(bBuffer, 0, nLen);
+		}
+	
+		// Flush
+		sOut.flush();
+		}
+		finally
+		{
+		// Close streams
+		try
+		{
+		if (sIn != null)
+		sIn.close();
+		if (sOut != null)
+		sOut.close();
+		}
+		catch (IOException eError)
+		{
+		}
+		}
+	}
 }

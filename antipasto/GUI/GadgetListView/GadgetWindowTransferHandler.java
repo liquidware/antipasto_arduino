@@ -25,18 +25,20 @@ class GadgetWindowTransferHandler extends TransferHandler {
   private EventListenerList transferListenerList = new EventListenerList();
     
   public boolean canImport(JComponent arg0, DataFlavor[] arg1) {
-    for (int i = 0; i < arg1.length; i++) {
-      DataFlavor flavor = arg1[i];
-      if (flavor.equals(DataFlavor.javaFileListFlavor)) {
-        System.out.println("canImport: JavaFileList FLAVOR: " + flavor);
-        return true;
-      }
-      if (flavor.equals(DataFlavor.stringFlavor)) {
-        System.out.println("canImport: String FLAVOR: " + flavor);
-        return true;
-      }
-      System.err.println("canImport: Rejected Flavor: " + flavor);
-    }
+	  if(arg1 != null){
+	    for (int i = 0; i < arg1.length; i++) {
+	      DataFlavor flavor = arg1[i];
+	      if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+	        System.out.println("canImport: JavaFileList FLAVOR: " + flavor);
+	        return true;
+	      }
+	      if (flavor.equals(DataFlavor.stringFlavor)) {
+	        System.out.println("canImport: String FLAVOR: " + flavor);
+	        return true;
+	      }
+	      System.err.println("canImport: Rejected Flavor: " + flavor);
+	    }
+	  }
     // Didn't find any that match, so:
     return false;
   }

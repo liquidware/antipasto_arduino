@@ -34,9 +34,9 @@ public class GadgetViewerTest {
 			}
 		}*/
 		
-		GadgetListHorizontal glh = new GadgetListHorizontal(gadgetLibraryDirectory);
+		//GadgetListHorizontal glh = new GadgetListHorizontal(gadgetLibraryDirectory);
 		
-		frame.add(glh);
+		//frame.add(glh);
 		frame.setVisible(true);
 		
 	}

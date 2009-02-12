@@ -30,9 +30,13 @@ import java.net.URL;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-public class GadgetPanel extends JWindow implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener {
+public class GadgetPanel extends JWindow implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener,
+													MouseListener
+													{
 
  
     //JList list;
@@ -52,7 +56,7 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
     private IGadget _gadget;
 
     public GadgetPanel(String sketchBookDirectory) {
-        
+        this.addMouseListener(new ModuleMouseAdapter());
     }
     
     public void loadGadget(String gadget){
@@ -63,10 +67,16 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
     	if(gadget  != null){
 	    	this.getContentPane().setLayout(new BorderLayout());
 	    	
-	    	JPanel top = new JPanel();
+	    	GadgetFactory fact = skbFact;
+	    	
+	        String dir = System.getProperty("java.io.tmpdir") + File.separator + gadget.getName();
+	        IGadget book = fact.loadGadget(gadget, dir);
+	        
+	        list = new GadgetList(book, gadget.getParent());
+	    	GadgetListHorizontal top = new GadgetListHorizontal(new File("C:" + File.separator + "OpenHardware" + File.separator + "Modules"), list);
 	    	top.setBackground(new Color(0x04, 0x4F, 0x6F));
 	    	this.getContentPane().add(top, BorderLayout.NORTH);
-	    	top.setSize(new Dimension(this.getWidth(), 15));
+	    	top.setSize(new Dimension(this.getWidth(), 90));
 	        top.setLayout(new FlowLayout());
 	        
 	        try {
@@ -103,16 +113,12 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 	        
 	    	
 	    	JButton button;
-	        GadgetFactory fact = skbFact;
-	        String dir = System.getProperty("java.io.tmpdir") + File.separator + gadget.getName();
-	        IGadget book = fact.loadGadget(gadget, dir);
-	
+	        
 	        System.out.println("Temporary directory is = " + dir);
 	
 	        _gadget = book;
 	
-	        GadgetWindowTransferHandler transferHandler = new GadgetWindowTransferHandler();
-	        list = new GadgetList(book, gadget.getParent());
+	        //GadgetWindowTransferHandler transferHandler = new GadgetWindowTransferHandler();
 	        list.addSketchChangingeListener(this);
 	
 	        list.addListSelectionListener(this);
@@ -276,6 +282,30 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 	
 	public void closeActiveGadget(){
 		this._gadget = null;
+	}
+
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 
