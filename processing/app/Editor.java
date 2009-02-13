@@ -290,7 +290,9 @@ public class Editor extends JFrame
     editorSection.add(rightWing, BorderLayout.EAST);
     
     upper.add(editorSection);
-    gadgetPanel = new GadgetPanel("", this);
+    String libraryDirectory = System.getProperty("user.dir") + File.separator + "hardware" + 
+           File.separator + "OpenHardware" + File.separator + "Modules";
+    gadgetPanel = new GadgetPanel("", this, libraryDirectory);
     gadgetPanel.addActiveGadgetChangedEventListener(this);
 
     leftWing.setVisible(true);

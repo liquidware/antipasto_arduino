@@ -55,13 +55,15 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
     private IModule activeModule;
 
+    private String libraryDirectory;
     private IGadget _gadget;
 
-    public GadgetPanel(String sketchBookDirectory, JFrame frame) {
+    public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
     	super(frame, false);
         this.addMouseListener(new ModuleMouseAdapter());
         this.setUndecorated(true);
         frame.addWindowListener(this);
+        this.libraryDirectory = libraryDirectory;
     }
     
     public void loadGadget(String gadget){
@@ -79,7 +81,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
 	        list = new GadgetList(book, gadget.getParent());
 	    	//Save this for later!
-	        GadgetListHorizontal libPanel = new GadgetListHorizontal(new File("C:" + File.separator + "OpenHardware" + File.separator + "Modules"), list);
+	        GadgetListHorizontal libPanel = new GadgetListHorizontal(new File(this.libraryDirectory), list);
 	    	JPanel top = new JPanel();
 	        top.setBackground(new Color(0x04, 0x4F, 0x6F));
 	    	this.getContentPane().add(top, BorderLayout.NORTH);
