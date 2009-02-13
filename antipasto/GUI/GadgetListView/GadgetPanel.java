@@ -35,7 +35,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 public class GadgetPanel extends JDialog implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener,
-													MouseListener
+													MouseListener 
 													{
 
  
@@ -45,7 +45,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
     private GadgetFactory skbFact = new GadgetFactory();
     private CoreFactory coreFact= new CoreFactory();
-    private ModuleFactory gadgFact = new ModuleFactory();
+    private ModuleFactory modFact = new ModuleFactory();
     private GadgetList list;
     private Serial serial;
 
@@ -72,7 +72,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	    	
 	        String dir = System.getProperty("java.io.tmpdir") + File.separator + gadget.getName();
 	        IGadget book = fact.loadGadget(gadget, dir);
-	        
+
 	        list = new GadgetList(book, gadget.getParent());
 	    	//Save this for later!
 	        GadgetListHorizontal libPanel = new GadgetListHorizontal(new File("C:" + File.separator + "OpenHardware" + File.separator + "Modules"), list);
@@ -126,13 +126,16 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	
 	        list.addListSelectionListener(this);
 	        Box box = Box.createVerticalBox();
-	        box.setBackground(Color.orange);
+	        
 	        JScrollPane scrollPanel = new JScrollPane((JList) list);
 	        scrollPanel.setPreferredSize(new Dimension(300, 300));
 	        scrollPanel.setSize(new Dimension(300, 300));
 	        
 	        libPanel.setSize(300, 100);
 	        libPanel.setPreferredSize(new Dimension(300, 100));
+	        libPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+	        
+	        box.setBackground(new Color(0x04, 0x4F, 0x6F));
 	        
 	        box.add(libPanel);
 	        box.add(scrollPanel);
@@ -276,9 +279,9 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
 	public void componentMoved(ComponentEvent arg0) {
 		Editor editor = (Editor) arg0.getComponent();
-		int width = 300;
-        this.setSize(width, editor.textarea.getHeight());
-        this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
+		//int width = 300;
+        //this.setSize(width, editor.textarea.getHeight());
+        //this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
 	}
 
 	public void componentResized(ComponentEvent arg0) {
@@ -297,28 +300,15 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 		this._gadget = null;
 	}
 
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void mouseClicked(MouseEvent e) {	
 	}
-
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
-
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 }
 

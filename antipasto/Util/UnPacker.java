@@ -5,10 +5,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.Enumeration;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Omar
- */
 public class UnPacker {
     public static File[] UnPack(File packedFile, File unpackDirectory)
     {

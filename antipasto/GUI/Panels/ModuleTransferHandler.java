@@ -42,7 +42,7 @@ public class ModuleTransferHandler extends TransferHandler{
 			ModuleFactory fact = new ModuleFactory();
 			for(int i = 0; i < modules.size(); i++){
 				try {
-					savedModule[i] = fact.loadModule((File)modules.get(i), System.getProperty("java.io.tmpdir"),false);
+					savedModule[i] = fact.loadModule((File)modules.get(i), System.getProperty("java.io.tmpdir") + File.separator + (((File)(modules.get(i))).getName()),false);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -514,7 +514,7 @@ public class Editor extends JFrame
 
     } else {
       //String sketchName = Preferences.get("last.sketch.name");
-      String sketchPath = Preferences.get("last.sketch.path");
+      String sketchPath = null/*Preferences.get("last.sketch.path")*/;
       //Sketch sketchTemp = new Sketch(sketchPath);
 
       if ((sketchPath != null) && (new File(sketchPath)).exists()) {

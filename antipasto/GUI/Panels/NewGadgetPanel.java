@@ -7,9 +7,10 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 
+import javax.swing.JFrame;
 import javax.swing.JWindow;
 
-public class NewGadgetPanel extends JWindow {
+public class NewGadgetPanel extends JFrame {
 	NewGadgetList gl;
 	public NewGadgetPanel()
 	{
@@ -24,5 +25,6 @@ public class NewGadgetPanel extends JWindow {
 	public static void main(String args[]){
 		NewGadgetPanel panel = new NewGadgetPanel();
 		panel.setVisible(true);
+		panel.setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 }

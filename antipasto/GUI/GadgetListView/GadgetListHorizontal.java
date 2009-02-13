@@ -45,15 +45,15 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		JPanel itemsPanel = new JPanel();
 		itemsPanel.setBackground(Color.WHITE);
 		itemsPanel.setLayout(new FlowLayout());
-		itemsPanel.setSize(new Dimension(this.scrollPane.getWidth(), 90 ));
+		itemsPanel.setSize(new Dimension(this.scrollPane.getWidth(), 70 ));
 		for(int i = 0; i < files.length; i ++){
 			if(files[i].getName().endsWith(IModule.moduleExtension)){
 				try {
 					IModule mod = fact.loadModule(files[i], System.getProperty("java.io.tmpdir"), false);
 					//ImageIcon icon = new ImageIcon(mod.getImage());
 					ModuleIcon label = new ModuleIcon(mod, this.gadgetList);
-					label.setSize(83,83);
-					label.setPreferredSize(new Dimension(83,83));
+					label.setSize(60,60);
+					label.setPreferredSize(new Dimension(60,60));
 					label.setVisible(true);
 					label.addSelectionListener(this);
 					itemsPanel.add(label);

@@ -169,7 +169,9 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
     }
 
 	public void doImportDragDrop(IModule module){
-		System.out.println("Attempting import");
+		//TODO: Do this later!
+		System.out.println("Drag drop not implemented just yet.....I'm only on programmer!");
+		/*System.out.println("Attempting import");
 		if(module instanceof IPackedFile){
 			IPackedFile file = (IPackedFile)module;
 			String name = module.getName();
@@ -209,7 +211,7 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 			this.loadGadget(gadget);
 		}else{
 			System.out.println("Error trying to import the module...");
-		}
+		}*/
 	}
 	
 	private boolean checkName(IGadget gadget, String name){
@@ -229,7 +231,7 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 	}
 
 	public void mouseEntered(MouseEvent arg0) {
-		System.out.println("Mouse enetered");
+		//System.out.println("Mouse enetered");
 		this.mouseIsOver = true;
 		int x = arg0.getLocationOnScreen().x;
 		int y = arg0.getLocationOnScreen().y;
@@ -239,7 +241,7 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 	}
 
 	public void mouseExited(MouseEvent arg0) {
-		System.out.println("Mouse exited");
+		//System.out.println("Mouse exited");
 		this.mouseIsOver = false;
 	}
 

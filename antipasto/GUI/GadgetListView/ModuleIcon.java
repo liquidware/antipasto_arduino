@@ -1,5 +1,6 @@
 package antipasto.GUI.GadgetListView;
 
+import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -29,7 +30,7 @@ public class ModuleIcon extends JLabel implements Transferable, DragGestureListe
 	DragSource ds;
 	GadgetList list;
 	public ModuleIcon(IModule module, GadgetList list){
-		super(new ImageIcon(module.getImage()));
+		super(new ImageIcon(module.getImage().getScaledInstance(60, 60, Image.SCALE_AREA_AVERAGING)));
 		internalModule = module;
 		ds = new DragSource();
 		ds.createDefaultDragGestureRecognizer(
