@@ -32,10 +32,12 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 
 public class GadgetPanel extends JDialog implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener,
-													MouseListener 
+													MouseListener, WindowListener 
 													{
 
  
@@ -55,9 +57,11 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
     private IGadget _gadget;
 
-    public GadgetPanel(String sketchBookDirectory) {
+    public GadgetPanel(String sketchBookDirectory, JFrame frame) {
+    	super(frame, false);
         this.addMouseListener(new ModuleMouseAdapter());
         this.setUndecorated(true);
+        frame.addWindowListener(this);
     }
     
     public void loadGadget(String gadget){
@@ -83,9 +87,9 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	        top.setLayout(new FlowLayout());
 	        
 	        try {
-	        	ImageIcon upperRight = new ImageIcon("..\\lib\\upperleftgadget.png");
-	    		upperRight.setImage(Base.getImage("..\\lib\\upperleftgadget.png", this));
-	    		JLabel upperImageLabel = new JLabel(upperRight);
+	        	ImageIcon upperLeft = new ImageIcon("..\\lib\\upperleftgadget.png");
+	    		upperLeft.setImage(Base.getImage("..\\lib\\upperleftgadget.png", this));
+	    		JLabel upperImageLabel = new JLabel(upperLeft);
 				top.add(upperImageLabel);
 				upperImageLabel.setVisible(true);
 			} catch (Exception e) {
@@ -99,8 +103,9 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	    	bottom.setLayout(new FlowLayout());
 	    	ImageIcon lowerRight = new ImageIcon();
 	    	try {
-	    		ImageIcon lowerRightImage = new ImageIcon("\\lib\\upperleftgadget.png");
-				JLabel lowerImageLabel = new JLabel(lowerRightImage);
+	    		ImageIcon lowerLeftImage = new ImageIcon("\\lib\\lowerleftgadget.png");
+				lowerLeftImage.setImage(Base.getImage("..\\lib\\lowerleftgadget.png", this));
+	    		JLabel lowerImageLabel = new JLabel(lowerLeftImage);
 				top.add(lowerImageLabel);
 				lowerImageLabel.setVisible(true);
 			} catch (Exception e) {
@@ -209,7 +214,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         this.sketchBookChangedEventList.remove(IActiveSketchChangingListener.class, listener);
      }
 
-    public void saveCurrentSketch(){
+    public void saveCurrentGadget(){
     	try{
     		if(list.gadget != null){
     			list.saveCurrentGadget();
@@ -240,7 +245,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     }
 
     public void onActiveSketchChanged(SketchChangingObject obj) {
-        this.saveCurrentSketch();
+        this.saveCurrentGadget();
         this.loadSketchFile(obj.newFile);
     }
 
@@ -281,7 +286,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 		Editor editor = (Editor) arg0.getComponent();
 		//int width = 300;
         //this.setSize(width, editor.textarea.getHeight());
-        //this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
+        this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
 	}
 
 	public void componentResized(ComponentEvent arg0) {
@@ -309,6 +314,44 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	public void mousePressed(MouseEvent e) {
 	}
 	public void mouseReleased(MouseEvent e) {
+	}
+
+	public void windowActivated(WindowEvent arg0) {
+		//boolean isVis = this.isVisible();
+		/*if(this._gadget != null){
+			if(this.isVisible()){
+				this.setAlwaysOnTop(true);
+				this.setAlwaysOnTop(false);
+			}
+		}*/
+	}
+
+	public void windowClosed(WindowEvent arg0) {
+		
+	}
+
+	public void windowClosing(WindowEvent arg0) {
+		this.saveCurrentGadget();
+	}
+
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

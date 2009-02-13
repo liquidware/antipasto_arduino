@@ -233,11 +233,11 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 	public void mouseEntered(MouseEvent arg0) {
 		//System.out.println("Mouse enetered");
 		this.mouseIsOver = true;
-		int x = arg0.getLocationOnScreen().x;
-		int y = arg0.getLocationOnScreen().y;
-		if(this.bounds().inside(x, y)){
+		//int x = arg0.getLocationOnScreen().x;
+		//int y = arg0.getLocationOnScreen().y;
+		//if(this.bounds().inside(x, y)){
 			
-		}
+		//}
 	}
 
 	public void mouseExited(MouseEvent arg0) {

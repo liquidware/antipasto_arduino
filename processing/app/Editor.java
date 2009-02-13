@@ -290,7 +290,7 @@ public class Editor extends JFrame
     editorSection.add(rightWing, BorderLayout.EAST);
     
     upper.add(editorSection);
-    gadgetPanel = new GadgetPanel("");
+    gadgetPanel = new GadgetPanel("", this);
     gadgetPanel.addActiveGadgetChangedEventListener(this);
 
     leftWing.setVisible(true);
@@ -1688,7 +1688,7 @@ public class Editor extends JFrame
     _frame.toFront();
     
     if(this.gadgetPanel.isActive()){
-    	this.gadgetPanel.saveCurrentSketch();
+    	this.gadgetPanel.saveCurrentGadget();
     	Preferences.set("gadget.active", "true");
     	Preferences.set("last.active.gadget", ((IPackedFile)this.gadgetPanel.getActiveGadget()).getPackedFile().getPath());
     }
@@ -2286,6 +2286,9 @@ public class Editor extends JFrame
   public void handleQuitInternal() {
     // doStop() isn't sufficient with external vm & quit
     // instead use doClose() which will kill the external vm
+	  if(this.gadgetPanel.getActiveGadget() != null){
+		  this.gadgetPanel.saveCurrentGadget();
+	  }
     doClose();
 
     checkModified(HANDLE_QUIT);
@@ -2569,7 +2572,7 @@ public class Editor extends JFrame
   }
 
     public void onActiveGadgetChanged(ActiveGadgetObject obj){
-        this.gadgetPanel.saveCurrentSketch();
+        this.gadgetPanel.saveCurrentGadget();
         if(gadgetPanel.getActiveModule() != null && gadgetPanel.getActiveGadget() != null){
 	        this.handleSave(true);
 	        File sketchFile = obj.getSketch();
