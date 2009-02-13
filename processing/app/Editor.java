@@ -1520,7 +1520,7 @@ public class Editor extends JFrame
 	                    String boardName = Preferences.get("board");
 	                    System.out.println(boardName);
 	                    if(!currentSketch.handleRun(new Target(System.getProperty("user.dir") + File.separator + "hardware" +
-	                    File.separator + "cores", Preferences.get("boards." + boardName + ".build.core")))){
+	                    File.separator + "cores", Preferences.get("boards." + target + ".build.core")))){
 	                        System.out.println("Error compiling file");
 
 	                    }                
@@ -2582,7 +2582,9 @@ public class Editor extends JFrame
 	        Preferences.init();
 	        this.buildToolsMenu();
 	        this.repaint();
-        }        
+        }else if(gadgetPanel.getActiveGadget() == null){
+        	this.setVisible(true);
+        }
     }
 
     /*

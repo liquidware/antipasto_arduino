@@ -174,13 +174,14 @@ public class Base {
     //editor.setSize(300, 600);
     frame.setSize(600, 600);
    
-    editor.gadgetPanel.setSize(300, editor.getHeight());
-    editor.gadgetPanel.setLocation(editor.getX() - editor.getWidth(), editor.textarea.getLocationOnScreen().y);	
+    editor.gadgetPanel.setSize(300, editor.textarea.getHeight() + 40);
+    int xLocation = editor.getX() - editor.gadgetPanel.getWidth();
+    editor.gadgetPanel.setLocation(xLocation, editor.textarea.getLocationOnScreen().y);	
     //editor.gadgetPanel.setSize(300,600);
     editor.addComponentListener(editor.gadgetPanel);
       
     // check for updates
-    editor.gadgetPanel.setLocation((int)(editor.getX() - editor.gadgetPanel.getSize().getWidth()), editor.getY());
+    //editor.gadgetPanel.setLocation((int)(editor.getX() - editor.gadgetPanel.getSize().getWidth()), editor.getY());
     if(editor.gadgetPanel.getActiveGadget() != null){
     	editor.gadgetPanel.setVisible(true);
     }

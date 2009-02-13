@@ -34,7 +34,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-public class GadgetPanel extends JWindow implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener,
+public class GadgetPanel extends JDialog implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener,
 													MouseListener
 													{
 
@@ -57,6 +57,7 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 
     public GadgetPanel(String sketchBookDirectory) {
         this.addMouseListener(new ModuleMouseAdapter());
+        this.setUndecorated(true);
     }
     
     public void loadGadget(String gadget){
@@ -73,10 +74,12 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 	        IGadget book = fact.loadGadget(gadget, dir);
 	        
 	        list = new GadgetList(book, gadget.getParent());
-	    	GadgetListHorizontal top = new GadgetListHorizontal(new File("C:" + File.separator + "OpenHardware" + File.separator + "Modules"), list);
-	    	top.setBackground(new Color(0x04, 0x4F, 0x6F));
+	    	//Save this for later!
+	        GadgetListHorizontal libPanel = new GadgetListHorizontal(new File("C:" + File.separator + "OpenHardware" + File.separator + "Modules"), list);
+	    	JPanel top = new JPanel();
+	        top.setBackground(new Color(0x04, 0x4F, 0x6F));
 	    	this.getContentPane().add(top, BorderLayout.NORTH);
-	    	top.setSize(new Dimension(this.getWidth(), 90));
+	    	top.setSize(new Dimension(this.getWidth(), 15));
 	        top.setLayout(new FlowLayout());
 	        
 	        try {
@@ -122,14 +125,23 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 	        list.addSketchChangingeListener(this);
 	
 	        list.addListSelectionListener(this);
+	        Box box = Box.createVerticalBox();
+	        box.setBackground(Color.orange);
 	        JScrollPane scrollPanel = new JScrollPane((JList) list);
-	        this.getContentPane().add(scrollPanel, BorderLayout.CENTER);
+	        scrollPanel.setPreferredSize(new Dimension(300, 300));
+	        scrollPanel.setSize(new Dimension(300, 300));
+	        
+	        libPanel.setSize(300, 100);
+	        libPanel.setPreferredSize(new Dimension(300, 100));
+	        
+	        box.add(libPanel);
+	        box.add(scrollPanel);
 	
-	        JPopupMenu menu = new JPopupMenu();
-	
-	        JPanel panel = new JPanel();
-	        panel.setLayout(new FlowLayout());
-	        panel.setSize(200, 100);
+	        this.getContentPane().add(box, BorderLayout.CENTER);
+	        
+	        //JPanel panel = new JPanel();
+	        //panel.setLayout(new FlowLayout());
+	        //panel.setSize(200, 100);
 	
 	        /*button = new JButton("Add Gadget");
 	        button.addMouseListener(new AddGadgetMenu(menu, button));
@@ -138,9 +150,10 @@ public class GadgetPanel extends JWindow implements ListSelectionListener, IActi
 	        button = new JButton("Remove Gadget");
 	        panel.add(button);
 	        */
-	        this.getContentPane().add(panel, BorderLayout.PAGE_START);
-	        panel.setVisible(true);
+	        //this.getContentPane().add(panel, BorderLayout.PAGE_START);
+	        //panel.setVisible(true);
 	
+	        libPanel.setVisible(true);
 	        right.setVisible(true);
 	        top.setVisible(true);
 	        bottom.setVisible(true);

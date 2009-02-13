@@ -31,7 +31,7 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		scrollPane.setSize(new Dimension(300, 90));
-		scrollPane.setPreferredSize(new Dimension(250, 83));
+		scrollPane.setPreferredSize(new Dimension(300, 90));
 		
 		this.add(scrollPane);
 		this.loadDirectory();
@@ -45,7 +45,7 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		JPanel itemsPanel = new JPanel();
 		itemsPanel.setBackground(Color.WHITE);
 		itemsPanel.setLayout(new FlowLayout());
-		itemsPanel.setSize(new Dimension(modules.size()*83, 83));
+		itemsPanel.setSize(new Dimension(this.scrollPane.getWidth(), 90 ));
 		for(int i = 0; i < files.length; i ++){
 			if(files[i].getName().endsWith(IModule.moduleExtension)){
 				try {
@@ -67,8 +67,8 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 			}
 		}
 		//this.scrollPane = new JScrollPane(itemsPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setSize(new Dimension(250, 83));
-		scrollPane.setPreferredSize(new Dimension(250, 83));
+		scrollPane.setSize(new Dimension(300, 83));
+		scrollPane.setPreferredSize(new Dimension(300, 83));
 		scrollPane.setViewportView(itemsPanel);
 		//scrollPane.add(itemsPanel);
 		//this.add(itemsPanel);
