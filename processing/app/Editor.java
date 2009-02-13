@@ -1982,6 +1982,7 @@ public class Editor extends JFrame
         	  this.loadGadget(this.gadgetPanel.getActiveGadget());
         	  isGadgetFile = true;
         	  this.lastActiveGadgetPath = path;
+        	  
           }catch(Exception ex){
 	        isGadgetFile = false;
 	        String properParent =
@@ -2043,7 +2044,12 @@ public class Editor extends JFrame
       this.gadgetPanel.setVisible(isGadgetFile);
       if(isGadgetFile){
     	  gadgetPanel.show();
+    	  /* The Boards menu doesn't 
+    	   * make sense with a gadget .pde file, so disable it */
+    	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
       }else{
+    	  /* Use the Boards menu with a std .pde file */
+    	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);
     	  gadgetPanel.hide();
       }
       
