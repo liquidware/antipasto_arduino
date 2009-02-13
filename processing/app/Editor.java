@@ -99,9 +99,12 @@ public class Editor extends JFrame
   Serial serialPort;
   JSplitPane splitPane;
   JPanel consolePanel;
-
+  
   JLabel lineNumberComponent;
 
+  JPanel leftWing;
+  JLabel leftExpandLabel; 
+  
   // currently opened program
   public Sketch sketch;
 
@@ -257,14 +260,29 @@ public class Editor extends JFrame
     lineStatus = new EditorLineStatus(textarea);
     consolePanel.add(lineStatus, BorderLayout.SOUTH);
     
-    JPanel leftWing = new JPanel();
+    leftExpandLabel = new JLabel("<");
+    leftWing = new JPanel();
     leftWing.setBackground(new Color(0x54, 0x91, 0x9e));
     leftWing.setSize(15, 0);
-    leftWing.setPreferredSize(new Dimension(15, 0));
-
+    leftWing.setPreferredSize(new Dimension(10, 0));
+    leftWing.setLayout(new BorderLayout());
+    leftWing.add(leftExpandLabel, BorderLayout.CENTER);
+    
+    
+    
     leftWing.addMouseListener(new MouseListener(){
 		public void mouseClicked(MouseEvent arg0) {
+			
 			gadgetPanel.setVisible(!gadgetPanel.isVisible());
+			
+			/* Handle the expand icon */
+			if (gadgetPanel.isVisible()){
+				leftExpandLabel.setText(">");
+			}
+			else
+			{
+				leftExpandLabel.setText("<");
+			}
 		}
 		public void mouseEntered(MouseEvent arg0) {
 			// TODO Auto-generated method stub
@@ -283,7 +301,7 @@ public class Editor extends JFrame
     JPanel rightWing = new JPanel();
     rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
     rightWing.setSize(15, 0);
-    rightWing.setPreferredSize(new Dimension(15, 0));
+    rightWing.setPreferredSize(new Dimension(10, 0));
     
     editorSection.add(leftWing, BorderLayout.WEST);
     editorSection.add(textarea, BorderLayout.CENTER);
@@ -2047,6 +2065,8 @@ public class Editor extends JFrame
     	  /* The Boards menu doesn't 
     	   * make sense with a gadget .pde file, so disable it */
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
+    	  leftExpandLabel.setText(">");
+    	  
       }else{
     	  /* Use the Boards menu with a std .pde file */
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);
