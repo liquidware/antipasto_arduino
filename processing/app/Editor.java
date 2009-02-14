@@ -285,7 +285,6 @@ public class Editor extends JFrame
 			}
 		}
 		public void mouseEntered(MouseEvent arg0) {
-			// TODO Auto-generated method stub
 		}
 		public void mouseExited(MouseEvent arg0) {
 			// TODO Auto-generated method stub
@@ -2065,8 +2064,7 @@ public class Editor extends JFrame
     	  /* The Boards menu doesn't 
     	   * make sense with a gadget .pde file, so disable it */
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
-    	  leftExpandLabel.setText(">");
-    	  
+    	  leftExpandLabel.setText(">");    	  
       }else{
     	  /* Use the Boards menu with a std .pde file */
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);

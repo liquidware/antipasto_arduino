@@ -37,7 +37,7 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 
 public class GadgetPanel extends JDialog implements ListSelectionListener, IActiveSketchChangingListener, ComponentListener,
-													MouseListener, WindowListener 
+													MouseListener, WindowListener
 													{
 
  
@@ -57,6 +57,9 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
     private String libraryDirectory;
     private IGadget _gadget;
+    
+    private int cachedHeight;
+    private int cachedWidth;
 
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
     	super(frame, false);
@@ -174,6 +177,14 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     	}
     }
 
+    public void setVisible(boolean b){
+    	if(this._gadget != null){
+    		super.setVisible(b);
+    	}else{
+    		super.setVisible(false);
+    	}
+    }
+    
     /*
     * Called when the active listview is changed
     * */

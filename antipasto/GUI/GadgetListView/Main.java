@@ -12,7 +12,7 @@ import java.awt.event.WindowEvent;
 
 public class Main {
     public static void main(String[] args) {
-        JFrame frame = new JFrame();
+        /*JFrame frame = new JFrame();
         frame.setLayout(new FlowLayout());
         final GadgetPanel wind = new GadgetPanel("C:\\OpenHardware\\Gadgets\\Slide.pde", frame);
         IActiveSketchChangingListener listenr;
@@ -23,6 +23,6 @@ public class Main {
         public void windowClosing(WindowEvent e) {
           wind.saveCurrentGadget();
         }
-      });
+      });*/
     }
 }
