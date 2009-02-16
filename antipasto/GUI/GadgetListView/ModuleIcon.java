@@ -101,8 +101,10 @@ public class ModuleIcon extends JLabel implements Transferable, DragGestureListe
 	public void dragDropEnd(DragSourceDropEvent arg0) {
 		int x = arg0.getX();
 		int y = arg0.getY();
-		if(list.bounds().inside(x, y)){
-			list.doImportDragDrop(this.internalModule);
+		if(list != null){
+			if(list.bounds().inside(x, y)){
+				list.doImportDragDrop(this.internalModule);
+			}
 		}
 	}
 

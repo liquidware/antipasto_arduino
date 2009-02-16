@@ -55,11 +55,14 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
     private IModule activeModule;
 
+    private GadgetListHorizontal libPanel;
+
     private String libraryDirectory;
     private IGadget _gadget;
+    private JScrollPane scrollPanel ;
     
-    private int cachedHeight;
-    private int cachedWidth;
+    private int cachedHeight = 390;
+    private int cachedWidth = 300;
 
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
     	super(frame, false);
@@ -67,111 +70,119 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         this.setUndecorated(true);
         frame.addWindowListener(this);
         this.libraryDirectory = libraryDirectory;
+        this.init();
     }
     
     public void loadGadget(String gadget){
     	this.loadGadget(new File(gadget));
     }
     
+    private void init(){
+    	this.getContentPane().setLayout(new BorderLayout());
+    	JPanel top = new JPanel();
+        top.setBackground(new Color(0x04, 0x4F, 0x6F));
+    	this.getContentPane().add(top, BorderLayout.NORTH);
+    	top.setSize(new Dimension(this.getWidth(), 15));
+        top.setLayout(new FlowLayout());
+        /*
+        try {
+        	ImageIcon upperLeft = new ImageIcon("..\\lib\\upperleftgadget.png");
+    		upperLeft.setImage(Base.getImage("..\\lib\\upperleftgadget.png", this));
+    		JLabel upperImageLabel = new JLabel(upperLeft);
+			top.add(upperImageLabel);
+			upperImageLabel.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}*/
+        
+    	JPanel bottom = new JPanel();
+    	bottom.setBackground(new Color(0x04, 0x4F, 0x6F));
+    	this.getContentPane().add(bottom, BorderLayout.SOUTH);
+    	bottom.setSize(new Dimension(this.getWidth(), 15));
+    	bottom.setLayout(new FlowLayout());
+    	/*
+    	ImageIcon lowerRight = new ImageIcon();
+    	try {
+    		ImageIcon lowerLeftImage = new ImageIcon("\\lib\\lowerleftgadget.png");
+			lowerLeftImage.setImage(Base.getImage("..\\lib\\lowerleftgadget.png", this));
+    		JLabel lowerImageLabel = new JLabel(lowerLeftImage);
+			top.add(lowerImageLabel);
+			lowerImageLabel.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        */
+        
+    	
+    	JPanel right = new JPanel();
+    	right.setBackground(new Color(0x04, 0x4F, 0x6F));
+    	this.getContentPane().add(right, BorderLayout.WEST);
+    	right.setSize(new Dimension(15, this.getHeight()));
+        
+    	
+    	JButton button;
+        
+        //GadgetWindowTransferHandler transferHandler = new GadgetWindowTransferHandler();
+       
+    	Box box = Box.createVerticalBox();
+        
+        scrollPanel = new JScrollPane();
+        scrollPanel.setPreferredSize(new Dimension(300, 300));
+        scrollPanel.setSize(new Dimension(300, 300));
+        
+        libPanel = new GadgetListHorizontal(new File(this.libraryDirectory), list);
+        
+        libPanel.setSize(300, 100);
+        libPanel.setPreferredSize(new Dimension(300, 100));
+        libPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+        
+        box.setBackground(new Color(0x04, 0x4F, 0x6F));
+        
+        box.add(libPanel);
+        box.add(scrollPanel);
+
+        this.getContentPane().add(box, BorderLayout.CENTER);
+        
+        //JPanel panel = new JPanel();
+        //panel.setLayout(new FlowLayout());
+        //panel.setSize(200, 100);
+
+        /*button = new JButton("Add Gadget");
+        button.addMouseListener(new AddGadgetMenu(menu, button));
+
+        panel.add(button);
+        button = new JButton("Remove Gadget");
+        panel.add(button);
+        */
+        //this.getContentPane().add(panel, BorderLayout.PAGE_START);
+        //panel.setVisible(true);
+
+        this.setSize(this.cachedWidth, this.cachedHeight);
+        
+        libPanel.setVisible(true);
+        right.setVisible(true);
+        top.setVisible(true);
+        bottom.setVisible(true);
+        this.setVisible(true);
+
+    }
+    
     public void loadGadget(File gadget){
-    	if(gadget  != null){
-	    	this.getContentPane().setLayout(new BorderLayout());
+    	if(gadget  != null){	
+    		scrollPanel = new JScrollPane((JList) list);
+            scrollPanel.setPreferredSize(new Dimension(300, 300));
+            scrollPanel.setSize(new Dimension(300, 300));
+            
+    		 list.addSketchChangingeListener(this);
+    		 list.addListSelectionListener(this);
+    		 GadgetFactory fact = skbFact;
 	    	
-	    	GadgetFactory fact = skbFact;
-	    	
-	        String dir = System.getProperty("java.io.tmpdir") + File.separator + gadget.getName();
-	        IGadget book = fact.loadGadget(gadget, dir);
+    		 String dir = System.getProperty("java.io.tmpdir") + File.separator + gadget.getName();
+    		 IGadget book = fact.loadGadget(gadget, dir);
 
 	        list = new GadgetList(book, gadget.getParent());
 	    	//Save this for later!
-	        GadgetListHorizontal libPanel = new GadgetListHorizontal(new File(this.libraryDirectory), list);
-	    	JPanel top = new JPanel();
-	        top.setBackground(new Color(0x04, 0x4F, 0x6F));
-	    	this.getContentPane().add(top, BorderLayout.NORTH);
-	    	top.setSize(new Dimension(this.getWidth(), 15));
-	        top.setLayout(new FlowLayout());
-	        
-	        try {
-	        	ImageIcon upperLeft = new ImageIcon("..\\lib\\upperleftgadget.png");
-	    		upperLeft.setImage(Base.getImage("..\\lib\\upperleftgadget.png", this));
-	    		JLabel upperImageLabel = new JLabel(upperLeft);
-				top.add(upperImageLabel);
-				upperImageLabel.setVisible(true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-	        
-	    	JPanel bottom = new JPanel();
-	    	bottom.setBackground(new Color(0x04, 0x4F, 0x6F));
-	    	this.getContentPane().add(bottom, BorderLayout.SOUTH);
-	    	bottom.setSize(new Dimension(this.getWidth(), 15));
-	    	bottom.setLayout(new FlowLayout());
-	    	ImageIcon lowerRight = new ImageIcon();
-	    	try {
-	    		ImageIcon lowerLeftImage = new ImageIcon("\\lib\\lowerleftgadget.png");
-				lowerLeftImage.setImage(Base.getImage("..\\lib\\lowerleftgadget.png", this));
-	    		JLabel lowerImageLabel = new JLabel(lowerLeftImage);
-				top.add(lowerImageLabel);
-				lowerImageLabel.setVisible(true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-	        
-	        
-	    	
-	    	JPanel right = new JPanel();
-	    	right.setBackground(new Color(0x04, 0x4F, 0x6F));
-	    	this.getContentPane().add(right, BorderLayout.WEST);
-	    	right.setSize(new Dimension(15, this.getHeight()));
-	        
-	    	
-	    	JButton button;
-	        
-	        System.out.println("Temporary directory is = " + dir);
-	
-	        _gadget = book;
-	
-	        //GadgetWindowTransferHandler transferHandler = new GadgetWindowTransferHandler();
-	        list.addSketchChangingeListener(this);
-	
-	        list.addListSelectionListener(this);
-	        Box box = Box.createVerticalBox();
-	        
-	        JScrollPane scrollPanel = new JScrollPane((JList) list);
-	        scrollPanel.setPreferredSize(new Dimension(300, 300));
-	        scrollPanel.setSize(new Dimension(300, 300));
-	        
-	        libPanel.setSize(300, 100);
-	        libPanel.setPreferredSize(new Dimension(300, 100));
-	        libPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
-	        
-	        box.setBackground(new Color(0x04, 0x4F, 0x6F));
-	        
-	        box.add(libPanel);
-	        box.add(scrollPanel);
-	
-	        this.getContentPane().add(box, BorderLayout.CENTER);
-	        
-	        //JPanel panel = new JPanel();
-	        //panel.setLayout(new FlowLayout());
-	        //panel.setSize(200, 100);
-	
-	        /*button = new JButton("Add Gadget");
-	        button.addMouseListener(new AddGadgetMenu(menu, button));
-	
-	        panel.add(button);
-	        button = new JButton("Remove Gadget");
-	        panel.add(button);
-	        */
-	        //this.getContentPane().add(panel, BorderLayout.PAGE_START);
-	        //panel.setVisible(true);
-	
-	        libPanel.setVisible(true);
-	        right.setVisible(true);
-	        top.setVisible(true);
-	        bottom.setVisible(true);
-	        this.setVisible(true);
-    	}else{
+	    		}else{
     		this.setVisible(false);
     		this.hide();				//gotta upgrade the java version....
     	}
@@ -181,7 +192,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     	if(this._gadget != null){
     		super.setVisible(b);
     	}else{
-    		super.setVisible(false);
+    		super.setVisible(b);
     	}
     }
     
@@ -304,8 +315,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
 	public void componentResized(ComponentEvent arg0) {
 		Editor editor = (Editor) arg0.getComponent();
-		int width = 300;
-        this.setSize(width, editor.textarea.getHeight());
+        this.setSize(this.cachedWidth, this.cachedHeight);
         this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
 		
 	}
