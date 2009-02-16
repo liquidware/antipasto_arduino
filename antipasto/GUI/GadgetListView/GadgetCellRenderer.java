@@ -27,8 +27,37 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
         if (value instanceof IModule) {
             IModule gadget = (IModule)value;
             ImageIcon icon = new ImageIcon(gadget.getImage());
-            label.setIcon(icon);
-            label.setText("");
+            
+            Box box = Box.createVerticalBox();
+            
+            /* Build the left panel */
+            JPanel panelLeft = new JPanel();
+            panelLeft.setLayout(new BorderLayout());
+            panelLeft.setBackground(Color.white);
+            
+            JLabel imageLabel = new JLabel(icon);
+            panelLeft.add(imageLabel, BorderLayout.WEST);
+            
+            
+            /* Build the right panel */
+            JPanel panelRight = new JPanel();
+            panelRight.setLayout(new BoxLayout(panelRight, BoxLayout.PAGE_AXIS));
+            panelRight.setBackground(Color.white);
+            
+            JLabel textLabel1 = new JLabel(" ");
+            JLabel textLabel2 = new JLabel("Size: 14.7kB");
+            JLabel textLabel3 = new JLabel("Lines of Code: 407");
+            panelRight.add(textLabel1);
+            panelRight.add(textLabel2);
+            panelRight.add(textLabel3);
+            
+            /* Build the main container for left and right */
+            JPanel panel = new JPanel();
+            panel.setLayout(new BorderLayout());
+            panel.setBackground(Color.white);
+            panel.add(panelLeft, BorderLayout.WEST);
+            panel.add(panelRight);
+            return panel;
             //label.setText(gadget.getName());
             
         } else {
