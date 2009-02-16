@@ -61,6 +61,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     private IGadget _gadget;
     private JScrollPane scrollPanel ;
     
+    private Box box;
+    
     private int cachedHeight = 390;
     private int cachedWidth = 300;
 
@@ -124,7 +126,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         
         //GadgetWindowTransferHandler transferHandler = new GadgetWindowTransferHandler();
        
-    	Box box = Box.createVerticalBox();
+    	box = Box.createVerticalBox();
         
         scrollPanel = new JScrollPane();
         scrollPanel.setPreferredSize(new Dimension(300, 300));
@@ -169,20 +171,32 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     public void loadGadget(File gadget){
     	if(gadget  != null){	
-    		scrollPanel = new JScrollPane((JList) list);
-            scrollPanel.setPreferredSize(new Dimension(300, 300));
-            scrollPanel.setSize(new Dimension(300, 300));
-            
-    		 list.addSketchChangingeListener(this);
-    		 list.addListSelectionListener(this);
-    		 GadgetFactory fact = skbFact;
-	    	
-    		 String dir = System.getProperty("java.io.tmpdir") + File.separator + gadget.getName();
-    		 IGadget book = fact.loadGadget(gadget, dir);
+    		
+    		GadgetFactory fact = skbFact;
+    		
+    		scrollPanel.setVisible(false);
+	    	this.remove(scrollPanel);
+    		
+	    	String dir = System.getProperty("java.io.tmpdir") + gadget.getName();
+    		IGadget book = fact.loadGadget(gadget, dir);
 
+    		this._gadget = book;
+    		 
 	        list = new GadgetList(book, gadget.getParent());
-	    	//Save this for later!
-	    		}else{
+	        list.loadGadget(_gadget);
+	        
+	        scrollPanel = new JScrollPane((JList) list);
+	        scrollPanel.setPreferredSize(new Dimension(300, 300));
+            scrollPanel.setSize(new Dimension(300, 300));
+            box.add(scrollPanel);
+            scrollPanel.setVisible(true);
+            
+    	    list.addSketchChangingeListener(this);
+    	    list.addListSelectionListener(this);
+
+    		 this.activeModule = this.getActiveModule();
+	    	//Save this for later!		
+    	}else{
     		this.setVisible(false);
     		this.hide();				//gotta upgrade the java version....
     	}

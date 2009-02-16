@@ -1995,12 +1995,15 @@ public class Editor extends JFrame
       }else {
           try{
         	  this.gadgetPanel.loadGadget(new File(path));
-        	  path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
+        	  IModule module = this.gadgetPanel.getActiveModule();
+        	  File sketchFile = module.getSketchFile();
+        	  path = sketchFile.getPath();
         	  this.loadGadget(this.gadgetPanel.getActiveGadget());
         	  isGadgetFile = true;
         	  this.lastActiveGadgetPath = path;
         	  
           }catch(Exception ex){
+        	  ex.printStackTrace();
 	        isGadgetFile = false;
 	        String properParent =
 	          file.getName().substring(0, file.getName().length() - 4);
