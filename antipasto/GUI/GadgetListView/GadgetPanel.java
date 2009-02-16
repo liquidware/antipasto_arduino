@@ -59,11 +59,17 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
     private String libraryDirectory;
     private IGadget _gadget;
-    private JScrollPane scrollPanel ;
+    private JScrollPane scrollPanel;
+
+    private JPanel messagePanel;
+    private JLabel messageLabel;
     
+    private JPanel gadgetDescPanel;
+    private JLabel gadgetDescLabel;
+
     private Box box;
     
-    private int cachedHeight = 390;
+    private int cachedHeight = 415;
     private int cachedWidth = 300;
 
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
@@ -81,11 +87,13 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     private void init(){
     	this.getContentPane().setLayout(new BorderLayout());
-    	JPanel top = new JPanel();
-        top.setBackground(new Color(0x04, 0x4F, 0x6F));
-    	this.getContentPane().add(top, BorderLayout.NORTH);
-    	top.setSize(new Dimension(this.getWidth(), 15));
-        top.setLayout(new FlowLayout());
+    	//JPanel top = new JPanel();
+        //top.setBackground(new Color(0x04, 0x4F, 0x6F));
+    	//this.getContentPane().add(top, BorderLayout.NORTH);
+    	//top.setSize(new Dimension(this.getWidth(), 15));
+        //top.setLayout(new FlowLayout());
+    	//messagePanel.setLayout(new FlowLayout());
+        
         /*
         try {
         	ImageIcon upperLeft = new ImageIcon("..\\lib\\upperleftgadget.png");
@@ -96,13 +104,16 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
-        
+
+        /*
     	JPanel bottom = new JPanel();
     	bottom.setBackground(new Color(0x04, 0x4F, 0x6F));
     	this.getContentPane().add(bottom, BorderLayout.SOUTH);
     	bottom.setSize(new Dimension(this.getWidth(), 15));
     	bottom.setLayout(new FlowLayout());
-    	/*
+        */ 
+
+        /*
     	ImageIcon lowerRight = new ImageIcon();
     	try {
     		ImageIcon lowerLeftImage = new ImageIcon("\\lib\\lowerleftgadget.png");
@@ -115,14 +126,37 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 		}
         */
         
-    	
-    	JPanel right = new JPanel();
-    	right.setBackground(new Color(0x04, 0x4F, 0x6F));
-    	this.getContentPane().add(right, BorderLayout.WEST);
-    	right.setSize(new Dimension(15, this.getHeight()));
+    	/* The library description */
+    	JPanel libDescPanel = new JPanel();
+        JLabel libDescLabel = new JLabel(" Library: OpenHardware");
+        libDescLabel.setForeground(Color.white);
         
-    	
-    	JButton button;
+        libDescPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+        libDescPanel.setSize(new Dimension(300, 15));
+    	libDescPanel.setLayout(new BorderLayout());
+    	libDescPanel.add(libDescLabel, BorderLayout.WEST);  	
+
+    	/* The gadget file description */
+    	gadgetDescPanel = new JPanel();
+        gadgetDescLabel = new JLabel(" Gadget: ");
+        gadgetDescLabel.setForeground(Color.white);
+        
+        gadgetDescPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+        gadgetDescPanel.setSize(new Dimension(300, 15));
+        gadgetDescPanel.setLayout(new BorderLayout());
+        gadgetDescPanel.add(gadgetDescLabel, BorderLayout.WEST);  
+        
+        /* The message panel */
+    	messagePanel = new JPanel();
+        messageLabel = new JLabel(" No messages.");
+        messageLabel.setForeground(Color.white);
+        
+        messagePanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+        messagePanel.setSize(new Dimension(300, 15));
+        messagePanel.setLayout(new BorderLayout());
+        messagePanel.add(messageLabel, BorderLayout.WEST);          
+        
+        JButton button;
         
         //GadgetWindowTransferHandler transferHandler = new GadgetWindowTransferHandler();
        
@@ -133,17 +167,18 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         scrollPanel.setSize(new Dimension(300, 300));
         
         libPanel = new GadgetListHorizontal(new File(this.libraryDirectory), list);
-        
-        libPanel.setSize(300, 100);
-        libPanel.setPreferredSize(new Dimension(300, 100));
-        libPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+        libPanel.setSize(300, 70);
+        libPanel.setPreferredSize(new Dimension(300, 70));
         
         box.setBackground(new Color(0x04, 0x4F, 0x6F));
         
+        box.add(libDescPanel);
         box.add(libPanel);
+        box.add(gadgetDescPanel);
         box.add(scrollPanel);
+        box.add(messagePanel);
 
-        this.getContentPane().add(box, BorderLayout.CENTER);
+        this.getContentPane().add(box, BorderLayout.NORTH);
         
         //JPanel panel = new JPanel();
         //panel.setLayout(new FlowLayout());
@@ -159,23 +194,31 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         //this.getContentPane().add(panel, BorderLayout.PAGE_START);
         //panel.setVisible(true);
 
-        this.setSize(this.cachedWidth, this.cachedHeight);
+        //this.setSize(this.cachedWidth, this.cachedHeight);
         
         libPanel.setVisible(true);
-        right.setVisible(true);
-        top.setVisible(true);
-        bottom.setVisible(true);
+        scrollPanel.setVisible(true);
+        //libDescPanel.setVisible(true);
+        //scrollDescPanel.setVisible(true);
+        //top.setVisible(true);
+        //bottom.setVisible(true);
+        
         this.setVisible(true);
-
     }
     
     public void loadGadget(File gadget){
     	if(gadget  != null){	
     		GadgetFactory fact = skbFact;
     		
+    		/* Remove the current panel GUI elements, because 
+    		 * we're going to update them....
+    		 */
     		scrollPanel.setVisible(false);
 	    	this.remove(scrollPanel);
+    		this.remove(messagePanel);
+    		this.remove(gadgetDescPanel);
     		
+    		/* Setup the new panels */
 	    	String dir = System.getProperty("java.io.tmpdir") + gadget.getName();
     		IGadget book = fact.loadGadget(gadget, dir);
 
@@ -187,7 +230,17 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	        scrollPanel = new JScrollPane((JList) list);
 	        scrollPanel.setPreferredSize(new Dimension(300, 300));
             scrollPanel.setSize(new Dimension(300, 300));
+            
+            /* Describe what's going on here to the user and 
+             * display the description in the panel labels.
+             */
+            gadgetDescLabel.setText(" Gadget: " + gadget.getName());
+            messageLabel.setText(" Gadget Loaded.");
+            
+            /* Add all the updated GUI elements back to the panel */
+            box.add(gadgetDescPanel);
             box.add(scrollPanel);
+            box.add(messagePanel);
             scrollPanel.setVisible(true);
             
     	    list.addSketchChangingeListener(this);
@@ -205,7 +258,9 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     	if(this._gadget != null){
     		super.setVisible(b);
     	}else{
+    		this.setSize(this.cachedWidth, this.cachedHeight);
     		super.setVisible(b);
+    		
     	}
     }
     
@@ -323,13 +378,14 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 		Editor editor = (Editor) arg0.getComponent();
 		//int width = 300;
         //this.setSize(width, editor.textarea.getHeight());
+		//this.setSize(this.cachedWidth, this.cachedHeight);
         this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
 	}
 
 	public void componentResized(ComponentEvent arg0) {
-		Editor editor = (Editor) arg0.getComponent();
-        this.setSize(this.cachedWidth, this.cachedHeight);
-        this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
+		//Editor editor = (Editor) arg0.getComponent();
+        //this.setSize(this.cachedWidth, this.cachedHeight);
+        //this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
 		
 	}
 

@@ -30,8 +30,9 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		scrollPane.setSize(new Dimension(300, 90));
-		scrollPane.setPreferredSize(new Dimension(300, 90));
+		scrollPane.setSize(new Dimension(300, 60));
+		scrollPane.setPreferredSize(new Dimension(300, 60));
+		scrollPane.setBorder(null);
 		
 		this.add(scrollPane);
 		this.loadDirectory();
@@ -67,8 +68,8 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 			}
 		}
 		//this.scrollPane = new JScrollPane(itemsPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setSize(new Dimension(300, 83));
-		scrollPane.setPreferredSize(new Dimension(300, 83));
+		scrollPane.setSize(new Dimension(300, 60));
+		scrollPane.setPreferredSize(new Dimension(300, 60));
 		scrollPane.setViewportView(itemsPanel);
 		//scrollPane.add(itemsPanel);
 		//this.add(itemsPanel);
