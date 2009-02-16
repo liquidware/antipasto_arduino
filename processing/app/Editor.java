@@ -2187,21 +2187,30 @@ public class Editor extends JFrame
     //String what = sketch.isLibrary() ? "Applet" : "Library";
     //message("Exporting " + what + "...");
     message("Uploading to I/O Board...");
+    final GadgetPanel panel = this.gadgetPanel;
 
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           try {
             //boolean success = sketch.isLibrary() ?
             //sketch.exportLibrary() : sketch.exportApplet();
-            boolean success = sketch.exportApplet(new Target(
-                System.getProperty("user.dir") + File.separator + "hardware" +
-                File.separator + "cores",
-                Preferences.get("boards." + Preferences.get("board") + ".build.core")));
-            if (success) {
-              message("Done uploading.");
-            } else {
-              // error message will already be visible
-            }
+        	  if(panel.getActiveGadget() == null){
+	            boolean success = sketch.exportApplet(new Target(
+	                System.getProperty("user.dir") + File.separator + "hardware" +
+	                File.separator + "cores",
+	                Preferences.get("boards." + Preferences.get("board") + ".build.core")));
+	            if (success) {
+	              message("Done uploading.");
+	            } else {
+	              // error message will already be visible
+	            }
+        	  }else{
+        		  sketch.exportApplet(new Target(
+      	                System.getProperty("user.dir") + File.separator + "hardware" +
+      	                File.separator + "cores",
+      	                Preferences.get("boards." + panel.getActiveModule().getTarget() + ".build.core")));
+      	             
+        	  }
           } catch (RunnerException e) {
             message("Error during upload.");
             //e.printStackTrace();

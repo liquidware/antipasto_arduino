@@ -171,7 +171,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     public void loadGadget(File gadget){
     	if(gadget  != null){	
-    		
     		GadgetFactory fact = skbFact;
     		
     		scrollPanel.setVisible(false);
