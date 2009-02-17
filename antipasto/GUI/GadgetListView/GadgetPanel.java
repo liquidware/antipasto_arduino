@@ -143,7 +143,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         gadgetDescLabel = new JLabel(" Gadget: ");
         gadgetDescLabel.setForeground(Color.white);
         
-        gadgetDescPanel.setBackground(Color.black);
+        gadgetDescPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
 		gadgetDescPanel.setSize(new Dimension(300, 15));
         gadgetDescPanel.setLayout(new BorderLayout());
         gadgetDescPanel.add(gadgetDescLabel, BorderLayout.WEST);  
