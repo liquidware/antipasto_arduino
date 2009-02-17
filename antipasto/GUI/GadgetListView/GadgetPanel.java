@@ -196,14 +196,14 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
         //this.setSize(this.cachedWidth, this.cachedHeight);
         
-        libPanel.setVisible(true);
-        scrollPanel.setVisible(true);
+        //libPanel.setVisible(true);
+        //scrollPanel.setVisible(true);
         //libDescPanel.setVisible(true);
         //scrollDescPanel.setVisible(true);
         //top.setVisible(true);
         //bottom.setVisible(true);
         
-        this.setVisible(true);
+        //this.setVisible(true);
     }
     
     public void loadGadget(File gadget){
@@ -258,10 +258,9 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     	if(this._gadget != null){
     		super.setVisible(b);
     	}else{
-    		this.setSize(this.cachedWidth, this.cachedHeight);
     		super.setVisible(b);
-    		
     	}
+		this.setSize(this.cachedWidth, this.cachedHeight);
     }
     
     /*

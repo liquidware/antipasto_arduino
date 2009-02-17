@@ -144,6 +144,8 @@ public class Editor extends JFrame
   boolean running;
   boolean presenting;
   boolean debugging;
+  
+  boolean isExporting = false;
 
   // undo fellers
   JMenuItem undoItem, redoItem;
@@ -1439,6 +1441,7 @@ public class Editor extends JFrame
       System.out.println("handling the run");
     doClose();
     running = true;
+    this.isExporting = false;
     buttons.activate(EditorButtons.RUN);
     message("Compiling...");
     // do this for the terminal window / dos prompt / etc
@@ -1469,7 +1472,7 @@ public class Editor extends JFrame
     if(gadgetPanel.getActiveGadget() != null){
 	    if(gadgetPanel.getActiveModule().getRules() != null){
 	    	IMessage message = gadgetPanel.getActiveModule().getRules().getMessages()[0];
-	    	if(message != null){
+	    	if(message != null && this.isExporting){
 	    		IOkListener ourListener = new IOkListener(){
 	    			private String msg;
 	    			public void OkButton() {
@@ -1481,8 +1484,7 @@ public class Editor extends JFrame
 	
 	    			public void setMessage(String message) {
 	    				msg = message;
-	    			}
-	    	    	
+	    			}	    	    	
 	    	    };
 	    	    status.CreateOkDialog(ourListener, message.getMessage());
 	    	}
@@ -2121,11 +2123,17 @@ public class Editor extends JFrame
   public void handleSave2() {
     message("Saving...");
     try {
-      if (sketch.save()) {
-        message("Done Saving.");
-      } else {
-        message(EMPTY);
-      }
+
+	      if (sketch.save()) {
+	        message("Done Saving.");
+	      } else {
+	        message(EMPTY);
+	      }  
+    	if(this.gadgetPanel.getActiveGadget()!= null){
+    	  this.gadgetPanel.saveCurrentGadget();
+    	  System.out.println("saved gadget");
+    	 
+    	}
       // rebuild sketch menu in case a save-as was forced
       // Disabling this for 0125, instead rebuild the menu inside
       // the Save As method of the Sketch object, since that's the
@@ -2149,20 +2157,54 @@ public class Editor extends JFrame
   public void handleSaveAs() {
     doStop();
     buttons.activate(EditorButtons.SAVE);
-
+    final GadgetPanel gp = this.gadgetPanel;
+    final Editor edit = this;
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           message("Saving...");
           try {
-            if (sketch.saveAs()) {
-              message("Done Saving.");
-              // Disabling this for 0125, instead rebuild the menu inside
-              // the Save As method of the Sketch object, since that's the
-              // only one who knows whether something was renamed.
-              //sketchbook.rebuildMenusAsync();
-            } else {
-              message("Save Cancelled.");
-            }
+        	  if(gp.getActiveGadget() != null){
+        			  FileDialog fd = new FileDialog(edit._frame,
+                              "Save gadget file as...",
+                              FileDialog.SAVE);
+        			  File packedDirectory = ((IPackedFile)gp.getActiveGadget()).getPackedFile().getParentFile();
+						 fd.setDirectory(packedDirectory.getPath());
+						 fd.setFile(gp.getActiveGadget().getName());
+						 fd.show();
+						
+						 String newParentDir = fd.getDirectory();
+						 String newName = fd.getFile();
+						
+						if (newName != null){
+							String fileName;
+							if(newName.endsWith(".pde")){
+								fileName = newName;
+								newName = newName.substring(0, newName.length() - 4);
+							}else{
+								fileName = newName + ".pde";
+							}
+							//save the gadget file
+							GadgetFactory fact = new GadgetFactory();
+							IPackedFile file = ((IPackedFile)gp.getActiveGadget());
+							File newGadget = new File(newParentDir + File.separator + fileName);
+							Base.copyFile(file.getPackedFile(), newGadget);
+							IGadget gadg = fact.loadGadget(newGadget, System.getProperty("java.io.tmpdir") + File.separator + newGadget.getName());
+							gadg.setName(newName);
+							gp.loadGadget(newGadget);
+							gp.saveCurrentGadget();
+						}
+						
+        		  }else{
+		            if (sketch.saveAs()) {
+		              message("Done Saving.");
+		              // Disabling this for 0125, instead rebuild the menu inside
+		              // the Save As method of the Sketch object, since that's the
+		              // only one who knows whether something was renamed.
+		              //sketchbook.rebuildMenusAsync();
+		            } else {
+		              message("Save Cancelled.");
+		            }
+        		  }
           } catch (Exception e) {
             // show the error as a message in the window
             error(e);
@@ -2188,6 +2230,7 @@ public class Editor extends JFrame
     //message("Exporting " + what + "...");
     message("Uploading to I/O Board...");
     final GadgetPanel panel = this.gadgetPanel;
+    this.isExporting = true;
 
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {

@@ -5,10 +5,17 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 import antipasto.Interfaces.IModule;
+import antipasto.Interfaces.IPackedFile;
 
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.ColorModel;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class GadgetCellRenderer extends DefaultListCellRenderer {
     public Component getListCellRendererComponent(JList list,
@@ -44,9 +51,11 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
             panelRight.setLayout(new BoxLayout(panelRight, BoxLayout.PAGE_AXIS));
             panelRight.setBackground(Color.white);
             
+            File f = ((IPackedFile)value).getPackedFile();
+            
             JLabel textLabel1 = new JLabel(" ");
-            JLabel textLabel2 = new JLabel("Size: 14.7kB");
-            JLabel textLabel3 = new JLabel("Lines of Code: 407");
+            JLabel textLabel2 = new JLabel("Size: " + f.length() + " kb");
+            JLabel textLabel3 = new JLabel("Lines of Code: " + countLines((IModule)value));
             panelRight.add(textLabel1);
             panelRight.add(textLabel2);
             panelRight.add(textLabel3);
@@ -66,4 +75,21 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
         }
         return(label);
       }
+    
+    private int countLines(IModule module){
+    	File sketch = module.getSketchFile();
+    	try {
+			BufferedReader reader = new BufferedReader(new FileReader(sketch));
+			String line;
+	    	int count = 0;
+	    	while((line = reader.readLine())!=null){	
+	    		count++;
+	    	}
+	    	return count;
+		} catch (FileNotFoundException e) {
+			return 0;
+		} catch (IOException e) {
+			return 0;
+		}
+    }
 }
