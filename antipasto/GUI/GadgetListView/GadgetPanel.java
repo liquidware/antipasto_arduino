@@ -69,7 +69,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
     private Box box;
     
-    private int cachedHeight = 415;
+    private int cachedHeight = 425;
     private int cachedWidth = 300;
 
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
@@ -126,6 +126,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 		}
         */
         
+		this.setBackground(new Color(0x04, 0x4F, 0x6F));
+		
     	/* The library description */
     	JPanel libDescPanel = new JPanel();
         JLabel libDescLabel = new JLabel(" Library: OpenHardware");
@@ -141,8 +143,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         gadgetDescLabel = new JLabel(" Gadget: ");
         gadgetDescLabel.setForeground(Color.white);
         
-        gadgetDescPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
-        gadgetDescPanel.setSize(new Dimension(300, 15));
+        gadgetDescPanel.setBackground(Color.black);
+		gadgetDescPanel.setSize(new Dimension(300, 15));
         gadgetDescPanel.setLayout(new BorderLayout());
         gadgetDescPanel.add(gadgetDescLabel, BorderLayout.WEST);  
         
