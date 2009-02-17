@@ -1,5 +1,5 @@
 #!/bin/sh
- 
+
 REVISION=`head -c 5 ../../todo.txt`
  
 # check to see if the version number in the app is correct
@@ -115,10 +115,10 @@ echo
 
 #define the package
 PACKAGER="AdvancedInstaller.com"                #the packager
-PACKAGE_DIST=Antipasto                          #The distribution
-PACKAGE_NAME=Arduino                            #uppercase, we're growing up :-)
+PACKAGE_DIST="Arduino"                          #The distribution
+PACKAGE_NAME="Arduino"                          #the name of the App
 PACKAGE_FOLDER=package                          #dest for our created package
-PACKAGE_PROJ=$PACKAGE_FOLDER/Antipasto_Arduino_$REVISION.aip   #packager project file
+PACKAGE_PROJ=$PACKAGE_FOLDER/$PACKAGE_NAME'_'$REVISION.aip   #packager project file
 PACKAGE_DIST_DIR=$PACKAGE_FOLDER/$PACKAGE_DIST
 
 #cleanup package directory
@@ -132,12 +132,12 @@ fi
 #build the package
 mv arduino $PACKAGE_NAME                      #rename
 mkdir $PACKAGE_DIST_DIR                       #create distribution dir
-mv $PACKAGE_NAME $PACKAGE_DIST_DIR            #move  directory
-cp Antipasto-package.aip $PACKAGE_PROJ                        #copy the packager project file
+mv $PACKAGE_NAME $PACKAGE_DIST_DIR            #move directory
+cp Antipasto-package.aip $PACKAGE_PROJ        #copy the packager project file
 
 ./packager/$PACKAGER /edit $PACKAGE_PROJ /AddFolder ProgramFilesFolder $PACKAGE_FOLDER'\'$PACKAGE_DIST
 ./packager/$PACKAGER /edit $PACKAGE_PROJ /SetVersion $REVISION
-./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name Arduino.exe -target 'ProgramFilesFolder\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\Antipasto'
+./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name $PACKAGE_NAME -target 'ProgramFilesFolder\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\'$PACKAGE_DIST
 ./packager/$PACKAGER /build $PACKAGE_PROJ
 
 
