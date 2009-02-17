@@ -54,7 +54,8 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
             File f = ((IPackedFile)value).getPackedFile();
             
             JLabel textLabel1 = new JLabel(" ");
-            JLabel textLabel2 = new JLabel("Size: " + f.length() + " kb");
+            long sizeInBytes = f.length();
+            JLabel textLabel2 = new JLabel("Size: " + sizeInBytes / 10000 + " kb");
             JLabel textLabel3 = new JLabel("Lines of Code: " + countLines((IModule)value));
             panelRight.add(textLabel1);
             panelRight.add(textLabel2);

@@ -1487,9 +1487,11 @@ public class Editor extends JFrame
 	    			}	    	    	
 	    	    };
 	    	    status.CreateOkDialog(ourListener, message.getMessage());
+	    	}else{
+	    		this.compile();		//no message just compile
 	    	}
 	    }else{
-	    	this.compile();		//no message just compile
+	    	this.compile();
 	    }
     }else{
     	this.compile();
