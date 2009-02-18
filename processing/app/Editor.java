@@ -2131,6 +2131,7 @@ public class Editor extends JFrame
 	      } else {
 	        message(EMPTY);
 	      }  
+	      
     	if(this.gadgetPanel.getActiveGadget()!= null){
     	  this.gadgetPanel.saveCurrentGadget();
     	  System.out.println("saved gadget");
@@ -2187,12 +2188,20 @@ public class Editor extends JFrame
 							}
 							//save the gadget file
 							GadgetFactory fact = new GadgetFactory();
-							IPackedFile file = ((IPackedFile)gp.getActiveGadget());
+						/*	IPackedFile file = ((IPackedFile)gp.getActiveGadget());
 							File newGadget = new File(newParentDir + File.separator + fileName);
 							Base.copyFile(file.getPackedFile(), newGadget);
 							IGadget gadg = fact.loadGadget(newGadget, System.getProperty("java.io.tmpdir") + File.separator + newGadget.getName());
 							gadg.setName(newName);
+							((IPackedFile)gadg).setPackedFile(newGadget);
+							ITemporary tempDir = (ITemporary)gadg;
+							File dir = new File(tempDir.getTempDirectory());
+							dir.listFiles();
 							gp.loadGadget(newGadget);
+							gp.saveCurrentGadget();*/
+							File newFile = fact.copyGadget(gp.getActiveGadget(), newParentDir , newName);
+							//IGadget newGadget = fact.loadGadget(newFile, System.getProperty("java.io.tmpdir") + File.separator + newFile.getName());
+							gp.loadGadget(newFile.getPath());
 							gp.saveCurrentGadget();
 						}
 						

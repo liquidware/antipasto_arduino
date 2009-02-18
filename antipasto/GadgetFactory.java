@@ -5,6 +5,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import processing.app.Base;
+
 import antipasto.CoreFactory;
 import antipasto.Gadget;
 import antipasto.ModuleFactory;
@@ -68,6 +70,36 @@ public class GadgetFactory {
             }
         }
         return null;
+    }
+    
+    public File copyGadget(IGadget src, String outputDirectory, String name) throws IOException{
+    	IModule[] gadgetModules = src.getModules();
+    	
+    	
+    	ModuleFactory fact = new ModuleFactory();
+    	
+    	IModule[] newGadgetModules = new IModule[gadgetModules.length];
+    	
+    	File modTempDir = Base.createTempFolder("moduleTemp");
+    	
+    	for(int i = 0; i < gadgetModules.length; i++){
+    		File tempDir = Base.createTempFolder("slack" + i);
+    		File newFile = new File(tempDir.getPath() + File.separator + ((IPackedFile)gadgetModules[i]).getPackedFile().getName());
+    		try {
+				Base.copyFile(((IPackedFile)gadgetModules[i]).getPackedFile(), newFile);
+				try {
+					newGadgetModules[i] = fact.loadModule(newFile, modTempDir.getPath() + File.separator + ((IPackedFile)gadgetModules[i]).getPackedFile().getName()
+															, false);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	return this.CreateGadgetFile(name, outputDirectory, newGadgetModules);
     }
 
     public File writeGadgetToFile(IGadget gadget, String outputDir) throws IOException {

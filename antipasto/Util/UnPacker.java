@@ -63,6 +63,7 @@ public class UnPacker {
         {
             bo.write(buf, 0, length);
         }
+        bo.flush();
         bo.close();
     }
 }
