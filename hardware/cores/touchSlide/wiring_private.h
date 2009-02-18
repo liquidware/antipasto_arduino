@@ -41,27 +41,30 @@
 #include <avr/eeprom.h>
 
 #include "wiring.h"
-
-#define ARDUINO_RESET_PORT 	PORTE
-#define ARDUINO_RESET_PIN 	PE4
+#ifndef ARDUINO_RESET_PORT
+	#define ARDUINO_RESET_PORT 	PORTE
+#endif
+#ifndef ARDUINO_RESET_PIN
+	#define ARDUINO_RESET_PIN 	PE4
+#endif
 
 #ifdef _TOUCH_STEALTH_
 
-	#define ARDUINO_TX_ENABLE_PORT PORTE
+	#define ARDUINO_TX_ENABLE_PORT	PORTE
 	#define ARDUINO_TX_ENABLE_DDR	DDRE
 	#define ARDUINO_TX_ENABLE_PIN	PE7
 
-	#define RX_PIN        PE5
-	#define TX_PIN        PE6
-	#define RXTX_PIN    PINE
-	#define RXTX_DDR    DDRE
-	#define RXTX_PORT    PORTE
+	#define RX_PIN					PE5
+	#define TX_PIN					PE6
+	#define RXTX_PIN				PINE
+	#define RXTX_DDR				DDRE
+	#define RXTX_PORT				PORTE
 
-	#define PCMSK_REGISTER    PCMSK0        //RX pin change interrupt mask register
-	#define RX_PCINT        PCINT5        //RX pin change interrupt bit position
+	#define PCMSK_REGISTER			PCMSK0		//RX pin change interrupt mask register
+	#define RX_PCINT				PCINT5		//RX pin change interrupt bit position
 
-	#define BITTIME			200 	//ticks of the counter 9600 = 200
-	#define BITTIME_HALF		100	//ticks of the counter 9600 = 100
+	#define BITTIME					200 		//ticks of the counter 9600 = 200
+	#define BITTIME_HALF			100			//ticks of the counter 9600 = 100
 
 #endif
 

@@ -31,7 +31,6 @@
 #include	"HardwareDef.h"
 #include	"bitops.h"
 #include	"usart.h"
-#include	"touchscreen.h"
 #include	"dataflash.h"
 #include	"image_interface.h"
 #include	"graphics.h"
@@ -40,9 +39,11 @@
 
 #ifdef _TOUCH_SLIDE_
 	#include	"oled_slide.h"
+	#include	"touchscreen.h"
 #endif
 #ifdef _TOUCH_STEALTH_
 	#include	"oled_stealth.h"
+	#include	"touchscreen_stealth.h"
 #endif
 #include	"binary.h"
 #include	"pindefs.h"
@@ -63,8 +64,19 @@ extern "C"{
 #define INPUT 0x0
 #define OUTPUT 0x1
 
+#define true 0x1
+#define false 0x0
+
+#define PI 3.14159265
+#define HALF_PI 1.57079
+#define TWO_PI 6.283185
+#define DEG_TO_RAD 0.01745329
+#define RAD_TO_DEG 57.2957786
+
+
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
+
 
 typedef uint8_t boolean;
 typedef uint8_t byte;
@@ -76,6 +88,14 @@ void			setup(void);
 void			loop(void);
 void			delay(unsigned long ms);
 unsigned long	millis();
+
+#ifdef _TOUCH_STEALTH_
+void			bitbang_init();
+unsigned char	bitbang_receive(void);
+void			bitbang_putc(unsigned char c);
+void			arduinoReset();
+void			arduinoRun();
+#endif
 
 //Wiring Serial Functions
 void			beginSerial(unsigned long baud);

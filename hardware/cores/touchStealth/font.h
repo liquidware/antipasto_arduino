@@ -1,4 +1,4 @@
-/*! \file Font.h 
+/*! \file Font.h
 	\brief	Include all font definitions here.
 			Fonts are stored in program memory
 */
@@ -15,7 +15,7 @@ extern "C"{
 
 void dispPutC(unsigned char ch, unsigned int x_pos,unsigned int y_pos,COLOR fc, COLOR bc);
 void dispPutS(char * string,unsigned int x_pos, unsigned int y_pos, COLOR fc, COLOR bc);
-
+extern unsigned char *font_5x7;
 #ifdef __cplusplus
 } // extern "C"
 #endif

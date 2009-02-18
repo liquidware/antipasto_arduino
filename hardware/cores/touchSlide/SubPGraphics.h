@@ -28,6 +28,8 @@
 //*	Dec 26,	2008	<MLS> Changing names of command ENUMS to kSubP_xxx
 //*	Jan  3,	2009	<MLS> Changed my_point to gMostRecentTouchPt
 //*	Jan 11,	2009	<MLS> started on support for lcd family of calls
+//*	Jan 18,	2009	Version 1.1.0 handed over to Matt, Mike and Chriss
+//*	Jan 18,	2009	<MLS> Added bezier curve functions
 //*******************************************************************************
 //#include	"SubPGraphics.h"
 //*******************************************************************************
@@ -49,11 +51,11 @@
 	#include	"HardwareDef.h"
 #endif
 
-#define	kSubP_VersionString	"SubP Ver 0.2"
+#define	kSubP_VersionString	"SubP Ver 1.1.1"
 
-/*==============================================================================
-* TYPES
-*============================================================================*/
+//*******************************************************************************
+//*	TYPES
+//*******************************************************************************
 typedef enum
 {
 	kSubP_SETFCOLOR			=	1,
@@ -77,18 +79,10 @@ typedef enum
 	kSubP_NOSTROKE			=	19,
 } SubPCommand;
 
-/*==============================================================================
- * GLOBAL CONSTANTS AND VARIABLES
- *============================================================================*/
-
-/* CONSTANTS */
-/* None */
-
-/* INPUT VARIABLES */
-/* None */
-
-/* OUTPUT VARIABLES */
-extern	COLOR	fCOLOR;
+//*******************************************************************************
+//*	GLOBAL CONSTANTS AND VARIABLES
+//*******************************************************************************
+extern	COLOR	fcolor;
 extern	COLOR	bcolor;
 extern	COLOR	green;
 extern	COLOR	blue;
@@ -104,14 +98,13 @@ extern	int		mouseX;
 extern	int		mouseY;
 extern	int		width;
 extern	int		height;
-
 //extern int max_distance;
  
  #ifdef __cplusplus
 
-/*==============================================================================
- * GLOBAL FUNCTION PROTOTYPES
- *============================================================================*/
+//*******************************************************************************
+//*	GLOBAL FUNCTION PROTOTYPES
+//*******************************************************************************
 
 void	background(uint8_t backGroundColor);
 void	background(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
@@ -139,9 +132,9 @@ void	setbcolor(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
 void	setbrightness( int bright);
 void	setfcolor(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
 void	size(int width, int height);
-void	stroke( int s);
+void	stroke(int newStrokeColor);
 void	stroke(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
-void	strokeWeight(int s);
+void	strokeWeight(int newStrokeWeight);
 void	text(char theChar, int xLoc, int yLoc);
 void	text(char *textString, int xLoc, int yLoc);
 void	text(int data,int xLoc, int yLoc);
@@ -149,6 +142,8 @@ void	text(unsigned int data, int xLoc, int yLoc);
 void	text(long data, int xLoc, int yLoc);
 void	text(double data, int xLoc, int yLoc);
 void	triangle( int x1, int y1, int x2, int y2, int x3, int y3);
+void	bezier(int x1, int y1, int cx1, int cy1, int cx2, int cy2, int x2, int y2);
+void	arc(int xCenter, int yCenter, int xDiameter, int yDiameter, float startAngle, float stopAngle);
 
 
 
@@ -174,7 +169,7 @@ enum {	kButtonMode_dontDraw	=	0,
 						short			buttonSize;
 						char			imageFileIndex;		//*	file index number to speed up drawing
 						char			buttonChar;
-						char			buttonName[12];
+						char			buttonName[14];
 						char			bmpImageOK;
 						char			bmpWidth;
 						char			bmpHeight;

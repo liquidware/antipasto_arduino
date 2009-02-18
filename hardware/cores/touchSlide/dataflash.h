@@ -24,6 +24,8 @@
 #define	DATAFLASH_BUSY		0
 #define	DATAFLASH_READY		1
 #define	DATAFLASH_PAGESIZE	528					//!< pages size in bytes
+//*	its a good thing this constant isnt used anywhere, its wrong
+//#define	DATAFLASH_MAXPAGES	(unsigned int)((DATAFLASH_SIZE*1E6)/DATAFLASH_PAGESIZE)	//!< maximum pages on the chip
 #define	DATAFLASH_BLOCK_COUNT	512				//!< Number of blocks on the chip
 
 #ifdef __cplusplus

@@ -8,31 +8,39 @@
 //*	Jan 16,	2009	<MLS> Got my own C program on MacOSX to talk to the USB port and to this code
 //*******************************************************************************
 
-#include <avr/io.h>
-#include <inttypes.h>
-#include <stdlib.h>
-#include <inttypes.h>
-#include <avr/interrupt.h>
+#include	<avr/io.h>
+#include	<inttypes.h>
+#include	<stdlib.h>
+#include	<inttypes.h>
+#include	<avr/interrupt.h>
 
 #include	"HardwareDef.h"
 
-#include "wiring.h"
-#include "image_interface.h"
-#include "usart.h"
-#include "dataflash.h"
-#include "touchscreen.h"
-//#include "wiring_private.h"
-#include "bitops.h"
+//-?#include "wiring.h" was in stealth version
+#include	"image_interface.h"
+#include	"usart.h"
+#include	"dataflash.h"
+#ifndef _TOUCHSCREEN_H_
+	#ifdef _TOUCH_SLIDE_
+		#include	"touchscreen.h"
+	#endif
+	#ifdef _TOUCH_STEALTH_
+		#include	"touchscreen_stealth.h"
+	#endif
+#endif
+//#include	"wiring_private.h"
+#include	"bitops.h"
 #ifdef _TOUCH_SLIDE_
 	#include	"oled_slide.h"
 #endif
-#include "bmp.h"
+#include	"bmp.h"
 
 #ifndef SUBPGRAPHICS_H
 	#include	"SubPGraphics.h"
 #endif
 
 //#define	_USE_DBBUG_RECT_STATUS_
+
 
 //*******************************************************************************
 //*		This is where we get the chunks of data 

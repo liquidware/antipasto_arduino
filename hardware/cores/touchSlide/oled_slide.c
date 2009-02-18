@@ -9,6 +9,7 @@
 //*	Dec 29,	2008	<?> dispBrightness changed to oled_brightness
 //*	Dec 29,	2008	<CHRIS> released v0012LW
 //*	Jan  2,	2009	<MLS> Changed name to oled_slide.c
+//*	Jan 19,	2009	<MLS> Got permission from Chris to start working on cleanin up slide code
 //*******************************************************************************
 
 #include	"HardwareDef.h"
@@ -32,6 +33,7 @@ OLED_GAMMA	gGammaTable[BRIGHT_MAX] = {
 /* BRIGHT5 250 */ { {0x2B80, 0x2C80, 0x3980, 0x1912, 0x1A0D, 0x2014, 0x1811, 0x2218, 0x1E11}},
 };
 
+//*******************************************************************************
 unsigned int oled_status()
 {
 //unsigned char low, med, high;
@@ -96,16 +98,16 @@ void	oled_init()
 		SETBIT(OLED_CTRL_PORT,OLED_RESET);
 	}
 
-	dispCommand(0x23);
+	dispCommand(kOLEDcmd_IFselect);
 	
-	dispCommand(0x02);
+	dispCommand(kOLEDcmd_RGBinterfaceControl);
 	dispData(0x0000);
 	
-	dispCommand(0x03);
+	dispCommand(kOLEDcmd_EntryMode);
  //  dispData(0x8030);
 	dispData(0x8031);
 	
-	dispCommand(0x10); //standby off
+	dispCommand(kOLEDcmd_StandbyMode); //standby off
 	dispData(0x0000);
 	
 	//delay
@@ -124,12 +126,12 @@ void	oled_init()
 		asm("nop");
 	}
 
-	dispCommand(0x05); //display on
+	dispCommand(kOLEDcmd_DisplayControl1); //display on
 	dispData(0x0001);
 	
 	oled_brightness(1); //low brightness
 	
-	dispCommand(0x22); //write / read graphics data
+	dispCommand(kOLEDcmd_GRAMread_write); //write / read graphics data
 	
 	dispColor(black);
 	dispClearScreen();
@@ -148,7 +150,7 @@ void	oled_brightness(uint8_t brightnessLevel)
 		/* Set the Brightness */
 		for(ii=0; ii<GREG_MAX; ii++)
 		{
-			dispCommand(ii + 0x70);
+			dispCommand(kOLEDcmd_GammaTopBottomControl + ii);
 			dispData(gGammaTable[brightnessLevel].gReg[ii]);
 		}
 	}

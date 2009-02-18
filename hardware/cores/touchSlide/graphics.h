@@ -53,12 +53,13 @@ void	dispCommand(unsigned char command);
 void	dispData(unsigned int data);
 void	dispLine( int x1,  int y1, int x2,  int y2);
 void	dispPixel( int x,  int y);
-void	dispRead(COLOR *buffer, uint16_t  x, uint16_t  y);
+void	dispRead(COLOR *buffer, int  x, int  y);
 void	dispRectangle(int  xLoc,  int  yLoc,   int rectWidth,   int  rectHeight);
 void	dispSetWindow(int x, int y, int width, int height);
 
 void	dispFillRect();
 void	dispPix();
+
 
 
 

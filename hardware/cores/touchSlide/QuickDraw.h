@@ -10,6 +10,9 @@
 //*	Dec 26,	2008	<MLS> Mark Sproul meet with Chris and Matt in New Haven
 //*	Dec 26,	2008	<MLS> taking over the development of Sub-Processing
 //*	Dec 29,	2008	<MLS> Starting on Macintosh QUICKDRAW interface to graphics library
+//*	Jan 25,	2009	<MLS> Added QuickDraw MoveTo, LineTo, Move, Line
+//*	Jan 26,	2009	<MLS> Added QuickDraw EraseRect
+//*	Feb  2,	2009	<MLS> Added QuickDraw DrawCString
 //*******************************************************************************
 //#include	"QuickDraw.h"
 
@@ -47,8 +50,14 @@ typedef struct  {
 
 //*******************************************************************************
 //*	Macintosh QuickDraw functions
+	void	MoveTo(short xLoc, short yLoc);
+	void	LineTo(short xLoc, short yLoc);
+	void	Move(short deltaX, short deltaY);
+	void	Line(short deltaX, short deltaY);
+
 	void	FrameRect(RECT *theRect);
-	void	FillRect(RECT *theRect);
+	void	FillRect(RECT *theRect);		//*	uses foreground color
+	void	EraseRect(RECT *theRect);		//*	uses background color
 	boolean	PtInRect(Point thePoint, const RECT *theRect);
 	boolean	POINTinRect(POINT thePoint, const RECT *theRect);
 	void	SetRect(RECT *theRect, short left, short top, short right, short bottom);
@@ -57,6 +66,10 @@ typedef struct  {
 	void	RGBForeColor(COLOR *theColor);
 	void	RGBBackColor(COLOR *theColor);
 	void	PlotIcon(short xLoc, short yLoc, unsigned char *iconDef);
+
+	void	DrawCString(short xloc, short yloc, char *theCstr);
+
+	void	BezierCurve(Point p1, Point p2, Point p3, Point p4);
 
 #define	kIconRLEcode	0x80
 

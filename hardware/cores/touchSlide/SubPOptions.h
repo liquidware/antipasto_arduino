@@ -26,7 +26,7 @@
 
 #define _SUBP_OPTIONS_H_
 
-#define	_SUBP_OPTION_GAMES_
+//#define	_SUBP_OPTION_GAMES_		//	nothing implmented yet
 #define	_SUBP_OPTION_KEYBOARD_
 #define	_SUBP_OPTION_QUICKDRAW_
 #define	_SUBP_OPTION_7_SEGMENT_

@@ -13,6 +13,10 @@ extern "C"{
 #define IMAGE_INTERFACE_CHECKSUM	'C'
 #define IMAGE_INTERFACE_FORMAT		'F'
 
+#define IMAGE_INTERFACE_ERASE		'X'
+
+
+
 void image_interface_begin(void);
 
 

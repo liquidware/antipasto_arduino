@@ -525,8 +525,7 @@ public class EditorStatus extends JPanel implements ActionListener {
       editor.sketch.nameCode(answer);
       unedit();
     } else if (e.getSource() == sendButton) {
-      //editor.serialPort.write(serialField.getText());
-      //arduinoFlasher();
+      editor.serialPort.write(serialField.getText());
       serialField.setText("");
     } else if (e.getSource() == serialRates) {
       String wholeString = (String) serialRates.getSelectedItem();

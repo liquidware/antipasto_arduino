@@ -13,7 +13,6 @@
 #define	_HARDWARE_DEF_H_
 
 #define	_VERSION_0012LW_
-#define	_ENABLE_FLASH_FILE_SYSTEM_
 
 #ifdef __AVR_ARCH__
 	#if (__AVR_ARCH__ == 5)
@@ -26,12 +25,18 @@
 	#error Unable to determine hardware platform (_TOUCH_STEALTH_ / _TOUCH_SLIDE_)
 #endif
 
+#ifdef __AVR_ATmega128__
+	#warning __AVR_ATmega128__ defined
+#endif
+#ifdef __AVR_ATmega2560__
+	#warning __AVR_ATmega2560__ defined
+#endif
 
+#define	nil	0
 
 //*****************************************************************************
 #ifdef _TOUCH_STEALTH_
 	#define	kDisplayHardwareString	"TouchStealth"
-	#define	kDisplayHardwareVersion	"V1.1.0"
 
 	#define	kSCREEN_X_size		128
 	#define	kSCREEN_Y_size		128
@@ -39,15 +44,15 @@
 
 //*****************************************************************************
 #ifdef _TOUCH_SLIDE_
+	#define	_ENABLE_FLASH_FILE_SYSTEM_
 
 	#define	kDisplayHardwareString	"TouchSlide"
-	#define	kDisplayHardwareVersion	"V1.1.0"
 
 	#define	kSCREEN_X_size		320
 	#define	kSCREEN_Y_size		240
 #endif
 
-#endif
+#define	_NEW_SERIAL_
 
 
 
@@ -60,10 +65,30 @@
 	#undef		sei
 	#define		__MATH_H
 	#define		sin(x) x
+	#undef		__PGMSPACE_H_
 	#define		__PGMSPACE_H_
 	#define		prog_uchar unsigned char
+	#undef		PROGMEM
 	#define		PROGMEM
+	#undef		prog_char
+	#define		prog_char char
 //	#undef		pgm_read_byte_near
+	#undef		pgm_read_byte_near
 	#define		pgm_read_byte_near(x)	(char)x
-	#define		random(x,y)	(y)
+	#undef		pgm_read_word
+	#define		pgm_read_word(x)		(int)x
+//	#define		random(x,y)	(y)
+	void		dtostrf(int a, int b, int c, char *out);
+	
+//	#undef		CLRBIT
+//	#define		CLRBIT(x,y)	x=y
+
+//	extern	int	PORTL;
+//	extern	int	PORTJ;
+//	extern	int	DDRJ;
+//	extern	int	PINJ;
+//	extern	int	DDRL;
+#endif
+
+
 #endif

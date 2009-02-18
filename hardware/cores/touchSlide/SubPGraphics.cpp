@@ -1,26 +1,15 @@
 //*******************************************************************************
 //*	
-//*	                             Sub-Processing 
-//*                        for TouchShield library
-//*	         by inthebitz @ antipastohw.blogspot.com & liquidware.com
-//*	
-//*******************************************************************************
-//*	 History:
-//*	
-//*	 Version 0.2 | Dec 4, 2008  | Chris @ antipastohw.blogspot.com & liquidware.com
-//*	 Merged into the TouchShield core
-//*	
-//*	 Version 0.1 | Nov 30, 2008 | inthebitz @ antipastohw.blogspot.com & liquidware.com
-//*	 This is the beginnings of the "Sub-Processing" for TouchShield library
-//*	 
-//*	
-//*	 DESCRIPTION:
-//*	 Sub-Processing provides a rich graphics and interaction library 
-//*	 for the TouchShield.
-//*	 
+//*		Sub-Processing 
+//*		for TouchShield library
+//*		by inthebitz @ antipastohw.blogspot.com & liquidware.com
+//*		by Chris 
+//*		by Mark Sproul  msproul@jove.rutgers.edu
 //*******************************************************************************
 //*	Detailed Edit history
-//*	<MLS>	=	Mark Sproul, msproul@jove.rutgers.edu
+//*	<inthebitz>	=	Matt <inthebitz @ antipastohw.blogspot.com & liquidware.com>
+//*	<Chris>		=	Chris  <Chris @ antipastohw.blogspot.com & liquidware.com>
+//*	<MLS>		=	Mark Sproul <msproul@jove.rutgers.edu>
 //*******************************************************************************
 //*	Nov 30,	2008	<inthebitz> Version 0.1 This is the beginnings of the "Sub-Processing" for TouchShield library
 //*	Dec  4,	2008	<Chris> Version 0.2 Merged into the TouchShield core
@@ -30,7 +19,7 @@
 //*	Dec 27,	2008	<MLS> Changing many variable names to longer more understandable names
 //*	Dec 28,	2008	<MLS> Separated rect into framerect and rect
 //*	Dec 28,	2008	<MLS> Wrote on 7-segment display, it looks great
-//*	Dec 29,	2008	<?> Changed from serialBegin(9600); to beginSerial(9600);
+//*	Dec 29,	2008	<Chris/Matt> Changed from serialBegin(9600); to beginSerial(9600);
 //*	Dec 29,	2008	<MLS> Starting on Macintosh QUICKDRAW interface to graphics library
 //*	Dec 30,	2008	<MLS> Changed gettouch to return isTouching
 //*	Dec 31,	2008	<MLS> When Chris did v0012LW, the screen structure got lost
@@ -38,24 +27,36 @@
 //*	Jan  2,	2009	<MLS> Changed args in orientation() to LONG, fixed bug in filled triangles
 //*	Jan  3,	2009	<MLS> Added OffsetRect
 //*	Jan  3,	2009	<MLS> Changed my_point to gMostRecentTouchPt
+//*	Jan 18,	2009	<MLS> Meet with Matt, Chris, Mike and Justin, made lots of progress
+//*	Jan 18,	2009	<MLS> Version 1.1.0 handed over to Matt, Mike and Chriss
+//*	Jan 18,	2009	<MLS> Added bezier curve functions
+//*	Jan	19,	2009	<MLS> Changed strokeWeightVal to gStrokeWeightVal and changed it to uint8_t
+//*	Jan 19,	2009	<MLS> Changed strokeEnb to gStrokeEnb
+//*	Jan 19,	2009	<MLS> Reducing memory footprint by moving some globals that dont need to be globals into routines
+//*	Jan 19,	2009	<MLS> Fixed bug in quad, did not restore stroke values completely
+//*	Jan 19,	2009	<MLS> Added arc() routine, including fill option
+//*	Jan 25,	2009	<MLS> Added QuickDraw MoveTo, LineTo, Move, Line
+//*	Jan 26,	2009	<MLS> Added QuickDraw EraseRect
+//*	Feb  2,	2009	<MLS> Added QuickDraw DrawCString
 //*******************************************************************************
 //*	<MLS> Programming style
-//*			never use 1 letter variable names, use LONG names, 
+//*			Never use 1 letter variable names, use LONG names, 
 //*			{ and } always go on their own line
-//*			never put 2 lines of code on the same line
-//*			use TAB instead of multiple spaces
-//*			a comment line of "****"s above the start of each routine
-//*			leave a space before and after each operator "a + b"  not "a+b"
+//*			Never put 2 lines of code on the same line
+//*			Use TAB instead of multiple spaces
+//*			A comment line of "****"s above the start of each routine
+//*			Leave a space before and after each operator "a + b"  not "a+b"
 //*		these next few rules have to be broken to keep compatibility
-//*			routine names should start with a CAPITAL letter
-//*			variable names should always start with lower case,
-//*			global variables should start with a lower case "g" followed by an UPPER case char
-//*			constants (#define )  should start with a lower case "k" followed by an UPPER case char
-//*			underLine "_" is an ok char to use in variable names, routine names, and constants
-//*			changes should include comments with your initials
+//*			Routine names should start with a CAPITAL letter
+//*			Variable names should always start with lower case,
+//*			Global variables should start with a lower case "g" followed by an UPPER case char
+//*			Constants (#define )  should start with a lower case "k" followed by an UPPER case char
+//*			UnderLine "_" is an ok char to use in variable names, routine names, and constants
+//*			Changes should include comments with your initials
+//*			Macros should have some comments explaining what they do and why
 //*******************************************************************************
-//*	PREPROCESSOR DIRECTIVES
-//*******************************************************************************
+
+
 #include	<avr/io.h>
 #include	<inttypes.h>
 #include	<math.h>
@@ -78,9 +79,7 @@
 	#include	"graphics.h"
 #endif
 
-//#define	incx() x++, dxt += d2xt, t += dxt
 #define	incx() xx++, dxt += d2xt, t += dxt
-//#define	incy() y--, dyt += d2yt, t += dyt
 #define	incy() yy--, dyt += d2yt, t += dyt
 
 #define MIN3(a,b,c) ((((a)<(b))&&((a)<(c))) ? (a) : (((b)<(c)) ? (b) : (c)))
@@ -90,34 +89,27 @@
 //*******************************************************************************
 //*	GLOBAL CONSTANTS AND VARIABLES
 //*******************************************************************************
-
-//* INPUT VARIABLES
-COLOR	fcolor		=	{ 255, 255, 255 };
-COLOR	bcolor		=	{ 0, 0, 0 };
-//COLOR	green		=	{ 0, 255, 0 };
-//COLOR	blue		=	{0,0,255};
-//COLOR	yellow		=	{255,255,0};
-//COLOR	grey		=	{0x77,0x77,0x77};
-//COLOR	red			=	{255,0,0};
-//COLOR	black		=	{0,0,0};
-//COLOR	white		=	{255,255,255};
-//COLOR	mycolor		=	{255, 255, 255};
-
-int		brightness	=	BRIGHT_MAX;
+COLOR	fcolor				=	{ 255, 255, 255 };
+COLOR	bcolor				=	{ 0, 0, 0 };
+//COLOR	green				=	{ 0, 255, 0 };
+//COLOR	blue				=	{0,0,255};
+//COLOR	yellow				=	{255,255,0};
+//COLOR	grey				=	{0x77,0x77,0x77};
+//COLOR	red					=	{255,0,0};
+//COLOR	black				=	{0,0,0};
+//COLOR	white				=	{255,255,255};
+//COLOR	mycolor				=	{255, 255, 255};
+int		gBrightness			=	BRIGHT_MAX;
+int		mouseX				=	screen.width / 2;
+int		mouseY				=	screen.height / 2;
+int		width				=	kSCREEN_X_size;		//screen.width;
+int		height				=	kSCREEN_Y_size;		//screen.height;
+uint8_t	gStrokeWeightVal	=	1;
+uint8_t	gStrokeEnb			=	true;
+uint8_t	gFillEnb			=	true;
+uint8_t	gServerEnb			=	false;
 POINT	gMostRecentTouchPt;
 int		trix1, triy1, trix2, triy2, trix3, triy3;
-	
-int		mouseX			=	screen.width / 2;
-int		mouseY			=	screen.height / 2;
-int		width			=	kSCREEN_X_size;		//screen.width;
-int		height			=	kSCREEN_Y_size;		//screen.height;
-int		strokeWeightVal	=	1;
-uint8_t	strokeEnb		=	true;
-uint8_t	fillEnb			=	true;
-uint8_t	cptr;
-uint8_t	buf[32];
-uint8_t	serverEnb		=	false;
-char	command[16];
 
 
 //*******************************************************************************
@@ -131,7 +123,7 @@ int		point_triangle_intersection(int px, int py, int x1, int y1, int x2, int y2,
 int		orientation (long x1, long y1, long x2, long y2, long px, long py);
 void	getstring(uint8_t *buf, int bufsize);
 void	sendStringL( char *buf, int size);
-void	drawNumber(unsigned long n, uint8_t base, int xLoc, int yLoc);
+//void	drawNumber(unsigned long n, uint8_t base, int xLoc, int yLoc);
 
 //*******************************************************************************
 //*	LOCAL FUNCTIONS
@@ -246,9 +238,9 @@ long			d2yt	=	2 * a2;
 } 
  
 //*******************************************************************************
-//There's definitely an easier way to do this, but for now I'll use some help from:
-//http://www.codeproject.com/KB/GDI/antialias.aspx#dwuln
-//Edited by inthebitz
+//	There's definitely an easier way to do this, but for now I'll use some help from:
+//	http://www.codeproject.com/KB/GDI/antialias.aspx#dwuln
+//	Edited by inthebitz
 //*******************************************************************************
 void	dispWuLine( int X0, int Y0, int X1, int Y1)
 {
@@ -403,7 +395,7 @@ unsigned short	IntensityBits	=	2;
 void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3) 
 {
 
-	if (strokeEnb) 
+	if (gStrokeEnb) 
 	{
 		dispColor(fcolor);
 		dispWuLine ( x1, y1, x2, y2);
@@ -411,7 +403,7 @@ void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3)
 		dispWuLine ( x3, y3, x1, y1);
 	}
 
-	if (fillEnb) 
+	if (gFillEnb) 
 	{
 	int		xx;
 	int		yy;
@@ -554,19 +546,20 @@ void	drawstring( int xLoc, int yLoc, char *text)
 //*******************************************************************************
 void	ellipse( int xLoc, int yLoc, int radx, int rady)
 {
+int	ii;
 
-	//fill
-	if (fillEnb) 
+	//*	fill
+	if (gFillEnb) 
 	{
 		dispColor(bcolor);
 		dispFillEllipse(xLoc, yLoc, radx-1, rady-1);
 	}
 	
-	//stroke
+	//*	stroke
 	dispColor(fcolor);
-	for(int i=0; i<strokeWeightVal; i++)
+	for(ii = 0; ii < gStrokeWeightVal; ii++)
 	{
-		dispOutlineEllipse(xLoc, yLoc, radx+i, rady+i);
+		dispOutlineEllipse(xLoc, yLoc, radx + ii, rady + ii);
 	}
 }
 
@@ -576,14 +569,14 @@ void	fadein( int time)
 {
 uint8_t ii;
 
-	for (ii = 0; ii<(brightness+1); ii++) 
+	for (ii = 0; ii<(gBrightness+1); ii++) 
 	{
 	#if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
 		dispBrightness((uint8_t)ii);
 	#else
 		oled_brightness((uint8_t)ii);
 	#endif
-		delay(time / brightness);
+		delay(time / gBrightness);
 	}
 }
 
@@ -592,28 +585,28 @@ void	fadeout( int time)
 {
 uint8_t ii;
 
-	for (ii = brightness; ii>0; ii--) 
+	for (ii = gBrightness; ii>0; ii--) 
 	{
 	#if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
 		dispBrightness((uint8_t)ii);
 	#else
 		oled_brightness((uint8_t)ii);
 	#endif
-		delay(time / brightness);
+		delay(time / gBrightness);
 	}
 }
 
 //*******************************************************************************
 void	fill(int fillColor)
 {
-	fillEnb	=	true;
+	gFillEnb	=	true;
 	setbcolor(fillColor, fillColor, fillColor);
 }
 
 //*******************************************************************************
 void	fill(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
 {
-	fillEnb	=	true;
+	gFillEnb	=	true;
 	setbcolor(redValue, greenValue, blueValue);
 }
 
@@ -646,36 +639,23 @@ boolean	isTouching;
 //*******************************************************************************
 void	line(int x1, int y1, int x2, int y2)
 {
-int	temp;
 
-//	if (y2 < y1)
-//	{
-//		temp	=	y1;
-//		y1		=	y2;
-//		y2		=	temp;
-//	}
-//	if (x2 < x1)
-//	{
-//		temp	=	x1;
-//		x1		=	x2;
-//		x2		=	temp;
-//	}
 	dispColor(fcolor);
 
-	dispWuLine (x1, y1, x2, y2);
+	dispWuLine(x1, y1, x2, y2);
 }
 
 //*******************************************************************************
 void	noFill(void)
 {
-	fillEnb	=	false;
+	gFillEnb	=	false;
 }
 
 //*******************************************************************************
 void	noStroke(void)
 {
-	strokeEnb		=	false;
-	strokeWeightVal	=	0;
+	gStrokeEnb			=	false;
+	gStrokeWeightVal	=	0;
 }
 
 //*******************************************************************************
@@ -688,30 +668,33 @@ void	point( int xLoc, int yLoc)
 //*******************************************************************************
 void	quad( int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 {
-	/* Save the stroke state */
-	uint8_t prevStroke	=	strokeEnb;
+uint8_t		prevStroke;
+uint8_t		prevStrokeWeight;
 
-	if (fillEnb) 
+	
+	if (gFillEnb) 
 	{
-		/* Disable stroke */
+		//* Save the stroke state
+		prevStroke			=	gStrokeEnb;
+		prevStrokeWeight	=	gStrokeWeightVal;
+
+		//*	Disable stroke
 		noStroke();
 		triangle(x1, y1, x2, y2, x3, y3);
 		triangle(x2, y2, x3, y3, x4, y4);
 		triangle(x1, y1, x3, y3, x4, y4);
 
-		/* Restore Stroke */
-		if (prevStroke)
-		{
-			strokeEnb	=	true;
-		}
+		//* Restore Stroke values
+		gStrokeEnb			=	prevStroke;
+		gStrokeWeightVal	=	prevStrokeWeight;
 	}
 
-	if (strokeEnb) 
+	if (gStrokeEnb) 
 	{
-		line(x1,y1,x2,y2);
-		line(x2,y2,x3,y3);
-		line(x3,y3,x4,y4);
-		line(x4,y4,x1,y1);
+		line(x1, y1, x2, y2);
+		line(x2, y2, x3, y3);
+		line(x3, y3, x4, y4);
+		line(x4, y4, x1, y1);
 	}
 }
 
@@ -723,7 +706,7 @@ void	framerect(int xLeft, int yTop, int width, int height)
 	if ((width > 0) && (height > 0))
 	{
 		dispColor(fcolor);
-		if (strokeWeightVal > 1)
+		if (gStrokeWeightVal > 1)
 		{
 		//stroke
 		int		left	=	xLeft - 1;
@@ -731,7 +714,7 @@ void	framerect(int xLeft, int yTop, int width, int height)
 		int		right	=	xLeft + width;
 		int		bottom	=	yTop + height;
 
-			for(int i=0; i<strokeWeightVal; i++)
+			for(int i=0; i<gStrokeWeightVal; i++)
 			{
 				line(left,	top,	right,	top);
 				line(left,	top,	left,	bottom);
@@ -754,6 +737,7 @@ void	framerect(int xLeft, int yTop, int width, int height)
 
 	}
 }
+
 //*******************************************************************************
 //*	Dec 27,	2008	<MLS> Rewriting rect because it doesnt work when compiled on Mac
 void	rect(int xLeft, int yTop, int width, int height)
@@ -762,7 +746,7 @@ void	rect(int xLeft, int yTop, int width, int height)
 	if ((width > 0) && (height > 0))
 	{
 		//	fill
-		if (fillEnb)
+		if (gFillEnb)
 		{
 			dispColor(bcolor);
 			dispRectangle(xLeft, yTop, width, height); 
@@ -772,6 +756,7 @@ void	rect(int xLeft, int yTop, int width, int height)
 		framerect(xLeft, yTop, width, height);
 	}
 }
+
 
 //*******************************************************************************
 void	setbcolor(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
@@ -789,7 +774,7 @@ void	setbrightness( int bright)
 #else
 	oled_brightness(bright);
 #endif
-	brightness = bright;
+	gBrightness	=	bright;
 }
 
 //*******************************************************************************
@@ -814,20 +799,34 @@ void	size(int w, int h)
 
 
 //*******************************************************************************
-void	stroke( int s)
+void	stroke(int newStrokeColor)
 {
-	setfcolor(s,s,s);
+	gStrokeEnb			=	true;
+	if (!gStrokeWeightVal)
+	{
+		//*	only reset it if it was zero, this will maintain other settings 
+		//*	such as a larger value
+		gStrokeWeightVal	=	1;	
+	}
+	setfcolor(newStrokeColor, newStrokeColor, newStrokeColor);
 }
 
 //*******************************************************************************
-void	strokeWeight(int s)
+void	strokeWeight(int newStrokeWeight)
 {
-	strokeWeightVal=s;
+	gStrokeWeightVal	=	newStrokeWeight;
 }
 
 //*******************************************************************************
 void	stroke(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
 {
+	gStrokeEnb			=	true;
+	if (!gStrokeWeightVal)
+	{
+		//*	only reset it if it was zero, this will maintain other settings 
+		//*	such as a larger value
+		gStrokeWeightVal	=	1;	
+	}
 	setfcolor(redValue, greenValue, blueValue);
 }
 
@@ -883,9 +882,12 @@ void	triangle( int x1, int y1, int x2, int y2, int x3, int y3)
 //*******************************************************************************
 void	beginCanvas(void)
 {
+uint8_t	cptr;
+uint8_t	buf[32];
+char	responseString[16];
 
 	/* Start Serial, if not started already */
-	if (!serverEnb)
+	if (!gServerEnb)
 	{
 	#ifdef _TOUCH_SLIDE_
 		//*	Dec 29,	2008	<?> Changed from serialBegin(9600); to beginSerial(9600);
@@ -893,12 +895,12 @@ void	beginCanvas(void)
 	#else
 		serialBegin(9600);		//*	version 0012
 	#endif
-		serverEnb	=	true;
+		gServerEnb	=	true;
 	}
 
-	/* Get our command string */
-	getstring(buf,sizeof(buf));
-	cptr=1;
+	//*	Get our command string
+	getstring(buf, sizeof(buf));
+	cptr	=	1;
 
 	/* Is it a valid command? */
 	if (buf[0] == '|') 
@@ -988,27 +990,27 @@ void	beginCanvas(void)
 			break;
 
 		case kSubP_GET_SCREEN_SIZE:
-			command[0]	=	'|';
-			command[1]	=	kSubP_GET_SCREEN_SIZE;
+			responseString[0]	=	'|';
+			responseString[1]	=	kSubP_GET_SCREEN_SIZE;
 		//*	Dec 31,	2008	<MLS> When Chris did v0012LW, the screen structure got lost
 		#if 1
-			command[2]	=	(unsigned char)kSCREEN_X_size;
-			command[3]	=	(unsigned char)(kSCREEN_X_size >> 8);
-			command[4]	=	(unsigned char)kSCREEN_Y_size;
-			command[5]	=	(unsigned char)(kSCREEN_Y_size >> 8);
+			responseString[2]	=	(unsigned char)kSCREEN_X_size;
+			responseString[3]	=	(unsigned char)(kSCREEN_X_size >> 8);
+			responseString[4]	=	(unsigned char)kSCREEN_Y_size;
+			responseString[5]	=	(unsigned char)(kSCREEN_Y_size >> 8);
 		#else
-			command[2]	=	(unsigned char)screen.width;
-			command[3]	=	(unsigned char)(screen.width >> 8);
-			command[4]	=	(unsigned char)screen.height;
-			command[5]	=	(unsigned char)(screen.height >> 8);
+			responseString[2]	=	(unsigned char)screen.width;
+			responseString[3]	=	(unsigned char)(screen.width >> 8);
+			responseString[4]	=	(unsigned char)screen.height;
+			responseString[5]	=	(unsigned char)(screen.height >> 8);
 		#endif
-			command[6]	=	(unsigned char)0;
-			command[7]	=	(unsigned char)0;
-			command[8]	=	0;
-			command[9]	=	0;
-			command[10]=0;
+			responseString[6]	=	(unsigned char)0;
+			responseString[7]	=	(unsigned char)0;
+			responseString[8]	=	0;
+			responseString[9]	=	0;
+			responseString[10]	=	0;
 
-			sendStringL(command,11);
+			sendStringL(responseString, 11);
 			break;
 			
 		case kSubP_ELLIPSE:
@@ -1076,11 +1078,367 @@ int	ii;
 } 
 
 #pragma mark -
+
+//*********************************************************************
+/*
+Bezier Curves
+
+Bezier curves (pronounced “bez-yeah”, after their inventor, a French mathematician) are well 
+suited to graphics applications on the Macintosh for a number of reasons. First, they’re 
+simple to describe. A curve is a function of four points. Second, the curve is efficient to 
+calculate. From a precomputed table, the segments of the curve can be produced using only 
+fixed-point multiplication. No trig, no messy quadratics, and no inSANEity. Third, and, to 
+some, the most important, the Bezier curve is directly supported by the PostScript curve and
+ curveto operators, and is one of the components of PostScript’s outlined fonts. 
+ The Bezier curve is also one of the principle drawing elements of Adobe Illustrator™. 
+ (Recently, they’ve shown up in a number of other places.)
+
+Bezier curves have some interesting properties. Unlike some other classes of curves, 
+they can fold over on themselves. They can also be joined together to form smooth 
+(continuous) shapes. Figure 1 shows a few Bezier curves, including two that are joined to 
+form a smooth shape.
+
+The Gruesome Details
+
+The description of Bezier curves below is going to get a bit technical. If you’re not 
+comfortable with the math, you can trust that the algorithm works, and skip ahead to the 
+implementation. However, if you’re curious about how the curves work and how to optimize 
+their implementation, or just don’t trust using code that you don’t understand, read on.
+
+The Bezier curve is a parametric function of four points; two endpoints and two “control” 
+points. The curve connects the endpoints, but doesn’t necessarily touch the control points. 
+The general form Bezier equation, which describes each point on the curve as a function of 
+time, is:
+
+where P1 and P4 are the endpoints, P2 and P3 are the control points, and the wn’s are 
+weighting functions, which blend the four points to produce the curve. (The weights are 
+applied to the h and v components of each point independently.) The single parameter t 
+represents time, and varies from 0 to 1. The full form of the Bezier curve is:
+
+We know that the curve touches each endpoint, so it isn’t too surprising that at t=0 the 
+first weighting function is 1 and all others are 0 (i.e., the initial point on the curve 
+is the first endpoint). Likewise, at t=1, the fourth weighting function is 1 and the rest 
+are 0. However, it’s what happens between 0 and 1 that’s really interesting. A quick 
+side-trip into calculus to take some first derivatives tells us that the second weighting 
+function is maximized (has its greatest impact on the curve) at t=1/3, and the third weight 
+is maximized at t=2/3. But the clever part--the bit that the graphics books don’t bother to 
+mention--run the curve backwards by solving the equation for 1-t, and you find 
+that w1(t)=w4(1-t) and w2(t)=w3(1-t). As we’ll see below, this symmetry halves the
+ effort needed to compute values for the weights.
+
+Figure 1. Some Beizer Curves and Shapes
+
+Implementing Bezier Curves
+
+One strategy for implementing Bezier curves is to divide the curve into a fixed number 
+of segments and then to pre-compute the values of the weighting functions for each of 
+the segments. The greater the number of segments, the smoother the curve. (I’ve found 
+that 16 works well for display purposes, but 32 is better for hardcopy.) Computing any 
+given curve becomes a simple matter of using the four points and the precomputed weights 
+to produce the end-points of the curve segments. Fixed-point math yields reasonable 
+accuracy, and is a hands down winner over SANE on the older (pre-Mac II) Macs, so we’ll 
+use it.
+
+We can optimize the process a bit. The curve touches each endpoint, so we can assume 
+weights of 0 or 1 and needn’t compute weights for these points. Another optimization 
+saves both time and space. By taking advantage of the symmetric nature of the Bezier 
+equation, we can compute arrays of values for the first two of the weighting functions, 
+and obtain values for the other two weights by indexing backwards into the arrays.
+
+Drawing the curve, given the endpoints of the segments, is the duty of QuickDraw 
+(or of PostScript, if you’re really hacking).
+
+The listing below shows a reasonably efficient implementation of Bezier curves in 
+Lightspeed C™. A few reminders about fixed-point math: an integer times a fixed-point 
+number yields a fixed-point number, and a fixed by fixed multiplication uses a trap. 
+The storage requirement for the algorithm, assuming 16 segments, (32 fixed-point values), 
+is around 32*4*4, or 512 bytes. The algorithm computes all of the segments before drawing 
+them so that the drawing can be done at full speed. (Having all of the segments around at 
+one time can be useful for other reasons.)
+
+More Fun With Curves
+
+Given an implementation for Bezier curves, there are some neat things that fall out 
+for almost free. Drawing a set of joined curves within an OpenPoly/ClosePoly or an 
+OpenRgn/CloseRgn envelope yields an object that can be filled with a pattern. 
+(Shades of popular illustration packages?) For that matter, lines, arcs, wedges, 
+and Bezier curves can be joined to produce complicated shapes, such as outlined fonts. 
+Given the direct mapping to PostScript’s curve and curveto operators, Bezier curves are 
+a natural for taking better advantage of the LaserWriter.
+
+As mentioned above, Bezier curves can be joined smoothly to produce more complicated 
+shapes (see figure 1). The catch is that the point at which two curves are joined, and 
+the adjacent control points, must be colinear (i.e., the three points must lay on a line). 
+If you take a close look at Adobe Illustrator’s drawing tool, you’ll see what this means.
+
+One nonobvious use of Bezier curves is in animation. The endpoints of the segments can 
+be used as anchor-points for redrawing an object, giving it the effect of moving smoothly 
+along the curve. One backgammon program that I’ve seen moves the tiles along invisible Bezier 
+curves, and the effect is very impressive. For animation, you would probably want to vary 
+the number of segments. Fortunately, the algorithm below is easily rewritten to produce the 
+nth segment of an m segment curve given the the end and control points.
+
+Further Optimizations
+
+If you’re really tight on space or pressed for speed, there are a few things that you 
+can do to tighten up the algorithm. A bit of code space (and a negligible amount of time) 
+can be preserved by eliminating the setup code in favor of statically initializing the 
+weight arrays with precomputed constant values.
+
+*/
+//*********************************************************************
+//*********************************************************************
+//*	http://www.mactech.com/articles/mactech/Vol.05/05.01/BezierCurve/
+//*********************************************************************
+//*
+//*	Bezier  --  Support for Bezier curves
+//*	Herein reside support routines for drawing Bezier curves.
+//*	Copyright (C) 1987, 1988 David W. Smith
+//*	Submitted to MacTutor for their source-disk.
+//*	MacTutor Magazine
+//*	Volume Number:		5
+//*	Issue Number:		1
+//*	Column Tag:		C Workshop
+//*
+//*	http://www.mactech.com/articles/mactech/Vol.05/05.01/BezierCurve/
+//*********************************************************************
+//*	The greater the number of curve segments, the smoother the curve, 
+//*	and the longer it takes to generate and draw.  The number below was pulled 
+//*	out of a hat, and seems to work o.k.
+//*********************************************************************
+//*	adapted by Mark Sproul, Jan 2009 for use in the SubPGrapnics lib
+//*	changed to use floats instead of Fixed data types
+//*	the code origninally had 3 separate routines, one to setup the weights
+//*	one to compute the points, and one to draw the code. This used 128 bytes
+//*	of static memory table for the weights. In order to save memory foot
+//*	print, these tables are computed each time. It takes a bit longer but
+//*	considering the amount of memory, its a price we can afford
+//*********************************************************************
+#define	kSEGMENTS	16
+#define w1(s)	weight1[s]
+#define w2(s)	weight2[s]
+#define w3(s)	weight2[kSEGMENTS - s]
+#define w4(s)	weight1[kSEGMENTS - s]
+
+//*********************************************************************
+//*
+//*	BezierCurve  --  Draw a Bezier Curve
+//*	Draw a curve with the given endpoints (p1, p4), and the given 
+//*	control points (p2, p3).
+//*	Note that we make no assumptions about pen or pen mode.
+//*	
+//*********************************************************************
+void	BezierCurve(Point p1, Point p2, Point p3, Point p4)
+{
+int		ss;
+float	tt;
+float	weight1[kSEGMENTS + 1];
+float	weight2[kSEGMENTS + 1];
+Point	segment[kSEGMENTS + 1];
+
+
+//*	debug code
+//	line(p1.h, p1.v, p4.h, p4.v);
+//	drawcircle(p2.h, p2.v, 4);
+//	drawcircle(p3.h, p3.v, 4);
+
+
+	//*********************************************************************
+	//*	Compute the weights for the Bezier function.
+	//*********************************************************************
+	weight1[0]	=	1.0;
+	weight2[0]	=	0.0;
+	for (ss	= 1 ; ss < kSEGMENTS ; ++ss)
+	{
+		tt			=	(1.0 * ss) / kSEGMENTS;
+		weight1[ss]	=	(1.0 - tt) * ((1.0 - tt) * (1.0 - tt));
+		weight2[ss]	=	3 * (tt * ((tt - 1.0) * (tt - 1.0)));
+	}
+	weight1[kSEGMENTS]	=	0.0;
+	weight2[kSEGMENTS]	=	0.0;
+
+
+	//*********************************************************************
+	//*
+	//*	computeSegments  --  compute segments for the Bezier curve
+	//*	Compute the segments along the curve.
+	//*	The curve touches the endpoints, so don’t bother to compute them.
+	//*
+	//*********************************************************************
+	segment[0]	=	p1;
+	for (ss = 1 ; ss < kSEGMENTS ; ++ss)
+	{
+		segment[ss].v	=	round(w1(ss) * p1.v + w2(ss) * p2.v + w3(ss) * p3.v + w4(ss) * p4.v);
+		segment[ss].h	=	round(w1(ss) * p1.h + w2(ss) * p2.h + w3(ss) * p3.h + w4(ss) * p4.h);
+	}
+	segment[kSEGMENTS]	=	p4;
+
+	//*********************************************************************
+	//*	now do the drawing itself
+	//*********************************************************************
+	for (ss = 0 ; ss < kSEGMENTS ; ++ss)
+	{
+		if ((ss == 0) || (segment[ss].h != segment[ss - 1].h) || (segment[ss].v != segment[ss - 1].v ))
+		{
+			line(segment[ss].h, segment[ss].v, segment[ss + 1].h, segment[ss + 1].v);
+		}
+	}
+}
+
+
+//*******************************************************************************
+//*	Processing version
+//*******************************************************************************
+void	bezier(int x1, int y1, int cx1, int cy1, int cx2, int cy2, int x2, int y2)
+{
+Point	p1, p2, p3, p4;
+	
+	p1.h	=	x1;
+	p1.v	=	y1;
+	p2.h	=	cx1;
+	p2.v	=	cy1;
+	p3.h	=	cx2;
+	p3.v	=	cy2;
+	p4.h	=	x2;
+	p4.v	=	y2;
+	BezierCurve(p1,  p2,  p3,  p4);
+}
+
+
+//*******************************************************************************
+void	arc(int xCenter, int yCenter, int xDiameter, int yDiameter, float startAngle, float stopAngle)
+{
+int		xx, yy;
+int		prevxx, prevyy;
+float	myAngle;
+float	xRadius, yRadius;
+float	stepAngle;
+float	myStartAngle, myStopAngle;
+boolean	drawSegment;
+
+
+	xRadius		=	xDiameter / 2;
+	yRadius		=	yDiameter / 2;
+	stepAngle	=	PI / 50;
+	if (startAngle < stopAngle)
+	{
+		myStartAngle	=	startAngle;
+		myStopAngle		=	stopAngle;
+	}
+	else
+	{
+		//*	reverse the order so we are going in a POSITIVE direction
+		myStartAngle	=	stopAngle;
+		myStopAngle		=	startAngle;
+	}
+	myAngle		=	myStartAngle;
+
+
+	
+	if (gFillEnb) 
+	{
+	uint8_t		prevStroke;
+	uint8_t		prevStrokeWeight;
+
+		//* Save the stroke state
+		prevStroke			=	gStrokeEnb;
+		prevStrokeWeight	=	gStrokeWeightVal;
+
+		//*	Disable stroke
+		noStroke();
+		
+		//*	go thru and fill triangles
+		
+		drawSegment	=	false;
+		while (myAngle <= stopAngle)
+		{
+			xx		=	xCenter + (xRadius * cos(myAngle));
+			yy		=	yCenter + (yRadius * sin(myAngle));
+			//*	the 1st time thru we dont want to draw a line
+			if (drawSegment)
+			{
+				triangle(xCenter, yCenter, prevxx, prevyy, xx, yy);
+			}
+			drawSegment	=	true;
+			myAngle	+=	stepAngle;
+
+			prevxx	=	xx;
+			prevyy	=	yy;
+		}
+
+		//* Restore Stroke values
+		gStrokeEnb			=	prevStroke;
+		gStrokeWeightVal	=	prevStrokeWeight;
+	}
+
+
+	myAngle		=	myStartAngle;
+	drawSegment	=	false;
+	while (myAngle <= stopAngle)
+	{
+		xx		=	xCenter + (xRadius * cos(myAngle));
+		yy		=	yCenter + (yRadius * sin(myAngle));
+		//*	the 1st time thru we dont want to draw a line
+		if (drawSegment)
+		{
+			line(prevxx, prevyy, xx, yy);
+		}
+		drawSegment	=	true;
+		myAngle	+=	stepAngle;
+
+		prevxx	=	xx;
+		prevyy	=	yy;
+	}
+}
+
+
+#pragma mark -
 //*******************************************************************************
 //*	these routines are Macintosh QuickDraw style
 //*******************************************************************************
 #pragma mark Mac Quickdraw Style routines
 #ifdef _SUBP_OPTION_QUICKDRAW_
+
+//*	this is the CURRENT pen location
+short	gQDcurrentX	=	0;
+short	gQDcurrentY	=	0;
+
+//*******************************************************************************
+void	MoveTo(short xLoc, short yLoc)
+{
+	gQDcurrentX	=	xLoc;
+	gQDcurrentY	=	yLoc;
+}
+
+//*******************************************************************************
+void	LineTo(short xLoc, short yLoc)
+{
+	if ((xLoc != gQDcurrentX) || (yLoc != gQDcurrentY))
+	{
+		//*	only draw a line if we actually moved anyplace
+		line(gQDcurrentX, gQDcurrentY, xLoc, yLoc);
+	}
+	gQDcurrentX	=	xLoc;
+	gQDcurrentY	=	yLoc;
+}
+
+//*******************************************************************************
+void	Move(short deltaX, short deltaY)
+{
+	gQDcurrentX	+=	deltaX;
+	gQDcurrentY	+=	deltaY;
+}
+
+//*******************************************************************************
+void	Line(short deltaX, short deltaY)
+{
+	if ((deltaX != 0) || (deltaY != 0))
+	{
+		line(gQDcurrentX, gQDcurrentY, gQDcurrentX + deltaX, gQDcurrentY + deltaY);
+		gQDcurrentX	+=	deltaX;
+		gQDcurrentY	+=	deltaY;
+	}
+}
 
 //*******************************************************************************
 void	RGBForeColor(COLOR *theColor)
@@ -1100,10 +1458,10 @@ void	FrameRect(RECT *theRect)
 	framerect(theRect->left, theRect->top, (theRect->right - theRect->left), (theRect->bottom - theRect->top));
 }
 
+
 //*******************************************************************************
-void	FillRect(RECT *theRect)
+void	EraseRect(RECT *theRect)
 {
-#if 1
 int	myWidth, myHeight;
 
 	myWidth		=	theRect->right - theRect->left;
@@ -1111,9 +1469,19 @@ int	myWidth, myHeight;
 	
 	dispColor(bcolor);
 	dispRectangle(theRect->left, theRect->top, myWidth, myHeight); 
-#else
-	rect(theRect->left, theRect->top, (theRect->right - theRect->left), (theRect->bottom - theRect->top));
-#endif
+
+}
+
+//*******************************************************************************
+void	FillRect(RECT *theRect)
+{
+int	myWidth, myHeight;
+
+	myWidth		=	theRect->right - theRect->left;
+	myHeight	=	theRect->bottom - theRect->top;
+	
+	dispColor(fcolor);
+	dispRectangle(theRect->left, theRect->top, myWidth, myHeight); 
 }
 
 //*******************************************************************************
@@ -1156,10 +1524,8 @@ void	InsetRect(RECT *theRect, short insetX, short insetY)
 {
 	theRect->left		+=	insetX;
 	theRect->right		-=	insetX;
-	theRect->top		+=	insetX;
-	theRect->bottom		-=	insetX;
-	
-	
+	theRect->top		+=	insetY;
+	theRect->bottom		-=	insetY;
 }
 
 //*******************************************************************************
@@ -1174,8 +1540,6 @@ void	OffsetRect(RECT *theRect, short deltaX, short deltaY)
 }
 
 
-
-
 //*******************************************************************************
 void	SetRect(RECT *theRect, short left, short top, short right, short bottom)
 {
@@ -1183,6 +1547,12 @@ void	SetRect(RECT *theRect, short left, short top, short right, short bottom)
 	theRect->top	=	top;
 	theRect->right	=	right;
 	theRect->bottom	=	bottom;
+}
+
+//*******************************************************************************
+void	DrawCString(short xloc, short yloc, char *theCstr)
+{
+	drawstring(xloc, yloc, theCstr);
 }
 
 
@@ -1357,7 +1727,7 @@ RECT	digitRect;
 	digitRect.right		=	xLeft + segmentLength + 1;
 	digitRect.top		=	yTop - 1;
 	digitRect.bottom	=	yTop + (2 * segmentLength) + 1;
-	FillRect(&digitRect);
+	EraseRect(&digitRect);
 
 	if (segmentLength > 8)
 	{
@@ -1475,7 +1845,7 @@ void	DrawKeyPadButton(Button *theButton)
 short	buttonWidth;
 short	segmentSize;
 
-	FillRect(&theButton->buttonRect);
+	EraseRect(&theButton->buttonRect);
 	FrameRect(&theButton->buttonRect);
 
 	buttonWidth	=	(theButton->buttonRect.right - theButton->buttonRect.left);
@@ -1502,9 +1872,9 @@ short	segmentSize;
 void	lcd_rectangle(int x1, int y1, int x2, int y2, COLOR outline_color, COLOR fill_color)
 {
 
-	bcolor	=	fill_color;
-	fcolor	=	outline_color;
-	fillEnb	=	true;
+	bcolor		=	fill_color;
+	fcolor		=	outline_color;
+	gFillEnb	=	true;
 	drawrect(x1, y1, (x2 - x1), (y2, y1));
 }
 

@@ -16,6 +16,8 @@
 //*	Jan  2,	2009	<MLS> Added negitive checking to w/h of dispRectangle
 //*	Jan  3,	2009	<MLS> dispRectangle, changed xLoc, yLoc back to signed ints
 //*	Jan 14,	2009	<MLS> Changed all 320/240/319/239 number constants to define constants
+//*	Jan 19,	2009	<MLS> Got permission from Chris to start working on cleanin up slide code
+//*	Jan 19,	2009	<MLS> Added more bounds checking to dispRectangle, fixed offscreen center problem
 //*******************************************************************************
 
 
@@ -44,7 +46,8 @@
 do { \
 	int32_t count_ = (aCount); \
 	int32_t times_ = (count_ + 15) >> 4; \
-	switch (count_ & 7){ \
+	switch (count_ & 7)		\
+	{ \
 		case 0: do { aAction; \
 		case 15: aAction; \
 		case 14: aAction; \
@@ -70,8 +73,13 @@ SCREEN	screen	=	{
 					kSCREEN_X_size,			//*	Width
 					kSCREEN_Y_size};		//*	Height
 
+#pragma mark -
+#pragma mark _TOUCH_SLIDE_
 
 #ifdef _TOUCH_SLIDE_
+//*******************************************************************************
+//*	Slide specific stuff
+//*******************************************************************************
 
 //*******************************************************************************
 void	dispCommand(unsigned char command)
@@ -156,11 +164,13 @@ void	dispSetWindow(int x, int y, int width, int height)
 	//* Bounds clipping
 	if (x < 0 )
 	{
-		width += x-0; x	=	0;
+		width += x-0;
+		x	=	0;
 	}
 	if (y < 0 )
 	{
-		height += y-0; y	=	0;
+		height += y-0;
+		y	=	0;
 	}
 	if (x >= kSCREEN_X_size )
 	{
@@ -181,28 +191,28 @@ void	dispSetWindow(int x, int y, int width, int height)
 
 
 	/* Specify the Vertical start positions */
-	dispCommand(0x35);
+	dispCommand(kOLEDcmd_VerticalRamAddrHi);
 	dispData(x);
 
 	/* Specify the Vertical end positions */
 	temp	=	(x+width);
-	dispCommand(0x36);
-	dispData(temp); 
+	dispCommand(kOLEDcmd_VerticalRamAddrLow);
+	dispData(temp);
 	
     /* Specify the horizontal start/end positions */
-	dispCommand(0x37);
-	dispData( ((y)<<8)|(y+height) ); 	
+	dispCommand(kOLEDcmd_HorizontalRamAddr);
+	dispData( ((y)<<8)|(y+height) );	
 	
 	/* Specify the x address in RAM */			
-	dispCommand(0x20);   
-	dispData(y); 
+	dispCommand(kOLEDcmd_GRAMaddressSetX);
+	dispData(y);
 	
 	/* Specify the y address in RAM */
-	dispCommand(0x21);   
+	dispCommand(kOLEDcmd_GRAMaddressSetY);
 	dispData(x);
 
 	/* RAM write */
-	dispCommand(0x22);   				
+	dispCommand(kOLEDcmd_GRAMread_write);
 
 }
 
@@ -213,7 +223,7 @@ void	dispPixel(int x, int y)
 /* Bounds clipping */	
 	if ( (x >= kSCREEN_X_size) || (y >= kSCREEN_Y_size))
 	{
-		return; 
+		return;
 	}
 	if ( (x < 0) || (y < 0))
 	{
@@ -221,13 +231,13 @@ void	dispPixel(int x, int y)
 	}
 
 /* Set XY location   */
-	dispCommand(0x20); //Specify the x address in RAM
+	dispCommand(kOLEDcmd_GRAMaddressSetX);	//Specify the x address in RAM
 	dispData(0x00FF & y);
 
-	dispCommand(0x21); //Specify the y address in RAM
+	dispCommand(kOLEDcmd_GRAMaddressSetY);	//Specify the y address in RAM
 	dispData(0x01FF & x);
 
-	dispCommand(0x22); //RAM write	
+	dispCommand(kOLEDcmd_GRAMread_write);	//RAM write	
 
 /* Draw pixel */
 	CLRBIT(OLED_CTRL_PORT,OLED_CS);
@@ -243,18 +253,19 @@ void	dispPixel(int x, int y)
 }
 
 //*******************************************************************************
-void	dispRead(COLOR *buffer, uint16_t  x, uint16_t  y)
+//*	Jan 29, 2009	<MLS> Changed args to int (were uint16_t)
+void	dispRead(COLOR *buffer, int  x, int  y)
 {
 
 	/* Set XY location   */
-	dispCommand(0x20); //Specify the x address in RAM
-	dispData(0x00FF&y);
+	dispCommand(kOLEDcmd_GRAMaddressSetX);	//Specify the x address in RAM
+	dispData(0x00FF & y);
 
-	dispCommand(0x21); //Specify the y address in RAM
-	dispData(0x01FF&x);
+	dispCommand(kOLEDcmd_GRAMaddressSetY);	//Specify the y address in RAM
+	dispData(0x01FF & x);
 
 	/* RAM write */
-	dispCommand(0x22); 
+	dispCommand(kOLEDcmd_GRAMread_write);
 
 	/* Input Direction */
 	OLED_DATA_LOW_DDR	=	0x00;
@@ -264,7 +275,7 @@ void	dispRead(COLOR *buffer, uint16_t  x, uint16_t  y)
 	/* Read pixel */
 	SETBIT(OLED_CTRL_PORT,OLED_WR);
 	CLRBIT(OLED_CTRL_PORT,OLED_CS);
-	CLRBIT(OLED_CTRL_PORT,OLED_RD);   
+	CLRBIT(OLED_CTRL_PORT,OLED_RD);
 
 	CLRBIT(OLED_CTRL_PORT,OLED_RD);
 	CLRBIT(OLED_CTRL_PORT,OLED_RD);
@@ -285,6 +296,7 @@ void	dispRead(COLOR *buffer, uint16_t  x, uint16_t  y)
 //*******************************************************************************
 //*	Jan  1,	2009	<MLS> dispRectangle -  Fixed overflow problem on large rectangles
 //*	Jan  3,	2009	<MLS> dispRectangle, changed xLoc, yLoc back to signed ints
+//*******************************************************************************
 void	dispRectangle(int  xLoc,  int  yLoc,   int rectWidth,   int  rectHeight) 
 {
 //int32_t len	=	(width*height);	//*	if width or height get modified, this is messed up
@@ -299,6 +311,12 @@ long	myHeight;
 	{
 		return;
 	}
+	//*	Jan 19,	2009	<MLS> Added more bounds checking to dispRectangle, fixed offscreen center problem
+	if (((xLoc + myWidth) < 0) || ((yLoc + myHeight) < 0))
+	{
+		return;
+	}
+
 	if ((xLoc + myWidth) >= kSCREEN_X_size)
 	{
 		myWidth	=	(kSCREEN_X_size - 1) - xLoc;
@@ -322,22 +340,24 @@ long	myHeight;
 
 	len	=	(myWidth * myHeight);
 
-		DUFF_DEVICE_8(len,
-				  asm("ldi r24,0x20		""\n\t"
-					  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-					  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-					  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-					  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-					  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-					  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-					  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-					  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-					  :
-					  :
-					  : "r24" ););
+#ifndef __MWERKS__
+	DUFF_DEVICE_8(len,
+			  asm("ldi r24,0x20		""\n\t"
+				  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+				  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+				  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+				  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+				  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+				  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+				  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+				  "sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+				  :
+				  :
+				  : "r24" ););
 
 	//*	SET the screen CS
 	SETBIT(OLED_CTRL_PORT,OLED_CS);
+#endif
 }
 
 //*******************************************************************************
@@ -346,13 +366,13 @@ void	dispClearScreen()
 	unsigned int i=2400;
   
 	/* Set XY location   */
-	dispCommand(0x20); //Specify the x address in RAM
+	dispCommand(kOLEDcmd_GRAMaddressSetX);	//Specify the x address in RAM
 	dispData(0);
 
-	dispCommand(0x21); //Specify the y address in RAM
+	dispCommand(kOLEDcmd_GRAMaddressSetY);	//Specify the y address in RAM
 	dispData(0);
 
-	dispCommand(0x22); //RAM write
+	dispCommand(kOLEDcmd_GRAMread_write);	//RAM write
 
 
 	/* Clear the screen */
@@ -365,51 +385,75 @@ void	dispClearScreen()
   
 	/* Start the clocking of the WR pin */
 
+#ifndef __MWERKS__
 	while(i--)
 	{
-	/* Set & Clear */
-	asm("ldi r24,0x20	   ""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+		/* Set & Clear */
+		asm("ldi r24,0x20	   ""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
 
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
 
 
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
 
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
-		:
-		:
-		: "r24"
-	);
-
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			"sts 0x0109,r24	""\n\t" "sts 0x0109,r24	""\n\t"
+			:
+			:
+			: "r24"
+		);
 	}
+#endif
 }
 #endif	//	_TOUCH_SLIDE_
+
+
+#if 0
+//*******************************************************************************
+void	dispScrollVertical(short startRow, short endRow, short numRows)
+{
+//*	this worked but veritcal is actually horzontal in the way this code works
+//*	also, once scrolled, the cordinates are messed up and it stays scrolled,
+//*	in other words, USELESS!!!!
+#ifdef _TOUCH_SLIDE_
+
+	dispCommand(kOLEDcmd_VerticalScrollCtrlHi);
+	dispData(0);
+
+	dispCommand(kOLEDcmd_VerticalScrollCtrlLo);
+	dispData(300);
+
+	dispCommand(kOLEDcmd_VerticalScrollCtrl2);
+	dispData(10);
+#endif
+
+}
+#endif

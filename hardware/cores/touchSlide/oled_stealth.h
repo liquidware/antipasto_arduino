@@ -22,7 +22,15 @@
 
 #define BRIGHT_MAX 15
 
-#include "touchscreen.h"
+#ifndef _TOUCHSCREEN_H_
+	#ifdef _TOUCH_SLIDE_
+		#include	"touchscreen.h"
+	#endif
+	#ifdef _TOUCH_STEALTH_
+		#include	"touchscreen_stealth.h"
+	#endif
+#endif
+
 #define LCD_DC		PG4
 #define LCD_CS		PG0
 #define LCD_RD		PG2
