@@ -2243,6 +2243,12 @@ public class Editor extends JFrame
     final GadgetPanel panel = this.gadgetPanel;
     this.isExporting = true;
 
+    try {
+		this.sketch.save();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           try {
