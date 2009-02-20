@@ -26,14 +26,7 @@
 #ifdef _TOUCH_STEALTH_
 	#include	"oled_stealth.h"
 #endif
-#ifndef _TOUCHSCREEN_H_
-	#ifdef _TOUCH_SLIDE_
-		#include	"touchscreen.h"
-	#endif
-	#ifdef _TOUCH_STEALTH_
-		#include	"touchscreen_stealth.h"
-	#endif
-#endif
+#include	"touchscreen.h"
 #include	"graphics.h"
 #include	"bitops.h"
 #include	"usart.h"

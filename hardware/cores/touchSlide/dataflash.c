@@ -49,17 +49,11 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include	"HardwareDef.h"
 
 #include "dataflash.h"
 #include "bitops.h"
 #include "usart.h"
-#ifdef _TOUCH_SLIDE_
-	#include "touchscreen.h"
-#endif
-#ifdef _TOUCH_STEALTH_
-	#include "touchscreen_stealth.h"
-#endif
+#include "touchscreen.h"
 
 unsigned int dataflash_buff_size = 0;	//!< The size of the on-chip buffer
 

@@ -18,11 +18,6 @@
 #include	<avr/pgmspace.h>
 #include	<avr/eeprom.h>
 
-
-#include	"HardwareDef.h"
-
-#ifdef _TOUCH_SLIDE_
-
 #include	"touchscreen.h"
 #include	"graphics.h"
 #include	"bitops.h"
@@ -500,7 +495,3 @@ unsigned char w,y,g;
 #ifdef __cplusplus
 } // extern "C"
 #endif
-
-
-#endif
-

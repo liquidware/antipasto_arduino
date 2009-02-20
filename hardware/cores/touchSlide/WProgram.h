@@ -10,7 +10,7 @@
 
 #include "HardwareSerial.h"
 #ifndef SUBPGRAPHICS_H
-	#include "SubPGraphics.h" //enable by default
+	#include "SubPGraphics.h" //enable SubPGrahpics by default
 #endif
 
 #ifdef __cplusplus
@@ -20,6 +20,5 @@
 long random(long);
 long random(long, long);
 void randomSeed(unsigned int);
-long map(long, long, long, long, long);
 
 #endif

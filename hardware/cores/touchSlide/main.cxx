@@ -8,8 +8,6 @@
 //*	Dec 26,	2008	<MLS> Will be taking over the development of the SubProcessing files
 //*******************************************************************************
 
-#include	<string.h>
-
 #include	"HardwareDef.h"
 #include	"SubPOptions.h"
 #include	"SubPGraphics.h"
@@ -247,6 +245,8 @@ int		yTextLoc;
 	//*	display the overall library version
 	yTextLoc	=	10;
 	strcpy(startupMsg, kDisplayHardwareString);
+	strcat(startupMsg, " ");
+	strcat(startupMsg, kDisplayHardwareVersion);
 	dispPutS(startupMsg, 5, yTextLoc, fontColor, bgColor);
 	yTextLoc	+=	kLinrSpacing;
 	

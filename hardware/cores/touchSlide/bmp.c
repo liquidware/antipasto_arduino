@@ -62,6 +62,18 @@ unsigned char	bmp_lookup_table_checkStatus()
 	return TRUE;
 }
 
+//*******************************************************************************
+static char	itoh(char theNyble)
+{
+char	theChar;
+
+	theChar	=	(theNyble & 0x0f) + 0x30;
+	if (theChar > 0x39)
+	{
+		theChar	+=	7;
+	}
+	return(theChar);
+}
 
 //*******************************************************************************
 void	GetFlashFileEntry(short fileIndex, FLASH_FILE_ENTRY *fileEntry)
