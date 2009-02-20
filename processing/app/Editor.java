@@ -1469,6 +1469,11 @@ public class Editor extends JFrame
       }
     }
 
+    try {
+		this.sketch.save();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
     if(gadgetPanel.getActiveGadget() != null){
 	    if(gadgetPanel.getActiveModule().getRules() != null){
 	    	IMessage message = gadgetPanel.getActiveModule().getRules().getMessages()[0];
