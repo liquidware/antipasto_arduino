@@ -949,13 +949,13 @@ public class Editor extends JFrame
       System.out.println("Switching to " + board);
       Preferences.set("board", board);
       try {
-        LibraryManager libraryManager = new LibraryManager();
-        libraryManager.rebuildAllBuilt();
-      } catch (IOException e) {
+        //LibraryManager libraryManager = new LibraryManager();
+        //libraryManager.rebuildAllBuilt();
+      } catch (Exception e) {
         e.printStackTrace();
-      } catch (RunnerException e) {
-        message("Error rebuilding libraries...");
-        error(e);
+      //} catch (RunnerException e) {
+      //  message("Error rebuilding libraries...");
+      //  error(e);
       }
     }
   }

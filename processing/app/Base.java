@@ -168,7 +168,7 @@ public class Base {
     editor.show();
 
     // attempt to build libraries
-    editor.prepareLibraries();
+    //editor.prepareLibraries(); 
 
       
     //editor.setSize(300, 600);
