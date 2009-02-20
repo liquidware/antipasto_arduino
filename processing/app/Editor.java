@@ -949,13 +949,13 @@ public class Editor extends JFrame
       System.out.println("Switching to " + board);
       Preferences.set("board", board);
       try {
-        LibraryManager libraryManager = new LibraryManager();
-        libraryManager.rebuildAllBuilt();
-      } catch (IOException e) {
+        //LibraryManager libraryManager = new LibraryManager();
+        //libraryManager.rebuildAllBuilt();
+      } catch (Exception e) {
         e.printStackTrace();
-      } catch (RunnerException e) {
-        message("Error rebuilding libraries...");
-        error(e);
+      //} catch (RunnerException e) {
+      //  message("Error rebuilding libraries...");
+      //  error(e);
       }
     }
   }
@@ -1469,6 +1469,11 @@ public class Editor extends JFrame
       }
     }
 
+    try {
+		this.sketch.save();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
     if(gadgetPanel.getActiveGadget() != null){
 	    if(gadgetPanel.getActiveModule().getRules() != null){
 	    	IMessage message = gadgetPanel.getActiveModule().getRules().getMessages()[0];
@@ -2243,6 +2248,12 @@ public class Editor extends JFrame
     final GadgetPanel panel = this.gadgetPanel;
     this.isExporting = true;
 
+    try {
+		this.sketch.save();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           try {
