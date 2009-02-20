@@ -103,15 +103,13 @@ find arduino -name ".svn" -exec rm -rf {} ';' 2> /dev/null
 # zip it all up for release
 echo Packaging standard release...
 echo
-#P5=arduino-$REVISION
-#mv arduino $P5
-#zip -rq $P5.zip $P5
-# nah, keep the new directory around
-#rm -rf $P5
 
 ##################################### 
 #Package the build
 #<CML> renamed the package to Antipasto
+
+echo Extracting packager tool...
+unzip packager.zip
 
 #define the package
 PACKAGER="AdvancedInstaller.com"                #the packager
@@ -140,21 +138,10 @@ cp Antipasto-package.aip $PACKAGE_PROJ        #copy the packager project file
 ./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name $PACKAGE_NAME -target 'ProgramFilesFolder\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\'$PACKAGE_DIST
 ./packager/$PACKAGER /build $PACKAGE_PROJ
 
-
-
-# zip up another for experts
-#echo Packaging expert release...
-#echo
+echo Cleaning packager
+rm -rf packager
  
-#cp -a $P5 $P5-expert
- 
-# can't use the run.bat that's tied to a local jre
-#rm $P5-expert/run.bat
-#cp dist/run-expert.bat $P5-expert/run.bat
-#chmod +x $P5-expert/run.bat
- 
-# remove enormous java runtime
-#rm -rf $P5-expert/java
-#zip -rq $P5-expert.zip $P5-expert
+echo Cleaning work directory
+rm -rf work
  
 echo Done.
