@@ -16,6 +16,8 @@ import antipasto.ModuleRules.ModuleRulesParser;
 import javax.swing.*;
 import javax.imageio.*;
 
+import antipasto.Util.*;
+
 
 public class Module implements IModule, ITemporary, IPackedFile {
 
@@ -34,6 +36,7 @@ public class Module implements IModule, ITemporary, IPackedFile {
     private String _target;
     private File _rulesFile;
     private ModuleRules _rules;
+	private File dataDirectory;
 
     public BufferedImage getImage() {
         return _img;
@@ -50,9 +53,27 @@ public class Module implements IModule, ITemporary, IPackedFile {
     }
 
     public File[] getData() {
-    	File dataDirectory = new File(this.getTempDirectory() + File.separator + "data");
+    	checkDataDirectory();
         return dataDirectory.listFiles();
     }
+	
+	public void checkDataDirectory(){
+		System.out.println("checking data directory");
+		dataDirectory = new File(this.getTempDirectory() + File.separator + "data");
+		if(!dataDirectory.exists()){
+    		dataDirectory.mkdir();
+    	}
+	}
+	
+	public void addFile(File file){
+		checkDataDirectory();
+		String newFilePath = this.dataDirectory.getPath() + File.separator + file.getName();
+		try{
+			FileCopy.copy(file.getPath(), newFilePath);
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+		}
+	}
 
     public void setData(File[] _files) {
         this._files = _files;

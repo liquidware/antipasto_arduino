@@ -29,8 +29,10 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 			File file = (File)value;
 			ImageIcon icon;
 			try {
-				icon = new ImageIcon(ImageIO.read(file));
-				label.setIcon(icon);
+				if(file.getName().endsWith(".bmp")){
+					icon = new ImageIcon(ImageIO.read(file));
+					label.setIcon(icon);
+				}
 				label.setText(file.getName());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

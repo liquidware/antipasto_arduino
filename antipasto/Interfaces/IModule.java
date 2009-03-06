@@ -15,6 +15,8 @@ public interface IModule extends IVersionable, IConfigurable {
 
     public File[] getData();
     public void setData(File[] files);
+	
+	public void addFile(File file);
 
     public void setName(String name);
     public String getName();

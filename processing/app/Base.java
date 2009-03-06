@@ -186,7 +186,7 @@ public class Base {
     	editor.gadgetPanel.setVisible(true);
     }
       
-    TouchShieldImageTransfer transfer = new TouchShieldImageTransfer(editor.serialPort);
+    FlashTransfer transfer = new FlashTransfer(editor.serialPort, "FlashFileSystem 0.1.0");
   
     ImageListPanel imageListPanel = new ImageListPanel(editor.gadgetPanel, transfer);
     imageListPanel.setLocation(editor.getX() + editor.getWidth() + 3, editor.getY());

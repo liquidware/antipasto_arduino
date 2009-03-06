@@ -26,6 +26,7 @@ package processing.app;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -34,7 +35,7 @@ import javax.swing.event.*;
 /**
  * Sketch tabs at the top of the editor window.
  */
-public class EditorHeader extends JComponent {
+public class EditorHeader extends JPanel {
   static Color backgroundColor;
   static Color textColor[] = new Color[2];
 
@@ -54,6 +55,10 @@ public class EditorHeader extends JComponent {
 
   int menuLeft;
   int menuRight;
+  
+  ArrayList tabs = new ArrayList();
+  
+  String previousSketch = "";
 
   //
 
@@ -77,10 +82,14 @@ public class EditorHeader extends JComponent {
   int sizeW, sizeH;
   int imageW, imageH;
 
+  JPanel tabHeader = new JPanel(new FlowLayout());
 
   public EditorHeader(Editor eddie) {
     this.editor = eddie; // weird name for listener
 
+    //this.setLayout(new FlowLayout());
+    this.add(tabHeader);
+    tabHeader.setVisible(true);
     pieces = new Image[STATUS.length][WHERE.length];
     for (int i = 0; i < STATUS.length; i++) {
       for (int j = 0; j < WHERE.length; j++) {
@@ -119,6 +128,8 @@ public class EditorHeader extends JComponent {
           }
         }
       });
+    
+    tabHeader.setBackground(backgroundColor);    
   }
 
 
@@ -128,6 +139,9 @@ public class EditorHeader extends JComponent {
     Sketch sketch = editor.sketch;
     if (sketch == null) return;  // ??
 
+    this.tabHeader.setLocation(0,0);
+    this.tabHeader.setSize(this.getWidth() - 100, this.getHeight());
+    
     Dimension size = getSize();
     if ((size.width != sizeW) || (size.height != sizeH)) {
       // component has been resized
@@ -181,45 +195,53 @@ public class EditorHeader extends JComponent {
     //int x = 0; //Preferences.GUI_SMALL;
     //int x = (Base.platform == Base.MACOSX) ? 0 : 1;
     int x = 6; // offset from left edge of the component
-    for (int i = 0; i < sketch.codeCount; i++) {
-      SketchCode code = sketch.code[i];
-
-      String codeName = (code.flavor == Sketch.PDE) ?
-        code.name : code.file.getName();
-
-      // if modified, add the li'l glyph next to the name
-      String text = "  " + codeName + (code.modified ? " \u00A7" : "  ");
-
-      //int textWidth = metrics.stringWidth(text);
-      Graphics2D g2 = (Graphics2D) g;
-      int textWidth = (int)
-        font.getStringBounds(text, g2.getFontRenderContext()).getWidth();
-
-      int pieceCount = 2 + (textWidth / PIECE_WIDTH);
-      int pieceWidth = pieceCount * PIECE_WIDTH;
-
-      int state = (code == sketch.current) ? SELECTED : UNSELECTED;
-      g.drawImage(pieces[state][LEFT], x, 0, null);
-      x += PIECE_WIDTH;
-
-      int contentLeft = x;
-      tabLeft[i] = x;
-      for (int j = 0; j < pieceCount; j++) {
-        g.drawImage(pieces[state][MIDDLE], x, 0, null);
-        x += PIECE_WIDTH;
-      }
-      tabRight[i] = x;
-      int textLeft = contentLeft + (pieceWidth - textWidth) / 2;
-
-      g.setColor(textColor[state]);
-      int baseline = (sizeH + fontAscent) / 2;
-      //g.drawString(sketch.code[i].name, textLeft, baseline);
-      g.drawString(text, textLeft, baseline);
-
-      g.drawImage(pieces[state][RIGHT], x, 0, null);
-      x += PIECE_WIDTH - 1;  // overlap by 1 pixel
+    
+    //here is where we're creating the code tabs....lets override this
+    if(!this.previousSketch.equalsIgnoreCase(sketch.name)){
+    	for(int i = 0; i < tabs.size(); i++){
+			((Component)tabs.get(i)).setVisible(false);
+    		this.remove((Component)tabs.get(i));
+    	}
+    	
+    	for(int i = 0; i < tabs.size(); i++){
+    		this.remove(((EditorTab)tabs.get(i)));
+    	}
+    	
+    	tabs.clear();
+    	
+	    for (int i = 0; i < sketch.codeCount; i++) {
+	    	this.tabHeader.setVisible(true);
+	      SketchCode code = sketch.code[i];
+	
+	      String codeName = (code.flavor == Sketch.PDE) ?
+	        code.name : code.file.getName();
+	      
+	      EditorTab editorTab = new EditorTab(Color.ORANGE, codeName, code, this.editor);
+	      editorTab.setPreferredSize(new Dimension(editorTab.WIDTH, this.getHeight() + 5));
+	      editorTab.setBackground(this.backgroundColor);
+	      editorTab.paint(getGraphics());
+	      
+	      tabs.add(editorTab);
+	      
+	      this.tabHeader.add(editorTab);
+	      this.setVisible(true);
+	    }
+	    if(editor.gadgetPanel != null && editor.gadgetPanel.getActiveModule() != null){
+		    if(editor.gadgetPanel.getActiveModule().getData() != null||editor.gadgetPanel.getActiveModule().getData().length > 0){
+		    	EditorTab editorTab = new EditorTab(Color.green, "Data", editor.gadgetPanel.getActiveModule(),this.editor);
+		    	editorTab.setPreferredSize(new Dimension(editorTab.WIDTH, this.getHeight() + 5));
+		    	editorTab.setBackground(this.backgroundColor);
+		    	tabs.add(editorTab);
+		    	this.tabHeader.add(editorTab);
+		    	editorTab.paint(getGraphics());
+		    }
+	    }
+	    this.previousSketch = sketch.name;
     }
 
+    int restOfTabStart = x;
+    
+    
     menuLeft = sizeW - (16 + pieces[0][MENU].getWidth(this));
     menuRight = sizeW - 16;
     // draw the dropdown menu target
@@ -301,6 +323,7 @@ public class EditorHeader extends JComponent {
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           editor.sketch.newCode();
+          
         }
       });
     menu.add(item);

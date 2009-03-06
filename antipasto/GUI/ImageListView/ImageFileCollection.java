@@ -21,10 +21,17 @@ public class ImageFileCollection extends ArrayList{
 		return returnVal;
 	}
 	
-	public boolean remove(Object item){
-		boolean returnVal = super.add(item);
+	
+	
+	public Object getItemAt(int index){
+		return super.get(index);
+	}
+	
+	public Object remove(int index){
+		Object retItem = getItemAt(index);
+		super.remove(getItemAt(index));
 		onItemChanged();
-		return returnVal;
+		return retItem;
 	}
 	
 	public void addItemListener(IImageFileCollectionChangedListener model){

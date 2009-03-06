@@ -50,6 +50,7 @@ import javax.swing.undo.*;
 import antipasto.*;
 import antipasto.GUI.GadgetListView.*;
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.*;
+import antipasto.GUI.ImageListView.ImageListPanel;
 import antipasto.Interfaces.*;
 import antipasto.ModuleRules.IMessage;
 import antipasto.ModuleRules.IOkListener;
@@ -81,6 +82,10 @@ public class Editor extends JFrame
   static public final KeyStroke WINDOW_CLOSE_KEYSTROKE =
     KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 
+  static final String CODEEDITOR = "CODEPANEL";
+  static final String FILELIST = "FILELIST";
+  static final String TEST = "TEST";
+  
   static final int HANDLE_NEW  = 1;
   static final int HANDLE_OPEN = 2;
   static final int HANDLE_QUIT = 3;
@@ -127,6 +132,7 @@ public class Editor extends JFrame
   JMenuItem exportAppItem;
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
+  JPanel centerPanel;
   
   JMenuItem burnBootloader8Item = null;
   JMenuItem burnBootloader8ParallelItem = null;
@@ -138,6 +144,8 @@ public class Editor extends JFrame
   JMenu serialMenu;
   JMenu serialRateMenu;
   JMenu mcuMenu;
+  
+  ImageListPanel imageListPanel;
   
   SerialMenuListener serialMenuListener;
 
@@ -303,9 +311,33 @@ public class Editor extends JFrame
     rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
     rightWing.setSize(15, 0);
     rightWing.setPreferredSize(new Dimension(10, 0));
+
+    imageListPanel = new ImageListPanel(this.gadgetPanel, new FlashTransfer(this.serialPort,"FlashFileSystem 0.1.0"));
+    
+	JPanel testPanel = new JPanel();
+	JLabel lbl = new JLabel("THIS IS A TEST STRING");
+	lbl.setVisible(true);
+	lbl.setBackground(Color.BLUE);
+	  
+    
+    centerPanel = new JPanel();
+    
+    Dimension dim = textarea.getSize();
+    
+    System.out.println("The dimensions...." + dim);
+     
+    centerPanel.setLayout(new CardLayout());
+    
+    centerPanel.setVisible(true);
+    centerPanel.add(textarea, CODEEDITOR);
+    centerPanel.add(imageListPanel, FILELIST);
+	  centerPanel.add(lbl, TEST);  
+    
+    CardLayout cl = (CardLayout) centerPanel.getLayout();
+    cl.show(centerPanel, CODEEDITOR);
     
     editorSection.add(leftWing, BorderLayout.WEST);
-    editorSection.add(textarea, BorderLayout.CENTER);
+    editorSection.add(centerPanel, BorderLayout.CENTER);
     editorSection.add(rightWing, BorderLayout.EAST);
     
     upper.add(editorSection);
@@ -337,7 +369,7 @@ public class Editor extends JFrame
       splitPane.setDividerSize(dividerSize);
     }
 
-    splitPane.setMinimumSize(new Dimension(600, 600));
+    splitPane.setMinimumSize(new Dimension(this.getWidth(), 300));
     box.add(splitPane);
 
     // hopefully these are no longer needed w/ swing
@@ -346,12 +378,10 @@ public class Editor extends JFrame
     pain.add(box);
 
     pain.setTransferHandler(new TransferHandler() {
-
         public boolean canImport(JComponent dest, DataFlavor[] flavors) {
           // claim that we can import everything
           return true;
         }
-
         public boolean importData(JComponent src, Transferable transferable) {
           DataFlavor[] flavors = transferable.getTransferDataFlavors();
 
@@ -719,6 +749,7 @@ public class Editor extends JFrame
       menu.add(item);
 
       menu.addSeparator();
+
 
       item = newJMenuItem("Quit", 'Q');
       item.addActionListener(new ActionListener() {
@@ -1407,6 +1438,17 @@ public class Editor extends JFrame
         });
     }
 
+	//switch to a code card
+	  try{
+		  CardLayout cl = (CardLayout)this.getLayout();
+		  cl.show(textarea, CODEEDITOR);
+	  }catch(Exception ex){
+		  
+	  }
+	  
+	  //set the card layout to give focus to the textarea
+	  CardLayout layout = (CardLayout)this.centerPanel.getLayout();
+	  layout.show(this.centerPanel, CODEEDITOR);
     // update the document object that's in use
     textarea.setDocument(code.document,
                          code.selectionStart, code.selectionStop,
@@ -2682,7 +2724,7 @@ public class Editor extends JFrame
 	        this.handleSave(true);
 	        File sketchFile = obj.getSketch();
 	        File boardFile = obj.getBoards();
-	        this.handleOpen2(sketchFile.getPath());
+	        this.handleOpen(sketchFile.getPath());
 	        String board = gadgetPanel.getActiveModule().getTarget();
 	        this.curBoard = board;
 	        Preferences.set("board", board);
@@ -2693,6 +2735,8 @@ public class Editor extends JFrame
         }else if(gadgetPanel.getActiveGadget() == null){
         	this.setVisible(true);
         }
+        System.out.println("repainting header");
+        this.header.paint(getGraphics());
     }
 
     /*
@@ -2828,6 +2872,7 @@ public class Editor extends JFrame
     	for(int i = 0; i < gadget.getModules().length; i++){
     		this.importModule(gadget.getModules()[i]);
     	}
+    	//imageListPanel.setGadgetPanel(this.gadgetPanel);
     }
     
     private void importModule(IModule module){
@@ -2840,6 +2885,13 @@ public class Editor extends JFrame
             File.separator + "cores" + File.separator + target;
     		module.copyCoreToDirectory(cpyDir);
     	}
+    }
+    
+    public void setImageListVisable(IModule module){
+    	this.imageListPanel.setModule(module);
+    	//this.textarea.setVisible(true);
+    	CardLayout cl = ((CardLayout)this.centerPanel.getLayout());
+    	cl.show(centerPanel, FILELIST);
     }
 }
 
