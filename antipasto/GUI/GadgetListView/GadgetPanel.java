@@ -380,7 +380,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 		//int width = 300;
         //this.setSize(width, editor.textarea.getHeight());
 		//this.setSize(this.cachedWidth, this.cachedHeight);
-        this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
+		//System.out.println(editor.getLocationOnScreen().getY() - editor.centerPanel.getLocationOnScreen().getY());
+        this.setLocation(editor.getX() - this.getWidth(), editor.centerPanel.getLocationOnScreen().y);	
 	}
 
 	public void componentResized(ComponentEvent arg0) {

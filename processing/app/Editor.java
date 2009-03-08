@@ -132,7 +132,7 @@ public class Editor extends JFrame
   JMenuItem exportAppItem;
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
-  JPanel centerPanel;
+  public JPanel centerPanel;
   
   JMenuItem burnBootloader8Item = null;
   JMenuItem burnBootloader8ParallelItem = null;
