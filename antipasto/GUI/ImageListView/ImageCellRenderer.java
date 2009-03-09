@@ -75,7 +75,16 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 				
 				fileEntry.add(imgLabel, BorderLayout.WEST);
 				fileEntry.add(imgDescPanel);
-				
+				if (isSelected) {
+					fileEntry.setBackground(Color.orange);
+					imgLabel.setBackground(Color.orange);
+					imgDescPanel.setBackground(Color.orange);
+					
+				} else {
+					fileEntry.setBackground(Color.white);
+					imgLabel.setBackground(Color.white);
+					imgDescPanel.setBackground(Color.white);
+				}
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

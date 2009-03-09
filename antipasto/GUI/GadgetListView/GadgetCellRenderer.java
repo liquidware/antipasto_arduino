@@ -55,8 +55,8 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
             
             JLabel textLabel1 = new JLabel(" ");
             long sizeInBytes = f.length();
-            JLabel textLabel2 = new JLabel("Size: " + sizeInBytes / 10000 + " kb");
-            JLabel textLabel3 = new JLabel("Lines of Code: " + countLines((IModule)value));
+            JLabel textLabel2 = new JLabel(" Size: " + sizeInBytes / 10000 + " kb");
+            JLabel textLabel3 = new JLabel(" Lines of Code: " + countLines((IModule)value));
             panelRight.add(textLabel1);
             panelRight.add(textLabel2);
             panelRight.add(textLabel3);
@@ -67,9 +67,19 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
             panel.setBackground(Color.white);
             panel.add(panelLeft, BorderLayout.WEST);
             panel.add(panelRight);
-            return panel;
-            //label.setText(gadget.getName());
             
+            if (isSelected) {
+            	panelLeft.setBackground(Color.orange);
+            	panelRight.setBackground(Color.orange);
+            	panel.setBackground(Color.orange);
+            } else {
+            	panelLeft.setBackground(Color.white);
+            	panelRight.setBackground(Color.white);
+            	panel.setBackground(Color.white);            	
+            }
+            
+            return panel;
+                  
         } else {
           // Clear old icon; needed in 1st release of JDK 1.2
           label.setIcon(null);
