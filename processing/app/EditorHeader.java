@@ -117,7 +117,7 @@ public class EditorHeader extends JPanel {
 
           if ((x > menuLeft) && (x < menuRight)) {
             popup.show(EditorHeader.this, x, y);
-
+            
           } else {
             for (int i = 0; i < editor.sketch.codeCount; i++) {
               if ((x > tabLeft[i]) && (x < tabRight[i])) {
@@ -216,7 +216,7 @@ public class EditorHeader extends JPanel {
 	      String codeName = (code.flavor == Sketch.PDE) ?
 	        code.name : code.file.getName();
 	      
-	      EditorTab editorTab = new EditorTab(Color.ORANGE, codeName, code, this.editor);
+	      EditorTab editorTab = new EditorTab(new Color(0x54, 0x91, 0x9e), codeName, code, this.editor);
 	      editorTab.setPreferredSize(new Dimension(editorTab.WIDTH, this.getHeight() + 5));
 	      editorTab.setBackground(this.backgroundColor);
 	      editorTab.paint(getGraphics());
@@ -228,7 +228,7 @@ public class EditorHeader extends JPanel {
 	    }
 	    if(editor.gadgetPanel != null && editor.gadgetPanel.getActiveModule() != null){
 		    if(editor.gadgetPanel.getActiveModule().getData() != null||editor.gadgetPanel.getActiveModule().getData().length > 0){
-		    	EditorTab editorTab = new EditorTab(Color.green, "Data", editor.gadgetPanel.getActiveModule(),this.editor);
+		    	EditorTab editorTab = new EditorTab(new Color(46, 163, 94), "Data", editor.gadgetPanel.getActiveModule(),this.editor);
 		    	editorTab.setPreferredSize(new Dimension(editorTab.WIDTH, this.getHeight() + 5));
 		    	editorTab.setBackground(this.backgroundColor);
 		    	tabs.add(editorTab);
