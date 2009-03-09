@@ -608,6 +608,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 				listener.OkButton();
 				okButton.setVisible(false);
 				okButton.addActionListener(es);
+				editor.header.paintComponents(editor.getGraphics());
 			}
 			public void mouseEntered(MouseEvent arg0) {
 			}

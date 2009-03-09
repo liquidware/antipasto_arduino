@@ -27,6 +27,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.*;
 import java.awt.geom.*;
+import java.io.IOException;
+
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -319,7 +321,12 @@ public class EditorButtons extends JComponent implements MouseInputListener {
     switch (sel) {
     case RUN:
       //if (!disableRun) {
-      editor.handleRun(e.isShiftDown());
+      try {
+				editor.handleRun(e.isShiftDown());
+			} catch (IOException ex) {
+				// TODO Auto-generated catch block
+				ex.printStackTrace();
+			}
       //}
       break;
 

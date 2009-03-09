@@ -132,7 +132,7 @@ public class Editor extends JFrame
   JMenuItem exportAppItem;
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
-  JPanel centerPanel;
+  public JPanel centerPanel;
   
   JMenuItem burnBootloader8Item = null;
   JMenuItem burnBootloader8ParallelItem = null;
@@ -574,6 +574,7 @@ public class Editor extends JFrame
 
       } else {
         handleNew2(true);
+        this.header.rebuild();
       }
     }
 
@@ -770,7 +771,11 @@ public class Editor extends JFrame
     item = newJMenuItem("Verify/Compile", 'R');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          handleRun(false);
+          try {
+			handleRun(false);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
         }
       });
     menu.add(item);
@@ -1479,7 +1484,7 @@ public class Editor extends JFrame
   // ...................................................................
 
 
-  public void handleRun(final boolean present) {
+  public void handleRun(final boolean present) throws IOException {
       System.out.println("handling the run");
     doClose();
     running = true;
@@ -1511,11 +1516,8 @@ public class Editor extends JFrame
       }
     }
 
-    try {
-		this.sketch.save();
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
+    this.saveSketches();
+    
     if(gadgetPanel.getActiveGadget() != null){
 	    if(gadgetPanel.getActiveModule().getRules() != null){
 	    	IMessage message = gadgetPanel.getActiveModule().getRules().getMessages()[0];
@@ -1762,7 +1764,11 @@ public class Editor extends JFrame
     if(this.gadgetPanel.isActive()){
     	this.gadgetPanel.saveCurrentGadget();
     	Preferences.set("gadget.active", "true");
+    	try{
     	Preferences.set("last.active.gadget", ((IPackedFile)this.gadgetPanel.getActiveGadget()).getPackedFile().getPath());
+    	}catch(Exception ex){
+    		//there is no gadget
+    	}
     }
   }
 
@@ -1885,6 +1891,7 @@ public class Editor extends JFrame
           handleNewLibrary = false;
           checkModified(HANDLE_NEW);
         }});
+    this.header.paintComponents(this.getGraphics());
   }
 
 
@@ -1926,6 +1933,8 @@ public class Editor extends JFrame
       String pdePath =
         sketchbook.handleNew(noPrompt, handleNewShift, handleNewLibrary);
       if (pdePath != null) handleOpen2(pdePath);
+      
+      this.header.rebuild();
 
     } catch (IOException e) {
       // not sure why this would happen, but since there's no way to
@@ -2173,7 +2182,8 @@ public class Editor extends JFrame
     message("Saving...");
     try {
 
-	      if (sketch.save()) {
+		System.out.println("Calling the standard sketch saver...");
+	      if (saveSketches()) {
 	        message("Done Saving.");
 	      } else {
 	        message(EMPTY);
@@ -2182,7 +2192,6 @@ public class Editor extends JFrame
     	if(this.gadgetPanel.getActiveGadget()!= null){
     	  this.gadgetPanel.saveCurrentGadget();
     	  System.out.println("saved gadget");
-    	 
     	}
       // rebuild sketch menu in case a save-as was forced
       // Disabling this for 0125, instead rebuild the menu inside
@@ -2290,12 +2299,8 @@ public class Editor extends JFrame
     final GadgetPanel panel = this.gadgetPanel;
     this.isExporting = true;
 
-    try {
-		this.sketch.save();
-	} catch (IOException e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
-	}
+    this.saveSketches();
+    
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           try {
@@ -2893,5 +2898,25 @@ public class Editor extends JFrame
     	CardLayout cl = ((CardLayout)this.centerPanel.getLayout());
     	cl.show(centerPanel, FILELIST);
     }
+    
+    private boolean saveSketches(){
+    	boolean retVal = true;
+    	int correctSketch = sketch.currentIndex;
+    	for(int i = 0; i < sketch.code.length - 1; i++){
+    		try {
+    			sketch.setCurrent(i);
+				sketch.save();
+				if(!retVal){
+				   retVal = true;
+				}
+			} catch (IOException e) {
+				retVal = false;
+				e.printStackTrace();
+			}
+    	}
+    	sketch.setCurrent(correctSketch);
+    	return retVal;
+    }
+    
 }
 
