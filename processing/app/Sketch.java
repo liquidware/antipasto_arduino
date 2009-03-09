@@ -534,6 +534,7 @@ public class Sketch {
       }
       SketchCode newCode = new SketchCode(newName, newFile, newFlavor);
       insertCode(newCode);
+      editor.header.paintComponents(editor.header.getGraphics());
     }
 
     // sort the entries

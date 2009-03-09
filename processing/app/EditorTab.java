@@ -65,7 +65,9 @@ public class EditorTab extends JComponent implements DocumentListener, MouseList
 		if(obj instanceof SketchCode){
 			//SketchCode instance
 			SketchCode skc = (SketchCode)obj;
-			skc.document.addDocumentListener(this);
+			if(skc.document != null){
+				skc.document.addDocumentListener(this);
+			}
 			this.internalType = CODE;
 		}else if(obj instanceof IModule){
 			//List of files isntance
@@ -105,6 +107,9 @@ public class EditorTab extends JComponent implements DocumentListener, MouseList
 
 	public void changedUpdate(DocumentEvent arg0) {
 		this.isUpdated = true;
+		if(arg0.getLength() == 0){
+			this.isUpdated = false;
+		}
 		System.out.println("Changed Update");
 		this.repaint();
 	}

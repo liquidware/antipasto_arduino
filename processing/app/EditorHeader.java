@@ -209,7 +209,7 @@ public class EditorHeader extends JPanel {
     	
     	tabs.clear();
     	
-	    for (int i = 0; i < sketch.codeCount; i++) {
+	    for (int i = 0; i < sketch.code.length; i++) {
 	    	this.tabHeader.setVisible(true);
 	      SketchCode code = sketch.code[i];
 	
@@ -320,10 +320,11 @@ public class EditorHeader extends JPanel {
     */
 
     item = new JMenuItem("New Tab");
+    final EditorHeader header = this;
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           editor.sketch.newCode();
-          
+          header.paintComponents(header.getGraphics());
         }
       });
     menu.add(item);
