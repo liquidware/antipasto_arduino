@@ -30,7 +30,6 @@
 #include	"FlashFileSystem.h"
 #include	"usart.h"
 #include	"dataflash.h"
-//#include	"touchscreen.h"
 #include	"bitops.h"
 #include	"bmp.h"
 #include	"wiring.h"
@@ -40,6 +39,32 @@
 #endif
 
 #define	_USE_DBBUG_RECT_STATUS_
+
+COLOR black = { 0,0,0};
+COLOR textColor = {255,255,255};
+COLOR white = {255,255,255};
+uint16_t gPageIndex = 0; 
+
+//************************************************************************
+//* A debug tool.
+//* AutoIncrements the line.
+void DebugRectPrintText(char * msg) {
+	static int line;
+	
+	dispColor(black);
+	dispRectangle(0,line,319,line+8);
+	dispPutS(msg,10,line,textColor, black);
+
+	textColor.red +=20;
+	textColor.green -=50;
+	textColor.blue += 50;
+
+	line+=10;
+	if (line > 220) {
+		line = 0;
+	}
+
+}
 
 //*******************************************************************************
 //*	this can also be considered ERASE
@@ -93,7 +118,7 @@ static void	FlashFileDownload(void)
 {
 unsigned int	xx;
 unsigned int	ii,wait,wait2;
-//unsigned char	out_data[DATAFLASH_PAGESIZE],in_data[DATAFLASH_PAGESIZE];
+unsigned char	dataBuff[DATAFLASH_PAGESIZE];
 char			msgBuff[48];
 unsigned char	*buff;
 unsigned int	page_count;
@@ -105,22 +130,22 @@ long			longByte3;
 long			longByte4;
 
 #ifdef _USE_DBBUG_RECT_STATUS_
-	DebugRectPrintText("IMAGE_INTERFACE_STORE");
+	DebugRectPrintText("STORE");
 #endif
 
 	buff	=	usart_getBuff_ptr();
-	
 
-	buff[0]	=	0;
-	while (buff[0] != 0x01)	//*	wait for SOH
-	{
-		usart_read_bytes(1);
-	}
-
-
+	/* Clear the buffer */
 	for (ii=0; ii<17; ii++)
 	{
 		buff[ii]	=	0;
+	}
+
+	usart_putc(IMAGE_INTERFACE_PAGE_DONE); //respond
+
+	while (buff[0] != 0x01)	//*	wait for SOH
+	{
+		usart_read_bytes(1);
 	}
 
 	//*	read the file header
@@ -137,8 +162,8 @@ long			longByte4;
 						(longByte3 << 8) +
 						longByte4;
 						
-		page_count	=	newFileSize / 512;		//*	number of pages			
-		if ((newFileSize % page_count) > 0)
+		page_count	=	newFileSize / DATAFLASH_PAGESIZE;		//*	number of pages			
+		if ((newFileSize % DATAFLASH_PAGESIZE) > 0)
 		{
 			page_count++;
 		}
@@ -146,66 +171,63 @@ long			longByte4;
 		strncpy(newFileName, buff + 5, 12);
 		newFileName[12]	=	0;
 		
-		sprintf(msgBuff, "File=%s, size=%ld page=%d", newFileName, newFileSize, page_count);
+		sprintf(msgBuff, "File=%s, size=%ld pages=%d", newFileName, newFileSize, page_count);
 		DebugRectPrintText(msgBuff);
 		
-		DelayBigTime();
-		SendAck();
+		//bmp_store(dataBuff,newFileName,(uint32_t)gPageIndex*DATAFLASH_PAGESIZE); //save the file name and offset
+				
+		usart_putc(IMAGE_INTERFACE_PAGE_DONE); //respond
 
-		for (ii=0; ii< page_count; ii++)
+		for (ii=gPageIndex; ii< gPageIndex+page_count; ii++)
 		{
 		unsigned int buffer_count	=	0;
+		unsigned char outChecksum = 0;
+		unsigned char inChecksum = 0;
 
-			usart_read_bytes(519);	//read the whole page
+			usart_read_bytes(DATAFLASH_PAGESIZE);	//read the whole page
 			buff	=	usart_getBuff_ptr();
-			DelayBigTime();
-			if (buff[0] == 0x02)	//*	look for STX
-			{
-				SendAck();
-			}
-			else
-			{
-				SendNAK();
-			}
-		#if 0
-
-			buffer_count	=	usart_getBuff_size();
-
-
 
 			//program the whole page
 			for(xx=0; xx<DATAFLASH_PAGESIZE; xx++)
 			{
-				out_data[xx]	=	buff[xx];
+				dataBuff[xx]	=	buff[xx];	
+				inChecksum += buff[xx];					//increment the checksum
 			}
-			dataflash_program_page(&out_data[0], ii); 	//program the page
+
+			inChecksum = (inChecksum ^ 0xFF) + 1;		// two's compliment
+			dataflash_program_page(&dataBuff[0], ii); 	//program the page
 	    
-	    				
+			/* Clear the buffer */
 			for(xx=0; xx<DATAFLASH_PAGESIZE; xx++)
 			{
-				in_data[xx]	=	0x00;
+				dataBuff[xx]	=	0x00;
 	     	}
 
-			dataflash_cont_read(&in_data[0], ii, DATAFLASH_PAGESIZE);
+			dataflash_cont_read(&dataBuff[0], ii, DATAFLASH_PAGESIZE);	//read the page
 
-
-			for (xx=0; xx<DATAFLASH_PAGESIZE; xx++)
+			for (xx=0; xx<DATAFLASH_PAGESIZE; xx++)						//calculate the checksum
 			{
-				if (xx==256)
-				{
-					for (wait = 0; wait < 254; wait++)
-					{
-						for (wait2 = 0; wait2 < 254; wait2++)
-						{
-							asm("nop");
-						}
-					}
-				}
-				usart_putc(in_data[xx]);
-				asm("nop");
+				outChecksum += dataBuff[xx];
 			}
-		#endif
-		}
+
+			outChecksum = (outChecksum ^ 0xFF) + 1;						// two's compliment
+
+			/* Make sure the checksum matches */
+			if (inChecksum == outChecksum) {
+
+				sprintf(msgBuff, "File=%s %d / %d",newFileName, ii+1, page_count);
+				DebugRectPrintText(msgBuff);
+				usart_putc(IMAGE_INTERFACE_PAGE_DONE); 			//respond
+
+			} else {
+				DebugRectPrintText("checksum fail");
+				usart_putc(0); 									//error
+			}
+			
+		} //end for
+
+		/* Incremement the page index*/
+		gPageIndex+= page_count;
 	}
 	else
 	{
@@ -227,9 +249,11 @@ short	bmpHeight;
 char	displayLine[64];
 
 
-	usart_puts("\nTouchShield/Slide Flash File System Ver 0.1\n");
-//	usart_putc(0);
+//	usart_puts("\nTouchShield/Slide Flash File System Ver 0.1\n");
+	usart_puts("Flasher v0.2");
+	usart_putc(0);
 
+	#if 0
 	ii			=	0;
 	validImage	=	TRUE;
 
@@ -241,6 +265,7 @@ char	displayLine[64];
 		usart_puts("\n");
 		ii++;
 	}
+	#endif
 }
 
 
@@ -288,34 +313,20 @@ boolean			keepGoing;
 char			commandString[8];
 
 
-	/*
-		order of operations:
-			1.) purge usart buffers
-			2.) recv mode byte
-			3.) if mode == STORE,
-					recv page_count 
-					recv all pages
-				else mode == READ
-					send page_count
-					send pages
-	*/
-
-	DebugRectPrintText("FlashFileDownload()");
+	DebugRectPrintText("FlashFileSystemComm()");
 
 
 	arduinoReset();
-//	DebugRectPrintText("arduino in reset");
 
-//	usart_init(115200);
-	usart_init(57600);
-//	DebugRectPrintText("usart_init 115200");
+	//usart_init(57600);
+	usart_init(115200);
 
 	cli();	//*	disable interupts
 
 	buff	=	usart_getBuff_ptr();
 
 	//*	send out newlines to get the programs attention
-//	usart_puts("\n\n\n\n");
+	//	usart_puts("\n\n\n\n");
 
 
 	//*******************************************************************************
@@ -353,7 +364,8 @@ char			commandString[8];
 
 
 			case IMAGE_INTERFACE_EXIT:
-				usart_puts("Exit Command\n");
+
+				DebugRectPrintText("File Send complete.");
 
 				sei(); //enable interrupts
 				bmp_init();
@@ -364,7 +376,6 @@ char			commandString[8];
 				break;
 				
 			default:
-				usart_puts("Unknown Command\n");
 				DebugRectPrintText("Unknown Command");
 				break;
 

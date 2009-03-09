@@ -43,12 +43,14 @@ import javax.swing.*;
 
 public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventListener {
 	private ImageListView list;
-	private FlashTransfer imageTransfer;
+	final FlashTransfer imageTransfer;
+	Serial mySerial = null;
 	private JButton removeButton;
 	private JButton transferButton;
 	private GadgetPanel panel;
 	private IModule _module;
 	private JProgressBar progressBar;
+	boolean isTransfering = false; 
 	
 	public ImageListPanel(GadgetPanel panel, FlashTransfer imageTransfer){
 		this.imageTransfer = imageTransfer;
@@ -159,7 +161,11 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		this.transferButton.addMouseListener(new MouseListener(){
 
 			public void mouseClicked(MouseEvent arg0) {
-				transfer();
+				if (isTransfering == false) {
+					transfer();
+				} else {
+					reset();		//already transfering, reset
+				}
 			}
 
 			public void mouseEntered(MouseEvent arg0) {
@@ -186,37 +192,64 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	}
 	
 	/*
-	 *Transfers the files using the flash transferer
+	 *Transfers the files
 	 */
 	private void transfer(){
 		try {
-			try{
-				this.imageTransfer.setSerial(new Serial(true));
-			}catch(SerialException ex){
-				ex.printStackTrace();
-			}
-			final File file[] = this._module.getData();
-			progressBar.setMaximum(file.length - 1);
+			final File fileList[] = this._module.getData();
 			final FlashTransfer transfer = imageTransfer;
+			isTransfering = true;
+			
+			transferButton.setText("Sending...");
+			
+			progressBar.setMaximum(fileList.length+1);
+			progressBar.setValue(1);	//bump the progress bar
+										//up one for visual friendliness
 			new Thread(
 					   new Runnable() {
 					   public void run() {
-					   for(int i = 0; i < file.length; i++){
-					   System.out.println("sending: " + file[i].getName());
-					   transfer.send(file[i]);
-					   progressBar.setValue(i);
-					   try{
-					   Thread.sleep(1000);
-					   }catch(Exception ex){
-					   ex.printStackTrace();
-					   }
-					   }
+						   				   
+						   try {
+							   mySerial = new Serial();
+							   transfer.setSerial(mySerial);
+							   
+							   /* For each file... */
+							   for(int i = 0; i < fileList.length; i++){
+								   System.out.println("sending: " + fileList[i].getName());
+								   transfer.sendFile(fileList[i]);
+								   progressBar.setValue(progressBar.getValue()+1);
+								   progressBar.repaint();
+							   }
+							   
+							   /* Exit the image transfer */
+							   transfer.close();
+							   
+							   /* Reset UI after transfer */
+							   reset();
+							   
+						   } catch (SerialException e) {
+							  
+							   e.printStackTrace();
+						   }
+				        
 					   }}).start();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}	
 	}
 
+	/*
+	 * Reset the UI after transfer.
+	 */
+	private void reset() {
+		
+		   mySerial.dispose();
+		   transferButton.setText("Transfer");
+		   progressBar.setValue(0);
+		   isTransfering = false;
+		
+	}
+	
 	public void onActiveGadgetChanged(ActiveGadgetObject obj) {
 	}
 	

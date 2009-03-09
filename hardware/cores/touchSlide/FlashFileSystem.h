@@ -13,31 +13,25 @@
 #ifndef _FLASH_FILE_SYSTEM_H_
 #define _FLASH_FILE_SYSTEM_H_
 
-
-//*	this is the DIRECTORY entry for the flash file system
-#define	kFlashFileNameLen	8
-#define	kFlashMagicCookie	0x55AA
+//* this is the DIRECTORY entry for the flash file system
+#define kFlashFileNameLen 8
+#define kFlashMagicCookie 0x55AA
 typedef struct {
-					char	fileName[kFlashFileNameLen];
-					char	extension[3];
-					long	fileSize;				//*	in bytes
-					short	startBlock;
-					
-					
-					
-				} FlashDirEntry;
+	char	fileName[kFlashFileNameLen];
+	char	extension[3];
+	long	fileSize;		//* in bytes
+	short	startBlock;
+} FlashDirEntry;
 
 
-//*	this is a file block stored as a 528 byte PAGE in the Flash memory
+//* this is a file block stored as a 528 byte PAGE in the Flash memory
 typedef struct {
-					short	magicCookie;			//*	this should be 0x55AA for a block that has been written by this file system
-					short	fileIndex;				//*	which directory index does this block belong to
-					short	blockIndex;				//*	which block is this within the file
-					short	nextBlock;				//*	the next block that comes after this one
-					long	checksum;				//*	32 bit checksum
-					
-					
-				} FlashFileBlock;
+	short	magicCookie;	//* this should be 0x55AA for a block that has been written by this file system
+	short	fileIndex;	//* which directory index does this block belong to
+	short	blockIndex;	//* which block is this within the file
+	short	nextBlock;	//* the next block that comes after this one
+	long	checksum;	//* 32 bit checksum	
+} FlashFileBlock;
 
 
 
@@ -46,7 +40,7 @@ extern "C"{
 #endif
 
 void FlashFileSystemComm(void);
-
+void DebugRectPrintText(char * msg);
 
 #ifdef __cplusplus
 } // extern "C"

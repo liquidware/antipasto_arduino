@@ -51,11 +51,178 @@ public class FlashTransfer {
 	public void setSerial(Serial serial){
 		this.serialPort = serial;
 	}
+
+	/*
+	 * Closes the connection.
+	 * Device continues code execution.
+	 */
+	public void close() {
+	
+		/* Send Exit command */
+		serialPort.clear(); //purge
+		serialPort.write("E");
+		while (serialPort.readChar() != 'D') { ; } //wait
+		
+	}
+	
+	/*
+	 * Identifies the device we're talking to.
+	 * @return Returns true if device found.
+	 */
+	private boolean identifyFlash() {
+		String id;
+		
+		serialPort.clear(); //purge
+		
+		
+		try{ Thread.sleep(100); } catch (Exception e) { }
+		
+		serialPort.write("I"); //send the Identify command
+
+		try{ Thread.sleep(200); } catch (Exception e) { }
+		
+		/* Read the string */
+		id = new String(serialPort.readString());
+		
+		if (id.indexOf("Flasher") < 0) {
+			System.out.println("Arduino Flasher: Device not ready");
+		    return false;
+		}
+		
+		/* We found something */
+		return true;
+	}
+	
+	/* Loads a file.
+	 * 
+	 * Returns:
+	 * If the file is a bitmap, it returns 
+	 * TouchShield friendly bitmap data.
+	 * 
+	 * Otherwise, returns a byte array of file data.
+	 */
+	private byte[] loadFile(File file) {
+		
+		byte[] fileBytes = new byte[0];
+		                            
+		/* Load the file */
+		try { 
+			
+			/* Image check */
+			if (file.getName().contains(".bmp")) {
+				
+				DeviceBMP bmp = new DeviceBMP(file);
+					       
+				/* Get the parsed data */
+				fileBytes = bmp.getBytes();
+				
+			} else {
+				
+				/* Get the file bytes */
+				fileBytes = Base.grabFile(file);
+			}
+			
+		} catch (Exception e) { 
+			System.out.println("Cannot open " + file.getName());
+		} 
+		
+		return fileBytes;
+	}
 	
 	/* Sends one file to the flash disk.
 	 * returns a string starting with either
 	 * pass or fail */
-	public boolean send(File file) {
+	public boolean sendFile(File file) throws SerialException {
+			serialPort.monitor = false; //disable the console reads
+			//serialPort.rate = 57600; 	// This is the speed at which we transfer
+			serialPort.rate = 115200; 	// This is the speed at which we transfer
+			
+		byte[] fileBytes = loadFile(file);
+		
+		/* Are you there? */
+		if (!identifyFlash()) {
+			System.out.println("Nobody there.");
+			return false;
+		}
+		
+		/* Send STORE command */
+		serialPort.clear(); //purge
+		serialPort.write("S");
+		while (serialPort.readChar() != 'D') { ; } //wait
+		
+		
+		//File Header format:
+		// |                18 bytes          |
+		// |  SOH       | FileSize | FileName | FileData        |  
+		// | 0x01 0x01  | 4 bytes  | 12 bytes | variable length |
+		
+		
+		/* Send SOH */
+		serialPort.clear(); //purge
+		serialPort.write((char)1);
+		serialPort.write((char)1);
+		
+		/* Send File Size */
+		serialPort.clear(); //purge
+		serialPort.write((char)((fileBytes.length >> 24) & 255));
+		serialPort.write((char)((fileBytes.length >> 16) & 255));
+		serialPort.write((char)((fileBytes.length >> 8) & 255));
+		serialPort.write((char)(fileBytes.length & 255));
+		
+		/* Send File Name String */
+		serialPort.clear(); //purge
+		
+	    int fNameSize = 8+4;
+	    String fName = file.getName();
+	    
+	    // Send the file name
+	    for (int x=0; x<fNameSize; x++) {				
+	
+	    	if (x < (fName.length()) ) {
+	    		serialPort.write(fName.charAt(x));	//send the char
+	    	} else {
+	    		serialPort.write((char)0 & 255);				//else, pad with null
+	    	}
+	    }
+	    
+		//wait for a response
+		while (serialPort.readChar() != 'D') { ; } //wait
+		
+		/* Send the file data */
+		int index = 0;
+		int pageSize = 528;
+		int pageCount = fileBytes.length / pageSize;	
+		int remainder = fileBytes.length % pageSize;	//Calculate reminder bytes
+		
+		if (remainder > 0) {
+			pageCount++;		//send an extra page, if there's a remainder
+		}
+		
+		/* Send the file bytes */
+		for (int x = 0; x < pageCount; x++) {
+			byte newPage[] = new byte[pageSize];
+			
+			
+			for (int p=0; p < pageSize; p++) {
+				
+				if (index < fileBytes.length) {
+					newPage[p] = fileBytes[index];
+					//serialPort.write((char)fileBytes[index]);	//send data
+				} else {
+					newPage[p] = 0;
+					//serialPort.write((char)0);				//else pad with null
+				}
+				
+				index++;
+			}
+			
+			serialPort.write(newPage);
+			
+			/* Wait for a response after the page was sent */
+			while (serialPort.readChar() != 'D') { ; } //wait
+		}
+		
+		
 		return true;
 	}
 	
@@ -121,27 +288,6 @@ public class FlashTransfer {
 		return 2000000 - (23000 + 1600); 
 	}
 	
-	/*
-	 * List of Image files for uploading
-	 * @return Array of .bmp files as File objects
-	 */
-	private File[] getBMPFiles(File[] fileList)
-	{
-		ArrayList files = new ArrayList();
-		for(int i = 0; i < fileList.length; i++){
-			if(fileList[i].getName().endsWith(".bmp")){
-				files.add(fileList[i]);
-			}
-		}
-		
-		File[] retFiles = new File[files.size()];
-		for(int i = 0; i < files.size() ; i++){
-			retFiles[i] = (File) files.get(i);
-		}
-		
-	    
-	    return retFiles;
-	}
 	
 	//	  /*
 	//	  Sends the files located
@@ -254,9 +400,6 @@ public class FlashTransfer {
 	//	     
 	//	     /* Send the STORE command */
 	//	     System.out.println("Arduino Flasher: Sending STORE");
-	//	     serialPort.clear(); //purge
-	//	     serialPort.write("S");
-	//	     while (serialPort.readChar() != 'D') { ; } //wait
 	//
 	//	     /* Send the page number */
 	//	     System.out.println("Arduino Flasher: Sending pagenum: " + pageNum);
