@@ -1,6 +1,8 @@
 package antipasto.GUI.ImageListView;
 
 import javax.swing.BoxLayout;
+
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -41,7 +43,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventListener {
+public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventListener, ComponentListener {
 	private ImageListView list;
 	final FlashTransfer imageTransfer;
 	Serial mySerial = null;
@@ -55,104 +57,90 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	private JLabel progressLabel;
 	private long totalSize = 0;
 	private long totalFileCount = 0;
+	private JScrollPane scrollPane;
 	
 	public ImageListPanel(GadgetPanel panel, FlashTransfer imageTransfer){
-		this.imageTransfer = imageTransfer;
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.imageTransfer = imageTransfer;	
+		this.init();
+	}
+	
+	private void init(){
 		this.createTransferButton();
 		this.transferButton.setVisible(true);
+		
+		this.setLayout(new BorderLayout());
+		
+		this.createRemoveButton();
+		
+		/* The north panel */
+		JPanel northPanel = new JPanel();
+		northPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+		northPanel.setLayout(new BorderLayout());
+		
+		/* I'm the transfer buttons area */
+		JPanel northButtonPanel = new JPanel();
+		northButtonPanel.setLayout(new BorderLayout());
+		northButtonPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+		northButtonPanel.add(transferButton, BorderLayout.WEST);
+		northButtonPanel.add(removeButton, BorderLayout.EAST);
+		
+		/* I'm the transfer label area */
+		JPanel northLabelPanel = new JPanel();
+		northLabelPanel.setBackground(new Color(0x04, 0x4F, 0x6F));	
+		JLabel infoLabel = new JLabel(" Drop files below. ");
+		infoLabel.setForeground(Color.white);
+		northLabelPanel.add(infoLabel);
+		
+		/* Add everything that's North */
+		northPanel.add(northButtonPanel,BorderLayout.EAST);
+		northPanel.add(northLabelPanel, BorderLayout.WEST);
+		this.add(northPanel, BorderLayout.NORTH);
+		
+		/* The south label */
+		JPanel southProgressPanel = new JPanel();
+		southProgressPanel.setLayout(new BorderLayout());
+		southProgressPanel.setBackground(new Color(0x04, 0x4f, 0x6f));
+		
+		/* A progress bar for the transfer */
+		progressBar = new JProgressBar();
+		progressBar.setVisible(false);
+		
+		/* A label to describe stuff */
+		progressLabel = new JLabel("  Files: " + totalFileCount + 
+	   					   	       " | Total Size: " + totalSize / 1000 + " KB");
+		progressLabel.setForeground(Color.WHITE);
+		
+		/* Add everything that's South */
+		southProgressPanel.add(progressBar,BorderLayout.EAST);
+		southProgressPanel.add(progressLabel, BorderLayout.WEST);
+		
+		this.add(southProgressPanel, BorderLayout.SOUTH);
+		
+		this.transferButton.setVisible(true);
+
+		this.removeButton.setVisible(true);
+		this.progressBar.setVisible(true);
+		this.progressLabel.setVisible(true);
+		
 	}
 	
 	public void setModule(IModule module){
 		if(module != null){
-			if(list != null){
-				this.list.setVisible(false);
-				this.remove(list);
-			}
-			if(transferButton != null){
-				this.transferButton.setVisible(false);
-				this.remove(transferButton);
-			   }
-			if(removeButton != null){
-				this.removeButton.setVisible(false);
-				this.remove(removeButton);
-			}
-			if(progressBar != null){
-				this.progressBar.setVisible(false);
-				this.remove(progressBar);
-			}
-			if(infoLabel != null){
-				this.infoLabel.setVisible(false);
-				this.remove(infoLabel);
-			}
-			if(progressLabel != null) {
-				this.progressBar.setVisible(false);
-				this.remove(progressLabel);
-			}
-			
-			this.setLayout(new BorderLayout());
-			this.createTransferButton();
-			this.createRemoveButton();
-			
-			/* The north panel */
-			JPanel northPanel = new JPanel();
-			northPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
-			northPanel.setLayout(new BorderLayout());
-			
-			/* I'm the transfer buttons area */
-			JPanel northButtonPanel = new JPanel();
-			northButtonPanel.setLayout(new BorderLayout());
-			northButtonPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
-			northButtonPanel.add(transferButton, BorderLayout.WEST);
-			northButtonPanel.add(removeButton, BorderLayout.EAST);
-			
-			/* I'm the transfer label area */
-			JPanel northLabelPanel = new JPanel();
-			northLabelPanel.setBackground(new Color(0x04, 0x4F, 0x6F));	
-			JLabel infoLabel = new JLabel(" Drop files below. ");
-			infoLabel.setForeground(Color.white);
-			northLabelPanel.add(infoLabel);
-			
-			/* Add everything that's North */
-			northPanel.add(northButtonPanel,BorderLayout.EAST);
-			northPanel.add(northLabelPanel, BorderLayout.WEST);
-			
 			/* Build the center */
-			this.add(northPanel, BorderLayout.NORTH);
 			File[] files = module.getData();
 			list = new ImageListView(module);
-			JScrollPane scrollPane = new JScrollPane(list);
+			if(scrollPane != null){
+				this.remove(scrollPane);
+				scrollPane.setVisible(false);
+				scrollPane = null;				//let's take out the trash!
+			}
+			scrollPane = new JScrollPane(list);
 			this.add(scrollPane, BorderLayout.CENTER);
 			scrollPane.setSize(this.getWidth(), this.getHeight() - transferButton.getHeight());
 			scrollPane.setVisible(true);
 			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			list.setVisible(true);
 			
-			/* The south label */
-			JPanel southProgressPanel = new JPanel();
-			southProgressPanel.setLayout(new BorderLayout());
-			southProgressPanel.setBackground(new Color(0x04, 0x4f, 0x6f));
-			
-			/* A progress bar for the transfer */
-			progressBar = new JProgressBar();
-			progressBar.setVisible(false);
-			
-			/* A label to describe stuff */
-			progressLabel = new JLabel("  Files: " + totalFileCount + 
-		   					   	       " | Total Size: " + totalSize / 1000 + " KB");
-			progressLabel.setForeground(Color.WHITE);
-			
-			/* Add everything that's South */
-			southProgressPanel.add(progressBar,BorderLayout.EAST);
-			southProgressPanel.add(progressLabel, BorderLayout.WEST);
-			
-			this.add(southProgressPanel, BorderLayout.SOUTH);
-			
-			this.transferButton.setVisible(true);
-			this.list.setVisible(true);
-			this.removeButton.setVisible(true);
-			this.progressBar.setVisible(true);
-			this.progressLabel.setVisible(true);
 		}
 		this.transferButton.setVisible(true);
 		this.setSizesOfComponents();
@@ -165,9 +153,8 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	}
 	
 	public void paint(java.awt.Graphics g){
-		this.setSizesOfComponents();
+		//this.setSizesOfComponents();
 		super.paint(g);
-		
 	}
 	
 	private void setSizesOfComponents(){
@@ -177,7 +164,7 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		int heightI = (int)height;
 		Dimension listViewSize = new Dimension(this.getParent().getWidth(), heightI);
 		list.setSize(listViewSize);
-		this.repaint();
+		//this.repaint();
 	}
 	
 	private JButton createRemoveButton(){
@@ -187,27 +174,21 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 			new MouseListener(){
 										   
 			public void mouseClicked(MouseEvent arg0) {
-				 list.removeSelected();
+				if(list.getSelectedValue() != null){
+					list.removeSelected();
+				}
 			}
 
 			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+			public void mouseExited(MouseEvent arg0) {	
 			}
 
 			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 										   
 			});
@@ -228,23 +209,15 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 			}
 
 			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+			public void mousePressed(MouseEvent arg0) {	
 			}
 
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 		});
@@ -311,6 +284,26 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	}
 	
 	public void onActiveGadgetChanged(ActiveGadgetObject obj) {
+	}
+
+	public void componentHidden(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void componentMoved(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void componentResized(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void componentShown(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

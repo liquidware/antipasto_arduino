@@ -3,6 +3,12 @@ package antipasto.GUI.ImageListView;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileSystemView;
 
 import processing.app.Base;
 
@@ -61,10 +68,14 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 					icon = new ImageIcon(shellFolder.getIcon(false));  
 				}else if(Base.isMacOS()){
 					//what do we do when we're mac
-					icon = new ImageIcon();
+					FileSystemView view = FileSystemView.getFileSystemView();
+					Icon sysIcon = view.getSystemIcon(file);
+					icon = new ImageIcon(ImageCellRenderer.iconToImage(sysIcon));
 				}else{
 					//what do we do when we're linux
-					icon = new ImageIcon();
+					FileSystemView view = FileSystemView.getFileSystemView();
+					Icon sysIcon = view.getSystemIcon(file);
+					icon = new ImageIcon(ImageCellRenderer.iconToImage(sysIcon));
 				}
 				/* Test for an image */
 				if(file.getName().endsWith(".bmp")){
@@ -76,11 +87,14 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 							   icon.getIconWidth() + " x " + 
 							   icon.getIconHeight() + " px";
 				}
-				imgLabel.setIcon(icon);
+				
+				
 				
 				/* Append more description */
 				fileText = fileText + "   " + (double)file.length()/1000 + " KB";
 				imgDescPanel.add(new JLabel(fileText));
+				
+				imgLabel = new JLabel(icon);
 				
 				fileEntry.add(imgLabel, BorderLayout.WEST);
 				fileEntry.add(imgDescPanel);
@@ -105,4 +119,22 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 			}
 			return(fileEntry);
 			}
+	
+	static Image iconToImage(Icon icon) {
+		if (icon instanceof ImageIcon) {
+		return ((ImageIcon)icon).getImage();
+		} else {
+			int w = icon.getIconWidth();
+			int h = icon.getIconHeight();
+			GraphicsEnvironment ge = 
+			GraphicsEnvironment.getLocalGraphicsEnvironment();
+			GraphicsDevice gd = ge.getDefaultScreenDevice();
+			GraphicsConfiguration gc = gd.getDefaultConfiguration();
+			BufferedImage image = gc.createCompatibleImage(w, h);
+			Graphics2D g = image.createGraphics();
+			icon.paintIcon(null, g, 0, 0);
+			g.dispose();
+		return image;
+		}
+		}
 }
