@@ -186,11 +186,11 @@ public class Base {
     	editor.gadgetPanel.setVisible(true);
     }
       
-    FlashTransfer transfer = new FlashTransfer(editor.serialPort, "FlashFileSystem 0.1.0");
+ //   FlashTransfer transfer = new FlashTransfer(editor.serialPort, "FlashFileSystem 0.1.0");
   
-    ImageListPanel imageListPanel = new ImageListPanel(editor.gadgetPanel, transfer);
-    imageListPanel.setLocation(editor.getX() + editor.getWidth() + 3, editor.getY());
-    imageListPanel.setSize(editor.gadgetPanel.getSize());
+ //   ImageListPanel imageListPanel = new ImageListPanel(editor.gadgetPanel, transfer);
+ //   imageListPanel.setLocation(editor.getX() + editor.getWidth() + 3, editor.getY());
+ //   imageListPanel.setSize(editor.gadgetPanel.getSize());
   
     if (Preferences.getBoolean("update.check")) {
       new UpdateCheck(editor);

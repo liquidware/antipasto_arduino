@@ -43,6 +43,7 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 			JPanel imgDescPanel = new JPanel();
 			imgDescPanel.setLayout(new BoxLayout(imgDescPanel, BoxLayout.PAGE_AXIS));
 			imgDescPanel.setBackground(Color.white);
+			imgDescPanel.setOpaque(true);
 			
 			JLabel fileDesc;
 			JLabel fileName;

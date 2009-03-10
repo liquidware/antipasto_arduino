@@ -38,6 +38,7 @@ typedef struct {
 #ifdef __cplusplus
 extern "C"{
 #endif
+#include <stdio.h>
 
 void FlashFileSystemComm(void);
 void DebugRectPrintText(char * msg);

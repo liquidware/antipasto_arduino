@@ -18,9 +18,10 @@
 
 #include <avr/io.h>
 #include <inttypes.h>
-#include <stdlib.h>
+#include <string.h>
 #include <inttypes.h>
 #include <avr/interrupt.h>
+#include <stdlib.h>
 
 #include	"HardwareDef.h"
 
@@ -44,6 +45,7 @@ COLOR black = { 0,0,0};
 COLOR textColor = {255,255,255};
 COLOR white = {255,255,255};
 uint16_t gPageIndex = 0; 
+
 
 //************************************************************************
 //* A debug tool.
@@ -168,18 +170,18 @@ long			longByte4;
 			page_count++;
 		}
 
-		strncpy(newFileName, buff + 5, 12);
+		strncpy((char*)newFileName, (const char*)buff + 5, 12);
 		newFileName[12]	=	0;
 		
 		sprintf(msgBuff, "File=%s, size=%ld pages=%d", newFileName, newFileSize, page_count);
 		DebugRectPrintText(msgBuff);
 		
-		//bmp_store(dataBuff,newFileName,(uint32_t)gPageIndex*DATAFLASH_PAGESIZE); //save the file name and offset
+		bmp_store((char*)dataBuff,(char*)newFileName,(uint32_t)gPageIndex*DATAFLASH_PAGESIZE); //save the file name and offset
 				
 		usart_putc(IMAGE_INTERFACE_PAGE_DONE); //respond
 
 		for (ii=gPageIndex; ii< gPageIndex+page_count; ii++)
-		{
+		{ 
 		unsigned int buffer_count	=	0;
 		unsigned char outChecksum = 0;
 		unsigned char inChecksum = 0;
@@ -215,7 +217,7 @@ long			longByte4;
 			/* Make sure the checksum matches */
 			if (inChecksum == outChecksum) {
 
-				sprintf(msgBuff, "File=%s %d / %d",newFileName, ii+1, page_count);
+				sprintf(msgBuff, "File=%s %d / %d",newFileName, (ii-gPageIndex)+1, page_count);
 				DebugRectPrintText(msgBuff);
 				usart_putc(IMAGE_INTERFACE_PAGE_DONE); 			//respond
 
@@ -252,7 +254,7 @@ char	displayLine[64];
 //	usart_puts("\nTouchShield/Slide Flash File System Ver 0.1\n");
 	usart_puts("Flasher v0.2");
 	usart_putc(0);
-
+	
 	#if 0
 	ii			=	0;
 	validImage	=	TRUE;
