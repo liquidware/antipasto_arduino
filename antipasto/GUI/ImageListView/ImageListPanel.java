@@ -66,21 +66,27 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	public void setModule(IModule module){
 		if(module != null){
 			if(list != null){
+				this.list.setVisible(false);
 				this.remove(list);
 			}
 			if(transferButton != null){
+				this.transferButton.setVisible(false);
 				this.remove(transferButton);
 			   }
 			if(removeButton != null){
+				this.removeButton.setVisible(false);
 				this.remove(removeButton);
 			}
 			if(progressBar != null){
+				this.progressBar.setVisible(false);
 				this.remove(progressBar);
 			}
 			if(infoLabel != null){
+				this.infoLabel.setVisible(false);
 				this.remove(infoLabel);
 			}
 			if(progressLabel != null) {
+				this.progressBar.setVisible(false);
 				this.remove(progressLabel);
 			}
 			
@@ -142,7 +148,11 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 			
 			this.add(southProgressPanel, BorderLayout.SOUTH);
 			
-		
+			this.transferButton.setVisible(true);
+			this.list.setVisible(true);
+			this.removeButton.setVisible(true);
+			this.progressBar.setVisible(true);
+			this.progressLabel.setVisible(true);
 		}
 		this.transferButton.setVisible(true);
 		this.setSizesOfComponents();
