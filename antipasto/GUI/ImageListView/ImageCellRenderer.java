@@ -15,6 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import processing.app.Base;
+
 import sun.awt.shell.ShellFolder;
 
 import antipasto.Interfaces.IModule;
@@ -54,9 +56,16 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 				
 				String fileText = " " + file.getName();
 				
-				ShellFolder shellFolder = ShellFolder.getShellFolder(file);      
-				icon = new ImageIcon(shellFolder.getIcon(true));  
-					
+				ShellFolder shellFolder = ShellFolder.getShellFolder(file);     
+				if(Base.isWindows()){
+					icon = new ImageIcon(shellFolder.getIcon(false));  
+				}else if(Base.isMacOS()){
+					//what do we do when we're mac
+					icon = new ImageIcon();
+				}else{
+					//what do we do when we're linux
+					icon = new ImageIcon();
+				}
 				/* Test for an image */
 				if(file.getName().endsWith(".bmp")){
 					

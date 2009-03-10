@@ -2902,7 +2902,7 @@ public class Editor extends JFrame
     private boolean saveSketches(){
     	boolean retVal = true;
     	int correctSketch = sketch.currentIndex;
-    	for(int i = 0; i < sketch.code.length - 1; i++){
+    	for(int i = 0; i < sketch.code.length; i++){
     		try {
     			sketch.setCurrent(i);
 				sketch.save();
