@@ -88,6 +88,8 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		
 		/* I'm the transfer label area */
 		JPanel northLabelPanel = new JPanel();
+		northLabelPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+		northLabelPanel.setOpaque(true);
 			
 		JLabel infoLabel = new JLabel(" Drop files below. ");
 		infoLabel.setForeground(Color.white);
