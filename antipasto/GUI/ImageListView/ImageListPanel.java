@@ -169,7 +169,7 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	
 	private JButton createRemoveButton(){
 		this.removeButton = new JButton("Remove File");
-		this.removeButton.setBackground(new Color(0x04, 0x4F, 0x6F));
+		//this.removeButton.setBackground(new Color(0x04, 0x4F, 0x6F));
 		this.removeButton.addMouseListener(
 			new MouseListener(){
 										   
@@ -197,14 +197,12 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	
 	private void createTransferButton(){
 		this.transferButton = new JButton("Transfer");
-		this.transferButton.setBackground(new Color(0x04, 0x4F, 0x6F));
+		//this.transferButton.setBackground(new Color(0x04, 0x4F, 0x6F));
 		this.transferButton.addMouseListener(new MouseListener(){
 			
 			public void mouseClicked(MouseEvent arg0) {
 				if (isTransfering == false) {
 					transfer();
-				} else {
-					reset();		//already transfering, reset
 				}
 			}
 
@@ -228,9 +226,11 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	 */
 	private void transfer(){
 		try {
+			
+			
 			final File fileList[] = this._module.getData();
 			final FlashTransfer transfer = imageTransfer;
-			isTransfering = true;
+			
 			
 			transferButton.setText("Sending...");
 			progressBar.setVisible(true);
@@ -243,14 +243,19 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 						   				   
 						   try {
 							   mySerial = new Serial();
+							   isTransfering = true;
 							   transfer.setSerial(mySerial);
 							   
 							   /* For each file... */
 							   for(int i = 0; i < fileList.length; i++){
 								   System.out.println("sending: " + fileList[i].getName());
-								   transfer.sendFile(fileList[i]);
-								   progressBar.setValue(progressBar.getValue()+1);
-								   progressBar.repaint();
+								   if (transfer.sendFile(fileList[i])) {
+									   /* Made some progress */
+									   progressBar.setValue(progressBar.getValue()+1);
+									   progressBar.repaint();
+								   } else {
+									   break;
+								   }
 							   }
 							   
 							   /* Exit the image transfer */
@@ -259,9 +264,14 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 							   /* Reset UI after transfer */
 							   reset();
 							   
-						   } catch (SerialException e) {
-							  
-							   e.printStackTrace();
+						   } catch (SerialException err) {
+							   
+							   //editor.error(err);
+							   try { Thread.sleep(500); } catch (Exception e) { ; }
+							   isTransfering = false;
+							   
+							   /* Reset UI after transfer */
+							   reset();
 						   }
 				        
 					   }}).start();
@@ -275,12 +285,15 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	 */
 	private void reset() {
 		
-		   mySerial.dispose();
+		   if (isTransfering) {
+			   mySerial.dispose();
+		   }
+		   
+		   isTransfering = false;
+		   
 		   transferButton.setText("Transfer");
 		   progressBar.setValue(0);
 		   progressBar.setVisible(false);
-		   isTransfering = false;
-		
 	}
 	
 	public void onActiveGadgetChanged(ActiveGadgetObject obj) {

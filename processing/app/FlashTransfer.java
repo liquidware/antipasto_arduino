@@ -82,13 +82,17 @@ public class FlashTransfer {
 		try{ Thread.sleep(200); } catch (Exception e) { }
 		
 		/* Read the string */
-		id = new String(serialPort.readString());
+		try {
+			id = new String(serialPort.readString());
+		} catch (Exception e) {
+			return false; //not ready
+		}	
 		
-		if (id.indexOf("Flasher") < 0) {
-			System.out.println("Arduino Flasher: Device not ready");
-		    return false;
-		}
-		
+			if (id.indexOf("Flasher") < 0) {
+				System.out.println("Arduino Flasher: Device not ready");
+			    return false;
+			}
+	
 		/* We found something */
 		return true;
 	}
@@ -109,7 +113,7 @@ public class FlashTransfer {
 		try { 
 			
 			/* Image check */
-			if (file.getName().contains(".bmp")) {
+			if (file.getName().indexOf(".bmp") > 0) {
 				
 				DeviceBMP bmp = new DeviceBMP(file);
 					       
