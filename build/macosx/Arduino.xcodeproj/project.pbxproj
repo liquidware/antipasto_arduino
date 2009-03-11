@@ -326,6 +326,7 @@
 		3A4DDF310F643DEF00C137F7 /* PPolygon.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A4DDE940F643DEF00C137F7 /* PPolygon.java */; };
 		3A4DDF320F643DEF00C137F7 /* PShape.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A4DDE950F643DEF00C137F7 /* PShape.java */; };
 		3A4DDF330F643DEF00C137F7 /* PTriangle.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A4DDE960F643DEF00C137F7 /* PTriangle.java */; };
+		3AAC0A500F66D4880013875C /* DeviceBMP.java in Sources */ = {isa = PBXBuildFile; fileRef = 3AAC0A4F0F66D4880013875C /* DeviceBMP.java */; };
 		3AE93F3C0F2D793E00B94BD9 /* arduino.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F340F2D793E00B94BD9 /* arduino.icns */; };
 		3AE93F3D0F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F360F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg */; };
 		3AE93F3E0F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F370F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */; };
@@ -611,6 +612,7 @@
 		3A4DDE940F643DEF00C137F7 /* PPolygon.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PPolygon.java; sourceTree = "<group>"; };
 		3A4DDE950F643DEF00C137F7 /* PShape.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PShape.java; sourceTree = "<group>"; };
 		3A4DDE960F643DEF00C137F7 /* PTriangle.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PTriangle.java; sourceTree = "<group>"; };
+		3AAC0A4F0F66D4880013875C /* DeviceBMP.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = DeviceBMP.java; sourceTree = "<group>"; };
 		3AE93F340F2D793E00B94BD9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = arduino.icns; sourceTree = "<group>"; };
 		3AE93F360F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_9.dmg; sourceTree = "<group>"; };
 		3AE93F370F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_2_9_Intel.dmg; sourceTree = "<group>"; };
@@ -1008,6 +1010,7 @@
 		3A4DDE4B0F643DED00C137F7 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				3AAC0A4F0F66D4880013875C /* DeviceBMP.java */,
 				3A4DDE4C0F643DED00C137F7 /* ArduinoMessageSiphon.java */,
 				3A4DDE4D0F643DED00C137F7 /* AvrdudeUploader.java */,
 				3A4DDE4E0F643DED00C137F7 /* Base.java */,
@@ -1411,6 +1414,7 @@
 				3A4DDF310F643DEF00C137F7 /* PPolygon.java in Sources */,
 				3A4DDF320F643DEF00C137F7 /* PShape.java in Sources */,
 				3A4DDF330F643DEF00C137F7 /* PTriangle.java in Sources */,
+				3AAC0A500F66D4880013875C /* DeviceBMP.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

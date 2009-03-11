@@ -41,7 +41,8 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
             JPanel panelLeft = new JPanel();
             panelLeft.setLayout(new BorderLayout());
             panelLeft.setBackground(Color.white);
-            
+            panelLeft.setOpaque(true);
+			
             JLabel imageLabel = new JLabel(icon);
             panelLeft.add(imageLabel, BorderLayout.WEST);
             
@@ -50,7 +51,8 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
             JPanel panelRight = new JPanel();
             panelRight.setLayout(new BoxLayout(panelRight, BoxLayout.PAGE_AXIS));
             panelRight.setBackground(Color.white);
-            
+            panelRight.setOpaque(true);
+			
             File f = ((IPackedFile)value).getPackedFile();
             
             JLabel textLabel1 = new JLabel(" ");

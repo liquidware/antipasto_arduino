@@ -75,21 +75,26 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		/* The north panel */
 		JPanel northPanel = new JPanel();
 		northPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+		northPanel.setOpaque(true);
 		northPanel.setLayout(new BorderLayout());
 		
 		/* I'm the transfer buttons area */
 		JPanel northButtonPanel = new JPanel();
 		northButtonPanel.setLayout(new BorderLayout());
 		northButtonPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+		northButtonPanel.setOpaque(true);
 		northButtonPanel.add(transferButton, BorderLayout.WEST);
 		northButtonPanel.add(removeButton, BorderLayout.EAST);
 		
 		/* I'm the transfer label area */
 		JPanel northLabelPanel = new JPanel();
-		northLabelPanel.setBackground(new Color(0x04, 0x4F, 0x6F));	
+			
 		JLabel infoLabel = new JLabel(" Drop files below. ");
 		infoLabel.setForeground(Color.white);
+		infoLabel.setBackground(new Color(0x04, 0x4F, 0x6F));
+		infoLabel.setOpaque(true);
 		northLabelPanel.add(infoLabel);
+		
 		
 		/* Add everything that's North */
 		northPanel.add(northButtonPanel,BorderLayout.EAST);
@@ -100,14 +105,15 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		JPanel southProgressPanel = new JPanel();
 		southProgressPanel.setLayout(new BorderLayout());
 		southProgressPanel.setBackground(new Color(0x04, 0x4f, 0x6f));
+		southProgressPanel.setOpaque(true);
 		
 		/* A progress bar for the transfer */
 		progressBar = new JProgressBar();
 		progressBar.setVisible(false);
 		
 		/* A label to describe stuff */
-		progressLabel = new JLabel("  Files: " + totalFileCount + 
-	   					   	       " | Total Size: " + totalSize / 1000 + " KB");
+		progressLabel = new JLabel(" Files: " + totalFileCount + 
+	   					   	       " | Total Size: " + totalSize / 1000 + " KB of 2000 KB Max ");
 		progressLabel.setForeground(Color.WHITE);
 		
 		/* Add everything that's South */
@@ -121,6 +127,7 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		this.removeButton.setVisible(true);
 		this.progressBar.setVisible(true);
 		this.progressLabel.setVisible(true);
+		
 		
 	}
 	
@@ -143,7 +150,7 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 			
 		}
 		this.transferButton.setVisible(true);
-		this.setSizesOfComponents();
+		//this.setSizesOfComponents();
 		
 		_module = module;
 	}
@@ -162,9 +169,9 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		Dimension btnSize = this.transferButton.getSize();
 		double height = this.getParent().getSize().getHeight() - this.transferButton.getSize().getHeight();
 		int heightI = (int)height;
-		Dimension listViewSize = new Dimension(this.getParent().getWidth(), heightI);
-		list.setSize(listViewSize);
-		//this.repaint();
+		//Dimension listViewSize = new Dimension(this.getParent().getWidth(), heightI);
+		//list.setSize(listViewSize);
+		this.repaint();
 	}
 	
 	private JButton createRemoveButton(){
@@ -175,7 +182,8 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 										   
 			public void mouseClicked(MouseEvent arg0) {
 				if(list.getSelectedValue() != null){
-					list.removeSelected();
+										   
+					list.removeSelected();	
 				}
 			}
 
@@ -245,7 +253,9 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 							   mySerial = new Serial();
 							   isTransfering = true;
 							   transfer.setSerial(mySerial);
-							   
+					   
+							   transfer.format();
+					   
 							   /* For each file... */
 							   for(int i = 0; i < fileList.length; i++){
 								   System.out.println("sending: " + fileList[i].getName());
@@ -298,6 +308,8 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	
 	public void onActiveGadgetChanged(ActiveGadgetObject obj) {
 	}
+	
+	
 
 	public void componentHidden(ComponentEvent e) {
 		// TODO Auto-generated method stub
@@ -306,11 +318,14 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 
 	public void componentMoved(ComponentEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void componentResized(ComponentEvent e) {
 		// TODO Auto-generated method stub
+		this.show();
+		this.validate();
+		this.repaint();
 		
 	}
 

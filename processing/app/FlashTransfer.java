@@ -234,6 +234,23 @@ public class FlashTransfer {
 	 * returns a string starting with either:
 	 * pass or fail */
 	public boolean format() {
+		
+		
+		if (identifyFlash()) {
+			
+			serialPort.write("F"); //send the Identify command
+			
+			try{ Thread.sleep(200); } catch (Exception e) { }
+			
+			/* Wait for a response after the request was sent */
+			if (serialPort.readChar() != 'D') { 
+				return false;
+			}
+			
+		} else {
+			return false;
+		}
+		
 		return true;
 	}
 	

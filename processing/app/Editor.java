@@ -273,6 +273,7 @@ public class Editor extends JFrame
     leftExpandLabel = new JLabel("<");
     leftWing = new JPanel();
     leftWing.setBackground(new Color(0x54, 0x91, 0x9e));
+	leftWing.setOpaque(true);
     leftWing.setSize(15, 0);
     leftWing.setPreferredSize(new Dimension(10, 0));
     leftWing.setLayout(new BorderLayout());
@@ -309,11 +310,15 @@ public class Editor extends JFrame
     
     JPanel rightWing = new JPanel();
     rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
+	rightWing.setOpaque(true);
     rightWing.setSize(15, 0);
     rightWing.setPreferredSize(new Dimension(10, 0));
 
-    imageListPanel = new ImageListPanel(this.gadgetPanel, new FlashTransfer(this.serialPort,"FlashFileSystem 0.1.0"));
-    
+    imageListPanel = new ImageListPanel(this.gadgetPanel, new FlashTransfer(this.serialPort,"FlashFileSystem 0.1.0")); 
+	
+	  this.getContentPane().validate();
+	  this.getContentPane().validate();
+	  
 	JPanel testPanel = new JPanel();
 	JLabel lbl = new JLabel("THIS IS A TEST STRING");
 	lbl.setVisible(true);
@@ -2472,6 +2477,8 @@ public class Editor extends JFrame
    * Actually do the quit action.
    */
   protected void handleQuit2() {
+	handleSave2();
+	  
     storePreferences();
     Preferences.save();
 

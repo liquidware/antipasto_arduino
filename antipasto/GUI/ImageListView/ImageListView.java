@@ -57,6 +57,7 @@ public class ImageListView extends JList implements IActiveGadgetChangedEventLis
 	public void removeSelected(){
 		int index = this.getSelectedIndex();
 		((ImageListModel)this.getModel()).remove(index);
+		this.repaint();
 	}
 	
 	public IModule getModule(){
