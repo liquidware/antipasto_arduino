@@ -31,7 +31,7 @@
 	#include	"SubPGraphics.h"
 #endif
 
-#define	_USE_DBBUG_RECT_STATUS_
+//#define	_USE_DBBUG_RECT_STATUS_
 
 //*******************************************************************************
 //*		This is where we get the chunks of data 
@@ -61,7 +61,7 @@ COLOR			white		=	{255,255,255};
 	*/
 
 #ifdef _USE_DBBUG_RECT_STATUS_
-	DebugRectPrintText("image_interface_begin()");
+	//DebugRectPrintText("image_interface_begin()");
 #endif
 
 
@@ -77,13 +77,13 @@ COLOR			white		=	{255,255,255};
 	usart_init(115200);
 //	usart_init(57600);
 #ifdef _USE_DBBUG_RECT_STATUS_
-	DebugRectPrintText("usart_init 115200");
+	//DebugRectPrintText("usart_init 115200");
 #endif
 #endif
 
 
 #ifdef _USE_DBBUG_RECT_STATUS_
-	DebugRectPrintText("arduino in reset");
+	//DebugRectPrintText("arduino in reset");
 #endif
 
 	cli();
@@ -123,7 +123,7 @@ COLOR			white		=	{255,255,255};
 			usart_putc(IMAGE_INTERFACE_PAGE_DONE); //done erasing 
 
 		#ifdef _USE_DBBUG_RECT_STATUS_
-			DebugRectPrintText("done erasing ");
+			//DebugRectPrintText("done erasing ");
 		#endif
 			//give us the page number to write
 			usart_read_bytes(2);
@@ -164,7 +164,7 @@ COLOR			white		=	{255,255,255};
 
 
 		#ifdef _USE_DBBUG_RECT_STATUS_
-			DebugRectPrintText("IMAGE_INTERFACE_READ");
+			//DebugRectPrintText("IMAGE_INTERFACE_READ");
 		#endif
 
 			page_num=0;

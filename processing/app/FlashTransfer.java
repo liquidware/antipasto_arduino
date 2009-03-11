@@ -61,6 +61,7 @@ public class FlashTransfer {
 		/* Send Exit command */
 		serialPort.clear(); //purge
 		serialPort.write("E");
+		
 		while (serialPort.readChar() != 'D') { ; } //wait
 		
 	}
