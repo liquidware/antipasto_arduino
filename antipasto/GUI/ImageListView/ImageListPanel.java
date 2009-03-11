@@ -245,6 +245,8 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 			progressBar.setMaximum(fileList.length+1);
 			progressBar.setValue(1);	//bump the progress bar
 										//up one for visual friendliness
+			
+			final ImageListPanel ilist = this;
 			new Thread(
 					   new Runnable() {
 					   public void run() {
@@ -256,6 +258,7 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 					   
 							   transfer.format();
 					   
+							   boolean errorFree = true;
 							   /* For each file... */
 							   for(int i = 0; i < fileList.length; i++){
 								   System.out.println("sending: " + fileList[i].getName());
@@ -264,24 +267,25 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 									   progressBar.setValue(progressBar.getValue()+1);
 									   progressBar.repaint();
 								   } else {
-									   break;
+									   errorFree = false;
+									   progressBar.setValue(progressBar.getValue()+1);
 								   }
 							   }
-							   
 							   /* Exit the image transfer */
-							   transfer.close();
-							   
+							   if( errorFree){
+								   transfer.close();
+							   }
+							   isTransfering = false;
 							   /* Reset UI after transfer */
-							   reset();
-							   
+							   ilist.resetUI();
 						   } catch (SerialException err) {
-							   
+							   err.printStackTrace();
 							   //editor.error(err);
-							   try { Thread.sleep(500); } catch (Exception e) { ; }
+							   try { Thread.sleep(500); } catch (Exception e) { ilist.resetUI(); }
 							   isTransfering = false;
 							   
 							   /* Reset UI after transfer */
-							   reset();
+							   ilist.resetUI();
 						   }
 				        
 					   }}).start();
@@ -293,17 +297,12 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	/*
 	 * Reset the UI after transfer.
 	 */
-	private void reset() {
-		
-		   if (isTransfering) {
-			   mySerial.dispose();
-		   }
-		   
-		   isTransfering = false;
-		   
+	public void resetUI() {
+		   System.out.println("Reseting progress bar");
 		   transferButton.setText("Transfer");
 		   progressBar.setValue(0);
 		   progressBar.setVisible(false);
+		   this.repaint();
 	}
 	
 	public void onActiveGadgetChanged(ActiveGadgetObject obj) {
