@@ -2477,6 +2477,8 @@ public class Editor extends JFrame
    * Actually do the quit action.
    */
   protected void handleQuit2() {
+	handleSave2();
+	  
     storePreferences();
     Preferences.save();
 
