@@ -87,44 +87,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     private void init(){
     	this.getContentPane().setLayout(new BorderLayout());
-    	//JPanel top = new JPanel();
-        //top.setBackground(new Color(0x04, 0x4F, 0x6F));
-    	//this.getContentPane().add(top, BorderLayout.NORTH);
-    	//top.setSize(new Dimension(this.getWidth(), 15));
-        //top.setLayout(new FlowLayout());
-    	//messagePanel.setLayout(new FlowLayout());
-        
-        /*
-        try {
-        	ImageIcon upperLeft = new ImageIcon("..\\lib\\upperleftgadget.png");
-    		upperLeft.setImage(Base.getImage("..\\lib\\upperleftgadget.png", this));
-    		JLabel upperImageLabel = new JLabel(upperLeft);
-			top.add(upperImageLabel);
-			upperImageLabel.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
-
-        /*
-    	JPanel bottom = new JPanel();
-    	bottom.setBackground(new Color(0x04, 0x4F, 0x6F));
-    	this.getContentPane().add(bottom, BorderLayout.SOUTH);
-    	bottom.setSize(new Dimension(this.getWidth(), 15));
-    	bottom.setLayout(new FlowLayout());
-        */ 
-
-        /*
-    	ImageIcon lowerRight = new ImageIcon();
-    	try {
-    		ImageIcon lowerLeftImage = new ImageIcon("\\lib\\lowerleftgadget.png");
-			lowerLeftImage.setImage(Base.getImage("..\\lib\\lowerleftgadget.png", this));
-    		JLabel lowerImageLabel = new JLabel(lowerLeftImage);
-			top.add(lowerImageLabel);
-			lowerImageLabel.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-        */
         
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		

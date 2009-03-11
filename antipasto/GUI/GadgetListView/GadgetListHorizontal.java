@@ -13,6 +13,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import processing.app.Base;
+
 import antipasto.ModuleFactory;
 import antipasto.Interfaces.IModule;
 
@@ -47,10 +49,13 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		itemsPanel.setBackground(Color.WHITE);
 		itemsPanel.setLayout(new FlowLayout());
 		itemsPanel.setSize(new Dimension(this.scrollPane.getWidth(), 70 ));
+		File libDir = Base.createTempFolder("moduleLib");
 		for(int i = 0; i < files.length; i ++){
 			if(files[i].getName().endsWith(IModule.moduleExtension)){
 				try {
-					IModule mod = fact.loadModule(files[i], System.getProperty("java.io.tmpdir"), false);
+					File newFile = new File(libDir + File.separator + files[i].getName());
+					Base.copyFile(files[i], newFile);
+					IModule mod = fact.loadModule(newFile, libDir.getPath(), false);
 					//ImageIcon icon = new ImageIcon(mod.getImage());
 					ModuleIcon label = new ModuleIcon(mod, this.gadgetList);
 					label.setSize(60,60);
