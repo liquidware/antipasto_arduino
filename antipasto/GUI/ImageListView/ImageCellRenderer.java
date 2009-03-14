@@ -80,13 +80,16 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 				}
 				/* Test for an image */
 				if(file.getName().endsWith(".bmp")){
-					
-					/* Read the image as an icon */
-					icon = new ImageIcon(ImageIO.read(file));
-					
-					fileText = fileText + "   " +
-							   icon.getIconWidth() + " x " + 
-							   icon.getIconHeight() + " px";
+					try{
+						/* Read the image as an icon */
+						icon = new ImageIcon(ImageIO.read(file));
+						
+						fileText = fileText + "   " +
+								   icon.getIconWidth() + " x " + 
+								   icon.getIconHeight() + " px";
+					}catch(Exception ex){
+						System.out.println("Try...");
+					}
 				}
 				
 				
