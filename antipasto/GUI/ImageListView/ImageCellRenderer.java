@@ -88,7 +88,7 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 								   icon.getIconWidth() + " x " + 
 								   icon.getIconHeight() + " px";
 					}catch(Exception ex){
-						System.out.println("Try...");
+						System.out.println(ex.getMessage());
 					}
 				}
 				
