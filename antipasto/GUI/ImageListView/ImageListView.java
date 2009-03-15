@@ -55,8 +55,18 @@ public class ImageListView extends JList implements IActiveGadgetChangedEventLis
 	}
 	
 	public void removeSelected(){
-		int index = this.getSelectedIndex();
-		((ImageListModel)this.getModel()).remove(index);
+		try{
+			System.out.println("removing selected from imagelistview.java");
+			int index = this.getSelectedIndex();
+			System.out.println("Got selected index:" + index);
+			ImageListModel model = ((ImageListModel)this.getModel());
+			System.out.println("Got the model" + model);
+			model.remove(index);
+			System.out.println("Removed selected item");
+		}catch(Exception ex){
+			ex.printStackTrace();
+			System.out.println("Error remvoing selected");
+		}
 		this.repaint();
 	}
 	

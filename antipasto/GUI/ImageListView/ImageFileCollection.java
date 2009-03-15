@@ -27,10 +27,18 @@ public class ImageFileCollection extends ArrayList{
 		return super.get(index);
 	}
 	
-	public Object remove(int index){
-		Object retItem = getItemAt(index);
-		super.remove(getItemAt(index));
-		onItemChanged();
+	public Object removeFile(int index){
+		Object retItem = null;
+		try{
+			System.out.println("Attempting to get object @ index " + index);
+			retItem = getItemAt(index);
+			System.out.println("Calling super function to remove object");
+			super.remove(getItemAt(index));
+			onItemChanged();
+		}catch(Exception ex){
+			System.out.println("Error removing in imagefilecollection.java");
+			ex.printStackTrace();
+		}
 		return retItem;
 	}
 	
@@ -40,6 +48,7 @@ public class ImageFileCollection extends ArrayList{
 	
 	
 	private void onItemChanged(){
+		System.out.println("Items changed event lisnteners");
 		Object[] listeners = listDataListener.getListenerList();
         // Each listener occupies two elements - the first is the listener class
         // and the second is the listener instance
