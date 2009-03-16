@@ -114,8 +114,7 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		progressBar.setVisible(false);
 		
 		/* A label to describe stuff */
-		progressLabel = new JLabel(" Files: " + totalFileCount + 
-	   					   	       " | Total Size: " + totalSize / 1000 + " KB of 2000 KB Max ");
+		progressLabel = new JLabel(" ");
 		progressLabel.setForeground(Color.WHITE);
 		
 		/* Add everything that's South */
@@ -163,6 +162,10 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	
 	public void paint(java.awt.Graphics g){
 		//this.setSizesOfComponents();
+		
+		totalFileCount = list.getModel().getSize();
+		progressLabel.setText(" Files: " + totalFileCount);
+		
 		super.paint(g);
 	}
 	
