@@ -190,6 +190,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     		 
 	        list = new GadgetList(book, gadget.getParent());
 	        list.loadGadget(_gadget);
+	        list.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
+	        
 	        
 	        scrollPanel = new JScrollPane((JList) list);
 	        scrollPanel.setPreferredSize(new Dimension(300, 300));
@@ -209,7 +211,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
             
     	    list.addSketchChangingeListener(this);
     	    list.addListSelectionListener(this);
-
+    	    
     		 this.activeModule = this.getActiveModule();
 	    	//Save this for later!		
     	}else{

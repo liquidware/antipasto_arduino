@@ -1,23 +1,11 @@
 package antipasto.GUI.GadgetListView;
 
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.*;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListDataEvent;
 
 import antipasto.GadgetFactory;
 import antipasto.ModuleFactory;
@@ -29,10 +17,8 @@ import antipasto.Interfaces.IModule;
 import antipasto.Interfaces.IPackedFile;
 import antipasto.Interfaces.ITemporary;
 
-import java.io.*;
-import java.util.Arrays;
 
-public class GadgetList extends JList implements IGadgetWindowTransferFileEventListener, MouseListener{
+public class GadgetList extends JList implements IGadgetWindowTransferFileEventListener/*, MouseListener*/{
 
     IGadget gadget;
     JList jList;
@@ -47,13 +33,13 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
         super();
         this.loadGadget(gadget);
         this.moduleDirectory = gadgetDirectory;
-        this.addMouseListener(this);
+        //this.addMouseListener(this);
     }
 
     public GadgetList(String gajDirectory){
         super();
         this.moduleDirectory = gajDirectory;
-        this.addMouseListener(this);
+        //this.addMouseListener(this);
     }
 
     public void loadGadget(IGadget gaj){
@@ -61,13 +47,12 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
         gadget = gaj;
         _collection = new GadgetCollection(gaj);
         
-        GadgetWindowTransferHandler transferHandler = new GadgetWindowTransferHandler();
-        transferHandler.addTransferFileListener(this);
         this.setModel(new GadgetListModel(_collection));
         this.setCellRenderer(new GadgetCellRenderer());
-        this.setTransferHandler(transferHandler);
+        this.setSelectedIndex(0);
+        this.setDragEnabled(false);
     }
-
+    
     public void addGadgetToCurrentSketchBook(File f) {
         if(f.getName().endsWith(".module")){
             ModuleFactory fact = new ModuleFactory();
@@ -170,8 +155,8 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 
 	public void doImportDragDrop(IModule module){
 		//TODO: Do this later!
-		System.out.println("Drag drop not implemented just yet.....I'm only on programmer!");
-		/*System.out.println("Attempting import");
+		//System.out.println("Drag drop not implemented just yet.....I'm only on programmer!");
+		System.out.println("Attempting import");
 		if(module instanceof IPackedFile){
 			IPackedFile file = (IPackedFile)module;
 			String name = module.getName();
@@ -211,7 +196,7 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 			this.loadGadget(gadget);
 		}else{
 			System.out.println("Error trying to import the module...");
-		}*/
+		}
 	}
 	
 	private boolean checkName(IGadget gadget, String name){
