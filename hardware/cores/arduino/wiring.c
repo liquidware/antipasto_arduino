@@ -19,16 +19,18 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.c 461 2008-07-02 19:06:27Z mellis $
+  $Id: wiring.c 539 2008-12-23 00:17:14Z mellis $
 */
 
 #include "wiring_private.h"
 
+volatile unsigned long timer0_overflow_count = 0;
 volatile unsigned long timer0_clock_cycles = 0;
 volatile unsigned long timer0_millis = 0;
 
-SIGNAL(SIG_OVERFLOW0)
+SIGNAL(TIMER0_OVF_vect)
 {
+	timer0_overflow_count++;
 	// timer 0 prescale factor is 64 and the timer overflows at 256
 	timer0_clock_cycles += 64UL * 256UL;
 	while (timer0_clock_cycles > clockCyclesPerMicrosecond() * 1000UL) {
@@ -51,11 +53,32 @@ unsigned long millis()
 	return m;
 }
 
+unsigned long micros() {
+	unsigned long m, t;
+	uint8_t oldSREG = SREG;
+	
+	cli();	
+	t = TCNT0;
+  
+#ifdef TIFR0
+	if ((TIFR0 & _BV(TOV0)) && (t == 0))
+		t = 256;
+#else
+	if ((TIFR & _BV(TOV0)) && (t == 0))
+		t = 256;
+#endif
+
+	m = timer0_overflow_count;
+	SREG = oldSREG;
+	
+	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
+}
+
 void delay(unsigned long ms)
 {
 	unsigned long start = millis();
 	
-	while (millis() - start < ms)
+	while (millis() - start <= ms)
 		;
 }
 
@@ -130,23 +153,23 @@ void init()
 	// on the ATmega168, timer 0 is also used for fast hardware pwm
 	// (using phase-correct PWM would mean that timer 0 overflowed half as often
 	// resulting in different millis() behavior on the ATmega8 and ATmega168)
-#if defined(__AVR_ATmega168__)
+#if !defined(__AVR_ATmega8__)
 	sbi(TCCR0A, WGM01);
 	sbi(TCCR0A, WGM00);
 #endif  
 	// set timer 0 prescale factor to 64
-#if defined(__AVR_ATmega168__)
-	sbi(TCCR0B, CS01);
-	sbi(TCCR0B, CS00);
-#else
+#if defined(__AVR_ATmega8__)
 	sbi(TCCR0, CS01);
 	sbi(TCCR0, CS00);
+#else
+	sbi(TCCR0B, CS01);
+	sbi(TCCR0B, CS00);
 #endif
 	// enable timer 0 overflow interrupt
-#if defined(__AVR_ATmega168__)
-	sbi(TIMSK0, TOIE0);
-#else
+#if defined(__AVR_ATmega8__)
 	sbi(TIMSK, TOIE0);
+#else
+	sbi(TIMSK0, TOIE0);
 #endif
 
 	// timers 1 and 2 are used for phase-correct hardware pwm
@@ -161,16 +184,16 @@ void init()
 	sbi(TCCR1A, WGM10);
 
 	// set timer 2 prescale factor to 64
-#if defined(__AVR_ATmega168__)
-	sbi(TCCR2B, CS22);
-#else
+#if defined(__AVR_ATmega8__)
 	sbi(TCCR2, CS22);
+#else
+	sbi(TCCR2B, CS22);
 #endif
 	// configure timer 2 for phase correct pwm (8-bit)
-#if defined(__AVR_ATmega168__)
-	sbi(TCCR2A, WGM20);
-#else
+#if defined(__AVR_ATmega8__)
 	sbi(TCCR2, WGM20);
+#else
+	sbi(TCCR2A, WGM20);
 #endif
 
 	// set a2d prescale factor to 128
@@ -187,9 +210,9 @@ void init()
 	// the bootloader connects pins 0 and 1 to the USART; disconnect them
 	// here so they can be used as normal digital i/o; they will be
 	// reconnected in Serial.begin()
-#if defined(__AVR_ATmega168__)
-	UCSR0B = 0;
-#else
+#if defined(__AVR_ATmega8__)
 	UCSRB = 0;
+#else
+	UCSR0B = 0;
 #endif
 }
