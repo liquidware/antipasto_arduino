@@ -314,10 +314,9 @@ public class Editor extends JFrame
     rightWing.setSize(15, 0);
     rightWing.setPreferredSize(new Dimension(10, 0));
 
-    imageListPanel = new ImageListPanel(this.gadgetPanel, new FlashTransfer(this.serialPort,"FlashFileSystem 0.1.0")); 
+   	imageListPanel = new ImageListPanel(this.gadgetPanel, new FlashTransfer());
 	
-	  this.getContentPane().validate();
-	  this.getContentPane().validate();
+   	this.getContentPane().validate();
 	  
 	JPanel testPanel = new JPanel();
 	JLabel lbl = new JLabel("THIS IS A TEST STRING");

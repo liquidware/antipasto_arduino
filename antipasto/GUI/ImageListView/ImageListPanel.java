@@ -59,9 +59,19 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	private long totalFileCount = 0;
 	private JScrollPane scrollPane;
 	
+	//We'll use this static function to take control of the serial port when 
+	//we want to
+	private static boolean killTransfer = false;
+	
 	public ImageListPanel(GadgetPanel panel, FlashTransfer imageTransfer){
 		this.imageTransfer = imageTransfer;	
 		this.init();
+	}
+	
+	//This function is used to kill any active transfer that may be hogging 
+	//the serial port.
+	public static void killActiveTransfer(){
+		ImageListPanel.killTransfer = true;
 	}
 	
 	private void init(){
@@ -239,11 +249,8 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	 */
 	private void transfer(){
 		try {
-			
-			
 			final File fileList[] = this._module.getData();
 			final FlashTransfer transfer = imageTransfer;
-			
 			
 			transferButton.setText("Sending...");
 			progressBar.setVisible(true);
@@ -252,12 +259,15 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 										//up one for visual friendliness
 			
 			final ImageListPanel ilist = this;
+			
+			killTransfer = false;
+			
 			new Thread(
 					   new Runnable() {
 					   public void run() {
 						   				   
 						   try {
-							   mySerial = new Serial();
+							   mySerial = new Serial(115200);
 							   isTransfering = true;
 							   transfer.setSerial(mySerial);
 					   
@@ -266,7 +276,14 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 							   boolean errorFree = true;
 							   /* For each file... */
 							   for(int i = 0; i < fileList.length; i++){
+								   if(killTransfer == true){
+									   FlashTransfer.killTransfer();
+									   System.out.println("Stopping the transfer");
+									   break;
+								   }
+								   
 								   System.out.println("sending: " + fileList[i].getName());
+								   
 								   if (transfer.sendFile(fileList[i])) {
 									   /* Made some progress */
 									   progressBar.setValue(progressBar.getValue()+1);

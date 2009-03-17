@@ -32,6 +32,8 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import antipasto.GUI.ImageListView.ImageListPanel;
+
 
 /**
  * run/stop/etc buttons for the ide
@@ -377,6 +379,7 @@ public class EditorButtons extends JComponent implements MouseInputListener {
       break;
 
     case SERIAL:
+      ImageListPanel.killActiveTransfer();
       editor.handleSerial();
       break;
     }    

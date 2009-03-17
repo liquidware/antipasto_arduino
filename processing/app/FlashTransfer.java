@@ -36,11 +36,12 @@ public class FlashTransfer {
 	Serial serialPort;
 	String versionID;
 	
+	private static boolean killTransfer = false; //if this is set to true, kill the file transfer
 	
 	/* Constructor.
 	 * serialPort : An available serial port.
 	 * versionID  : string needs to match the device's id string ex. "FlashFileSystem 0.1.0" */
-	public FlashTransfer(Serial serialPort, String versionID){
+	public FlashTransfer(){
 		//this.serialPort = serialPort;
 		//serialPort.rate = 115200;
 		//this.versionID = versionID;
@@ -52,6 +53,13 @@ public class FlashTransfer {
 		this.serialPort = serial;
 	}
 
+	/*
+	 * Acts as a kill switch for transfering files to the flash system.
+	 */
+	public static void killTransfer(){
+		killTransfer = true;
+	}
+	
 	/*
 	 * Closes the connection.
 	 * Device continues code execution.
@@ -153,7 +161,7 @@ public class FlashTransfer {
 		/* Send STORE command */
 		serialPort.clear(); //purge
 		serialPort.write("S");
-		while (serialPort.readChar() != 'D') { ; } //wait
+		while (serialPort.readChar() != 'D' && killTransfer != true) { ; } //wait
 		
 		
 		//File Header format:
@@ -182,7 +190,7 @@ public class FlashTransfer {
 	    
 	    // Send the file name
 	    for (int x=0; x<fNameSize; x++) {				
-	
+	    	if(killTransfer != true) break;
 	    	if (x < (fName.length()) ) {
 	    		serialPort.write(fName.charAt(x));	//send the char
 	    	} else {
@@ -191,7 +199,7 @@ public class FlashTransfer {
 	    }
 	    
 		//wait for a response
-		while (serialPort.readChar() != 'D') { ; } //wait
+		while (serialPort.readChar() != 'D' && (killTransfer != true)) { ; } //wait
 		
 		/* Send the file data */
 		int index = 0;
@@ -206,10 +214,10 @@ public class FlashTransfer {
 		/* Send the file bytes */
 		for (int x = 0; x < pageCount; x++) {
 			byte newPage[] = new byte[pageSize];
-			
+			if(killTransfer != true) break;
 			
 			for (int p=0; p < pageSize; p++) {
-				
+				if(killTransfer != true) break;
 				if (index < fileBytes.length) {
 					newPage[p] = fileBytes[index];
 					//serialPort.write((char)fileBytes[index]);	//send data
@@ -224,7 +232,7 @@ public class FlashTransfer {
 			serialPort.write(newPage);
 			
 			/* Wait for a response after the page was sent */
-			while (serialPort.readChar() != 'D') { ; } //wait
+			while (serialPort.readChar() != 'D' && killTransfer != true) { ; } //wait
 		}
 		
 		
