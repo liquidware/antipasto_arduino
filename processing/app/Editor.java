@@ -2136,6 +2136,7 @@ public class Editor extends JFrame
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
     	  leftExpandLabel.setText(">");    	  
       }else{
+    	  this.gadgetPanel.Unload(); 	//remove the gadget list and unload active module
     	  /* Use the Boards menu with a std .pde file */
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);
     	  gadgetPanel.hide();
@@ -2262,7 +2263,7 @@ public class Editor extends JFrame
 							gp.saveCurrentGadget();*/
 							File newFile = fact.copyGadget(gp.getActiveGadget(), newParentDir , newName);
 							//IGadget newGadget = fact.loadGadget(newFile, System.getProperty("java.io.tmpdir") + File.separator + newFile.getName());
-							gp.loadGadget(newFile.getPath());
+							gp.loadGadget(newFile);
 							gp.saveCurrentGadget();
 						}
 						

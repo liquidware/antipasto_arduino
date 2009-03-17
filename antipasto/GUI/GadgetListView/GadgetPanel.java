@@ -72,6 +72,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     private int cachedHeight = 425;
     private int cachedWidth = 300;
 
+    public boolean gadgetIsLoaded = false;
+    
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
     	super(frame, false);
         this.addMouseListener(new ModuleMouseAdapter());
@@ -81,8 +83,42 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         this.init();
     }
     
-    public void loadGadget(String gadget){
-    	this.loadGadget(new File(gadget));
+    private void reinit(){
+    	
+		/* Remove the current panel GUI elements, because 
+		 * we're going to update them....
+		 */
+		scrollPanel.setVisible(false);
+    	this.remove(scrollPanel);
+		this.remove(messagePanel);
+		this.remove(gadgetDescPanel);
+		
+		/* Setup the new panels */
+
+        
+        scrollPanel = new JScrollPane();
+        scrollPanel.setPreferredSize(new Dimension(300, 300));
+        scrollPanel.setSize(new Dimension(300, 300));
+        
+        /* Describe what's going on here to the user and 
+         * display the description in the panel labels.
+         */
+        gadgetDescLabel.setText(" No Gadget " );
+        messageLabel.setText(" No Gadget Loaded");
+        
+        /* Add all the updated GUI elements back to the panel */
+        box.add(gadgetDescPanel);
+        box.add(scrollPanel);
+        box.add(messagePanel);
+        scrollPanel.setVisible(true);
+        
+        //Save this for later!		
+    }
+    
+    public void Unload(){
+    	this.reinit();
+    	this.activeModule = null;
+    	this.gadgetIsLoaded = false;
     }
     
     private void init(){
@@ -172,6 +208,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     public void loadGadget(File gadget){
     	if(gadget  != null){	
+    		
     		GadgetFactory fact = skbFact;
     		
     		/* Remove the current panel GUI elements, because 
@@ -213,6 +250,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     	    list.addListSelectionListener(this);
     	    
     		 this.activeModule = this.getActiveModule();
+    		 
+    		 this.gadgetIsLoaded = true;
 	    	//Save this for later!		
     	}else{
     		this.setVisible(false);

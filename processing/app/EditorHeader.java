@@ -227,13 +227,15 @@ public class EditorHeader extends JPanel {
 	      this.setVisible(true);
 	    }
 	    if(editor.gadgetPanel != null && editor.gadgetPanel.getActiveModule() != null){
-		    if(editor.gadgetPanel.getActiveModule().getData() != null||editor.gadgetPanel.getActiveModule().getData().length > 0){
+		 if(editor.gadgetPanel.gadgetIsLoaded){
+	    	if(editor.gadgetPanel.getActiveModule().getData() != null||editor.gadgetPanel.getActiveModule().getData().length > 0){
 		    	EditorTab editorTab = new EditorTab(new Color(46, 163, 94), "Data", editor.gadgetPanel.getActiveModule(),this.editor);
 		    	editorTab.setPreferredSize(new Dimension(editorTab.WIDTH, this.getHeight() + 5));
 		    	editorTab.setBackground(this.backgroundColor);
 		    	tabs.add(editorTab);
 		    	this.tabHeader.add(editorTab);
 		    	editorTab.paint(getGraphics());
+	    	}
 		    }
 	    }
 	    this.previousSketch = sketch.name;
