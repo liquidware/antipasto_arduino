@@ -375,6 +375,7 @@ public class EditorButtons extends JComponent implements MouseInputListener {
       break;
 
     case EXPORT:
+      ImageListPanel.killActiveTransfer();
       editor.handleExport();
       break;
 
