@@ -146,6 +146,7 @@ public class FlashTransfer {
 	 * returns a string starting with either
 	 * pass or fail */
 	public boolean sendFile(File file) throws SerialException {
+		killTransfer = false;
 			serialPort.monitor = false; //disable the console reads
 			//serialPort.rate = 57600; 	// This is the speed at which we transfer
 			serialPort.rate = 115200; 	// This is the speed at which we transfer
