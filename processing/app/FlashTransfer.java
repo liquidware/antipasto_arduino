@@ -70,7 +70,7 @@ public class FlashTransfer {
 		serialPort.clear(); //purge
 		serialPort.write("E");
 		
-		while (serialPort.readChar() != 'D') { ; } //wait
+		//while (serialPort.readChar() != 'D') { ; } //wait
 		
 	}
 	
@@ -162,7 +162,12 @@ public class FlashTransfer {
 		/* Send STORE command */
 		serialPort.clear(); //purge
 		serialPort.write("S");
-		while (serialPort.readChar() != 'D' && killTransfer != true) { ; } //wait
+		while (serialPort.readChar() != 'D') 
+		{
+			if(killTransfer){
+				return false;
+			}
+		} //wait
 		
 		
 		//File Header format:
@@ -191,7 +196,7 @@ public class FlashTransfer {
 	    
 	    // Send the file name
 	    for (int x=0; x<fNameSize; x++) {				
-	    	if(killTransfer != true) break;
+	    	if(killTransfer == true) return false;
 	    	if (x < (fName.length()) ) {
 	    		serialPort.write(fName.charAt(x));	//send the char
 	    	} else {
@@ -200,7 +205,11 @@ public class FlashTransfer {
 	    }
 	    
 		//wait for a response
-		while (serialPort.readChar() != 'D' && (killTransfer != true)) { ; } //wait
+		while (serialPort.readChar() != 'D') { 
+			if(killTransfer){
+				return false;
+			}; 
+		} //wait
 		
 		/* Send the file data */
 		int index = 0;
@@ -215,10 +224,9 @@ public class FlashTransfer {
 		/* Send the file bytes */
 		for (int x = 0; x < pageCount; x++) {
 			byte newPage[] = new byte[pageSize];
-			if(killTransfer != true) break;
+			if(killTransfer == true) return false;
 			
 			for (int p=0; p < pageSize; p++) {
-				if(killTransfer != true) break;
 				if (index < fileBytes.length) {
 					newPage[p] = fileBytes[index];
 					//serialPort.write((char)fileBytes[index]);	//send data
@@ -233,10 +241,14 @@ public class FlashTransfer {
 			serialPort.write(newPage);
 			
 			/* Wait for a response after the page was sent */
-			while (serialPort.readChar() != 'D' && killTransfer != true) { ; } //wait
+			while (serialPort.readChar() != 'D') 
+			{
+				if(killTransfer){
+					return false;
+				}
+			} //wait
 		}
-		
-		
+		System.out.println("exiting");
 		return true;
 	}
 	

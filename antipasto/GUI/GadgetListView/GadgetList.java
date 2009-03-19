@@ -94,36 +94,33 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 
     public void saveCurrentGadget(){
         GadgetFactory factory = new GadgetFactory();
-        try{
-            //factory.writeSketchBookToFile(_book, sketchBookDirectory);
-            String originalDirectory = ((IPackedFile)gadget).getPackedFile().getPath();
-            String bookFileName = ((IPackedFile)gadget).getPackedFile().getName();
-            antipasto.Interfaces.ITemporary temp = (antipasto.Interfaces.ITemporary)gadget;
-            IModule[] newGadgets = new IModule[gadget.getModules().length];
-            for(int i = 0; i < gadget.getModules().length; i++){
-                IModule curGadget = gadget.getModules()[i];
-                if(curGadget instanceof IPackedFile && curGadget instanceof ITemporary){
-                    File gadgetDirectory = new File(((ITemporary)curGadget).getTempDirectory());
-                    File packedFile = ((IPackedFile)curGadget).getPackedFile();
+        //factory.writeSketchBookToFile(_book, sketchBookDirectory);
+		String originalDirectory = ((IPackedFile)gadget).getPackedFile().getPath();
+		String bookFileName = ((IPackedFile)gadget).getPackedFile().getName();
+		System.out.println("Saving gadget called : " + bookFileName);
+		antipasto.Interfaces.ITemporary temp = (antipasto.Interfaces.ITemporary)gadget;
+		IModule[] newGadgets = new IModule[gadget.getModules().length];
+		for(int i = 0; i < gadget.getModules().length; i++){
+		    IModule curGadget = gadget.getModules()[i];
+		    if(curGadget instanceof IPackedFile && curGadget instanceof ITemporary){
+		        File gadgetDirectory = new File(((ITemporary)curGadget).getTempDirectory());
+		        File packedFile = ((IPackedFile)curGadget).getPackedFile();
 
-                    ModuleFactory fact = new ModuleFactory();
-                    try{
-                    	fact.WriteModuleToFile(curGadget, packedFile.getPath().substring(0,
-                    			packedFile.getPath().length() - packedFile.getName().length()));
-                    }catch(Exception ex){
-                        ex.printStackTrace();
-                    }
-                    newGadgets[i] = curGadget;
-                }
-            }
-            gadget.setModule(newGadgets);
-            File tempDirectory = new File(temp.getTempDirectory());
-            int endIndex = originalDirectory.length() - bookFileName.length();
-            originalDirectory = originalDirectory.substring(0, endIndex);
-            factory.writeGadgetToFile(gadget, originalDirectory);
-        }catch(IOException e){
-            e.printStackTrace();
-        }
+		        ModuleFactory fact = new ModuleFactory();
+		        try{
+		        	fact.WriteModuleToFile(curGadget, packedFile.getPath().substring(0,
+		        			packedFile.getPath().length() - packedFile.getName().length()));
+		        }catch(Exception ex){
+		            ex.printStackTrace();
+		        }
+		        newGadgets[i] = curGadget;
+		    }
+		}
+		gadget.setModule(newGadgets);
+		File tempDirectory = new File(temp.getTempDirectory());
+		int endIndex = originalDirectory.length() - bookFileName.length();
+		originalDirectory = originalDirectory.substring(0, endIndex);
+		factory.writeGadgetToFile(gadget, ((IPackedFile)gadget).getPackedFile());
     }
 
     public String getSketchBookDirectory() {

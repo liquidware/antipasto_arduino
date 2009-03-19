@@ -205,6 +205,7 @@ public class Serial implements SerialPortEventListener {
       //System.err.flush();
       try {
         while (input.available() > 0) {
+        	try{
         //if (input.available() > 0) {
           //serial = input.read();
           //serialEvent();
@@ -229,9 +230,11 @@ public class Serial implements SerialPortEventListener {
                                //((char) buffer[bufferLast-1]));
                        //}
           }
+        }catch(Exception ex){
+        	
         }
         //System.out.println("no more");
-
+        }
       } catch (IOException e) {
         errorMessage("serialEvent", e);
         //e.printStackTrace();

@@ -220,7 +220,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     		this.remove(gadgetDescPanel);
     		
     		/* Setup the new panels */
-	    	String dir = System.getProperty("java.io.tmpdir") + gadget.getName();
+	    	String dir = Base.createTempFolder(gadget.getName()).getPath();
     		IGadget book = fact.loadGadget(gadget, dir);
 
     		this._gadget = book;

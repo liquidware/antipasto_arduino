@@ -72,6 +72,7 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	//the serial port.
 	public static void killActiveTransfer(){
 		ImageListPanel.killTransfer = true;
+		FlashTransfer.killTransfer();
 	}
 	
 	private void init(){
@@ -288,16 +289,21 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 									   /* Made some progress */
 									   progressBar.setValue(progressBar.getValue()+1);
 									   progressBar.repaint();
+									   System.out.println("sent file");
 								   } else {
 									   errorFree = false;
 									   progressBar.setValue(progressBar.getValue()+1);
+									   progressBar.repaint();
+									   System.out.println("errors in transfer");
 								   }
 							   }
+							   System.out.println("closing flash transfer");
 							   /* Exit the image transfer */
-							   if( errorFree){
-								   transfer.close();
-							   }
+							   transfer.close();
 							   isTransfering = false;
+							   //close the serial
+							   System.out.println("Closing serial port...");
+							   mySerial.dispose();
 							   /* Reset UI after transfer */
 							   ilist.resetUI();
 						   } catch (SerialException err) {

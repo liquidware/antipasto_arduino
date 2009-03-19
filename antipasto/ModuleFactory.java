@@ -165,6 +165,13 @@ public class ModuleFactory {
                previewImage = moduleFiles[i];
            }else if(moduleFiles[i].getName().equalsIgnoreCase("rules.xml")){
         	   rulesFile = moduleFiles[i];
+           }else if(moduleFiles[i].getName().equalsIgnoreCase("data.jar")){
+        	   //we've found the data folder
+        	   File dataFolder = new File(dir.getPath() + File.separator + "data");
+        	   if(!dataFolder.exists()){
+        		   dataFolder.mkdir();
+        	   }
+        	   UnPacker.UnPack(moduleFiles[i], dataFolder);
            }
        }
        return this.CreateModule(configFile, boardsFile, previewImage, moduleFiles, module, rulesFile ,outputDirectory, true);
@@ -213,11 +220,20 @@ public class ModuleFactory {
             if(module.getRulesFile()!= null){
             	rulesFileCount = 1;
             }
-            File[] packerFiles = new File[module.getData().length + tot + cores.length + rulesFileCount];
-            for(int i =0; i < module.getData().length; i++){
-            	packerFiles[i] = module.getData()[i];
+            int moduleDataCount = 0;		//don't be alarmed, were only using this
+            								//for array init.
+            if(module.getData().length > 0) moduleDataCount = 1;
+            
+            File[] packerFiles = new File[moduleDataCount + tot + cores.length + rulesFileCount];
+            File packedData;
+            int x = 0;
+            if(moduleDataCount > 0){
+            	packedData = Packer.packageFile(outputDirectory + File.separator + "data.jar", module.getData());
+            	packerFiles[x] = packedData;
+            	x++;
             }
-            int x = module.getData().length;
+            
+           
             packerFiles[x] = xml;
             packerFiles[++x] = module.getSketchFile();
             packerFiles[++x] = module.getBoardsFile();

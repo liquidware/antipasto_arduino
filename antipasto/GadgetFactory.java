@@ -102,6 +102,59 @@ public class GadgetFactory {
     	return this.CreateGadgetFile(name, outputDirectory, newGadgetModules);
     }
 
+    /*
+     * Writes gadget back to the original file
+     * */
+    public File writeGadgetToFile(IGadget gadget, File originalFile){
+        File outDir = new File(originalFile.getPath());
+        if(!outDir.exists())
+        {
+            outDir.mkdir();
+        }
+
+        File tmpDir = Base.createTempFolder(gadget.getName());
+        tmpDir.mkdir();
+
+        ModuleFactory fact = new ModuleFactory();
+
+        for(int i=0; i < gadget.getModules().length; i++)
+        {
+            try {
+            	//NOTE: We may need to add a hook for the module rules
+                fact.WriteModuleToFile(gadget.getModules()[i], tmpDir.getPath());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            XMLWriter.Writer(gadget.getConfiguration(), "config.xml", tmpDir.getPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        File returnFile = null;
+		try {
+			returnFile = Packer.packageFile(originalFile.getPath()
+			                                    , tmpDir.listFiles());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+        File[] tmpFiles = tmpDir.listFiles();
+        for(int i =0; i < tmpFiles.length; i++)
+        {
+            tmpFiles[i].delete();
+        }  
+
+        tmpDir.delete();
+        return returnFile;
+    }
+    
+    /*
+     * Outputs a gadget to the specified directory
+     * */
     public File writeGadgetToFile(IGadget gadget, String outputDir) throws IOException {
         File outDir = new File(outputDir);
         if(!outDir.exists())
@@ -109,7 +162,7 @@ public class GadgetFactory {
             outDir.mkdir();
         }
 
-        File tmpDir = new File(System.getProperty("java.io.tmpdir") + File.separator + gadget.getName() + ".tmp");
+        File tmpDir = Base.createTempFolder(gadget.getName());
         tmpDir.mkdir();
 
         ModuleFactory fact = new ModuleFactory();

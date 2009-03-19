@@ -1683,6 +1683,12 @@ public class Editor extends JFrame
   public void handleSerial() {
     if (!debugging) {
       try {
+        ImageListPanel.killActiveTransfer();
+        try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
         serialPort = new Serial(true);
         this.gadgetPanel.setSerial(serialPort);
         console.clear();
@@ -2012,8 +2018,8 @@ public class Editor extends JFrame
       // auto-clean right away
       try {
         // don't clean if we're re-opening the same file
-        String oldPath = sketch.code[0].file.getCanonicalPath();
-        String newPath = new File(path).getCanonicalPath();
+        String oldPath = sketch.code[0].file.getPath();
+        String newPath = new File(path).getPath();
         if (!oldPath.equals(newPath)) {
           if (Base.calcFolderSize(sketch.folder) == 0) {
             Base.removeDir(sketch.folder);
@@ -2056,6 +2062,7 @@ public class Editor extends JFrame
     	  this.gadgetPanel.loadGadget(new File(path));
     	  path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
     	  this.loadGadget(this.gadgetPanel.getActiveGadget());
+    	  
     	  isGadgetFile = true;
     	  this.lastActiveGadgetPath = path;
       }else {

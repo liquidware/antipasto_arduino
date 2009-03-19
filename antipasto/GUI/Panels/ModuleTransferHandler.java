@@ -54,6 +54,7 @@ public class ModuleTransferHandler extends TransferHandler{
 				//create a new sketch
 				GadgetFactory gadgFact = new GadgetFactory();
 				try {
+					System.out.println("********************************");
 					System.out.println("creating a new gadget");
 					gadgFact.CreateGadgetFile("Test", "C:\\openhardware", savedModule);
 				} catch (IOException e) {
