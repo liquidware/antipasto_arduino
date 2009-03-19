@@ -2193,8 +2193,7 @@ public class Editor extends JFrame
   public void handleSave2() {
     message("Saving...");
     try {
-
-		System.out.println("Calling the standard sketch saver...");
+    	  sketch.save();
 	      if (saveSketches()) {
 	        message("Done Saving.");
 	      } else {
@@ -2233,6 +2232,11 @@ public class Editor extends JFrame
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           message("Saving...");
+          try {
+			sketch.save();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
           try {
         	  if(gp.getActiveGadget() != null){
         			  FileDialog fd = new FileDialog(edit._frame,
