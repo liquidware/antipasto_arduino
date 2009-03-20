@@ -41,7 +41,6 @@ import com.oroinc.text.regex.*;
  */
 public class Sketch {
   static File tempBuildFolder;
-
   Editor editor;
 
   /**

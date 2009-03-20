@@ -2123,7 +2123,6 @@ public class Editor extends JFrame
         }
       }
       }
-
       //do one last check
       if(this.gadgetPanel.getActiveGadget() != null){
     	  for(int i = 0; i < gadgetPanel.getActiveGadget().getModules().length; i++){
@@ -2149,6 +2148,9 @@ public class Editor extends JFrame
       }
       
       sketch = new Sketch(this, path);
+      if(isGadgetFile){
+    	  System.out.println(path);
+      }
       // TODO re-enable this once export application works
       //exportAppItem.setEnabled(false);
       //exportAppItem.setEnabled(false && !sketch.isLibrary());
@@ -2744,7 +2746,7 @@ public class Editor extends JFrame
     public void onActiveGadgetChanged(ActiveGadgetObject obj){
         this.gadgetPanel.saveCurrentGadget();
         if(gadgetPanel.getActiveModule() != null && gadgetPanel.getActiveGadget() != null){
-	        this.handleSave(true);
+	        //this.handleSave(true);
 	        File sketchFile = obj.getSketch();
 	        File boardFile = obj.getBoards();
 	        this.handleOpen(sketchFile.getPath());
