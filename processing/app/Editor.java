@@ -2755,7 +2755,6 @@ public class Editor extends JFrame
 	        Preferences.set("board", board);
 	        Preferences.save();
 	        Preferences.init();
-	        this.buildToolsMenu();
 	        this.repaint();
         }else if(gadgetPanel.getActiveGadget() == null){
         	this.setVisible(true);
