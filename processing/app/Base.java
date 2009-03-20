@@ -61,7 +61,7 @@ import processing.core.*;
 public class Base {
   static final String DIST_NAME = "Antipasto Arduino";
   static final int VERSION = 13;
-  static final String VERSION_NAME = "0.8.4";
+  static final String VERSION_NAME = "0.8.5";
 
   /**
    * Path of filename opened on the command line,
