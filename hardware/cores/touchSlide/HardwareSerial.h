@@ -40,7 +40,7 @@ class HardwareSerial
     HardwareSerial(uint8_t);
     void begin(long);
  //   void end(void);
-    uint8_t available(void);
+    int available(void);
     int read(void);
     void flush(void);
     void print(char);

@@ -563,10 +563,13 @@ void	ellipse( int xLoc, int yLoc, int radx, int rady)
 	}
 	
 	//stroke
-	dispColor(fcolor);
-	for(int i=0; i<strokeWeightVal; i++)
+	if (strokeEnb)
 	{
-		dispOutlineEllipse(xLoc, yLoc, radx+i, rady+i);
+		dispColor(fcolor);
+		for(int i=0; i<strokeWeightVal; i++)
+		{
+			dispOutlineEllipse(xLoc, yLoc, radx+i, rady+i);
+		}
 	}
 }
 
@@ -768,8 +771,11 @@ void	rect(int xLeft, int yTop, int width, int height)
 			dispRectangle(xLeft, yTop, width, height); 
 		}
 
-		//*	frame the rect
-		framerect(xLeft, yTop, width, height);
+		if (strokeEnb)
+		{
+			//*	frame the rect
+			framerect(xLeft, yTop, width, height);
+		}
 	}
 }
 
@@ -816,6 +822,7 @@ void	size(int w, int h)
 //*******************************************************************************
 void	stroke( int s)
 {
+	strokeEnb = true;
 	setfcolor(s,s,s);
 }
 
@@ -828,6 +835,7 @@ void	strokeWeight(int s)
 //*******************************************************************************
 void	stroke(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
 {
+	strokeEnb = true;
 	setfcolor(redValue, greenValue, blueValue);
 }
 

@@ -13,12 +13,10 @@
 /* A file table entry */
 typedef struct {
 	char	fileName[kFileNameSize];
-	uint8_t	flashOffsetByte1;
-	uint8_t	flashOffsetByte2;
-	uint8_t	flashOffsetByte3;
-	uint8_t flashOffsetByte4;
+	uint32_t flashOffset;
 } FLASH_FILE_ENTRY;
 
+typedef uint64_t PImage; 
 
 unsigned char	bmp_lookup_table_checkStatus();
 char			bmp_draw(char *bmp_name, int xLoc, int yLoc);
@@ -40,6 +38,9 @@ void			bmp_init();
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+PImage loadImage(char * FileName);
+void image(PImage image, int xLoc, int yLoc);
 
 #endif
 
