@@ -36,6 +36,7 @@
 #include	"image_interface.h"
 #include	"graphics.h"
 #include	"bmp.h"
+#include    "FlashFileSystem.h"
 
 
 #ifdef _TOUCH_SLIDE_

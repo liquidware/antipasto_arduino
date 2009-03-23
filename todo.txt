@@ -1,4 +1,4 @@
-0.8.6 arduino
+0.8.7 arduino
 
 AVR
 
