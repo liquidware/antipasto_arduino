@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 
 import processing.app.Base;
 
+import antipasto.GadgetFactory;
 import antipasto.ModuleFactory;
 import antipasto.Interfaces.IModule;
 
@@ -41,6 +42,14 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		
 		scrollPane.setVisible(true);
 	}
+
+	/**
+	 * Sets the internal gadget
+	 * @param list Gadgetlist that we can add library modules to
+	 */
+	public void setGadgetList(GadgetList list){
+		this.gadgetList = list;
+	}
 	
 	private void loadDirectory(){
 		File[] files = this.baseDirectory.listFiles();
@@ -53,9 +62,10 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		for(int i = 0; i < files.length; i ++){
 			if(files[i].getName().endsWith(IModule.moduleExtension)){
 				try {
-					File newFile = new File(libDir + File.separator + files[i].getName());
-					Base.copyFile(files[i], newFile);
-					IModule mod = fact.loadModule(newFile, libDir.getPath(), false);
+					//File newFile = new File(libDir + File.separator + files[i].getName());
+					//Base.copyFile(files[i], newFile);
+					File curFile = files[i];
+					IModule mod = fact.loadModule(curFile, libDir.getPath(), false);
 					//ImageIcon icon = new ImageIcon(mod.getImage());
 					ModuleIcon label = new ModuleIcon(mod, this.gadgetList);
 					label.setSize(60,60);
@@ -72,27 +82,23 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 				}
 			}
 		}
-		//this.scrollPane = new JScrollPane(itemsPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setSize(new Dimension(300, 60));
 		scrollPane.setPreferredSize(new Dimension(300, 60));
 		scrollPane.setViewportView(itemsPanel);
-		//scrollPane.add(itemsPanel);
-		//this.add(itemsPanel);
 		itemsPanel.setVisible(true);		
 	}
 
 	public void onSelected(ModuleIcon selectedItem) {
-		/*System.out.println("Changing selected item to :" + selectedItem.getModule().getName());
-		for(int i = 0; i < modules.size(); i++){
-			System.out.println(((ModuleIcon)modules.get(i)).getModule().getName());
-			if(selectedItem.equals(modules.get(i))){
-				selectedItem.setBackground(Color.blue);
-				selectedItem.setOpaque(true);
-			}else{
-				((ModuleIcon)modules.get(i)).setBackground(Color.white);
-				selectedItem.setOpaque(false);
+		if(gadgetList.gadget != null){
+			GadgetFactory fact = new GadgetFactory();
+			try {
+				System.out.println("Attempting to add and reload the gadget");
+				fact.AddModuleToGadget(gadgetList.gadget, selectedItem.getModule());
+				gadgetList.saveCurrentGadget();
+				gadgetList.loadGadget(gadgetList.gadget);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
-		this.repaint();*/
 	}
 }

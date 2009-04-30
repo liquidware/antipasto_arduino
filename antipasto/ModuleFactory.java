@@ -481,8 +481,7 @@ public class ModuleFactory {
         module.setTarget(target);
         module.setRulesFile(rulesFile);
 
-        moduleFile.renameTo(new File(name + ".module"));
-
+      
         if(version == null)
         {
             module.setMajorNumber(1);

@@ -179,31 +179,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         box.add(messagePanel);
 
         this.getContentPane().add(box, BorderLayout.NORTH);
-        
-        //JPanel panel = new JPanel();
-        //panel.setLayout(new FlowLayout());
-        //panel.setSize(200, 100);
-
-        /*button = new JButton("Add Gadget");
-        button.addMouseListener(new AddGadgetMenu(menu, button));
-
-        panel.add(button);
-        button = new JButton("Remove Gadget");
-        panel.add(button);
-        */
-        //this.getContentPane().add(panel, BorderLayout.PAGE_START);
-        //panel.setVisible(true);
-
-        //this.setSize(this.cachedWidth, this.cachedHeight);
-        
-        //libPanel.setVisible(true);
-        //scrollPanel.setVisible(true);
-        //libDescPanel.setVisible(true);
-        //scrollDescPanel.setVisible(true);
-        //top.setVisible(true);
-        //bottom.setVisible(true);
-        
-        //this.setVisible(true);
     }
     
     public void loadGadget(File gadget){
@@ -229,6 +204,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	        list.loadGadget(_gadget);
 	        list.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
 	        
+	        libPanel.setGadgetList(list);
 	        
 	        scrollPanel = new JScrollPane((JList) list);
 	        scrollPanel.setPreferredSize(new Dimension(300, 300));
@@ -249,9 +225,14 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     	    list.addSketchChangingeListener(this);
     	    list.addListSelectionListener(this);
     	    
-    		 this.activeModule = this.getActiveModule();
-    		 
-    		 this.gadgetIsLoaded = true;
+    		this.list.setSelectedIndex(0);
+    		
+    		this.activeModule = (IModule) list.getSelectedValue();
+            this.onActiveGadgetChange(new ActiveGadgetObject(this,
+                    this.activeModule.getSketchFile(),
+                    this.activeModule.getBoardsFile()));
+    		
+    		this.gadgetIsLoaded = true;
 	    	//Save this for later!		
     	}else{
     		this.setVisible(false);

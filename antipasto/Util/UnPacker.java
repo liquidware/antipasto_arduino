@@ -38,6 +38,7 @@ public class UnPacker {
             while(entries.hasMoreElements())
             {
                 JarEntry je = (JarEntry) entries.nextElement();
+            	System.out.println(je.getComment());
                 BufferedInputStream stream = new BufferedInputStream(jf.getInputStream(je));
                 WriteFile(f.getPath(), je.getComment(), stream);
                 files[i] = new File(f.getPath() +  File.separator + je.getComment());
