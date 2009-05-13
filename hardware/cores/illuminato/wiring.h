@@ -4,7 +4,7 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
-#include <avr/delay.h>
+#include <util/delay.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -18,6 +18,11 @@ extern "C"{
 
 #include "binary.h"
 
+// undefine stdlib's abs if encountered
+#ifdef abs
+#undef abs
+#endif
+
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
 #define abs(x) ((x)>0?(x):-(x))
@@ -26,6 +31,10 @@ extern "C"{
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
+
+#define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
+#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
+#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
 
 #define SETBIT(ADDRESS,BIT) (ADDRESS |= (1<<BIT)) //!<Set a bit within a byte
 #define CLRBIT(ADDRESS,BIT) (ADDRESS &= ~(1<<BIT)) //!< Clear a bit within a byte
@@ -42,6 +51,11 @@ extern "C"{
 #define OUTPUT  1
 #define HIGH    1
 #define LOW     0
+#define bit(b) (1 << (b))
+
+typedef unsigned int word;
+typedef uint8_t boolean;
+typedef uint8_t byte;
 
 /* A structure to describe the pins */
 typedef struct {
@@ -65,6 +79,7 @@ uint8_t digitalRead(uint8_t pin);
 int analogRead(uint8_t pin);
 unsigned long millis();
 void delay(unsigned long ms);
+void delayMicroseconds(unsigned int us);
 void bling(uint8_t percent);
 
 #ifdef __cplusplus

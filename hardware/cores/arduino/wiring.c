@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.c 539 2008-12-23 00:17:14Z mellis $
+  $Id: wiring.c 565 2009-03-25 10:50:00Z dmellis $
 */
 
 #include "wiring_private.h"
@@ -194,6 +194,17 @@ void init()
 	sbi(TCCR2, WGM20);
 #else
 	sbi(TCCR2A, WGM20);
+#endif
+
+#if defined(__AVR_ATmega1280__)
+	// set timer 3, 4, 5 prescale factor to 64
+	sbi(TCCR3B, CS31);	sbi(TCCR3B, CS30);
+	sbi(TCCR4B, CS41);	sbi(TCCR4B, CS40);
+	sbi(TCCR5B, CS51);	sbi(TCCR5B, CS50);
+	// put timer 3, 4, 5 in 8-bit phase correct pwm mode
+	sbi(TCCR3A, WGM30);
+	sbi(TCCR4A, WGM40);
+	sbi(TCCR5A, WGM50);
 #endif
 
 	// set a2d prescale factor to 128
