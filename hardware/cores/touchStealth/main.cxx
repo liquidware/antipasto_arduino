@@ -252,7 +252,7 @@ int		yTextLoc;
 	
 	
 	//*	display the SubProcessing library version
-	strcpy(startupMsg, "Arduino Procssing Library ");
+	strcpy(startupMsg, "Arduino Processing Library ");
 	strcat(startupMsg, kSubP_VersionString);
 	strcat(startupMsg, " ");
 
