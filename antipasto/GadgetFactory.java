@@ -350,23 +350,28 @@ public class GadgetFactory {
         if(gadget instanceof IGadget){
             if(module instanceof Module){
                 int hasAlreadyCount = 0;
+                boolean hasMoreThanOne = false;
+                System.out.println("Checking the module names for repeats");
                 for(int i = 0; i < gadget.getModules().length; i++){
                     if(gadget.getModules()[i].getName().equalsIgnoreCase(module.getName())){
                         hasAlreadyCount ++;
+                        hasMoreThanOne = true;
                     }
                 }
                 
                 //Count the number of modules and increment the name
                 String moduleName = module.getName();
-                if(hasAlreadyCount > 1){
+                if(hasMoreThanOne){
                     moduleName = module.getName() + "(" + hasAlreadyCount + ")";
+                    System.out.println(moduleName);
                 }
+                
                 //copy the module to the base directory of the gadget
                 //get the file copy it to the book directory, unpack it to a subfolder
                 Gadget gadgetBase = (Gadget) gadget;
                 Module moduleOriginal = (Module)module;
                 File moduleFileOriginal = moduleOriginal.getPackedFile();
-                File outDirectory = new File(gadgetBase.getTempDirectory() + File.separator + module.getName());
+                File outDirectory = new File(gadgetBase.getTempDirectory() + File.separator + moduleName);
                 
                 if(!outDirectory.exists()){
                 	outDirectory.mkdir();
@@ -378,6 +383,18 @@ public class GadgetFactory {
                 ModuleFactory factory = new ModuleFactory();
                 try {
                     IModule copiedGadget = factory.loadModule(moduleFileNew, outDirectory.getPath(), true);
+                    File f =new File(copiedGadget.getSketchFile().getParentFile().getPath() 
+							  + File.separator + moduleName + ".pde");
+                    copiedGadget.getSketchFile().renameTo(f);
+                    copiedGadget.setSketchFile(f);
+                    copiedGadget.setName(moduleName);
+                    IPackedFile pf = (IPackedFile)copiedGadget;
+                    String packedFileName = ((IPackedFile)copiedGadget).getPackedFile().getParentFile().getParentFile().getPath() + File.separator + moduleName + ".module";
+                    pf.setPackedFile(new File(packedFileName));
+                    
+                    
+                    factory.WriteModuleToFile(copiedGadget, outDirectory.getPath());
+                    factory.CreateModuleXML(copiedGadget);
                     
                     IModule[] oldGadgets = gadget.getModules();
                     IModule[] newGadgets = new IModule[oldGadgets.length + 1];

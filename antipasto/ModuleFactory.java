@@ -209,7 +209,7 @@ public class ModuleFactory {
                 tot++;
             }
 
-            File xml = XMLWriter.Writer(module.getConfiguration(), "config.xml", outputDirectory);
+            File xml = XMLWriter.Writer(this.CreateModuleXML(module), "config.xml", outputDirectory);
             CoreFactory fact = new CoreFactory();
             File[] cores = new File[module.getCores().length];
             for(int i = 0; i < module.getCores().length; i++)
