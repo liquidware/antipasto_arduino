@@ -74,8 +74,11 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
     public boolean gadgetIsLoaded = false;
     
+    private JFrame parentFrame;
+    
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
     	super(frame, false);
+    	parentFrame = frame;
         this.addMouseListener(new ModuleMouseAdapter());
         this.setUndecorated(true);
         frame.addWindowListener(this);
@@ -226,14 +229,18 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     	    list.addListSelectionListener(this);
     	    
     		this.list.setSelectedIndex(0);
-    		
-    		this.activeModule = (IModule) list.getSelectedValue();
-            this.onActiveGadgetChange(new ActiveGadgetObject(this,
-                    this.activeModule.getSketchFile(),
-                    this.activeModule.getBoardsFile()));
-    		
+    		if(list._collection._gadgets.size() > 0){
+	    		this.activeModule = (IModule) list.getSelectedValue();
+	            this.onActiveGadgetChange(new ActiveGadgetObject(this,
+	                    this.activeModule.getSketchFile(),
+	                    this.activeModule.getBoardsFile()));
+    		}else{
+    			Editor editor = (Editor) this.parentFrame;
+    			editor.textarea.setVisible(false);
+    		}
     		this.gadgetIsLoaded = true;
-	    	//Save this for later!		
+	    	//Save this for later!
+    		
     	}else{
     		this.setVisible(false);
     		this.hide();				//gotta upgrade the java version....
@@ -281,6 +288,9 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
                             ((IActiveGadgetChangedEventListener)listeners[i+1]).onActiveGadgetChanged(evObj);
                         }
                     }
+                    Editor editor = (Editor) parentFrame;
+                    editor.textarea.setVisible(true);
+                    editor.textarea.setEnabled(true);
     }
 
     public void addSketchBookChangedEventListener(IActiveSketchChangingListener listener){

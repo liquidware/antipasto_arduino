@@ -50,7 +50,7 @@ public class ModuleGUI extends JPanel {
 		this.add(pane, BorderLayout.EAST);
 		this.add(coreList, BorderLayout.WEST);
 		this.add(inputPanel, BorderLayout.CENTER);
-		//pane.setPreferredSize(new Dimension(150, 150));
+		
 		pane.setVisible(true);
 		fileList.setVisible(true);
 		coreList.setVisible(true);

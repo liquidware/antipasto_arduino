@@ -23,7 +23,6 @@ public class Packer {
                 JarEntry je = new JarEntry(act);
                 String comment = f.getName();
               
-                System.out.println("parent for file " + f.getName() + " is " + f.getParent());
                 if(f.getParent().equalsIgnoreCase("data")){
                 	comment = "data" + File.separator + f.getName();
                 }

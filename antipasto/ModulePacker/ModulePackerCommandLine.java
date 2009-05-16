@@ -49,7 +49,7 @@ public class ModulePackerCommandLine {
                 module = (Module) fact.CreateModule(files);
                 module.setName(name);
                 module.getSketchFile().renameTo(new File(module.getName()));
-
+                
                 module.setMajorNumber(Integer.parseInt(maj));
                 module.setMinorNumber(Integer.parseInt(min));
                 module.setRevisionNumber(Integer.parseInt(rev));

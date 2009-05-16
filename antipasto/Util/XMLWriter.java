@@ -21,8 +21,7 @@ public class XMLWriter {
     {
         try {
 
-            System.out.println(elements.toString());
-
+            
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
@@ -35,8 +34,7 @@ public class XMLWriter {
             //Logger.getLogger(Util.Writer.class.getName()).log(Level.INFO, null, xmlString);
             return f;
         } catch (TransformerException ex) {
-        	System.out.print(ex.getMessage());
-            Logger.getLogger(XMLWriter.class.getName()).log(Level.SEVERE, null, ex);
+          Logger.getLogger(XMLWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
         throw new Exception("Error while creating XML file");
     }

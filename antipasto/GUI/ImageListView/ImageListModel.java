@@ -47,12 +47,10 @@ public class ImageListModel implements ListModel, IImageFileCollectionChangedLis
 		try{
 			File f = (File)fileCollection.get(index);
 			if(!f.delete()){
-				System.out.println("Can't delete the file, check permissions or delete manuallyL " + f.getPath());
-			}else{
+				}else{
 				fileCollection.removeFile(index);
 			}
 		}catch (Exception ex) {
-			System.out.println("error removing from fileCollection");
 			ex.printStackTrace();
 		}
 	}

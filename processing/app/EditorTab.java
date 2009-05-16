@@ -86,9 +86,10 @@ public class EditorTab extends JComponent implements DocumentListener, MouseList
 			
 			String printTxt = this.txt;
 			
-			if(isUpdated){
+			//Disabled until we figure out what the issue is....
+			/*if(isUpdated){
 				printTxt = printTxt + "*";
-			}
+			}*/
 			
 		 double textWidth = (metrics.getStringBounds(txt, g).getWidth() / 2) * 1.7;
 			roundRect = new RoundRectangle2D.Double(0, 0, textWidth, 25 , 10, 10);

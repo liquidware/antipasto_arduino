@@ -64,7 +64,7 @@ public class GadgetFactory {
     }
 
     public IGadget loadGadget(File gadgetFile, String outputDirectory) {
-        if(gadgetFile.getName().endsWith(".pde") || gadgetFile.getName().endsWith(".gadget"))
+        if(gadgetFile.getName().endsWith(".pde") || gadgetFile.getName().endsWith(".gdt"))
         {
             File[] unpackedFiles = UnPacker.UnPack(gadgetFile, new File(outputDirectory));
             File configFile = findFileByName("config.xml", unpackedFiles);
@@ -192,7 +192,7 @@ public class GadgetFactory {
         }
 
 
-        File returnFile = Packer.packageFile(outDir.getPath() + File.separator + gadget.getName() + ".pde"
+        File returnFile = Packer.packageFile(outDir.getPath() + File.separator + gadget.getName() + ".gdt"
                                             , tmpDir.listFiles());
 
         File[] tmpFiles = tmpDir.listFiles();
@@ -261,8 +261,6 @@ public class GadgetFactory {
                         File moduleFile = this.findFileByName(moduleName + IModule.moduleExtension , files);
 
                         try {
-                            System.out.println("Module being loaded : " + outputDirectory + File.separator + moduleName);
-                            System.out.println("Module location : " + moduleFile.getPath());
                             gadgets.add(gadgetFactory.loadModule(moduleFile,outputDirectory + File.separator + moduleName , true));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -368,16 +366,19 @@ public class GadgetFactory {
                 Gadget gadgetBase = (Gadget) gadget;
                 Module moduleOriginal = (Module)module;
                 File moduleFileOriginal = moduleOriginal.getPackedFile();
-                File outDirectory = new File(gadgetBase.getTempDirectory());
+                File outDirectory = new File(gadgetBase.getTempDirectory() + File.separator + module.getName());
                 
-                File moduleFileNew = new File(outDirectory + File.separator + moduleName);
+                if(!outDirectory.exists()){
+                	outDirectory.mkdir();
+                }
+                
+                File moduleFileNew = new File(outDirectory + File.separator + moduleName + ".module");
                 Base.copyFile(moduleFileOriginal, moduleFileNew);
                 
                 ModuleFactory factory = new ModuleFactory();
                 try {
                     IModule copiedGadget = factory.loadModule(moduleFileNew, outDirectory.getPath(), true);
                     
-
                     IModule[] oldGadgets = gadget.getModules();
                     IModule[] newGadgets = new IModule[oldGadgets.length + 1];
 
@@ -385,8 +386,10 @@ public class GadgetFactory {
                     {
                         newGadgets[i] = oldGadgets[i];
                     }
+                    
                     newGadgets[newGadgets.length - 1] = copiedGadget;
                     gadget.setModule(newGadgets);
+                    
                     return gadget;
                 } catch (Exception e) {
                     System.out.println("Error adding gadget to sketch");

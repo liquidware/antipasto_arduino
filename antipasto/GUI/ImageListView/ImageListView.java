@@ -56,16 +56,12 @@ public class ImageListView extends JList implements IActiveGadgetChangedEventLis
 	
 	public void removeSelected(){
 		try{
-			System.out.println("removing selected from imagelistview.java");
 			int index = this.getSelectedIndex();
-			System.out.println("Got selected index:" + index);
 			ImageListModel model = ((ImageListModel)this.getModel());
-			System.out.println("Got the model" + model);
 			model.remove(index);
-			System.out.println("Removed selected item");
+			
 		}catch(Exception ex){
 			ex.printStackTrace();
-			System.out.println("Error remvoing selected");
 		}
 		this.repaint();
 	}
@@ -104,37 +100,27 @@ public class ImageListView extends JList implements IActiveGadgetChangedEventLis
 		}
 		
 		public boolean importData(JComponent comp, Transferable t) {
-			System.out.println("Importing...");
 			if(comp instanceof ImageListView){
 				DataFlavor[] flavors = t.getTransferDataFlavors();
-				System.out.println("Trying to import:" + t);
-				System.out.println("... which has " + flavors.length + " flavors.");
 				for (int i = 0; i < flavors.length; i++) {
 					DataFlavor flavor = flavors[i];
 					try {
 						if (flavor.equals(DataFlavor.javaFileListFlavor)) {
-							System.out.println("importData: FileListFlavor");
 							
 							List l = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
 							Iterator iter = l.iterator();
 							while (iter.hasNext()) {
 								File file = (File) iter.next();
-								System.out.println("GOT FILE: "
-												   + file.getCanonicalPath());
 								// Now do something with the file...
 								((ImageListView)comp).getModule().addFile(file);
 								File[] dataFiles = (((ImageListView)comp).getModule().getData());
-								System.out.println("number of files " + dataFiles.length);
 								((ImageListView)comp).setModule(((ImageListView)comp).getModule());
 							}
 							return true;
 						} else if (flavor.equals(DataFlavor.stringFlavor)) {
-							System.out.println("importData: String Flavor");
 							String fileOrURL = (String) t.getTransferData(flavor);
-							System.out.println("GOT STRING: " + fileOrURL);
 							try {
 								URL url = new URL(fileOrURL);
-								System.out.println("Valid URL: " + url.toString());
 								// Do something with the contents...
 								return true;
 							} catch (MalformedURLException ex) {

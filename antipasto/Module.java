@@ -58,7 +58,6 @@ public class Module implements IModule, ITemporary, IPackedFile {
     }
 	
 	public void checkDataDirectory(){
-		System.out.println("checking data directory");
 		dataDirectory = new File(this.getTempDirectory() + File.separator + "data");
 		if(!dataDirectory.exists()){
     		dataDirectory.mkdir();

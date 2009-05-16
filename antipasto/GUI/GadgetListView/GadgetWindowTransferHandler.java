@@ -29,11 +29,9 @@ class GadgetWindowTransferHandler extends TransferHandler {
 	    for (int i = 0; i < arg1.length; i++) {
 	      DataFlavor flavor = arg1[i];
 	      if (flavor.equals(DataFlavor.javaFileListFlavor)) {
-	        System.out.println("canImport: JavaFileList FLAVOR: " + flavor);
 	        return true;
 	      }
 	      if (flavor.equals(DataFlavor.stringFlavor)) {
-	        System.out.println("canImport: String FLAVOR: " + flavor);
 	        return true;
 	      }
 	      System.err.println("canImport: Rejected Flavor: " + flavor);
@@ -51,41 +49,31 @@ class GadgetWindowTransferHandler extends TransferHandler {
    */
   public boolean importData(JComponent comp, Transferable t) {
     DataFlavor[] flavors = t.getTransferDataFlavors();
-    System.out.println("Trying to import:" + t);
-    System.out.println("... which has " + flavors.length + " flavors.");
     for (int i = 0; i < flavors.length; i++) {
       DataFlavor flavor = flavors[i];
       try {
         if (flavor.equals(DataFlavor.javaFileListFlavor)) {
-          System.out.println("importData: FileListFlavor");
-
+   
           List l = (List) t
               .getTransferData(DataFlavor.javaFileListFlavor);
           Iterator iter = l.iterator();
           while (iter.hasNext()) {
             File file = (File) iter.next();
-            System.out.println("GOT FILE: "
-                + file.getCanonicalPath());
               this.fireTransferEvent(new FileTransferObject(this, file));            
           }
           return true;
         } else if (flavor.equals(DataFlavor.stringFlavor)) {
-          System.out.println("importData: String Flavor");
           String fileOrURL = (String) t.getTransferData(flavor);
-          System.out.println("GOT STRING: " + fileOrURL);
           try {
             URL url = new URL(fileOrURL);
-            System.out.println("Valid URL: " + url.toString());
             // Do something with the contents...
             return true;
           } catch (MalformedURLException ex) {
-            System.err.println("Not a valid URL");
             return false;
           }
           // now do something with the String.
 
         } else {
-          System.out.println("importData rejected: " + flavor);
           // Don't return; try next flavor.
         }
       } catch (IOException ex) {

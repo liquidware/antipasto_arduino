@@ -71,11 +71,10 @@ public class AddGadgetMenu implements MouseListener {
 
         public void mouseClicked(MouseEvent e) {
             _item.getParent().setVisible(false);
-            System.out.println("closing menu item");
+            
         }
 
         public void mousePressed(MouseEvent e) {
-            System.out.println(e.getPoint());
         }
 
         public void mouseReleased(MouseEvent e) {

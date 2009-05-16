@@ -132,6 +132,7 @@ public class Editor extends JFrame
   JMenuItem exportAppItem;
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
+  JMenuItem newGadgetMenuItem;
   public JPanel centerPanel;
   
   JMenuItem burnBootloader8Item = null;
@@ -335,7 +336,7 @@ public class Editor extends JFrame
     centerPanel.setVisible(true);
     centerPanel.add(textarea, CODEEDITOR);
     centerPanel.add(imageListPanel, FILELIST);
-	  centerPanel.add(lbl, TEST);  
+	centerPanel.add(lbl, TEST);  
     
     CardLayout cl = (CardLayout) centerPanel.getLayout();
     cl.show(centerPanel, CODEEDITOR);
@@ -677,7 +678,41 @@ public class Editor extends JFrame
   protected JMenu buildFileMenu() {
     JMenuItem item;
     JMenu menu = new JMenu("File");
-
+    
+    final Editor editor = this;
+    
+    newGadgetMenuItem = newJMenuItem("New Gadget", 'C', true);
+    
+    newGadgetMenuItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            GadgetFactory fact = new GadgetFactory();
+            JFrame dialog;
+            dialog = new JFrame("Preferences");
+            dialog.setResizable(false);
+            File dflt = new File(Sketchbook.getSketchbookPath());
+            File file =
+                Base.selectFolder("Select new gadget location", dflt, dialog);
+            try {
+            	System.out.println("Creating the gadget!");
+            	String dir = file.getPath();
+            	if(file.getParentFile().isDirectory()){
+            		dir = file.getParent();
+            	}
+				File newFile = fact.CreateGadgetFile(file.getName(), dir, new IModule[]{});
+				editor.gadgetPanel.loadGadget(newFile);
+				editor.textarea.setEnabled(false);
+				//editor.textarea.setOpaque(false);
+				editor.textarea.setBackground(Preferences.getColor("editor.bgcolor"));
+				editor.textarea.repaint();
+				editor.header.tabHeader.setVisible(false);
+				editor.console.message("Start adding some modules from the left", false, false);
+			} catch (IOException e1) {
+				
+			}
+          }
+        });
+    menu.add(newGadgetMenuItem);
+    
     item = newJMenuItem("New", 'N');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -711,6 +746,8 @@ public class Editor extends JFrame
       });
     menu.add(item);
 
+    
+    
     /*exportAppItem = newJMenuItem("Export Application", 'E', true);
     exportAppItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -1524,7 +1561,14 @@ public class Editor extends JFrame
     
     if(gadgetPanel.getActiveGadget() != null){
 	    if(gadgetPanel.getActiveModule().getRules() != null){
-	    	IMessage message = gadgetPanel.getActiveModule().getRules().getMessages()[0];
+	    	IMessage message = null;
+	    	if(gadgetPanel.getActiveModule().getRules().getMessages() != null){
+	    		try{
+	    			message = gadgetPanel.getActiveModule().getRules().getMessages()[0];
+	    		}catch(Exception ex){
+	    			
+	    		}
+	    	}
 	    	if(message != null && this.isExporting){
 	    		IOkListener ourListener = new IOkListener(){
 	    			private String msg;
@@ -2030,6 +2074,7 @@ public class Editor extends JFrame
       } catch (Exception e) { }   // oh well
     }
 
+    boolean isGadgetFile = false;
     try {
       // check to make sure that this .pde file is
       // in a folder of the same name
@@ -2039,7 +2084,6 @@ public class Editor extends JFrame
       String pdeName = parentName + ".pde";
       File altFile = new File(file.getParent(), pdeName);
 
-      boolean isGadgetFile = false;
       //System.out.println("path = " + file.getParent());
       //System.out.println("name = " + file.getName());
       //System.out.println("pname = " + parentName);
@@ -2053,26 +2097,28 @@ public class Editor extends JFrame
         path = altFile.getAbsolutePath();
         //System.out.println("found alt file in same folder");
 
-      } else if (!path.endsWith(".pde")) {
+      } else if (!path.endsWith(".pde") && !path.endsWith(".gdt")) {
         Base.showWarning("Bad file selected",
                             "Arduino can only open its own sketches\n" +
                             "and other files ending in .pde", null);
         return;
-      } else if (path.endsWith(".gadget")){
-    	  this.gadgetPanel.loadGadget(new File(path));
-    	  path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
-    	  this.loadGadget(this.gadgetPanel.getActiveGadget());
-    	  
-    	  isGadgetFile = true;
-    	  this.lastActiveGadgetPath = path;
+      } else if (path.endsWith(".gdt")){
+    	  try{
+      	  	isGadgetFile = true;
+    		this.gadgetPanel.loadGadget(new File(path));
+    	  	path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
+    	  	this.loadGadget(this.gadgetPanel.getActiveGadget());
+    	  	this.lastActiveGadgetPath = path;
+    	  }catch(Exception ex){
+    	  }
       }else {
           try{
+        	  isGadgetFile = true;
         	  this.gadgetPanel.loadGadget(new File(path));
         	  IModule module = this.gadgetPanel.getActiveModule();
         	  File sketchFile = module.getSketchFile();
         	  path = sketchFile.getPath();
         	  this.loadGadget(this.gadgetPanel.getActiveGadget());
-        	  isGadgetFile = true;
         	  this.lastActiveGadgetPath = path;
         	  
           }catch(Exception ex){
@@ -2161,7 +2207,9 @@ public class Editor extends JFrame
       }
 
     } catch (Exception e) {
-      error(e);
+    	if(!isGadgetFile){
+    		error(e);
+    	}
     }
   }
 
@@ -2747,6 +2795,8 @@ public class Editor extends JFrame
         this.gadgetPanel.saveCurrentGadget();
         if(gadgetPanel.getActiveModule() != null && gadgetPanel.getActiveGadget() != null){
 	        //this.handleSave(true);
+        	CardLayout cl = (CardLayout) centerPanel.getLayout();
+            cl.show(centerPanel, CODEEDITOR);
 	        File sketchFile = obj.getSketch();
 	        File boardFile = obj.getBoards();
 	        this.handleOpen(sketchFile.getPath());
@@ -2759,7 +2809,6 @@ public class Editor extends JFrame
         }else if(gadgetPanel.getActiveGadget() == null){
         	this.setVisible(true);
         }
-        System.out.println("repainting header");
         this.header.paint(getGraphics());
     }
 

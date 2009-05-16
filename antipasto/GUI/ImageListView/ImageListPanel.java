@@ -289,20 +289,16 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 									   /* Made some progress */
 									   progressBar.setValue(progressBar.getValue()+1);
 									   progressBar.repaint();
-									   System.out.println("sent file");
 								   } else {
 									   errorFree = false;
 									   progressBar.setValue(progressBar.getValue()+1);
 									   progressBar.repaint();
-									   System.out.println("errors in transfer");
 								   }
 							   }
-							   System.out.println("closing flash transfer");
 							   /* Exit the image transfer */
 							   transfer.close();
 							   isTransfering = false;
 							   //close the serial
-							   System.out.println("Closing serial port...");
 							   mySerial.dispose();
 							   /* Reset UI after transfer */
 							   ilist.resetUI();
@@ -326,7 +322,6 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	 * Reset the UI after transfer.
 	 */
 	public void resetUI() {
-		   System.out.println("Reseting progress bar");
 		   transferButton.setText("Transfer");
 		   progressBar.setValue(0);
 		   progressBar.setVisible(false);
@@ -357,8 +352,7 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	}
 
 	public void componentShown(ComponentEvent e) {
-		// TODO Auto-generated method stub
-		
+		this.resetUI();
 	}
 	
 }

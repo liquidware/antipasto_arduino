@@ -1,17 +1,25 @@
 package antipasto.GUI.GadgetListView;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.event.MouseInputListener;
 
 import processing.app.Base;
 
@@ -25,19 +33,86 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 	ArrayList modules = new ArrayList();
 	JScrollPane scrollPane = new JScrollPane();
 	GadgetList gadgetList;
+	JViewport viewPort;
 	public GadgetListHorizontal(File gadgetLibDirectory, GadgetList gl){
 		super();
+		
+		this.setBackground(Color.white);
+		
+		JPanel panel = new JPanel();
+		panel.setBackground(Color.white);
+		BorderLayout bl = new BorderLayout();
+		panel.setSize(300, 60);
+		panel.setPreferredSize(new Dimension(300, 60));
+		panel.setLayout(bl);
+		this.add(panel);
 		
 		gadgetList = gl;
 		baseDirectory = gadgetLibDirectory;
 		
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		scrollPane.setSize(new Dimension(300, 60));
-		scrollPane.setPreferredSize(new Dimension(300, 60));
+		scrollPane.setSize(new Dimension(100, 60));
+		scrollPane.setPreferredSize(new Dimension(100, 60));
 		scrollPane.setBorder(null);
 		
-		this.add(scrollPane);
+		this.viewPort = scrollPane.getViewport();
+		
+		panel.add(scrollPane, BorderLayout.CENTER);
+		JLabel leftButton = new JLabel();
+		
+		Image leftImage = Base.getImage("module-library-left-arr.gif", this);
+		ImageIcon leftIcon = new ImageIcon();
+		leftIcon.setImage(leftImage);
+		leftButton.setIcon(leftIcon);
+		leftButton.setSize(15, 80);
+		leftButton.addMouseListener(new MouseInputListener(){
+			public void mouseClicked(MouseEvent arg0) {
+				ScrollPanel(-40,0);
+			}
+			public void mouseEntered(MouseEvent arg0) {
+			}
+			public void mouseExited(MouseEvent arg0) {
+			}
+			public void mousePressed(MouseEvent arg0) {
+			}
+			public void mouseReleased(MouseEvent arg0) {
+			}
+			public void mouseDragged(MouseEvent arg0) {
+			}
+			public void mouseMoved(MouseEvent arg0) {
+			}
+		});
+		
+		panel.add(leftButton, BorderLayout.WEST);
+		
+		JLabel rightButton = new JLabel();
+		
+		Image rightImage = Base.getImage("module-library-right-arr.gif", this);
+		ImageIcon rightIcon = new ImageIcon();
+		rightIcon.setImage(rightImage);
+		rightButton.setIcon(rightIcon);
+		rightButton.setSize(15,80);
+		rightButton.addMouseListener(new MouseInputListener(){
+			public void mouseClicked(MouseEvent arg0) {
+				ScrollPanel(40,0);
+			}
+			public void mouseEntered(MouseEvent arg0) {
+			}
+			public void mouseExited(MouseEvent arg0) {
+			}
+			public void mousePressed(MouseEvent arg0) {
+			}
+			public void mouseReleased(MouseEvent arg0) {
+			}
+			public void mouseDragged(MouseEvent arg0) {
+			}
+			public void mouseMoved(MouseEvent arg0) {
+			}
+		});
+		panel.add(rightButton, BorderLayout.EAST);
+		
+		panel.setVisible(true);
 		this.loadDirectory();
 		
 		scrollPane.setVisible(true);
@@ -51,6 +126,9 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		this.gadgetList = list;
 	}
 	
+	/*
+	 * loads all the modules from the module directory into the gadget panel
+	 * */
 	private void loadDirectory(){
 		File[] files = this.baseDirectory.listFiles();
 		ModuleFactory fact = new ModuleFactory();
@@ -59,25 +137,24 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		itemsPanel.setLayout(new FlowLayout());
 		itemsPanel.setSize(new Dimension(this.scrollPane.getWidth(), 70 ));
 		File libDir = Base.createTempFolder("moduleLib");
+
 		for(int i = 0; i < files.length; i ++){
 			if(files[i].getName().endsWith(IModule.moduleExtension)){
 				try {
-					//File newFile = new File(libDir + File.separator + files[i].getName());
-					//Base.copyFile(files[i], newFile);
 					File curFile = files[i];
 					IModule mod = fact.loadModule(curFile, libDir.getPath(), false);
-					//ImageIcon icon = new ImageIcon(mod.getImage());
+					
 					ModuleIcon label = new ModuleIcon(mod, this.gadgetList);
 					label.setSize(60,60);
 					label.setPreferredSize(new Dimension(60,60));
 					label.setVisible(true);
 					label.addSelectionListener(this);
+					
 					itemsPanel.add(label);
-					//scrollPane.add(label);
+					
 					modules.add(label);
-					System.out.println(mod.getName());
+					
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -92,7 +169,6 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		if(gadgetList.gadget != null){
 			GadgetFactory fact = new GadgetFactory();
 			try {
-				System.out.println("Attempting to add and reload the gadget");
 				fact.AddModuleToGadget(gadgetList.gadget, selectedItem.getModule());
 				gadgetList.saveCurrentGadget();
 				gadgetList.loadGadget(gadgetList.gadget);
@@ -101,4 +177,26 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 			}
 		}
 	}
+	
+	private void ScrollPanel(int xIncrement, int yIncrement){
+		Point pt = viewPort.getViewPosition();
+	    pt.x +=  xIncrement;
+	    pt.y +=  yIncrement;
+
+	    pt.x = Math.max(0, pt.x);
+	    pt.x = Math.min(getMaxXExtent(), pt.x);
+	    pt.y = Math.max(0, pt.y);
+	    pt.y = Math.min(getMaxYExtent(), pt.y);
+
+	    viewPort.setViewPosition(pt);
+	}
+	
+	protected int getMaxXExtent() {
+	    return viewPort.getView().getWidth() - viewPort.getWidth();
+	  }
+
+	  protected int getMaxYExtent() {
+	    return viewPort.getView().getHeight() - viewPort.getHeight();
+	  }
+
 }

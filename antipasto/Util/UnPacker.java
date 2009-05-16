@@ -17,6 +17,7 @@ public class UnPacker {
 
         String URI = packedFile.getAbsolutePath();
         File[] files = null;
+        
         try
         {
             JarFile jf = new JarFile(URI);
@@ -38,8 +39,7 @@ public class UnPacker {
             while(entries.hasMoreElements())
             {
                 JarEntry je = (JarEntry) entries.nextElement();
-            	System.out.println(je.getComment());
-                BufferedInputStream stream = new BufferedInputStream(jf.getInputStream(je));
+            	BufferedInputStream stream = new BufferedInputStream(jf.getInputStream(je));
                 WriteFile(f.getPath(), je.getComment(), stream);
                 files[i] = new File(f.getPath() +  File.separator + je.getComment());
                 i++;
