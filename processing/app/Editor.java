@@ -54,6 +54,8 @@ import antipasto.GUI.ImageListView.ImageListPanel;
 import antipasto.Interfaces.*;
 import antipasto.ModuleRules.IMessage;
 import antipasto.ModuleRules.IOkListener;
+import antipasto.Util.GadgetFilter;
+import antipasto.Util.Utils;
 
 import com.apple.mrj.*;
 import com.oroinc.text.regex.*;
@@ -689,9 +691,18 @@ public class Editor extends JFrame
             JFrame dialog;
             dialog = new JFrame("Preferences");
             dialog.setResizable(false);
+				
             File dflt = new File(Sketchbook.getSketchbookPath());
-            File file =
-                Base.selectFolder("Select new gadget location", dflt, dialog);
+            File file = Base.selectFile("Enter the new gadget file name", 
+                                        dflt,
+                                        dialog, 
+                                        new GadgetFilter());
+				
+    				/* Error checking and formatting */
+    				if (file == null) {
+    					return;
+    				}
+
             try {
             	System.out.println("Creating the gadget!");
             	String dir = file.getPath();
@@ -2288,17 +2299,23 @@ public class Editor extends JFrame
 			e1.printStackTrace();
 		}
           try {
-        	  if(gp.getActiveGadget() != null){
-        			  FileDialog fd = new FileDialog(edit._frame,
-                              "Save gadget file as...",
-                              FileDialog.SAVE);
-        			  File packedDirectory = ((IPackedFile)gp.getActiveGadget()).getPackedFile().getParentFile();
-						 fd.setDirectory(packedDirectory.getPath());
-						 fd.setFile(gp.getActiveGadget().getName());
-						 fd.show();
-						
-						 String newParentDir = fd.getDirectory();
-						 String newName = fd.getFile();
+              JFrame dialog;
+              dialog = new JFrame("Preferences");
+              dialog.setResizable(false);
+              
+              File dflt = new File(Sketchbook.getSketchbookPath());
+              File file = Base.selectFile("Save Gadget as...", 
+                        dflt,
+                        dialog, 
+                        new GadgetFilter());
+              
+              /* Error checking and formatting */
+              if (file == null) {
+                return;
+              }
+
+						String newParentDir = file.getParent();
+						String newName = file.getName();
 						
 						if (newName != null){
 							String fileName;
@@ -2325,8 +2342,7 @@ public class Editor extends JFrame
 							//IGadget newGadget = fact.loadGadget(newFile, System.getProperty("java.io.tmpdir") + File.separator + newFile.getName());
 							gp.loadGadget(newFile);
 							gp.saveCurrentGadget();
-						}
-						
+
         		  }else{
 		            if (sketch.saveAs()) {
 		              message("Done Saving.");

@@ -555,6 +555,48 @@ public class Base {
     return folder;
   }
 
+    /**
+   * Implementation for choosing directories that handles both the
+   * Mac OS X hack to allow the native AWT file dialog, or uses
+   * the JFileChooser on other platforms. Mac AWT trick obtained from
+   * <A HREF="http://lists.apple.com/archives/java-dev/2003/Jul/msg00243.html">this post</A>
+   * on the OS X Java dev archive which explains the cryptic note in
+   * Apple's Java 1.4 release docs about the special System property.
+   */
+  static public File selectFile(String prompt, File folder, Frame frame, javax.swing.filechooser.FileFilter filter) {
+    if (Base.isMacOS()) {
+      if (frame == null) frame = new Frame(); //.pack();
+      FileDialog fd = new FileDialog(frame, prompt, FileDialog.LOAD);
+      if (folder != null) {
+        fd.setDirectory(folder.getParent());
+        //fd.setFile(folder.getName());
+      }
+      System.setProperty("apple.awt.fileDialogForDirectories", "true");
+      fd.show();
+      System.setProperty("apple.awt.fileDialogForDirectories", "false");
+      if (fd.getFile() == null) {
+        return null;
+      }
+      return new File(fd.getDirectory(), fd.getFile());
+
+    } else {
+      JFileChooser fc = new JFileChooser();
+      fc.setDialogTitle(prompt);
+      fc.setAcceptAllFileFilterUsed(true);
+      fc.setFileFilter((javax.swing.filechooser.FileFilter) filter);
+     
+
+      if (folder != null) {
+        fc.setSelectedFile(folder);
+      }
+
+      int returned = fc.showOpenDialog(new JDialog());
+      if (returned == JFileChooser.APPROVE_OPTION) {
+        return fc.getSelectedFile();
+      }
+    }
+    return null;
+  }  
 
   /**
    * Implementation for choosing directories that handles both the
