@@ -338,6 +338,36 @@ public class GadgetFactory {
         throw new Exception("Error getting the base element of the project");
     }
 
+    public void RemoveModuleFromGadget(IGadget gadget, IModule module){
+    	IPackedFile gadgetFile = (IPackedFile)gadget;
+    	IPackedFile moduleFile = (IPackedFile)module;
+    	
+    	ITemporary gadgetTemp = (ITemporary)gadget;
+    	ITemporary moduleTemp = (ITemporary)module;
+    	
+    	int toBeRemoved = 0;
+    	
+    	for(int i = 0; i < gadget.getModules().length; i++){
+    		if(gadget.getModules()[i].getName().equals(module.getName())){
+    			toBeRemoved = i;
+    			break;
+       		}
+    	}
+    	
+    	IModule[] newArr = new IModule[gadget.getModules().length - 1];
+    	int added = 0;
+    	
+    	for(int i = 0; i < gadget.getModules().length; i++){
+    		if(!gadget.getModules()[i].getName().equalsIgnoreCase(module.getName())){
+    			newArr[added] = gadget.getModules()[i];
+    		}
+    	}
+    	gadget.setModule(newArr);
+    	
+    	moduleFile.getPackedFile().delete();
+    	new File(moduleTemp.getTempDirectory()).delete();
+    }
+    
     /**
      * Adds a module to the gadget by copying the original module file to the currently expanded
      * gadget directory
@@ -351,7 +381,6 @@ public class GadgetFactory {
             if(module instanceof Module){
                 int hasAlreadyCount = 0;
                 boolean hasMoreThanOne = false;
-                System.out.println("Checking the module names for repeats");
                 for(int i = 0; i < gadget.getModules().length; i++){
                     if(gadget.getModules()[i].getName().equalsIgnoreCase(module.getName())){
                         hasAlreadyCount ++;
@@ -363,7 +392,6 @@ public class GadgetFactory {
                 String moduleName = module.getName();
                 if(hasMoreThanOne){
                     moduleName = module.getName() + "(" + hasAlreadyCount + ")";
-                    System.out.println(moduleName);
                 }
                 
                 //copy the module to the base directory of the gadget

@@ -396,7 +396,6 @@ public class ModuleFactory {
             if(children.item(i).getNodeName().equalsIgnoreCase("cores")){
                 NodeList coreNodes = ((Element)children.item(i)).getElementsByTagName("Core");
                 for(int x = 0; x < coreNodes.getLength(); x++){
-                    System.out.println( coreNodes.getLength() + coreNodes.item(0).getNodeName());
                     Element coreRoot = (Element) coreNodes.item(x);
                     
                     NodeList coreElements = coreRoot.getChildNodes();
