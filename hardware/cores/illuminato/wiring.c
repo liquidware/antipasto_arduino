@@ -13,6 +13,7 @@
  * PREPROCESSOR DIRECTIVES
  *============================================================================*/
 #include "wiring.h"
+#include "pins_illuminato.h"
 
 /* Maximum number of pins, for error checking */
 #define NUM_PINS sizeof(pinTable)/sizeof(PIN_DESC_T) 
@@ -63,19 +64,19 @@ PIN_DESC_T const pinTable[] = {
     /* 27 */ { &PORTC, 4, &PINC, &DDRC },
     /* 28 */ { &PORTC, 5, &PINC, &DDRC },
     /* 29 */ { &PORTC, 6, &PINC, &DDRC },
-    /* 30 */ { &PORTC, 7, &PINC, &DDRC },
-    /* 31 */ { &PORTG, 2, &PING, &DDRG },
-    /* 32 */ { &PORTA, 7, &PINA, &DDRA },
-    /* 33 */ { &PORTA, 6, &PINA, &DDRA },
-    /* 34 */ { &PORTA, 5, &PINA, &DDRA },
-    /* 35 */ { &PORTA, 4, &PINA, &DDRA },
+    /* 30 */ { &PORTA, 4, &PINA, &DDRA },
+    /* 31 */ { &PORTA, 5, &PINA, &DDRA },
+    /* 32 */ { &PORTA, 6, &PINA, &DDRA },
+    /* 33 */ { &PORTA, 7, &PINA, &DDRA },
+    /* 34 */ { &PORTG, 2, &PING, &DDRG },
+    /* 35 */ { &PORTC, 7, &PINC, &DDRC },
 
-    /* 36 */ { &PORTF, 5, &PINF, &DDRF },
-    /* 37 */ { &PORTF, 4, &PINF, &DDRF },
-    /* 38 */ { &PORTF, 3, &PINF, &DDRF },
-    /* 39 */ { &PORTF, 2, &PINF, &DDRF },
-    /* 40 */ { &PORTF, 1, &PINF, &DDRF },
-    /* 41 */ { &PORTF, 0, &PINF, &DDRF },
+    /* 36 */ { &PORTF, 0, &PINF, &DDRF },
+    /* 37 */ { &PORTF, 1, &PINF, &DDRF },
+    /* 38 */ { &PORTF, 2, &PINF, &DDRF },
+    /* 39 */ { &PORTF, 3, &PINF, &DDRF },
+    /* 40 */ { &PORTF, 4, &PINF, &DDRF },
+    /* 41 */ { &PORTF, 5, &PINF, &DDRF },
 
     /* 42 */ { &PORTB, 7, &PINB, &DDRB },
 };
@@ -127,6 +128,22 @@ void pinMode(uint8_t pin, uint8_t mode)
     }
 }
 
+// Forcing this inline keeps the callers from having to push their own stuff
+// on the stack. It is a good performance win and only takes 1 more byte per
+// user than calling. (It will take more bytes on the 168.)
+//
+// But shouldn't this be moved into pinMode? Seems silly to check and do on
+// each digitalread or write.
+//
+static inline void turnOffPWM(uint8_t timer) __attribute__ ((always_inline));
+static inline void turnOffPWM(uint8_t timer)
+{
+	if (timer == TIMER0A) cbi(TCCR0A, COM0A1);
+	if (timer == TIMER1A) cbi(TCCR1A, COM1A1);
+	if (timer == TIMER1B) cbi(TCCR1A, COM1B1);
+	if (timer == TIMER2A) cbi(TCCR2A, COM2A1);
+}
+
 /* ===========================================================================
 *  FUNCTION: digitalWrite
 *
@@ -147,7 +164,10 @@ void pinMode(uint8_t pin, uint8_t mode)
 void digitalWrite(uint8_t pin, uint8_t val)
 {
     PIN_DESC_T *p = &pinTable[pin];
-
+    
+	uint8_t timer = digitalPinToTimer(pin);
+    if (timer != NO_TIMER) turnOffPWM(timer);
+    
     /* Check desired state */
     if (val == HIGH)
     {
@@ -227,6 +247,48 @@ int analogRead(uint8_t pin)
 
 	// combine the two bytes
 	return (high << 8) | low;
+}
+// Right now, PWM output only works on the pins with
+// hardware support.  These are defined in the appropriate
+// pins_*.c file.  For the rest of the pins, we default
+// to digital output.
+void analogWrite(uint8_t pin, int val)
+{
+	// We need to make sure the PWM output is enabled for those pins
+	// that support it, as we turn it off when digitally reading or
+	// writing with them.  Also, make sure the pin is in output mode
+	// for consistenty with Wiring, which doesn't require a pinMode
+	// call for the analog output pins.
+	pinMode(pin, OUTPUT);
+	
+	if (digitalPinToTimer(pin) == TIMER1A) {
+		// connect pwm to pin on timer 1, channel A
+		sbi(TCCR1A, COM1A1);
+		// set pwm duty
+		OCR1A = val;
+	} else if (digitalPinToTimer(pin) == TIMER1B) {
+		// connect pwm to pin on timer 1, channel B
+		sbi(TCCR1A, COM1B1);
+		// set pwm duty
+		OCR1B = val;
+	} else if (digitalPinToTimer(pin) == TIMER0A) {
+		if (val == 0) {
+			digitalWrite(pin, LOW);
+		} else {
+			// connect pwm to pin on timer 0, channel A
+			sbi(TCCR0A, COM0A1);
+			// set pwm duty
+			OCR0A = val;      
+		}
+	} else if (digitalPinToTimer(pin) == TIMER2A) {
+		// connect pwm to pin on timer 2, channel A
+		sbi(TCCR2A, COM2A1);
+		// set pwm duty
+		OCR2A = val;	
+	} else if (val < 128)
+		digitalWrite(pin, LOW);
+	else
+		digitalWrite(pin, HIGH);
 }
 
 /* ===========================================================================
@@ -374,12 +436,20 @@ void init()
 	TCCR0A = (0<<CS02) | (1<<CS01) | (0<<CS00); //timer 0 setup to overflow every 128us
 	TIMSK0 = (1<<TOIE0); //enable timer 0 overflow interrupts
 
+		// set timer 1 prescale factor to 64
+	sbi(TCCR1B, CS11);
+	sbi(TCCR1B, CS10);
+	sbi(TCCR1A, WGM10);
+
+	// put timer 1 in 8-bit phase correct pwm mode
+    TCCR2A =  (1<<CS22) | (1<<WGM20) | (1<<COM2A0) | (1<<COM2A1);
+
     //Init ADC      
     ADCSRA = (1 << ADEN) |                                 // Turn on the ADC converter
              (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);   // Clock = F_CPU / 128
 
     sei();          //enable global interupts
-    //delay(2500);    //wait for the DTR to stop messing with us
+    delay(2500);    //wait for the DTR to stop messing with us
 }
 
 void bling(uint8_t percent)

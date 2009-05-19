@@ -51,7 +51,15 @@ extern "C"{
 #define OUTPUT  1
 #define HIGH    1
 #define LOW     0
+
 #define bit(b) (1 << (b))
+
+#ifndef cbi
+#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+#endif
+#ifndef sbi
+#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+#endif
 
 typedef unsigned int word;
 typedef uint8_t boolean;
@@ -77,6 +85,7 @@ void pinMode(uint8_t pin, uint8_t mode);
 void digitalWrite(uint8_t pin, uint8_t val);
 uint8_t digitalRead(uint8_t pin);
 int analogRead(uint8_t pin);
+void analogWrite(uint8_t, int);
 unsigned long millis();
 void delay(unsigned long ms);
 void delayMicroseconds(unsigned int us);
