@@ -68,6 +68,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     private JLabel gadgetDescLabel;
 
     private Box box;
+    private JPanel libDescPanel;
     
     private int cachedHeight = 425;
     private int cachedWidth = 300;
@@ -130,7 +131,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		
     	/* The library description */
-    	JPanel libDescPanel = new JPanel();
+    	libDescPanel = new JPanel();
         JLabel libDescLabel = new JLabel(" Library: OpenHardware");
         libDescLabel.setForeground(Color.white);
         
@@ -169,7 +170,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         scrollPanel.setPreferredSize(new Dimension(300, 300));
         scrollPanel.setSize(new Dimension(300, 300));
         
-        libPanel = new GadgetListHorizontal(new File(this.libraryDirectory), list);
+        libPanel = new GadgetListHorizontal(new File(this.libraryDirectory), list, this);
         libPanel.setSize(300, 70);
         libPanel.setPreferredSize(new Dimension(300, 70));
         
@@ -182,6 +183,10 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         box.add(messagePanel);
 
         this.getContentPane().add(box, BorderLayout.NORTH);
+    }
+    
+    public void setMessage(String msg){
+    	this.gadgetDescLabel.setText(msg);
     }
     
     public void loadGadget(File gadget){

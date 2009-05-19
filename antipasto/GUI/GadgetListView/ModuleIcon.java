@@ -6,11 +6,13 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 
 import javax.swing.ImageIcon;
@@ -27,14 +29,32 @@ public class ModuleIcon extends JLabel {
 	private GadgetList list;
 	private boolean hovering = false;
 	private Ellipse2D toggledShape;
+	private boolean setGreen = false;
+	private GadgetPanel panel;
 	
-	public ModuleIcon(IModule module, GadgetList list){
+	public ModuleIcon(IModule module, GadgetList list, GadgetPanel panel){
 		super(new ImageIcon(module.getImage().getScaledInstance(60, 60, Image.SCALE_AREA_AVERAGING)));
 		internalModule = module;
 		this.list = list;
+		this.panel = panel;
 		
 		toggledShape = new Ellipse2D.Double(29, 29, 25, 25);
 		
+		this.addMouseMotionListener(new MouseMotionListener(){
+			public void mouseDragged(MouseEvent arg0) {
+			}
+
+			public void mouseMoved(MouseEvent arg0) {
+				if(hovering){
+					if(toggledShape.contains(arg0.getPoint())){
+						setGreen = true;
+					}else{
+						setGreen = false;
+					}
+					repaint();
+				}
+			}
+		});
 		this.addMouseListener(new MouseListener(){
 			public void mouseClicked(MouseEvent arg0) {
 				if(hovering == true){
@@ -65,13 +85,21 @@ public class ModuleIcon extends JLabel {
 	public void paint(Graphics g) {
 		super.paint(g);
         Graphics2D g2d = (Graphics2D)g;
-        
         if(hovering == true){
         	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             Font font = new Font("Serif", Font.PLAIN, 36);
             g2d.setFont(font);
             g2d.setColor(Color.GRAY);
+            if(setGreen){
+            	if(this.panel.gadgetIsLoaded){
+            		g2d.setColor(Color.GREEN);
+            		this.panel.setMessage("Add " + this.internalModule.getName() + " to the gadget");
+            	}
+            }else{
+            		g2d.setColor(Color.GRAY);
+            		this.panel.setMessage(" ");
+            }
             g2d.fill(this.toggledShape);
         	g2d.setColor(Color.WHITE);
         	g2d.drawString("+", 31, 51);

@@ -33,9 +33,12 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 	ArrayList modules = new ArrayList();
 	JScrollPane scrollPane = new JScrollPane();
 	GadgetList gadgetList;
+	GadgetPanel panel;
 	JViewport viewPort;
-	public GadgetListHorizontal(File gadgetLibDirectory, GadgetList gl){
+	public GadgetListHorizontal(File gadgetLibDirectory, GadgetList gl, GadgetPanel gadgetPanel){
 		super();
+		
+		panel = gadgetPanel;
 		
 		this.setBackground(Color.white);
 		
@@ -144,7 +147,7 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 					File curFile = files[i];
 					IModule mod = fact.loadModule(curFile, libDir.getPath(), false);
 					
-					ModuleIcon label = new ModuleIcon(mod, this.gadgetList);
+					ModuleIcon label = new ModuleIcon(mod, this.gadgetList, this.panel);
 					label.setSize(60,60);
 					label.setPreferredSize(new Dimension(60,60));
 					label.setVisible(true);
