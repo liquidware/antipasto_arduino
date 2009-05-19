@@ -563,7 +563,7 @@ public class Base {
    * on the OS X Java dev archive which explains the cryptic note in
    * Apple's Java 1.4 release docs about the special System property.
    */
-  static public File selectFile(String prompt, File folder, Frame frame, javax.swing.filechooser.FileFilter filter) {
+  static public File selectFile(String prompt, File folder, Frame frame, javax.swing.filechooser.FileFilter filter[]) {
     if (Base.isMacOS()) {
       if (frame == null) frame = new Frame(); //.pack();
       FileDialog fd = new FileDialog(frame, prompt, FileDialog.LOAD);
@@ -583,8 +583,9 @@ public class Base {
       JFileChooser fc = new JFileChooser();
       fc.setDialogTitle(prompt);
       fc.setAcceptAllFileFilterUsed(true);
-      fc.setFileFilter((javax.swing.filechooser.FileFilter) filter);
-     
+      for (int x=0; x < filter.length; x++) {
+    	  fc.setFileFilter((javax.swing.filechooser.FileFilter) filter[x]);
+      }
 
       if (folder != null) {
         fc.setSelectedFile(folder);

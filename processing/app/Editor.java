@@ -54,7 +54,8 @@ import antipasto.GUI.ImageListView.ImageListPanel;
 import antipasto.Interfaces.*;
 import antipasto.ModuleRules.IMessage;
 import antipasto.ModuleRules.IOkListener;
-import antipasto.Util.GadgetFilter;
+import antipasto.Util.GadgetFileFilter;
+import antipasto.Util.PDEFileFilter;
 import antipasto.Util.Utils;
 
 import com.apple.mrj.*;
@@ -135,6 +136,7 @@ public class Editor extends JFrame
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
   JMenuItem newGadgetMenuItem;
+  JMenuItem openMenuItem;
   public JPanel centerPanel;
   
   JMenuItem burnBootloader8Item = null;
@@ -683,7 +685,7 @@ public class Editor extends JFrame
     
     final Editor editor = this;
     
-    newGadgetMenuItem = newJMenuItem("New Gadget", 'C', true);
+    newGadgetMenuItem = newJMenuItem("New Gadget...", 'C', true);
     
     newGadgetMenuItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -691,12 +693,15 @@ public class Editor extends JFrame
             JFrame dialog;
             dialog = new JFrame("Preferences");
             dialog.setResizable(false);
-				
+            
+            javax.swing.filechooser.FileFilter filter[] = new javax.swing.filechooser.FileFilter[1];
+            filter[0] = new GadgetFileFilter();
+            
             File dflt = new File(Sketchbook.getSketchbookPath());
-            File file = Base.selectFile("Enter the new gadget file name", 
+            File file = Base.selectFile("Enter the new Gadget file name", 
                                         dflt,
                                         dialog, 
-                                        new GadgetFilter());
+                                        filter);
 				
     				/* Error checking and formatting */
     				if (file == null) {
@@ -704,7 +709,7 @@ public class Editor extends JFrame
     				}
 
             try {
-            	System.out.println("Creating the gadget!");
+            	System.out.println("Creating the Gadget!");
             	String dir = file.getPath();
             	if(file.getParentFile().isDirectory()){
             		dir = file.getParent();
@@ -730,6 +735,39 @@ public class Editor extends JFrame
           handleNew(false);
         }
       });
+    
+    openMenuItem = newJMenuItem("Open...", 'C', true);
+    openMenuItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            JFrame dialog;
+            dialog = new JFrame("Preferences");
+            dialog.setResizable(false);
+			
+            
+            javax.swing.filechooser.FileFilter filter[] = new javax.swing.filechooser.FileFilter[2];
+            filter[0] = new GadgetFileFilter();
+            filter[1] = new PDEFileFilter();
+
+            File dflt = new File(Sketchbook.getSketchbookPath());
+            File file = Base.selectFile("Open File", 
+                                        dflt,
+                                        dialog, 
+                                        filter);
+				
+			/* Error checking and formatting */
+			if (file == null) {
+				return;
+			}
+    				
+			/* Open stuff here! */
+			
+			
+        }
+        
+    });
+    menu.add(openMenuItem);
+    
+    
     menu.add(item);
     menu.add(sketchbook.getOpenMenu());
 
@@ -1667,7 +1705,7 @@ public class Editor extends JFrame
 	    	                    }
 	                }
 	            }else{
-	                System.out.println("error getting the gadget panel");
+	                System.out.println("error getting the Gadget panel");
 	            }
 
 	         /* if (!sketch.handleRun(new Target(
@@ -2263,7 +2301,7 @@ public class Editor extends JFrame
 	      
     	if(this.gadgetPanel.getActiveGadget()!= null){
     	  this.gadgetPanel.saveCurrentGadget();
-    	  System.out.println("saved gadget");
+    	  System.out.println("Saved Gadget");
     	}
       // rebuild sketch menu in case a save-as was forced
       // Disabling this for 0125, instead rebuild the menu inside
@@ -2303,11 +2341,14 @@ public class Editor extends JFrame
               dialog = new JFrame("Preferences");
               dialog.setResizable(false);
               
+              javax.swing.filechooser.FileFilter filter[] = new javax.swing.filechooser.FileFilter[1];
+              filter[0] = new GadgetFileFilter();
+              
               File dflt = new File(Sketchbook.getSketchbookPath());
               File file = Base.selectFile("Save Gadget as...", 
                         dflt,
                         dialog, 
-                        new GadgetFilter());
+                        filter);
               
               /* Error checking and formatting */
               if (file == null) {

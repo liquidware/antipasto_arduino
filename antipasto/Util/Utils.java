@@ -7,7 +7,8 @@ import javax.swing.ImageIcon;
 public class Utils {
     public final static String gdt = "gdt";
     public final static String module = "module";
-
+    public final static String pde = "pde";
+    
     /*
      * Get the extension of a file.
      */

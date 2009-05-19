@@ -6,7 +6,7 @@ import javax.swing.filechooser.*;
 import antipasto.Util.*;
 
 /* Gadget File Filter used for file choosing. */
-public class GadgetFilter extends FileFilter {
+public class GadgetFileFilter extends FileFilter {
 
     //Accept all gadget files
     public boolean accept(File f) {
@@ -28,7 +28,7 @@ public class GadgetFilter extends FileFilter {
 
     //The description of this filter
     public String getDescription() {
-        return "Gadget File (*.gdt)";
+        return "Gadget Files (*.gdt)";
     }
 }
 
