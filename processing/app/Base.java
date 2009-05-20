@@ -571,7 +571,7 @@ public class Base {
         fd.setDirectory(folder.getParent());
         //fd.setFile(folder.getName());
       }
-      System.setProperty("apple.awt.fileDialogForDirectories", "true");
+      System.setProperty("apple.awt.fileDialogForDirectories", "false");
       fd.show();
       System.setProperty("apple.awt.fileDialogForDirectories", "false");
       if (fd.getFile() == null) {

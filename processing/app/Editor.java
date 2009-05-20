@@ -692,8 +692,7 @@ public class Editor extends JFrame
     
     newGadgetMenuItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            GadgetFactory fact = new GadgetFactory();
-            JFrame dialog;
+                        JFrame dialog;
             dialog = new JFrame("Preferences");
             dialog.setResizable(false);
             
@@ -701,42 +700,64 @@ public class Editor extends JFrame
             filter[0] = new GadgetFileFilter();
             
             File dflt = new File(Sketchbook.getSketchbookPath());
-            File file = Base.selectFile("Enter the new Gadget file name", 
+			
+            /*File file = Base.selectFile("Enter the new Gadget file name", 
                                         dflt,
                                         dialog, 
                                         filter);
 				
     				/* Error checking and formatting */
-    				if (file == null) {
+    		/*		if (file == null) {
     					return;
     				}
 
-            try {
-            	System.out.println("Creating the Gadget!");
-            	String dir = file.getPath();
-            	if(file.getParentFile().isDirectory()){
-            		dir = file.getParent();
-            	}
-            	File newFile;
-            	if(!file.exists()){
-            		newFile = fact.CreateGadgetFile(file.getName(), dir, new IModule[]{});
-            	}else{
-            		newFile = file;
-            	}
+			*/
+			final String baseDir = Base.getDefaultSketchbookFolder().getPath();
+			IOkListener ourListener = new IOkListener(){
+	    			private String msg;
+	    			public void OkButton() {
+					try {
+						GadgetFactory fact = new GadgetFactory();
+					    File file = new File(baseDir + File.separator + editor.status.editField.getText());
+						System.out.println("Creating the Gadget!");
+						String dir = file.getPath();
+						if(file.getParentFile().isDirectory()){
+							dir = file.getParent();
+						}
             	
-            	//prompt the user to save before we go ahead we close this on them
-            	editor.handleSave(false);
-				editor.gadgetPanel.loadGadget(newFile);
-				editor.gadgetPanel.setVisible(true);
-				editor.SetShownPanel(BLANK);
-				//editor.textarea.setOpaque(false);
-				editor.textarea.repaint();
-				editor.header.tabHeader.setVisible(false);
-				editor.console.message("Start adding some modules from the left", false, false);
-			} catch (IOException e1) {
+						File newFile;
+						if(!file.exists()){
+							newFile = fact.CreateGadgetFile(file.getName(), dir, new IModule[]{});
+						}else{
+							newFile = file;
+						}
+            	
+						//prompt the user to save before we go ahead we close this on them
+						editor.handleSave(false);
+						editor.gadgetPanel.loadGadget(newFile);
+						editor.gadgetPanel.setVisible(true);
+						editor.SetShownPanel(BLANK);
+						//editor.textarea.setOpaque(false);
+						editor.textarea.repaint();
+						editor.header.tabHeader.setVisible(false);
+						editor.console.message("Just created a new Gadget File ! Located : " + file.getPath(), false, false);
+						editor.console.message("\n Start adding some modules from the left", false, false);
+						} catch (IOException e1) {
 				
-			}
-          }
+					}
+	    			}
+	    			public String getMessage() {
+	    				return msg;
+	    			}
+	
+	    			public void setMessage(String message) {
+	    				msg = message;
+	    			}	    	    	
+	    	    };
+
+				editor.status.CreateOkEditDialog(ourListener, "Create a new gadget: ");
+		    
+                      }
         });
     menu.add(newGadgetMenuItem);
     
@@ -747,7 +768,9 @@ public class Editor extends JFrame
         }
       });
     
-    openMenuItem = newJMenuItem("Open...", 'C', true);
+    menu.add(item);
+	
+	 openMenuItem = newJMenuItem("Open...", 'C', true);
     openMenuItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             JFrame dialog;
@@ -776,9 +799,8 @@ public class Editor extends JFrame
         
     });
     menu.add(openMenuItem);
-    
-    
-    menu.add(item);
+
+	
     menu.add(sketchbook.getOpenMenu());
 
     saveMenuItem = newJMenuItem("Save", 'S');

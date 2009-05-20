@@ -623,6 +623,37 @@ public class EditorStatus extends JPanel implements ActionListener {
 	   	   
    }
    
+    public void CreateOkEditDialog(final IOkListener listener, String message){
+	   if(listener != null){
+		   final EditorStatus es = this;
+		   this.message = message;
+		   this.okButton.setVisible(true);
+		   this.okButton.removeActionListener(this);
+		   this.edit(message, "default");
+		   this.okButton.addMouseListener(new MouseListener(){
+			public void mouseClicked(MouseEvent arg0) {
+				System.out.println("launchedOkButtonEvent");
+				listener.OkButton();
+				okButton.setVisible(false);
+				okButton.addActionListener(es);
+				cancelButton.setVisible(false);
+				editField.setVisible(false);
+				editor.header.paintComponents(editor.getGraphics());
+			}
+			public void mouseEntered(MouseEvent arg0) {
+			}
+			public void mouseExited(MouseEvent arg0) {
+			}
+			public void mousePressed(MouseEvent arg0) {
+			}
+			public void mouseReleased(MouseEvent arg0) {	
+			}
+		   });
+	   }
+	   	   
+   }
+
+   
    private void CreateSerialDialog(final ISerialListener listener, String message){
 	   if(listener != null){		   
 		   this.message = message;
