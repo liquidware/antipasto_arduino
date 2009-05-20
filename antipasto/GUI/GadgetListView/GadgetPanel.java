@@ -72,6 +72,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     private int cachedHeight = 425;
     private int cachedWidth = 300;
+    
+    private Editor editor;
 
     public boolean gadgetIsLoaded = false;
     
@@ -79,6 +81,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
     	super(frame, false);
+    	editor = (Editor) frame;
     	parentFrame = frame;
         this.addMouseListener(new ModuleMouseAdapter());
         this.setUndecorated(true);
@@ -115,8 +118,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         box.add(scrollPanel);
         box.add(messagePanel);
         scrollPanel.setVisible(true);
-        
-        //Save this for later!		
     }
     
     public void Unload(){
@@ -339,6 +340,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     public void onActiveSketchChanged(SketchChangingObject obj) {
         this.saveCurrentGadget();
         this.loadSketchFile(obj.newFile);
+        
     }
 
     public String dropExtension(String fileName){

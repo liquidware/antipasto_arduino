@@ -128,6 +128,7 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
     	
     	if(this.doHover == true){
     		this.drawHover(g2d);
+    		
     	}
     }
     

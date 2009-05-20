@@ -377,8 +377,8 @@ public class GadgetFactory {
      * @throws Exception
      */
     public IGadget AddModuleToGadget(IGadget gadget, IModule module) throws Exception {
-        if(gadget instanceof IGadget){
-            if(module instanceof Module){
+        if(gadget != null && gadget instanceof IGadget){
+            if(module != null && module instanceof Module){
                 int hasAlreadyCount = 0;
                 boolean hasMoreThanOne = false;
                 for(int i = 0; i < gadget.getModules().length; i++){
@@ -391,7 +391,7 @@ public class GadgetFactory {
                 //Count the number of modules and increment the name
                 String moduleName = module.getName();
                 if(hasMoreThanOne){
-                    moduleName = module.getName() + "(" + hasAlreadyCount + ")";
+                    moduleName = module.getName() + "_" + hasAlreadyCount;
                 }
                 
                 //copy the module to the base directory of the gadget

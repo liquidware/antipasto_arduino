@@ -87,6 +87,7 @@ public class Editor extends JFrame
 
   static final String CODEEDITOR = "CODEPANEL";
   static final String FILELIST = "FILELIST";
+  static final String BLANK = "BLANK";
   static final String TEST = "TEST";
   
   static final int HANDLE_NEW  = 1;
@@ -337,9 +338,11 @@ public class Editor extends JFrame
      
     centerPanel.setLayout(new CardLayout());
     
+    
     centerPanel.setVisible(true);
     centerPanel.add(textarea, CODEEDITOR);
     centerPanel.add(imageListPanel, FILELIST);
+    centerPanel.add(new BlankPanel(centerPanel), BLANK);
 	centerPanel.add(lbl, TEST);  
     
     CardLayout cl = (CardLayout) centerPanel.getLayout();
@@ -714,11 +717,19 @@ public class Editor extends JFrame
             	if(file.getParentFile().isDirectory()){
             		dir = file.getParent();
             	}
-				File newFile = fact.CreateGadgetFile(file.getName(), dir, new IModule[]{});
+            	File newFile;
+            	if(!file.exists()){
+            		newFile = fact.CreateGadgetFile(file.getName(), dir, new IModule[]{});
+            	}else{
+            		newFile = file;
+            	}
+            	
+            	//prompt the user to save before we go ahead we close this on them
+            	editor.handleSave(false);
 				editor.gadgetPanel.loadGadget(newFile);
-				editor.textarea.setEnabled(false);
+				editor.gadgetPanel.setVisible(true);
+				editor.SetShownPanel(BLANK);
 				//editor.textarea.setOpaque(false);
-				editor.textarea.setBackground(Preferences.getColor("editor.bgcolor"));
 				editor.textarea.repaint();
 				editor.header.tabHeader.setVisible(false);
 				editor.console.message("Start adding some modules from the left", false, false);
@@ -760,8 +771,7 @@ public class Editor extends JFrame
 			}
     				
 			/* Open stuff here! */
-			
-			
+			editor.handleOpen(file.getPath());
         }
         
     });
@@ -1556,6 +1566,10 @@ public class Editor extends JFrame
     redoAction.updateRedoState();
   }
 
+  public void SetShownPanel(String id){
+	  CardLayout cl = (CardLayout)this.centerPanel.getLayout();
+	  cl.show(this.centerPanel, id);
+  }
 
   public void beginCompoundEdit() {
     compoundEdit = new CompoundEdit();

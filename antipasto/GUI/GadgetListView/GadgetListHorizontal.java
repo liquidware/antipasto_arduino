@@ -169,11 +169,13 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 	}
 
 	public void onSelected(ModuleIcon selectedItem) {
-		if(gadgetList.gadget != null){
+		if(gadgetList != null && gadgetList.gadget != null){
 			GadgetFactory fact = new GadgetFactory();
 			try {
-				fact.AddModuleToGadget(gadgetList.gadget, selectedItem.getModule());
-				gadgetList.saveCurrentGadget();
+				if(gadgetList.gadget != null){
+					fact.AddModuleToGadget(gadgetList.gadget, selectedItem.getModule());
+					gadgetList.saveCurrentGadget();
+				}
 				gadgetList.loadGadget(gadgetList.gadget);
 			} catch (Exception e) {
 				e.printStackTrace();
