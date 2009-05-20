@@ -38,6 +38,11 @@ HardwareSerial::HardwareSerial(uint8_t uart)
 
 // Public Methods //////////////////////////////////////////////////////////////
 
+int HardwareSerial::available() {
+
+	return serialAvailable();
+}
+
 void HardwareSerial::begin(long speed)
 {
   serialBegin(speed);
@@ -50,7 +55,7 @@ int HardwareSerial::read(void)
 
 void HardwareSerial::flush()
 {
- ;
+ serialFlush();
 }
 
 void HardwareSerial::print(char c)

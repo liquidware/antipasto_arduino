@@ -148,6 +148,8 @@ void	text(int data,int xLoc, int yLoc);
 void	text(unsigned int data, int xLoc, int yLoc);
 void	text(long data, int xLoc, int yLoc);
 void	text(double data, int xLoc, int yLoc);
+void	text(char *textString, int xLoc, int yLoc, int height);
+void	text(char *textString, int xLoc, int yLoc, int width, int height);
 void	triangle( int x1, int y1, int x2, int y2, int x3, int y3);
 
 

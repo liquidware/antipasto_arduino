@@ -22,7 +22,6 @@
 #include	"font.h"
 #include	"binary.h"
 
-
 #ifdef	_ENABLE_XLARGE_NUMBERS_
 
 //*******************************************************************************

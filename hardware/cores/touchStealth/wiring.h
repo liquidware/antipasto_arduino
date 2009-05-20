@@ -37,7 +37,7 @@
 #include	"graphics.h"
 #include	"bmp.h"
 #include    "FlashFileSystem.h"
-
+#include    "HersheyFonts.h"
 
 #ifdef _TOUCH_SLIDE_
 	#include	"oled_slide.h"
@@ -63,6 +63,12 @@ extern "C"{
 
 #define INPUT 0x0
 #define OUTPUT 0x1
+
+#define PI 3.14159265
+#define HALF_PI 1.57079
+#define TWO_PI 6.283185
+#define DEG_TO_RAD 0.01745329
+#define RAD_TO_DEG 57.2957786
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )

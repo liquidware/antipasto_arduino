@@ -198,6 +198,7 @@ enum	{	kHerheyFont_Default	=	0,
 } // extern "C"
 #endif
 
+    void	HersheyDrawCString(char fontNumber, short xloc, short yloc, char *theCstr, char fontSize, short fontAngle, char penSize);
 
 #endif
 #endif

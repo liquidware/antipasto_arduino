@@ -881,6 +881,18 @@ void	text(double data, int xLoc, int yLoc)
 	dtostrf(data,4,3,out);
 	text(out, xLoc, yLoc);
 }
+
+//*******************************************************************************
+void	text(char *textString, int xLoc, int yLoc, int height)
+{
+    HersheyDrawCString(0, xLoc, yLoc, textString, height, 0, 1); 
+}
+
+//*******************************************************************************
+void	text(char *textString, int xLoc, int yLoc, int width, int height)
+{
+    HersheyDrawCString(0, xLoc, yLoc, textString, height, 0, 1); 
+}
  
 //*******************************************************************************
 void	triangle( int x1, int y1, int x2, int y2, int x3, int y3) 
