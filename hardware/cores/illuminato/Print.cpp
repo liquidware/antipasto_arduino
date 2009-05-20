@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <math.h>
 #include "wiring.h"
 
 #include "Print.h"
@@ -35,7 +36,7 @@ void Print::print(uint8_t b)
 
 void Print::print(char c)
 {
-  print((uint8_t) c);
+  print((byte) c);
 }
 
 void Print::print(const char c[])
@@ -76,6 +77,11 @@ void Print::print(long n, int base)
     print(n);
   else
     printNumber(n, base);
+}
+
+void Print::print(double n)
+{
+  printFloat(n, 2);
 }
 
 void Print::println(void)
@@ -132,6 +138,12 @@ void Print::println(long n, int base)
   println();
 }
 
+void Print::println(double n)
+{
+  print(n);
+  println();
+}
+
 // Private Methods /////////////////////////////////////////////////////////////
 
 void Print::printNumber(unsigned long n, uint8_t base)
@@ -153,4 +165,39 @@ void Print::printNumber(unsigned long n, uint8_t base)
     print((char) (buf[i - 1] < 10 ?
       '0' + buf[i - 1] :
       'A' + buf[i - 1] - 10));
+}
+
+void Print::printFloat(double number, uint8_t digits) 
+{ 
+  // Handle negative numbers
+  if (number < 0.0)
+  {
+     print('-');
+     number = -number;
+  }
+
+  // Round correctly so that print(1.999, 2) prints as "2.00"
+  double rounding = 0.5;
+  for (uint8_t i=0; i<digits; ++i)
+    rounding /= 10.0;
+  
+  number += rounding;
+
+  // Extract the integer part of the number and print it
+  unsigned long int_part = (unsigned long)number;
+  double remainder = number - (double)int_part;
+  print(int_part);
+
+  // Print the decimal point, but only if there are digits beyond
+  if (digits > 0)
+    print("."); 
+
+  // Extract digits from the remainder one at a time
+  while (digits-- > 0)
+  {
+    remainder *= 10.0;
+    int toPrint = int(remainder);
+    print(toPrint);
+    remainder -= toPrint; 
+  } 
 }

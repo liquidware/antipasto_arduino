@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <math.h>
+#include "binary.h"
 
 #include "wiring_serial.h"
 
@@ -16,7 +17,34 @@
 extern "C"{
 #endif
 
-#include "binary.h"
+#define HIGH 0x1
+#define LOW  0x0
+
+#define INPUT 0x0
+#define OUTPUT 0x1
+
+#define true 0x1
+#define false 0x0
+
+#define PI 3.14159265
+#define HALF_PI 1.57079
+#define TWO_PI 6.283185
+#define DEG_TO_RAD 0.01745329
+#define RAD_TO_DEG 57.2957786
+
+#define SERIAL  0x0
+#define DISPLAY 0x1
+
+#define LSBFIRST 0
+#define MSBFIRST 1
+
+#define CHANGE 1
+#define FALLING 2
+#define RISING 3
+
+#define INTERNAL 3
+#define DEFAULT 1
+#define EXTERNAL 0
 
 // undefine stdlib's abs if encountered
 #ifdef abs
@@ -32,6 +60,9 @@ extern "C"{
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
+#define interrupts() sei()
+#define noInterrupts() cli()
+
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
 #define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
@@ -40,6 +71,9 @@ extern "C"{
 #define CLRBIT(ADDRESS,BIT) (ADDRESS &= ~(1<<BIT)) //!< Clear a bit within a byte
 #define FLIPBIT(ADDRESS,BIT) (ADDRESS ^= (1<<BIT)) //!< Flip a bit within a byte
 #define CHECKBIT(ADDRESS,BIT) (ADDRESS & (1<<BIT)) //!< Check a bit within a byte
+
+#define lowByte(w) ((w) & 0xff)
+#define highByte(w) ((w) >> 8)
 
 #define TRUE	1	//!< A Global true
 #define FALSE	0	//!< A global false
@@ -53,6 +87,10 @@ extern "C"{
 #define LOW     0
 
 #define bit(b) (1 << (b))
+#define bitRead(value, bit) (((value) >> (bit)) & 0x01)
+#define bitSet(value, bit) ((value) |= (1UL << (bit)))
+#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
+#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))

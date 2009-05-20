@@ -1,7 +1,5 @@
 int main(void)
 {
-
-
 	init();
 
 	setup();
@@ -11,3 +9,4 @@ int main(void)
         
 	return 0;
 }
+
