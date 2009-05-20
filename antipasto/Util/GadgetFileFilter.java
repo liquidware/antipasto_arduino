@@ -11,12 +11,12 @@ public class GadgetFileFilter extends FileFilter {
     //Accept all gadget files
     public boolean accept(File f) {
         if (f.isDirectory()) {
-            return false;
+            return true;
         }
 
         String extension = Utils.getExtension(f);
         if (extension != null) {
-            if (extension.equals(Utils.gdt)) {
+            if (extension.equals(Utils.gdt) || f.isDirectory()) {
                     return true;
             } else {
                 return false;

@@ -11,7 +11,7 @@ public class PDEFileFilter extends FileFilter {
     //Accept all gadget files
     public boolean accept(File f) {
         if (f.isDirectory()) {
-            return false;
+            return true;
         }
 
         String extension = Utils.getExtension(f);
@@ -21,6 +21,8 @@ public class PDEFileFilter extends FileFilter {
             } else {
                 return false;
             }
+        } else if (f.isDirectory()) {
+        	return true;
         }
 
         return false;
