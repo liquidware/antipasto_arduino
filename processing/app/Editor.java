@@ -615,7 +615,7 @@ public class Editor extends JFrame
 
     textarea.setEditable(!external);
     saveMenuItem.setEnabled(!external);
-    saveAsMenuItem.setEnabled(!external);
+    //saveAsMenuItem.setEnabled(!external);
     //beautifyMenuItem.setEnabled(!external);
 
     TextAreaPainter painter = textarea.getPainter();
@@ -718,7 +718,7 @@ public class Editor extends JFrame
 	    			public void OkButton() {
 					try {
 						GadgetFactory fact = new GadgetFactory();
-					    File file = new File(baseDir + File.separator + editor.status.editField.getText());
+					    File file = new File(baseDir + File.separator + editor.status.editField.getText() + ".gdt");
 						System.out.println("Creating the Gadget!");
 						String dir = file.getPath();
 						if(file.getParentFile().isDirectory()){
@@ -728,22 +728,23 @@ public class Editor extends JFrame
 						File newFile;
 						if(!file.exists()){
 							newFile = fact.CreateGadgetFile(file.getName(), dir, new IModule[]{});
-						}else{
-							newFile = file;
-						}
+						
             	
 						//prompt the user to save before we go ahead we close this on them
-						editor.handleSave(false);
-						editor.gadgetPanel.loadGadget(newFile);
-						editor.gadgetPanel.setVisible(true);
-						editor.SetShownPanel(BLANK);
-						//editor.textarea.setOpaque(false);
-						editor.textarea.repaint();
-						editor.header.tabHeader.setVisible(false);
-						editor.console.message("Just created a new Gadget File ! Located : " + file.getPath(), false, false);
-						editor.console.message("\n Start adding some modules from the left", false, false);
+							editor.handleSave(false);
+							editor.gadgetPanel.loadGadget(newFile);
+							editor.gadgetPanel.setVisible(true);
+							editor.SetShownPanel(BLANK);
+							//editor.textarea.setOpaque(false);
+							editor.textarea.repaint();
+							editor.header.tabHeader.setVisible(false);
+							editor.console.message("Just created a new Gadget File ! Located : " + file.getPath(), false, false);
+							editor.console.message("\n Start adding some modules from the left", false, false);
+						}else{
+							editor.console.message("The name that you specified already exist...try again :)", true, false);
+						}
 						} catch (IOException e1) {
-				
+							editor.console.message("The name that you specified already exist...try again :p", true, false);
 					}
 	    			}
 	    			public String getMessage() {
@@ -811,7 +812,7 @@ public class Editor extends JFrame
       });
     menu.add(saveMenuItem);
 
-    saveAsMenuItem = newJMenuItem("Save As...", 'S', true);
+    /*saveAsMenuItem = newJMenuItem("Save As...", 'S', true);
     saveAsMenuItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleSaveAs();
@@ -819,6 +820,7 @@ public class Editor extends JFrame
       });
     menu.add(saveAsMenuItem);
 
+	*/
     item = newJMenuItem("Upload to I/O Board", 'U');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {

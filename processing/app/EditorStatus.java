@@ -522,7 +522,11 @@ public class EditorStatus extends JPanel implements ActionListener {
       // answering to "save as..." question
       String answer = editField.getText();
       //editor.handleSaveAs2(answer);
-      editor.sketch.nameCode(answer);
+      if(!this.ignoreFileName){
+    	  editor.sketch.nameCode(answer);
+      }else{
+    	  this.ignoreFileName = true;
+      }
       unedit();
     } else if (e.getSource() == sendButton) {
       editor.serialPort.write(serialField.getText());
@@ -623,6 +627,8 @@ public class EditorStatus extends JPanel implements ActionListener {
 	   	   
    }
    
+   boolean ignoreFileName = true;
+   
     public void CreateOkEditDialog(final IOkListener listener, String message){
 	   if(listener != null){
 		   final EditorStatus es = this;
@@ -630,6 +636,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 		   this.okButton.setVisible(true);
 		   this.okButton.removeActionListener(this);
 		   this.edit(message, "default");
+		   ignoreFileName = false;
 		   this.okButton.addMouseListener(new MouseListener(){
 			public void mouseClicked(MouseEvent arg0) {
 				System.out.println("launchedOkButtonEvent");
