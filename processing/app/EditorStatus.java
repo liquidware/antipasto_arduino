@@ -637,9 +637,26 @@ public class EditorStatus extends JPanel implements ActionListener {
 		   this.okButton.removeActionListener(this);
 		   this.edit(message, "default");
 		   ignoreFileName = false;
+		   this.editField.addKeyListener(new KeyListener(){
+			 public void keyPressed(KeyEvent arg0) {
+				if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
+					listener.OkButton();
+					okButton.setVisible(false);
+					okButton.addActionListener(es);
+					cancelButton.setVisible(false);
+					editField.setVisible(false);
+					editor.header.paintComponents(editor.getGraphics());
+					editField.removeKeyListener(this);
+				}
+			}
+
+			public void keyReleased(KeyEvent arg0) {
+			}
+
+			public void keyTyped(KeyEvent arg0) {
+			}});
 		   this.okButton.addMouseListener(new MouseListener(){
 			public void mouseClicked(MouseEvent arg0) {
-				System.out.println("launchedOkButtonEvent");
 				listener.OkButton();
 				okButton.setVisible(false);
 				okButton.addActionListener(es);
