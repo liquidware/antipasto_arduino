@@ -381,8 +381,9 @@ public class GadgetFactory {
             if(module != null && module instanceof Module){
                 int hasAlreadyCount = 0;
                 boolean hasMoreThanOne = false;
+                
                 for(int i = 0; i < gadget.getModules().length; i++){
-                    if(gadget.getModules()[i].getName().equalsIgnoreCase(module.getName())){
+                    if(gadget.getModules()[i].getName().startsWith((module.getName()))){
                         hasAlreadyCount ++;
                         hasMoreThanOne = true;
                     }
