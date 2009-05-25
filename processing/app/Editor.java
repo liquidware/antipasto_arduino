@@ -54,9 +54,7 @@ import antipasto.GUI.ImageListView.ImageListPanel;
 import antipasto.Interfaces.*;
 import antipasto.ModuleRules.IMessage;
 import antipasto.ModuleRules.IOkListener;
-import antipasto.Util.GadgetFileFilter;
-import antipasto.Util.PDEFileFilter;
-import antipasto.Util.Utils;
+import antipasto.Util.*;
 
 import com.apple.mrj.*;
 import com.oroinc.text.regex.*;
@@ -779,10 +777,11 @@ public class Editor extends JFrame
             dialog.setResizable(false);
 			
             
-            javax.swing.filechooser.FileFilter filter[] = new javax.swing.filechooser.FileFilter[2];
+            javax.swing.filechooser.FileFilter filter[] = new javax.swing.filechooser.FileFilter[3];
             filter[0] = new GadgetFileFilter();
             filter[1] = new PDEFileFilter();
-
+            filter[2] = new AntipastoFileFilter();
+            
             File dflt = new File(Sketchbook.getSketchbookPath());
             File file = Base.selectFile("Open File", 
                                         dflt,
