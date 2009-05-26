@@ -142,6 +142,7 @@ static inline void turnOffPWM(uint8_t timer)
 	if (timer == TIMER1A) cbi(TCCR1A, COM1A1);
 	if (timer == TIMER1B) cbi(TCCR1A, COM1B1);
 	if (timer == TIMER2A) cbi(TCCR2A, COM2A1);
+	
 }
 
 /* ===========================================================================
@@ -166,7 +167,10 @@ void digitalWrite(uint8_t pin, uint8_t val)
     PIN_DESC_T *p = &pinTable[pin];
     
 	uint8_t timer = digitalPinToTimer(pin);
-    if (timer != NO_TIMER) turnOffPWM(timer);
+	if (timer == SOFT_PWM)
+	  DeactivateSoftPwm(digitalPinToSoftPwmChannel(pin));
+    else if (timer != NO_TIMER) 
+	  turnOffPWM(timer);
     
     /* Check desired state */
     if (val == HIGH)
@@ -205,7 +209,7 @@ uint8_t digitalRead(uint8_t pin)
     
     /* Return the pin register value at the bit location */
     return CHECKBIT(*p->PinReg,
-                     p->PinNum);
+                     p->PinNum) >> p->PinNum;
 }
 
 /* ===========================================================================
@@ -285,6 +289,8 @@ void analogWrite(uint8_t pin, int val)
 		sbi(TCCR2A, COM2A1);
 		// set pwm duty
 		OCR2A = val;	
+	} else if (digitalPinToTimer(pin) == SOFT_PWM) {
+		ActivateSoftPwm(digitalPinToSoftPwmChannel(pin), val);
 	} else if (val < 128)
 		digitalWrite(pin, LOW);
 	else
@@ -433,16 +439,16 @@ void delayMicroseconds(unsigned int us)
 void init()
 {
     //Init TIMER 0 
-	TCCR0A = (0<<CS02) | (1<<CS01) | (0<<CS00); //timer 0 setup to overflow every 128us
+	TCCR0A = (0<<CS02) | (1<<CS01) | (0<<CS00) | (1<<WGM00) | (1<<WGM01); //timer 0 setup to overflow every 128us, and use fast PWM mode
 	TIMSK0 = (1<<TOIE0); //enable timer 0 overflow interrupts
 
-		// set timer 1 prescale factor to 64
+	// set timer 1 prescale factor to 64, in phase correct PWM
 	sbi(TCCR1B, CS11);
 	sbi(TCCR1B, CS10);
 	sbi(TCCR1A, WGM10);
 
-	// put timer 1 in 8-bit phase correct pwm mode
-    TCCR2A =  (1<<CS22) | (1<<WGM20) | (1<<COM2A0) | (1<<COM2A1);
+	// put timer 2 in 8-bit fast pwm mode, no prescale
+    TCCR2A =  (1<<CS20) | (1<<WGM20)| (1<<COM2A0) | (1<<COM2A1);
 
     //Init ADC      
     ADCSRA = (1 << ADEN) |                                 // Turn on the ADC converter
