@@ -1,8 +1,14 @@
 package antipasto;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 import org.w3c.dom.Element;
 
@@ -37,6 +43,8 @@ public class Module implements IModule, ITemporary, IPackedFile {
     private File _rulesFile;
     private ModuleRules _rules;
 	private File dataDirectory;
+	private String referenceText = "";
+	private boolean hasLoaded = false;
 
     public BufferedImage getImage() {
         return _img;
@@ -215,4 +223,55 @@ public class Module implements IModule, ITemporary, IPackedFile {
     public File getRulesFile(){
     	return this._rulesFile;
     }
+
+    
+	public String getReferenceText() {
+		if(/*!hasLoaded &&*/ (referenceText == null || referenceText.equalsIgnoreCase(""))){
+			System.out.println(_files.length);
+			for(int i = 0; i < this._files.length; i++){
+				System.out.println(_files[i].getName());
+				if(this._files[i].getName().equalsIgnoreCase("reference.txt")){
+					System.out.println("found the file!");
+					File file = _files[i];
+					try {
+						BufferedReader reader = new BufferedReader(new FileReader(file));
+						String line = "";
+						while((line = reader.readLine())!= null){
+							referenceText.concat(line);
+						}
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			hasLoaded = true;
+		}
+		
+		return this.referenceText;
+		
+	}
+
+	public String setReferenceText(String text) {
+		for(int i = 0; i < this._files.length; i++){
+			if(this._files[i].getName().equalsIgnoreCase("reference.txt")){
+				File referenceFile = _files[i];
+				if(referenceFile != null){
+					Writer writer;
+					try {
+						writer = new BufferedWriter(new FileWriter(referenceFile));
+						writer.write(text);
+			        	writer.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        	
+		        }
+			}
+		}
+		this.referenceText = text;
+		return this.referenceText;
+	}
 }

@@ -40,5 +40,8 @@ public interface IModule extends IVersionable, IConfigurable {
     public ModuleRules getRules();
     public File getRulesFile();
     
+    public String getReferenceText();
+    public String setReferenceText(String text);
+    
     public static String moduleExtension = ".module";
 }

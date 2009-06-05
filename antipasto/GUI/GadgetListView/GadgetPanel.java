@@ -239,7 +239,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	    		this.activeModule = (IModule) list.getSelectedValue();
 	            this.onActiveGadgetChange(new ActiveGadgetObject(this,
 	                    this.activeModule.getSketchFile(),
-	                    this.activeModule.getBoardsFile()));
+	                    this.activeModule.getBoardsFile(), 
+	                    this.activeModule));
     		}else{
     			Editor editor = (Editor) this.parentFrame;
     			editor.textarea.setVisible(false);
@@ -272,7 +273,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
                 this.activeModule = (IModule) list.getSelectedValue();
                 this.onActiveGadgetChange(new ActiveGadgetObject(this,
                         this.activeModule.getSketchFile(),
-                        this.activeModule.getBoardsFile()));
+                        this.activeModule.getBoardsFile(),
+                        this.activeModule));
             }
         }
     }

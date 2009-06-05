@@ -54,7 +54,10 @@ import antipasto.GUI.ImageListView.ImageListPanel;
 import antipasto.Interfaces.*;
 import antipasto.ModuleRules.IMessage;
 import antipasto.ModuleRules.IOkListener;
-import antipasto.Util.*;
+import antipasto.Util.AntipastoFileFilter;
+import antipasto.Util.GadgetFileFilter;
+import antipasto.Util.PDEFileFilter;
+import antipasto.Util.Utils;
 
 import com.apple.mrj.*;
 import com.oroinc.text.regex.*;
@@ -110,7 +113,9 @@ public class Editor extends JFrame
   JLabel lineNumberComponent;
 
   JPanel leftWing;
+  JPanel rightWing;
   JLabel leftExpandLabel; 
+  
   
   // currently opened program
   public Sketch sketch;
@@ -177,6 +182,7 @@ public class Editor extends JFrame
   FindReplace find;
   public JFrame _frame;
   public GadgetPanel gadgetPanel ;
+  public ReferencePanel referencePanel;
 
   //static Properties keywords; // keyword -> reference html lookup
 
@@ -312,12 +318,9 @@ public class Editor extends JFrame
 		}
     });
     
-    JPanel rightWing = new JPanel();
-    rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
-	rightWing.setOpaque(true);
-    rightWing.setSize(15, 0);
-    rightWing.setPreferredSize(new Dimension(10, 0));
-
+    referencePanel = new ReferencePanel(this);
+    
+    
    	imageListPanel = new ImageListPanel(this.gadgetPanel, new FlashTransfer());
 	
    	this.getContentPane().validate();
@@ -346,6 +349,41 @@ public class Editor extends JFrame
     CardLayout cl = (CardLayout) centerPanel.getLayout();
     cl.show(centerPanel, CODEEDITOR);
     
+    
+    
+    rightWing = new JPanel();
+    rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
+	rightWing.setOpaque(true);
+    rightWing.setSize(15, 0);
+    rightWing.setPreferredSize(new Dimension(10, 0));
+    rightWing.setLayout(new BorderLayout());
+    final JLabel rightWingLabel = new JLabel(">");
+    rightWing.add(rightWingLabel, BorderLayout.CENTER);
+    rightWing.addMouseListener(new MouseListener(){
+
+		public void mouseClicked(MouseEvent arg0) {
+			if(referencePanel.isVisible()){
+				referencePanel.setVisible(false);
+				rightWingLabel.setText(">");
+			}else{
+				referencePanel.setVisible(true);
+				rightWingLabel.setText("<");
+			}
+		}
+
+		public void mouseEntered(MouseEvent arg0) {
+		}
+
+		public void mouseExited(MouseEvent arg0) {
+		}
+
+		public void mousePressed(MouseEvent arg0) {
+		}
+
+		public void mouseReleased(MouseEvent arg0) {
+		}    	
+    });
+
     editorSection.add(leftWing, BorderLayout.WEST);
     editorSection.add(centerPanel, BorderLayout.CENTER);
     editorSection.add(rightWing, BorderLayout.EAST);
@@ -355,6 +393,11 @@ public class Editor extends JFrame
            File.separator + "OpenHardware" + File.separator + "Modules";
     gadgetPanel = new GadgetPanel("", this, libraryDirectory);
     gadgetPanel.addActiveGadgetChangedEventListener(this);
+    gadgetPanel.addActiveGadgetChangedEventListener(this.referencePanel);
+    
+    
+    gadgetPanel.setVisible(false);
+    
 
     leftWing.setVisible(true);
       //upper.add(gadgetPanel);
@@ -395,6 +438,8 @@ public class Editor extends JFrame
         public boolean importData(JComponent src, Transferable transferable) {
           DataFlavor[] flavors = transferable.getTransferDataFlavors();
 
+          gadgetPanel.setVisible(false);
+          
     /*
     DropTarget dt = new DropTarget(this, new DropTargetListener() {
 
@@ -507,8 +552,9 @@ public class Editor extends JFrame
       // update syntax coloring table
       libraryManager.addSyntaxColoring(new PdeKeywords());
     } catch (RunnerException re) {
-      message("Error compiling library ...");
+      message("Error compiling libraries ...");
       error(re);
+      message("If there is a binary sketch size then dont worry about the red stuff");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -1714,6 +1760,7 @@ public class Editor extends JFrame
 	        try {
 	              if(gadgetPanel != null){
 	                if(gadgetPanel.getActiveModule() != null){
+	                	prepareLibraries();
 	                    IGadget book = gadgetPanel.getActiveGadget();
 	                    
 	                    IModule[] gadgets = book.getModules();

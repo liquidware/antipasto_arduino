@@ -15,9 +15,15 @@ import antipasto.Util.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.Writer;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,6 +102,7 @@ public class ModuleFactory {
         File boardsFile = null;
         File img = null;
         File rulesFile = null;
+        File referenceFile = null;
         for(int i = 0; i < files.length; i++)
         {
             if(files[i].getName().equalsIgnoreCase("config.xml")){
@@ -108,6 +115,8 @@ public class ModuleFactory {
                 img = files[i];
             }else if(files[i].getName().equalsIgnoreCase("rules.xml")){
             	rulesFile = files[i];
+            }else if(files[i].getName().equalsIgnoreCase("reference.txt")){
+            	referenceFile = files[i];
             }
         }
 
@@ -118,7 +127,7 @@ public class ModuleFactory {
 
         File moduleFile = Packer.packageFile(outputDirectory + File.separator + "temp.module", files);
 
-        Module retMod = (Module) this.CreateModule(configFile, boardsFile, img ,files, moduleFile, rulesFile ,outputDirectory, true);
+        Module retMod = (Module) this.CreateModule(configFile, boardsFile, img, referenceFile ,files, moduleFile, rulesFile ,outputDirectory, true);
         if(rulesFile != null){
         	ModuleRulesParser parser = new ModuleRulesParser(rulesFile);
         	retMod.setRules(parser.getModuleRules());
@@ -148,6 +157,7 @@ public class ModuleFactory {
        File boardsFile = null;
        File previewImage = null;
        File rulesFile = null;
+       File referenceFile = null;
 
        for(int i = 0; i < moduleFiles.length; i++)
        {
@@ -172,9 +182,11 @@ public class ModuleFactory {
         		   dataFolder.mkdir();
         	   }
         	   UnPacker.UnPack(moduleFiles[i], dataFolder);
+           }else if(moduleFiles[i].getName().equalsIgnoreCase("reference.txt")){
+        	   referenceFile = moduleFiles[i];
            }
        }
-       return this.CreateModule(configFile, boardsFile, previewImage, moduleFiles, module, rulesFile ,outputDirectory, true);
+       return this.CreateModule(configFile, boardsFile, previewImage, referenceFile ,moduleFiles, module, rulesFile ,outputDirectory, true);
    }
 
     public File WriteModuleToFile(IModule module, String outputDirectory) throws Exception {
@@ -224,6 +236,18 @@ public class ModuleFactory {
             								//for array init.
             if(module.getData().length > 0) moduleDataCount = 1;
             
+            File referenceFile = null;
+            File moduleDirectory = new File(outputDirectory + File.separator + module.getName());
+            
+            if(module.getReferenceText() != null||!module.getReferenceText().equalsIgnoreCase("")){
+            	tot++;
+            	referenceFile = new File(outputDirectory + File.separator + "reference.txt");
+            	if(!referenceFile.exists()){
+            		referenceFile.createNewFile();
+            	}
+            	
+            }
+            
             File[] packerFiles = new File[moduleDataCount + tot + cores.length + rulesFileCount];
             File packedData;
             int x = 0;
@@ -232,11 +256,18 @@ public class ModuleFactory {
             	packerFiles[x] = packedData;
             	x++;
             }
-            
-           
             packerFiles[x] = xml;
             packerFiles[++x] = module.getSketchFile();
             packerFiles[++x] = module.getBoardsFile();
+            System.out.println("Preparing to write the reference file [" + referenceFile  + "]");
+            if(referenceFile != null){
+            	System.out.println("Writing it [ " + module.getReferenceText() + " ]");
+            	Writer writer = new BufferedWriter(new FileWriter(referenceFile));
+            	writer.write(module.getReferenceText());
+            	writer.flush();
+            	writer.close();
+            	packerFiles[++x] = referenceFile;
+            }
             if(imageFile != null)
             {
                 packerFiles[++x] = imageFile;
@@ -369,7 +400,10 @@ public class ModuleFactory {
         return retModule;
     }
 
-    public IModule CreateModule(File xmlConfig, File boardsTxt, File img ,File[] files, File moduleFile, File rulesFile, String outputDirectory, boolean checkDepends) throws Exception {
+    /*
+     * Creates the module from various 
+     * */
+    public IModule CreateModule(File xmlConfig, File boardsTxt, File img, File referenceFile ,File[] files, File moduleFile, File rulesFile, String outputDirectory, boolean checkDepends) throws Exception {
         Element root = this.getFirstElementOfModuleFile(xmlConfig);
         NodeList children = root.getChildNodes();
         CoreFactory coreFact = new CoreFactory();
@@ -479,6 +513,15 @@ public class ModuleFactory {
         module.setPackedFile(moduleFile);
         module.setTarget(target);
         module.setRulesFile(rulesFile);
+        if(referenceFile != null){
+        	BufferedReader reader = new BufferedReader(new FileReader(referenceFile));
+        	String readLine = "";
+        	String txt = "";
+        	while((readLine = reader.readLine())!=null){
+        		txt += readLine + "\n";
+        	}
+        	module.setReferenceText(txt);
+        }
 
       
         if(version == null)
