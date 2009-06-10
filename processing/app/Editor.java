@@ -732,7 +732,7 @@ public class Editor extends JFrame
     
     final Editor editor = this;
     
-    newGadgetMenuItem = newJMenuItem("New Gadget...", 'C', true);
+    newGadgetMenuItem = newJMenuItem("New Gadget...", 'N', true);
     
     newGadgetMenuItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -815,7 +815,7 @@ public class Editor extends JFrame
     
     menu.add(item);
 	
-	 openMenuItem = newJMenuItem("Open...", 'C', true);
+	 openMenuItem = newJMenuItem("Open...", 'O');
     openMenuItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             JFrame dialog;
@@ -828,7 +828,7 @@ public class Editor extends JFrame
             filter[1] = new PDEFileFilter();
             filter[2] = new AntipastoFileFilter();
             
-            File dflt = new File(Sketchbook.getSketchbookPath());
+            File dflt = new File(Preferences.get("sketchbook.path"));
             File file = Base.selectFile("Open File", 
                                         dflt,
                                         dialog, 
@@ -857,15 +857,14 @@ public class Editor extends JFrame
       });
     menu.add(saveMenuItem);
 
-    /*saveAsMenuItem = newJMenuItem("Save As...", 'S', true);
-    saveAsMenuItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleSaveAs();
-        }
-      });
-    menu.add(saveAsMenuItem);
+//    saveAsMenuItem = newJMenuItem("Save As...", 'S', true);
+//    saveAsMenuItem.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleSaveAs();
+//        }
+//      });
+//    menu.add(saveAsMenuItem);
 
-	*/
     item = newJMenuItem("Upload to I/O Board", 'U');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -2429,7 +2428,7 @@ public class Editor extends JFrame
               filter[0] = new GadgetFileFilter();
               
               File dflt = new File(Sketchbook.getSketchbookPath());
-              File file = Base.selectFile("Save Gadget as...", 
+              File file = Base.selectFile("Save File as...", 
                         dflt,
                         dialog, 
                         filter);

@@ -169,6 +169,8 @@
 		3A1221F30F2D920700F72906 /* quaqua.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AE93F3A0F2D793E00B94BD9 /* quaqua.jar */; };
 		3A1221F40F2D920700F72906 /* registry.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; };
 		3A1221F70F2D921200F72906 /* antlr.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; };
+		3A3C15E70FDCBAD800834E08 /* AntipastoFileFilter.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A3C15E60FDCBAD800834E08 /* AntipastoFileFilter.java */; };
+		3A3C15EB0FDCBB5E00834E08 /* ReferencePanel.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A3C15EA0FDCBB5E00834E08 /* ReferencePanel.java */; };
 		3A4DDE970F643DEF00C137F7 /* Core.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A4DDDE40F643DEB00C137F7 /* Core.java */; };
 		3A4DDE980F643DEF00C137F7 /* CoreFactory.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A4DDDE50F643DEB00C137F7 /* CoreFactory.java */; };
 		3A4DDE990F643DEF00C137F7 /* CorePacker.iml in Resources */ = {isa = PBXBuildFile; fileRef = 3A4DDDE70F643DEB00C137F7 /* CorePacker.iml */; };
@@ -459,6 +461,8 @@
 		33FFFE810965BD110016AC38 /* howto.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = howto.txt; sourceTree = "<group>"; };
 		33FFFE930965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		33FFFE940965BD110016AC38 /* Arduino.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Arduino.xcodeproj; sourceTree = "<group>"; };
+		3A3C15E60FDCBAD800834E08 /* AntipastoFileFilter.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AntipastoFileFilter.java; sourceTree = "<group>"; };
+		3A3C15EA0FDCBB5E00834E08 /* ReferencePanel.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ReferencePanel.java; sourceTree = "<group>"; };
 		3A4DDDE40F643DEB00C137F7 /* Core.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Core.java; sourceTree = "<group>"; };
 		3A4DDDE50F643DEB00C137F7 /* CoreFactory.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = CoreFactory.java; sourceTree = "<group>"; };
 		3A4DDDE70F643DEB00C137F7 /* CorePacker.iml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = CorePacker.iml; sourceTree = "<group>"; };
@@ -869,6 +873,7 @@
 		3A4DDDF90F643DEC00C137F7 /* GadgetListView */ = {
 			isa = PBXGroup;
 			children = (
+				3A3C15EA0FDCBB5E00834E08 /* ReferencePanel.java */,
 				3A4DDDFA0F643DEC00C137F7 /* AddGadgetActions */,
 				3A4DDDFC0F643DEC00C137F7 /* AddGadgetMenu.java */,
 				3A4DDDFD0F643DEC00C137F7 /* FileTransferObject.java */,
@@ -993,6 +998,7 @@
 		3A4DDE410F643DED00C137F7 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				3A3C15E60FDCBAD800834E08 /* AntipastoFileFilter.java */,
 				3A710EFE0FC398AD001F37E3 /* PDEFileFilter.java */,
 				3A710EFF0FC398AD001F37E3 /* GadgetFileFilter.java */,
 				3A710F000FC398AD001F37E3 /* Utils.java */,
@@ -1431,6 +1437,8 @@
 				3A710F020FC398AD001F37E3 /* GadgetFileFilter.java in Sources */,
 				3A710F030FC398AD001F37E3 /* Utils.java in Sources */,
 				3A710F060FC39913001F37E3 /* BlankPanel.java in Sources */,
+				3A3C15E70FDCBAD800834E08 /* AntipastoFileFilter.java in Sources */,
+				3A3C15EB0FDCBB5E00834E08 /* ReferencePanel.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
