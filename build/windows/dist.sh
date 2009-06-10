@@ -133,7 +133,7 @@ mkdir $PACKAGE_DIST_DIR                       #create distribution dir
 mv $PACKAGE_NAME $PACKAGE_DIST_DIR            #move directory
 cp Antipasto-package.aip $PACKAGE_PROJ        #copy the packager project file
 
-./packager/$PACKAGER /edit $PACKAGE_PROJ /AddFolder ProgramFilesFolder $PACKAGE_FOLDER'\'$PACKAGE_DIST
+./packager/$PACKAGER /edit $PACKAGE_PROJ /AddFolder APPDIR $PACKAGE_FOLDER'\'$PACKAGE_DIST
 ./packager/$PACKAGER /edit $PACKAGE_PROJ /SetVersion $REVISION
 ./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name $PACKAGE_NAME -target 'ProgramFilesFolder\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\'$PACKAGE_DIST
 ./packager/$PACKAGER /build $PACKAGE_PROJ
