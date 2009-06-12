@@ -11,6 +11,7 @@ import java.awt.event.FocusListener;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -30,6 +31,8 @@ public class ReferencePanel extends JDialog implements ComponentListener, IActiv
 	private int cachedHeight = 425;
     private int cachedWidth = 300;
 	private JTextArea textArea;
+	private JLabel titleLabel;
+	private JLabel statusLabel;
 	private JFrame component;
 	private IModule activeModule;
 	private JScrollPane scrollPane;
@@ -46,15 +49,26 @@ public class ReferencePanel extends JDialog implements ComponentListener, IActiv
 	public void LoadText(String txt){
 		this.textArea.setText(txt);
 	}
-	
-	private void init(){
+
+	//************************************************
+	// Do any initialization of the top panel
+	JPanel initTopPanel(String message) {
+		
 		JPanel topPanel = new JPanel();
 		topPanel.setSize(cachedWidth, 15);
 		topPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+		topPanel.setLayout(new BorderLayout());
 		
-		JPanel bottomPanel = new JPanel();
-		bottomPanel.setSize(cachedWidth, 15);
-		bottomPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
+		JLabel titleLabel = new JLabel(message);
+		titleLabel.setForeground(new Color(0xFF, 0xFF, 0xFF));
+		topPanel.add(titleLabel);
+		
+		return topPanel;
+	}
+	
+	//************************************************
+	// Do any initialization of the center panel
+	void initCenterPanel() {
 		
 		this.getContentPane().setLayout(new BorderLayout());
 		this.textArea = new JTextArea();
@@ -74,6 +88,33 @@ public class ReferencePanel extends JDialog implements ComponentListener, IActiv
 		
 		this.textArea.setVisible(true);
 		this.scrollPane.setVisible(true);
+		
+	}
+	
+	//************************************************
+	// Do any initialization of the bottom panel
+	JPanel initBottomPanel(String message) {
+		
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setSize(cachedWidth, 15);
+		bottomPanel.setBackground(new Color(0x04, 0x4F, 0x6F));		
+		bottomPanel.setLayout(new BorderLayout());
+		
+		JLabel statusLabel = new JLabel(message);
+		statusLabel.setForeground(new Color(0xFF, 0xFF, 0xFF));
+		bottomPanel.add(statusLabel, BorderLayout.WEST);
+		
+		return bottomPanel;
+	}
+	
+	/*************************************************
+	 * Initialize the Panel
+	 */
+	private void init(){
+		
+		JPanel topPanel = initTopPanel(" |  Reference  |  Scripts  |  Wiring  | ");
+		initCenterPanel();
+		JPanel bottomPanel = initBottomPanel(" Ref data loaded.");
 		
 		this.getContentPane().add(this.scrollPane, BorderLayout.CENTER);
 		this.getContentPane().add(topPanel, BorderLayout.NORTH);
