@@ -1,6 +1,6 @@
 #!/bin/sh
 
-REVISION=`head -c 5 ../../todo.txt`
+REVISION=`head -c 6 ../../todo.txt`
  
 # check to see if the version number in the app is correct
 # so that mikkel doesn't kick my ass
@@ -135,7 +135,7 @@ cp Antipasto-package.aip $PACKAGE_PROJ        #copy the packager project file
 
 ./packager/$PACKAGER /edit $PACKAGE_PROJ /AddFolder APPDIR $PACKAGE_FOLDER'\'$PACKAGE_DIST
 ./packager/$PACKAGER /edit $PACKAGE_PROJ /SetVersion $REVISION
-./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name $PACKAGE_NAME -target 'ProgramFilesFolder\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\'$PACKAGE_DIST
+./packager/$PACKAGER /edit $PACKAGE_PROJ /NewShortcut -name $PACKAGE_NAME -target 'APPDIR\'$PACKAGE_DIST'\'$PACKAGE_NAME'\'$PACKAGE_NAME'.exe' -dir 'ProgramMenuFolder\'$PACKAGE_DIST
 ./packager/$PACKAGER /build $PACKAGE_PROJ
 
 echo Cleaning packager

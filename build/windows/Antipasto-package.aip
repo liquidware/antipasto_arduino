@@ -20,8 +20,16 @@
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
   </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="Default" ComponentId="{3824BAB2-A3BA-4F26-AFD4-BD2FF3F35A36}" Directory_="APPDIR" Attributes="4" KeyPath="Default"/>
+    <ROW Component="Default_1" ComponentId="{ADB49BD4-A515-4442-B2A7-B763E9C7E56C}" Directory_="APPDIR" Attributes="4" KeyPath="Default_1"/>
+    <ROW Component="Default_2" ComponentId="{6B672575-912F-4EAD-BBFF-91DB9A8162B4}" Directory_="APPDIR" Attributes="4" KeyPath="Default_2"/>
+    <ROW Component="Default_3" ComponentId="{05D089F8-D45F-4C60-8EFA-3260D653C61C}" Directory_="APPDIR" Attributes="4" KeyPath="Default_3"/>
+    <ROW Component="_" ComponentId="{4D892756-1353-4C7D-9827-6125A8178396}" Directory_="APPDIR" Attributes="4" KeyPath="_"/>
+    <ROW Component="gdt" ComponentId="{2C295D6F-3331-4BFA-83D4-4E6F69A0C9BA}" Directory_="APPDIR" Attributes="4" KeyPath="gdt"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="gdt Default Default_1 Default_2 Default_3 _"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
@@ -61,8 +69,8 @@
     <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
     <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
-    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFilesFolder][APPDIR]\Arduino"/>
-    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFilesFolder][APPDIR]\Arduino"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:C:\[APPDIR]\Arduino"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]" MultiBuildTarget="DefaultBuild:C:\[APPDIR]\Arduino"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
@@ -77,6 +85,14 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="Version9X OR VersionNT64 OR (VersionNT &gt;= 501)" Description="[ProductName] cannot be installed on systems earlier than [WindowsTypeNT]" DescriptionLocId="AI.LaunchCondition.NoSpecificNT" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsFamily9X]" DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="Default" Root="0" Key=".gdt" Value="AntipastoGadget" Component_="Default"/>
+    <ROW Registry="Default_1" Root="0" Key="AntipastoGadget\DefaultIcon" Name="(Default)" Value="[APPDIR][ProductName]\[ProductName]\arduino.exe,1" Component_="Default_1"/>
+    <ROW Registry="Default_2" Root="0" Key="AntipastoGadget\shell\open\command" Name="(Default)" Value="[APPDIR][ProductName]\[ProductName]\arduino.exe %1" Component_="Default_2"/>
+    <ROW Registry="Default_3" Root="0" Key="AntipastoGadget" Name="(Default)" Value="AntipastoGadget" Component_="Default_3"/>
+    <ROW Registry="_" Root="0" Key=".pde" Value="AntipastoGadget" Component_="_"/>
+    <ROW Registry="gdt" Root="0" Key=".gdt" Name="*" Component_="gdt"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
     <ROW UpgradeCode="[|UpgradeCode]" VersionMax="[|ProductVersion]" Attributes="1025" ActionProperty="OLDPRODUCTS"/>
