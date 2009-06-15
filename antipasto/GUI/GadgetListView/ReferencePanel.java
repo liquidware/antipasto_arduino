@@ -17,6 +17,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -26,11 +27,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneLayout;
 
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.ActiveGadgetObject;
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveGadgetChangedEventListener;
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveSketchChangingListener;
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.SketchChangingObject;
+import antipasto.GUI.ImageListView.ScriptCellRenderer;
 import antipasto.Interfaces.IModule;
 
 import processing.app.Editor;
@@ -47,8 +50,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	private JFrame component;
 	private IModule activeModule;
 	private JScrollPane scrollPane;
-
-	private JList scriptList;
+	private JList scriptFileList;
 
 	public ReferencePanel(JFrame parent) {
 		super(parent, false);
@@ -98,6 +100,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 
 		return bottomPanel;
 	}
+	
 
 	/*************************************************
 	 * Initialize Tab Header Panel
@@ -110,6 +113,43 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		headerPanel.setLayout(new BorderLayout());
 
 		JLabel headerLabel = new JLabel(textDisplay);
+		
+		headerLabel.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				String selectedItem = new String(" ");
+				if (scriptFileList != null) {
+					selectedItem = (String) scriptFileList.getSelectedValue();
+					System.out.println("Selected Script: " + selectedItem);
+				}
+				
+			}});
 		headerLabel.setForeground(new Color(0xFF, 0xFF, 0xFF));
 		headerPanel.add(headerLabel, BorderLayout.CENTER);		
 		
@@ -169,16 +209,15 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		
-		JList fileList = new JList(scriptList);
-
-		this.scrollPane = new JScrollPane(fileList);
+		scriptFileList = new JList(scriptList);
+		scriptFileList.setCellRenderer(new ScriptCellRenderer());
+		
+		this.scrollPane = new JScrollPane(scriptFileList);
 		this.scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		this.scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.scrollPane.setVisible(true);
 		
-		JPanel headerPanel = initTabHeader("                 | Run |" +
-											 "              | Stop |" +
-									         "              | Edit |");
+		JPanel headerPanel = initTabHeader("                 | Run |                 ");
 		
 		// Assemble the panel
 		panel.add(headerPanel, BorderLayout.NORTH);
