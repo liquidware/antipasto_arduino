@@ -15,6 +15,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -35,11 +38,10 @@ import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveSketchChangingListe
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.SketchChangingObject;
 import antipasto.GUI.ImageListView.ScriptCellRenderer;
 import antipasto.Interfaces.IModule;
-
-import processing.app.Editor;
+import processing.app.*;
 
 public class ReferencePanel extends JDialog implements ComponentListener,
-		IActiveGadgetChangedEventListener, FocusListener {
+		IActiveGadgetChangedEventListener, FocusListener, MessageConsumer {
 
 	// The standard width and height for the dialog
 	private int cachedHeight = 425;
@@ -51,7 +53,8 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	private IModule activeModule;
 	private JScrollPane scrollPane;
 	private JList scriptFileList;
-
+	private RunnerException exception;
+	
 	public ReferencePanel(JFrame parent) {
 		super(parent, false);
 		component = parent;
@@ -141,12 +144,33 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 			}
 
 			@Override
+			/* JRuby Testing, need to clean this up....
+			 * 
+			 */
 			public void mouseReleased(MouseEvent arg0) {
 				// TODO Auto-generated method stub
 				String selectedItem = new String(" ");
 				if (scriptFileList != null) {
+					
+					String userdir = System.getProperty("user.dir") + File.separator;
+					String jrubyBasePath = new String(userdir + "hardware/tools/jruby/bin/");
+					String scriptBasePath = new String(Sketchbook.getSketchbookPath() + 
+													   File.separator + "scripts" +
+													   File.separator); 
+					
 					selectedItem = (String) scriptFileList.getSelectedValue();
 					System.out.println("Selected Script: " + selectedItem);
+					
+					String[] command = {jrubyBasePath + "jruby.bat",
+										scriptBasePath + selectedItem};
+					
+					try {
+						execAsynchronously(command, jrubyBasePath);
+					} catch (Exception e) {
+						Base.showWarning("JRuby Error", "Could not find the JRuby Compiler\n", null);
+						e.printStackTrace();
+					}
+				
 				}
 				
 			}});
@@ -347,4 +371,44 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 			System.out.println("Text being set to null");
 		}
 	}
+	
+	public void message(String s) {
+		System.out.println(s);
+	}
+	
+	  public int execAsynchronously(String[] command, String workingDirectory)
+	    throws RunnerException, IOException {
+
+	    int result = 0;
+	    
+	    
+        for(int j = 0; j < command.length; j++) {
+          System.out.print(command[j] + " ");
+        }
+        System.out.println(" ");
+	      
+	    Process process = Runtime.getRuntime().exec(command, 
+	    											null, 
+	    											new File(workingDirectory));
+	    
+	    new MessageSiphon(process.getInputStream(), this);
+	    new MessageSiphon(process.getErrorStream(), this);
+
+	    // wait for the process to finish.  if interrupted
+	    // before waitFor returns, continue waiting
+	    boolean executing = true;
+	      try {
+	        result = process.waitFor();
+	        //System.out.println("result is " + result);
+	        executing = false;
+	      } catch (InterruptedException ignored) { 
+	      }
+	    
+	      if (this.exception != null)  {
+	          this.exception.hideStackTrace = true;
+	          throw this.exception;
+	        }
+	      
+	    return result;
+	  }
 }

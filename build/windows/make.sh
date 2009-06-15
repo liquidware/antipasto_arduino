@@ -52,7 +52,7 @@ else
   cd ..
 
   # get jikes and depedencies
-  cp dist/jikes.exe work/
+  #cp dist/jikes.exe work/
   #chmod +x work/jikes.exe
 
   cp dist/ICE_JNIRegistry.dll work/
@@ -62,10 +62,15 @@ else
   mkdir work/drivers
   cp -r dist/drivers/* work/drivers/
 
-  cp dist/avr_tools.zip .
-  echo Extracting avr tools ...
-  unzip -q  -d work/hardware avr_tools.zip
-  rm -f avr_tools.zip
+# Extracting Compilers
+  echo Extracting Java Compiler ...
+  unzip -q  -d work/hardware/tools jre.zip
+
+  echo Extracting AVR Compiler ...
+  unzip -q  -d work/hardware dist/avr_tools.zip
+
+  echo Extracting JRuby Compiler ...
+  unzip -q  -d work/hardware/tools dist/jruby.zip
 
   # take care of the examples
   cp -r ../shared/dist/examples work/
@@ -74,6 +79,7 @@ else
   find work -name "*.dll" -exec chmod +x {} ';'
   find work -name "*.exe" -exec chmod +x {} ';'
   find work -name "*.html" -exec chmod +x {} ';'
+
 fi
 
 cd ../..

@@ -29,7 +29,7 @@ import java.io.*;
 /**
  * Slurps up messages from compiler.
  */
-class MessageSiphon implements Runnable {
+public class MessageSiphon implements Runnable {
   BufferedReader streamReader;
   Thread thread;
   MessageConsumer consumer;
