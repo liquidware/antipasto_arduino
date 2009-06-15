@@ -29,7 +29,7 @@ public class ScriptCellRenderer extends DefaultListCellRenderer {
          * the JLabels text property, it's foreground and background
          * colors, and so on.
          */
-        JLabel label = (JLabel)super.getListCellRendererComponent(list, value, index, iss, chf);
+        JLabel label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, chf);
 
         /* Modify the JLabel to your liking here.. 
          * */
