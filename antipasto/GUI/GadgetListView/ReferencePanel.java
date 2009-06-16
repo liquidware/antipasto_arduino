@@ -16,6 +16,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 
@@ -38,6 +39,9 @@ import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveSketchChangingListe
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.SketchChangingObject;
 import antipasto.GUI.ImageListView.ScriptCellRenderer;
 import antipasto.Interfaces.IModule;
+import antipasto.Util.GadgetFileFilter;
+import antipasto.Util.ScriptFileFilter;
+import antipasto.Util.Utils;
 import processing.app.*;
 
 public class ReferencePanel extends JDialog implements ComponentListener,
@@ -49,11 +53,20 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	private JTextArea textArea;
 	private JLabel titleLabel;
 	private JLabel statusLabel;
+	private JLabel headerLabel;
 	private JFrame component;
 	private IModule activeModule;
 	private JScrollPane scrollPane;
 	private JList scriptFileList;
 	private RunnerException exception;
+
+	private String userdir = System.getProperty("user.dir") + File.separator;
+	private String jrubyPath = new String(userdir + "hardware/tools/jruby/bin/");
+	private String scriptPath = new String(Sketchbook.getSketchbookPath() + 
+									   		File.separator); 
+	
+	private String headerTextDefault = new String("                  " +
+			   									  "                   | Run |");
 	
 	public ReferencePanel(JFrame parent) {
 		super(parent, false);
@@ -97,14 +110,37 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		bottomPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
 		bottomPanel.setLayout(new BorderLayout());
 
-		JLabel statusLabel = new JLabel(message);
+		statusLabel = new JLabel(message);
 		statusLabel.setForeground(new Color(0xFF, 0xFF, 0xFF));
 		bottomPanel.add(statusLabel, BorderLayout.WEST);
 
 		return bottomPanel;
 	}
 	
-
+	/* Execute a JRuby Script
+	 * If the script name is not null, this executes it.
+	 */
+	void executeScript(String scriptName) {
+		
+		if (scriptName != null) {
+			
+			String[] command = {jrubyPath + "jruby.bat",
+								scriptPath + scriptName};
+			
+			try {
+				execAsynchronously(command, jrubyPath);
+				statusLabel.setText(" Script finished.");
+			} catch (Exception e) {
+				Base.showWarning("JRuby Error", "Could not find the JRuby Compiler\n", null);
+				e.printStackTrace();
+			}
+		
+		} else {
+			/* Display the issue */
+			statusLabel.setText("Select a script to run.");
+		}
+	}
+	
 	/*************************************************
 	 * Initialize Tab Header Panel
 	 *  Returns: a JPanel with a header text 
@@ -115,65 +151,52 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		headerPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
 		headerPanel.setLayout(new BorderLayout());
 
-		JLabel headerLabel = new JLabel(textDisplay);
+		headerLabel = new JLabel(textDisplay);
 		
 		headerLabel.addMouseListener(new MouseListener() {
 
-			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				// TODO Auto-generated method stub
 				
 			}
 
-			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				// TODO Auto-generated method stub
+				headerLabel.setForeground(Color.orange);
 				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			/* JRuby Testing, need to clean this up....
-			 * 
-			 */
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				String selectedItem = new String(" ");
-				if (scriptFileList != null) {
-					
-					String userdir = System.getProperty("user.dir") + File.separator;
-					String jrubyBasePath = new String(userdir + "hardware/tools/jruby/bin/");
-					String scriptBasePath = new String(Sketchbook.getSketchbookPath() + 
-													   File.separator + "scripts" +
-													   File.separator); 
-					
-					selectedItem = (String) scriptFileList.getSelectedValue();
-					System.out.println("Selected Script: " + selectedItem);
-					
-					String[] command = {jrubyBasePath + "jruby.bat",
-										scriptBasePath + selectedItem};
-					
-					try {
-						execAsynchronously(command, jrubyBasePath);
-					} catch (Exception e) {
-						Base.showWarning("JRuby Error", "Could not find the JRuby Compiler\n", null);
-						e.printStackTrace();
-					}
-				
+				String selectedItem = (String) scriptFileList.getSelectedValue();
+				if (selectedItem != null) {
+					statusLabel.setText(" Run " + selectedItem + " script");
+				} else {
+					statusLabel.setText(" Run script");
 				}
 				
+			}
+
+			public void mouseExited(MouseEvent arg0) {
+				headerLabel.setText(headerTextDefault);
+				headerLabel.setForeground(Color.white);
+			}
+
+			public void mousePressed(MouseEvent arg0) {
+				
+				String selectedItem = (String) scriptFileList.getSelectedValue();
+				if (selectedItem != null) {
+					statusLabel.setText(" Running " + selectedItem + " script");
+				} else {
+					statusLabel.setText(" Run script");
+				}
+			}
+
+			/* JRuby Script Execution Testing
+			 */
+			public void mouseReleased(MouseEvent arg0) {
+				
+				executeScript((String) scriptFileList.getSelectedValue());
+
 			}});
+		
 		headerLabel.setForeground(new Color(0xFF, 0xFF, 0xFF));
 		headerPanel.add(headerLabel, BorderLayout.CENTER);		
 		
@@ -223,7 +246,6 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 	}
 	
-	
 	/*************************************************
 	 * Initialize Script Tab 
 	 *  Returns: a JPanel with the script content 
@@ -241,12 +263,12 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.scrollPane.setVisible(true);
 		
-		JPanel headerPanel = initTabHeader("                 | Run |                 ");
+		JPanel headerPanel = initTabHeader(headerTextDefault);
 		
 		// Assemble the panel
 		panel.add(headerPanel, BorderLayout.NORTH);
 		panel.add(this.scrollPane,BorderLayout.CENTER);
-
+		
 		return panel;
 
 	}
@@ -263,20 +285,25 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 		//Find some files from the sketchbook/scripts directory
 		// For testing, lets create some default files
-		String[] files = { "one.rb", 
-							"two.rb", 
-							"three.rb",
-							"four.rb",
-							"five.rb",
-							"six.rb",
-							"seven.rb",
-							"eight.rb",
-							"nine.rb",
-							"ten.rb",
-							"eleven.rb"};
 		
-		// Return the desired tab
-		   return initScriptTab(files);
+		// Grab the script files from the sketchbook directory
+		File scriptFolder = new File(scriptPath);
+		String fileList[] = scriptFolder.list(new FilenameFilter() {
+
+			public boolean accept(File dir, String name) {
+		        String extension = Utils.getExtension(name);
+		        if (extension != null) {
+		            if (extension.equals(Utils.rb) ){
+		                    return true;
+		            } 
+		        }
+		        
+				return false;
+			} });
+		
+		
+		  // Build and Return the script tab panel
+		  return initScriptTab(fileList);
 		 
 		//return initReferenceTab("Here is some default text   \n" +
 		//					    "from the TouchShield module \n" +
@@ -301,7 +328,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 		JPanel topPanel    = initTopPanel(" |  Reference  |  Scripts  |  Wiring  | ");
 		JPanel centerPanel = initCenterPanel("Scripts");
-		JPanel bottomPanel = initBottomPanel(" Wing Tabs loaded.");
+		JPanel bottomPanel = initBottomPanel(" Scripts loaded.");
 
 		this.getContentPane().add(centerPanel, BorderLayout.CENTER);
 		this.getContentPane().add(topPanel, BorderLayout.NORTH);
@@ -386,8 +413,8 @@ public class ReferencePanel extends JDialog implements ComponentListener,
           System.out.print(command[j] + " ");
         }
         System.out.println(" ");
-	      
-	    Process process = Runtime.getRuntime().exec(command, 
+	    
+	    Process process = Runtime.getRuntime().exec(command,
 	    											null, 
 	    											new File(workingDirectory));
 	    
