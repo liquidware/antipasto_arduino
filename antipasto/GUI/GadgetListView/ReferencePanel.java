@@ -124,7 +124,13 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 		if (scriptName != null) {
 			
-			String[] command = {jrubyPath + "jruby.bat",
+			String jrubyExe = new String("jruby");
+			if (!Base.isMACOS()) {
+				/* Windows Compatibility */
+				jrubyExe = jrubyExe + ".bat";
+			}
+			
+			String[] command = {jrubyPath + jrubyExe,
 								scriptPath + scriptName};
 			
 			try {

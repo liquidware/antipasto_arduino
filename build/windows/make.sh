@@ -70,7 +70,7 @@ else
   unzip -q  -d work/hardware dist/avr_tools.zip
 
   echo Extracting JRuby Compiler ...
-  unzip -q  -d work/hardware/tools dist/jruby.zip
+  unzip -q  -d work/hardware/tools ../shared/dist/jruby.zip
 
   # take care of the examples
   cp -r ../shared/dist/examples work/
