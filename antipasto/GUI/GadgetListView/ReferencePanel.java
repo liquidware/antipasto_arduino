@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneLayout;
 
+import antipasto.ScriptRunner;
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.ActiveGadgetObject;
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveGadgetChangedEventListener;
 import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveSketchChangingListener;
@@ -122,25 +123,21 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	 */
 	void executeScript(String scriptName) {
 		
+
 		if (scriptName != null) {
 			
-			String jrubyExe = new String("jruby");
-			if (!Base.isMACOS()) {
-				/* Windows Compatibility */
-				jrubyExe = jrubyExe + ".bat";
-			}
-			
-			String[] command = {jrubyPath + jrubyExe,
-								scriptPath + scriptName};
-			
+			ScriptRunner myScript = new ScriptRunner(jrubyPath + "jruby.bat", 
+			      	 								 jrubyPath + "jruby");
+
 			try {
-				execAsynchronously(command, jrubyPath);
+				myScript.run(scriptPath + scriptName);
+				System.out.println(myScript.getScriptOutput());
 				statusLabel.setText(" Script finished.");
 			} catch (Exception e) {
 				Base.showWarning("JRuby Error", "Could not find the JRuby Compiler\n", null);
-				e.printStackTrace();
+				e.printStackTrace();			
 			}
-		
+			
 		} else {
 			/* Display the issue */
 			statusLabel.setText("Select a script to run.");
@@ -409,39 +406,5 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		System.out.println(s);
 	}
 	
-	  public int execAsynchronously(String[] command, String workingDirectory)
-	    throws RunnerException, IOException {
 
-	    int result = 0;
-	    
-	    
-        for(int j = 0; j < command.length; j++) {
-          System.out.print(command[j] + " ");
-        }
-        System.out.println(" ");
-	    
-	    Process process = Runtime.getRuntime().exec(command,
-	    											null, 
-	    											new File(workingDirectory));
-	    
-	    new MessageSiphon(process.getInputStream(), this);
-	    new MessageSiphon(process.getErrorStream(), this);
-
-	    // wait for the process to finish.  if interrupted
-	    // before waitFor returns, continue waiting
-	    boolean executing = true;
-	      try {
-	        result = process.waitFor();
-	        //System.out.println("result is " + result);
-	        executing = false;
-	      } catch (InterruptedException ignored) { 
-	      }
-	    
-	      if (this.exception != null)  {
-	          this.exception.hideStackTrace = true;
-	          throw this.exception;
-	        }
-	      
-	    return result;
-	  }
 }
