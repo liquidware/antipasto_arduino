@@ -35,6 +35,7 @@ public class ScriptCellRenderer extends DefaultListCellRenderer {
          * */
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+        panel.setOpaque(true);
         
         if (!isSelected) {
         	panel.setBackground(new Color(0xFF, 0xFF, 0xFF));

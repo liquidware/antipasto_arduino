@@ -5,6 +5,10 @@ import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
@@ -15,12 +19,17 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -46,21 +55,19 @@ import antipasto.Util.Utils;
 import processing.app.*;
 
 public class ReferencePanel extends JDialog implements ComponentListener,
-		IActiveGadgetChangedEventListener, FocusListener, MessageConsumer {
+		IActiveGadgetChangedEventListener, FocusListener {
 
 	// The standard width and height for the dialog
 	private int cachedHeight = 425;
 	private int cachedWidth = 300;
 	private JTextArea textArea;
-	private JLabel titleLabel;
 	private JLabel statusLabel;
 	private JLabel headerLabel;
 	private JFrame component;
 	private IModule activeModule;
 	private JScrollPane scrollPane;
 	private JList scriptFileList;
-	private RunnerException exception;
-
+	
 	private String userdir = System.getProperty("user.dir") + File.separator;
 	private String jrubyPath = new String(userdir + "hardware/tools/jruby/bin/");
 	private String scriptPath = new String(Sketchbook.getSketchbookPath() + 
@@ -68,6 +75,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	
 	private String headerTextDefault = new String("                  " +
 			   									  "                   | Run |");
+	private String[] wingTabNames;
 	
 	public ReferencePanel(JFrame parent) {
 		super(parent, false);
@@ -81,23 +89,48 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	public void LoadText(String txt) {
 		this.textArea.setText(txt);
 	}
-
+	
 	/*************************************************
 	 * Initialize Top Panel
 	 *  Returns: a JPanel with the Tabs for the right wing.
 	 */
-	JPanel initTopPanel(String message) {
+	JPanel initTopPanel(String[] tabNames) {
 
-		JPanel topPanel = new JPanel();
-		topPanel.setSize(cachedWidth, 15);
-		topPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
-		topPanel.setLayout(new BorderLayout());
+		JPanel bgPanel = new JPanel();
+		bgPanel.setSize(cachedWidth, 15);
+		bgPanel.setBackground(new Color(0x21, 0x68, 0x86));
+		bgPanel.setLayout(new BorderLayout());
+		
+		/* Create the tab Panel */
+		JPanel tabPanel = new JPanel();
+		tabPanel.setBackground(new Color(0x21, 0x68, 0x86));
+		tabPanel.setSize(cachedWidth, 15);
+		tabPanel.setLayout(new BoxLayout(tabPanel,BoxLayout.X_AXIS));
+		tabPanel.setOpaque(true);
+		
+		/* Create the tabs */
+		wingTabNames = tabNames.clone();
+		for (int x=0; x < wingTabNames.length; x++) {
+			WingTab tab = new WingTab(wingTabNames[x],null);
+			tabPanel.add(tab);
+		}
+		
+		
+		/* A Horizontal Separator */
+		JComponent hrImg = new JComponent() {
+									private static final long serialVersionUID = 1L;
 
-		JLabel titleLabel = new JLabel(message);
-		titleLabel.setForeground(new Color(0xFF, 0xFF, 0xFF));
-		topPanel.add(titleLabel);
-
-		return topPanel;
+									public void paint(Graphics g) {
+							 	        Graphics2D graphics2 = (Graphics2D) g;
+							 	        graphics2.setBackground(new Color(255,255,255));
+							 	        graphics2.setColor(new Color(255,255,255));
+							 	        graphics2.drawLine(0,0,600,1);
+							       	 }};
+		
+		bgPanel.add(tabPanel, BorderLayout.NORTH);					       	 
+		bgPanel.add(hrImg, BorderLayout.CENTER);	
+		
+		return bgPanel;
 	}
 
 	/*************************************************
@@ -329,7 +362,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.setSize(cachedWidth, cachedHeight);
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		
-		JPanel topPanel    = initTopPanel(" |  Reference  |  Scripts  |  Wiring  | ");
+		JPanel topPanel    = initTopPanel(new String[] {" Reference ", " Scripts ", " Wiring ", " Plugin "});
 		JPanel centerPanel = initCenterPanel("Scripts");
 		JPanel bottomPanel = initBottomPanel(" Scripts loaded.");
 
@@ -368,6 +401,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 
 	public void componentShown(ComponentEvent arg0) {
 		setLocation();
+		repaint();
 	}
 
 	public void onActiveGadgetChanged(ActiveGadgetObject obj) {

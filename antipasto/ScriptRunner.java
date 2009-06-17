@@ -2,6 +2,8 @@ package antipasto;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
 
 import processing.app.Base;
 import processing.app.MessageConsumer;
@@ -97,9 +99,21 @@ public class ScriptRunner implements MessageConsumer {
       }
       System.out.println(" ");
 	    
-	    Process process = Runtime.getRuntime().exec(command,
-	    											null, 
-	    											new File(workingDirectory));
+      	ProcessBuilder processBuilder = new ProcessBuilder(command);
+		Map env = processBuilder.environment();
+		processBuilder.directory(new File(workingDirectory));
+		
+	    Properties prop = System.getProperties();
+	    prop.getProperty("java.class.path", null);
+		env.put("CLASSPATH", prop.getProperty("java.class.path", null));
+		//env.remove("var3");
+		
+	    Process process = processBuilder.start();
+	    
+
+	    //Process process = Runtime.getRuntime().exec(command,
+	    //											null, ///new String[] {"CLASSPATH=../../../../antipasto/Util"}, 
+	    //											new File(workingDirectory));
 	    
 	    new MessageSiphon(process.getInputStream(), this);
 	    new MessageSiphon(process.getErrorStream(), this);
