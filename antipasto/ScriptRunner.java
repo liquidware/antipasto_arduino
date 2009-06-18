@@ -77,11 +77,8 @@ public class ScriptRunner implements MessageConsumer {
 		String[] command = {binFileName,
 							file};
 		
-		/* Get the bin folder */
-		String binFolder = (new File(binFileName)).getParent();
-		
 		/* Run the script */
-		execAsynchronously(command, binFolder);
+		execAsynchronously(command, (new File(file)).getParent());
 		
 	}
 	
@@ -104,16 +101,10 @@ public class ScriptRunner implements MessageConsumer {
 		processBuilder.directory(new File(workingDirectory));
 		
 	    Properties prop = System.getProperties();
-	    prop.getProperty("java.class.path", null);
 		env.put("CLASSPATH", prop.getProperty("java.class.path", null));
-		//env.remove("var3");
+		env.put("JAVA_HOME", prop.getProperty("java.home", null));
 		
 	    Process process = processBuilder.start();
-	    
-
-	    //Process process = Runtime.getRuntime().exec(command,
-	    //											null, ///new String[] {"CLASSPATH=../../../../antipasto/Util"}, 
-	    //											new File(workingDirectory));
 	    
 	    new MessageSiphon(process.getInputStream(), this);
 	    new MessageSiphon(process.getErrorStream(), this);

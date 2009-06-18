@@ -63,8 +63,8 @@ else
   cp -r dist/drivers/* work/drivers/
 
 # Extracting Compilers
-  echo Extracting Java Compiler ...
-  unzip -q  -d work/hardware/tools jre.zip
+#  echo Extracting Java Compiler ...
+#  unzip -q  -d work/hardware/tools jre.zip
 
   echo Extracting AVR Compiler ...
   unzip -q  -d work/hardware dist/avr_tools.zip

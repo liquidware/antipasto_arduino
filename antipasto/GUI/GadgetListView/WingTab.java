@@ -26,6 +26,9 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 	
 	RoundRectangle2D roundRect;
 	Rectangle2D rect;
+	RoundRectangle2D roundRect2;
+	Rectangle2D rect2;
+	
 	boolean isUpdated = false;
 	String txt;
 	Font font;
@@ -42,6 +45,7 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 	
 	private double width = 0; 
 	private double height = 25;
+	private boolean isFocused = false;
 	
 	public WingTab(String title, Object valueHolder){
 		//We need to create a rounded tab
@@ -60,10 +64,7 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 		this.addMouseListener(this);
 		this.addComponentListener(this);
 
-		//FontRenderContext renderContext = super.getFontRenderContext();
-		//Graphics2D graphics2 = (Graphics2D)this.getGraphics();
 		this.setPreferredSize(new Dimension((int)this.width, (int)this.height));
-		this.setSize(new Dimension((int)this.width, (int)this.height));
 		this.repaint();
 		
 	}
@@ -71,22 +72,36 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 	 public void paint(Graphics g) {
 	        Graphics2D graphics2 = (Graphics2D) g;
 	        
-	        this.width = font.getStringBounds(this.txt,graphics2.getFontRenderContext()).getWidth();
+	        this.width = font.getStringBounds(this.txt,graphics2.getFontRenderContext()).getWidth()-10;
 	        
 			String printTxt = this.txt;
 			
 			roundRect = new RoundRectangle2D.Double(0, 5, width, 25 , 10, 10);
-			rect = new Rectangle2D.Double(0,15,width, 15);
-
+			rect = new Rectangle2D.Double(0,10,width, 15);
+			
+			if (isFocused) {
+				this.bgColor = this.bgHoverColor;
+			}
+			
 			graphics2.setColor(this.bgColor);
 			graphics2.fill(roundRect);
 			graphics2.fill(rect);
+			graphics2.draw(roundRect);
+			graphics2.draw(rect);
+			
 	        graphics2.setColor(this.textColor);
 	        graphics2.drawString(printTxt, 5,(int)height - 2 );
-			this.setPreferredSize(new Dimension((int) this.width, (int)height));
-			this.setSize(new Dimension((int) this.width, (int)height));
+			this.setPreferredSize(new Dimension((int) this.width+20, (int)height));
 	    }
 
+	 /**
+	  * 
+	  * @param focus Sets the tab focus.
+	  */
+	public void setFocus(boolean focus) {
+		this.isFocused = focus;
+	}
+	
 	public void changedUpdate(DocumentEvent arg0) {
 		this.isUpdated = true;
 		if(arg0.getLength() == 0){
@@ -112,7 +127,7 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("Clicked " + this.txt + "tab");
 	}
 
 	public void mouseEntered(MouseEvent arg0) {

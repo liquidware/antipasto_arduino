@@ -69,13 +69,20 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	private JList scriptFileList;
 	
 	private String userdir = System.getProperty("user.dir") + File.separator;
-	private String jrubyPath = new String(userdir + "hardware/tools/jruby/bin/");
+	private String jrubyPath = new String(userdir + "hardware"+File.separator+
+													"tools"+File.separator+
+													"jruby"+File.separator+
+													"bin"+File.separator);
+	
 	private String scriptPath = new String(Sketchbook.getSketchbookPath() + 
 									   		File.separator); 
 	
 	private String headerTextDefault = new String("                  " +
 			   									  "                   | Run |");
 	private String[] wingTabNames;
+	
+	private WingTab[] wingTabs;
+	private JPanel[] wingDocs;
 	
 	public ReferencePanel(JFrame parent) {
 		super(parent, false);
@@ -114,7 +121,39 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 			WingTab tab = new WingTab(wingTabNames[x],null);
 			tabPanel.add(tab);
 		}
-		
+		tabPanel.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				//this.
+			}
+			
+		});
 		
 		/* A Horizontal Separator */
 		JComponent hrImg = new JComponent() {
@@ -124,7 +163,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 							 	        Graphics2D graphics2 = (Graphics2D) g;
 							 	        graphics2.setBackground(new Color(255,255,255));
 							 	        graphics2.setColor(new Color(255,255,255));
-							 	        graphics2.drawLine(0,0,600,1);
+							 	        graphics2.drawLine(0,0,700,1);
 							       	 }};
 		
 		bgPanel.add(tabPanel, BorderLayout.NORTH);					       	 
