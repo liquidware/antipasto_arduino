@@ -55,7 +55,7 @@ import antipasto.Util.Utils;
 import processing.app.*;
 
 public class ReferencePanel extends JDialog implements ComponentListener,
-		IActiveGadgetChangedEventListener, FocusListener {
+		IActiveGadgetChangedEventListener, FocusListener, ISelectedItemListener {
 
 	// The standard width and height for the dialog
 	private int cachedHeight = 425;
@@ -79,10 +79,11 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	
 	private String headerTextDefault = new String("                  " +
 			   									  "                   | Run |");
-	private String[] wingTabNames;
+	private String[] wingTabNames = {""};
 	
-	private WingTab[] wingTabs;
+	
 	private JPanel[] wingDocs;
+	private WingTab[] wingTabs = {null,null,null,null};
 	
 	public ReferencePanel(JFrame parent) {
 		super(parent, false);
@@ -97,11 +98,11 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.textArea.setText(txt);
 	}
 	
-	/*************************************************
-	 * Initialize Top Panel
-	 *  Returns: a JPanel with the Tabs for the right wing.
+	/**
+	 * Initialize a Wing Header Panel
+	 *  Returns: a panel with the Tabs populated for the right wing.
 	 */
-	JPanel initTopPanel(String[] tabNames) {
+	JPanel initWingHeaderPanel(String[] tabNames) {
 
 		JPanel bgPanel = new JPanel();
 		bgPanel.setSize(cachedWidth, 15);
@@ -117,9 +118,10 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 		/* Create the tabs */
 		wingTabNames = tabNames.clone();
-		for (int x=0; x < wingTabNames.length; x++) {
-			WingTab tab = new WingTab(wingTabNames[x],null);
-			tabPanel.add(tab);
+		for (int x=0; x<wingTabNames.length; x++) {
+			wingTabs[x] = new WingTab(wingTabNames[x],null);
+			wingTabs[x].addSelectionListener(this);
+			tabPanel.add(wingTabs[x]);
 		}
 		
 		/* A Horizontal Separator */
@@ -140,10 +142,10 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	}
 
 	/*************************************************
-	 * Initialize Bottom Panel
-	 *  Returns: a JPanel with the status panel for the right wing.
+	 * Initialize Wing Status Panel
+	 *  Returns: The status panel for the right wing.
 	 */
-	JPanel initBottomPanel(String message) {
+	JPanel initWingStatusPanel(String message) {
 
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setSize(cachedWidth, 15);
@@ -160,7 +162,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	/* Execute a JRuby Script
 	 * If the script name is not null, this executes it.
 	 */
-	void executeScript(String scriptName) {
+	void executeJRubyScript(String scriptName) {
 		
 
 		if (scriptName != null) {
@@ -184,10 +186,10 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	}
 	
 	/*************************************************
-	 * Initialize Tab Header Panel
+	 * Initialize Panel Header
 	 *  Returns: a JPanel with a header text 
 	 */
-	JPanel initTabHeader(String textDisplay) {
+	JPanel initPanelHeader(String textDisplay) {
 		
 		JPanel headerPanel = new JPanel();
 		headerPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
@@ -231,11 +233,12 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 				}
 			}
 
-			/* JRuby Script Execution Testing
+			/* JRuby Script Execution
 			 */
 			public void mouseReleased(MouseEvent arg0) {
 				
-				executeScript((String) scriptFileList.getSelectedValue());
+				/* Run the selected script */
+				executeJRubyScript((String) scriptFileList.getSelectedValue());
 
 			}});
 		
@@ -249,7 +252,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	 * Initialize Reference Tab 
 	 *  Returns: a JPanel with the reference content 
 	 */
-	JPanel initReferenceTab(String defaultText) {
+	JPanel initReferencePanel(String defaultText) {
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -276,7 +279,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.textArea.addFocusListener(this);
 
 		//Build the header
-		JPanel headerPanel = initTabHeader(" Module: TouchShield.txt ");
+		JPanel headerPanel = initPanelHeader(" Module: TouchShield.txt ");
 		
 		// Assemble the panel
 		panel.add(headerPanel, BorderLayout.NORTH);
@@ -289,10 +292,10 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	}
 	
 	/*************************************************
-	 * Initialize Script Tab 
+	 * Initialize Script Panel 
 	 *  Returns: a JPanel with the script content 
 	 */
-	JPanel initScriptTab(String[] scriptList) {
+	JPanel initScriptPanel(String[] scriptList) {
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -305,7 +308,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.scrollPane.setVisible(true);
 		
-		JPanel headerPanel = initTabHeader(headerTextDefault);
+		JPanel headerPanel = initPanelHeader(headerTextDefault);
 		
 		// Assemble the panel
 		panel.add(headerPanel, BorderLayout.NORTH);
@@ -345,9 +348,9 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 		
 		  // Build and Return the script tab panel
-		  return initScriptTab(fileList);
+		  return initScriptPanel(fileList);
 		 
-		//return initReferenceTab("Here is some default text   \n" +
+		//return initReferencePanel("Here is some default text   \n" +
 		//					    "from the TouchShield module \n" +
 		//					    "Line 3                      \n" +
 		//					    "Line 4                      \n");
@@ -368,9 +371,9 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.setSize(cachedWidth, cachedHeight);
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		
-		JPanel topPanel    = initTopPanel(new String[] {" Reference ", " Scripts ", " Wiring ", " Plugin "});
+		JPanel topPanel    = initWingHeaderPanel(new String[] {" Reference ", " Scripts ", " Wiring ", " Plugin "});
 		JPanel centerPanel = initCenterPanel("Scripts");
-		JPanel bottomPanel = initBottomPanel(" Scripts loaded.");
+		JPanel bottomPanel = initWingStatusPanel(" Scripts loaded.");
 
 		this.getContentPane().add(centerPanel, BorderLayout.CENTER);
 		this.getContentPane().add(topPanel, BorderLayout.NORTH);
@@ -444,6 +447,16 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	
 	public void message(String s) {
 		System.out.println(s);
+	}
+
+
+	@Override
+	public void onSelected(Object object) {
+		// TODO Auto-generated method stub
+		WingTab selected = (WingTab)object;
+		
+		System.out.println(selected.txt);
+		
 	}
 	
 

@@ -19,11 +19,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.EventListenerList;
 
 import antipasto.Interfaces.*;
 
-public class WingTab extends JComponent implements DocumentListener, MouseListener {
-	
+public class WingTab extends JComponent implements MouseListener {
+	private EventListenerList listeners = new EventListenerList();
 	RoundRectangle2D roundRect;
 	Rectangle2D rect;
 	RoundRectangle2D roundRect2;
@@ -44,11 +45,12 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 	private Color textColor;
 	
 	private double width = 0; 
-	private double height = 25;
+	private double height = 20;
 	private boolean isFocused = false;
+	private boolean isSelected = false;
 	
 	public WingTab(String title, Object valueHolder){
-		//We need to create a rounded tab
+		
 		this.txt = title;
 		this.bgColor = bgDefaultColor;
 		this.textColor = textDefaultColor;
@@ -92,41 +94,32 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 	        graphics2.drawString(printTxt, 5,(int)height - 2 );
 			this.setPreferredSize(new Dimension((int) this.width+20, (int)height));
 	    }
-
+	 
 	 /**
 	  * 
 	  * @param focus Sets the tab focus.
 	  */
-	public void setFocus(boolean focus) {
+	public void setFocused(boolean focus) {
 		this.isFocused = focus;
+		System.out.println("hi");
 	}
 	
-	public void changedUpdate(DocumentEvent arg0) {
-		this.isUpdated = true;
-		if(arg0.getLength() == 0){
-			this.isUpdated = false;
-		}
-		System.out.println("Changed Update");
-		this.repaint();
+	/**
+	 * 
+	 * @param selected Sets the selected parameter of the class.
+	 */
+	public void setSelected(boolean selected) {
+		this.isSelected = selected;
 	}
-	public void insertUpdate(DocumentEvent arg0) {
-		this.isUpdated = true;
-		updates++;
-		this.repaint();
-	}
-
-	public void removeUpdate(DocumentEvent arg0) {
-		this.isUpdated = true;
-		updates--;
-		if(updates == 0){
-			isUpdated = false;
-		}
-		this.repaint();
+	
+	public boolean getSelected() {
+		return this.isSelected;
 	}
 
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		System.out.println("Clicked " + this.txt + "tab");
+		this.isSelected = true;
+		fireSelectedEvent();
 	}
 
 	public void mouseEntered(MouseEvent arg0) {
@@ -150,5 +143,24 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void addSelectionListener(ISelectedItemListener item){
+		this.listeners.add(ISelectedItemListener.class, item);
+	}
+	
+	private void fireSelectedEvent(){
+		Object[] listeners = this.listeners.getListenerList();
+	     // loop through each listener and pass on the event if needed
+	     int numListeners = listeners.length;
+	     for (int i = 0; i<numListeners; i+=2) 
+	     {
+	          if (listeners[i]==ISelectedItemListener.class) 
+	          {
+	               // pass the event to the listeners event dispatch method
+	                ((ISelectedItemListener)listeners[i+1]).onSelected(this);
+	          }            
+	     }
+
 	}
 }

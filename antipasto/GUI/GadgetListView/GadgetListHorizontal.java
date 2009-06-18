@@ -168,12 +168,13 @@ public class GadgetListHorizontal extends JPanel implements ISelectedItemListene
 		itemsPanel.setVisible(true);		
 	}
 
-	public void onSelected(ModuleIcon selectedItem) {
+	public void onSelected(Object selectedItem) {
+		ModuleIcon selected = (ModuleIcon)selectedItem;
 		if(gadgetList != null && gadgetList.gadget != null){
 			GadgetFactory fact = new GadgetFactory();
 			try {
 				if(gadgetList.gadget != null){
-					fact.AddModuleToGadget(gadgetList.gadget, selectedItem.getModule());
+					fact.AddModuleToGadget(gadgetList.gadget, selected.getModule());
 					gadgetList.saveCurrentGadget();
 				}
 				gadgetList.loadGadget(gadgetList.gadget);
