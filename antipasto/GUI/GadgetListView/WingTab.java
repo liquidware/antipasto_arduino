@@ -22,7 +22,7 @@ import javax.swing.event.DocumentListener;
 
 import antipasto.Interfaces.*;
 
-public class WingTab extends JComponent implements DocumentListener, MouseListener, ComponentListener{
+public class WingTab extends JComponent implements DocumentListener, MouseListener {
 	
 	RoundRectangle2D roundRect;
 	Rectangle2D rect;
@@ -62,7 +62,6 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 		obj = valueHolder;
 		
 		this.addMouseListener(this);
-		this.addComponentListener(this);
 
 		this.setPreferredSize(new Dimension((int)this.width, (int)this.height));
 		this.repaint();
@@ -151,30 +150,5 @@ public class WingTab extends JComponent implements DocumentListener, MouseListen
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void componentHidden(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		this.repaint();
-		
-	}
-
-	@Override
-	public void componentMoved(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		this.repaint();
-	}
-
-	@Override
-	public void componentResized(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		this.repaint();
-	}
-
-	@Override
-	public void componentShown(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		this.repaint();
 	}
 }

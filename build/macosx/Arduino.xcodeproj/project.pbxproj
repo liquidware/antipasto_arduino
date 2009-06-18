@@ -336,6 +336,9 @@
 		3A2D879A0FE75D87009B429E /* PPolygon.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A2D87510FE75D87009B429E /* PPolygon.java */; };
 		3A2D879B0FE75D87009B429E /* PShape.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A2D87520FE75D87009B429E /* PShape.java */; };
 		3A2D879C0FE75D87009B429E /* PTriangle.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A2D87530FE75D87009B429E /* PTriangle.java */; };
+		3A5784BD0FE9C389004351AC /* ruby.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A5784BC0FE9C389004351AC /* ruby.png */; };
+		3A5784DC0FE9C47B004351AC /* ScriptRunner.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A5784DB0FE9C47B004351AC /* ScriptRunner.java */; };
+		3A5784DF0FE9C49F004351AC /* WingTab.java in Sources */ = {isa = PBXBuildFile; fileRef = 3A5784DE0FE9C49F004351AC /* WingTab.java */; };
 		3AE93F3C0F2D793E00B94BD9 /* arduino.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F340F2D793E00B94BD9 /* arduino.icns */; };
 		3AE93F3D0F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F360F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg */; };
 		3AE93F3E0F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F370F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */; };
@@ -639,6 +642,9 @@
 		3A2D87510FE75D87009B429E /* PPolygon.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PPolygon.java; sourceTree = "<group>"; };
 		3A2D87520FE75D87009B429E /* PShape.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PShape.java; sourceTree = "<group>"; };
 		3A2D87530FE75D87009B429E /* PTriangle.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PTriangle.java; sourceTree = "<group>"; };
+		3A5784BC0FE9C389004351AC /* ruby.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ruby.png; sourceTree = "<group>"; };
+		3A5784DB0FE9C47B004351AC /* ScriptRunner.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ScriptRunner.java; sourceTree = "<group>"; };
+		3A5784DE0FE9C49F004351AC /* WingTab.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = WingTab.java; sourceTree = "<group>"; };
 		3AE93F340F2D793E00B94BD9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = arduino.icns; sourceTree = "<group>"; };
 		3AE93F360F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_1_9.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_9.dmg; sourceTree = "<group>"; };
 		3AE93F370F2D793E00B94BD9 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_2_9_Intel.dmg; sourceTree = "<group>"; };
@@ -697,6 +703,7 @@
 				33FF02770965BD160016AC38 /* buttons.gif */,
 				33FF02780965BD160016AC38 /* icon.gif */,
 				33FF02790965BD160016AC38 /* keywords.txt */,
+				3A5784BC0FE9C389004351AC /* ruby.png */,
 				33FF027A0965BD160016AC38 /* loading.gif */,
 				33FF027D0965BD160016AC38 /* preferences.txt */,
 				33FF027F0965BD160016AC38 /* resize.gif */,
@@ -804,6 +811,7 @@
 		3A2D863A0FE75D74009B429E /* antipasto */ = {
 			isa = PBXGroup;
 			children = (
+				3A5784DB0FE9C47B004351AC /* ScriptRunner.java */,
 				3A2D863B0FE75D74009B429E /* Core.java */,
 				3A2D863C0FE75D74009B429E /* CoreFactory.java */,
 				3A2D863D0FE75D74009B429E /* CorePacker */,
@@ -887,6 +895,7 @@
 		3A2D86500FE75D74009B429E /* GadgetListView */ = {
 			isa = PBXGroup;
 			children = (
+				3A5784DE0FE9C49F004351AC /* WingTab.java */,
 				3A2D86510FE75D74009B429E /* AddGadgetActions */,
 				3A2D86530FE75D74009B429E /* AddGadgetMenu.java */,
 				3A2D86540FE75D74009B429E /* FileTransferObject.java */,
@@ -1241,6 +1250,7 @@
 				3A2D86B30FE75D76009B429E /* SketchBookUnpacker.iml in Resources */,
 				3A2D86EA0FE75D76009B429E /* GadgetPacker.iml in Resources */,
 				3A2D86F60FE75D76009B429E /* GadgetUnpacker.iml in Resources */,
+				3A5784BD0FE9C389004351AC /* ruby.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1457,6 +1467,8 @@
 				3A2D879A0FE75D87009B429E /* PPolygon.java in Sources */,
 				3A2D879B0FE75D87009B429E /* PShape.java in Sources */,
 				3A2D879C0FE75D87009B429E /* PTriangle.java in Sources */,
+				3A5784DC0FE9C47B004351AC /* ScriptRunner.java in Sources */,
+				3A5784DF0FE9C49F004351AC /* WingTab.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1490,8 +1502,8 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "";
 				JAVA_CLASS_SEARCH_PATHS = "../Shared/lib/registry.jar ../Shared/lib/antlr.jar ../Shared/lib/mrj.jar ../Shared/lib/RXTXcomm.jar ../Shared/lib/oro.jar";
-				JAVA_COMPILER_SOURCE_VERSION = 1.4;
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
+				JAVA_COMPILER_SOURCE_VERSION = 1.5;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.5;
 				JAVA_ONLY = YES;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_SEARCH_PATHS = (
