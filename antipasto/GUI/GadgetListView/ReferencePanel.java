@@ -61,29 +61,25 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	private int cachedHeight = 425;
 	private int cachedWidth = 300;
 	private JTextArea textArea;
-	private JLabel statusLabel;
-	private JLabel headerLabel;
+
+	
 	private JFrame component;
 	private IModule activeModule;
 	private JScrollPane scrollPane;
-	private JList scriptFileList;
+
 	
 	private String userdir = System.getProperty("user.dir") + File.separator;
-	private String jrubyPath = new String(userdir + "hardware"+File.separator+
-													"tools"+File.separator+
-													"jruby"+File.separator+
-													"bin"+File.separator);
+
+	private JPanel	   wingHeader;
+	private JPanel	   wingBody;
+	private WingFooter wingFooter;
 	
-	private String scriptPath = new String(Sketchbook.getSketchbookPath() + 
-									   		File.separator); 
+	private WingPanelScripts scriptPanel;
 	
-	private String headerTextDefault = new String("                  " +
-			   									  "                   | Run |");
-	private String[] wingTabNames = {""};
-	
-	
-	private JPanel[] wingDocs;
-	private WingTab[] wingTabs = {null,null,null,null};
+	private String[]  wingTabNames = {""};
+	private WingTab[] wingTabs   = {null,null,null,null};
+	private JPanel[]  wingPanels = {null,null,null,null};
+	private int		  wingFocusedIndex = 0;
 	
 	public ReferencePanel(JFrame parent) {
 		super(parent, false);
@@ -99,10 +95,10 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	}
 	
 	/**
-	 * Initialize a Wing Header Panel
+	 * Initialize a Wing Header
 	 *  Returns: a panel with the Tabs populated for the right wing.
 	 */
-	JPanel initWingHeaderPanel(String[] tabNames) {
+	JPanel initWingHeader(String[] tabNames) {
 
 		JPanel bgPanel = new JPanel();
 		bgPanel.setSize(cachedWidth, 15);
@@ -140,107 +136,41 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 		return bgPanel;
 	}
-
-	/*************************************************
-	 * Initialize Wing Status Panel
-	 *  Returns: The status panel for the right wing.
-	 */
-	JPanel initWingStatusPanel(String message) {
-
-		JPanel bottomPanel = new JPanel();
-		bottomPanel.setSize(cachedWidth, 15);
-		bottomPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
-		bottomPanel.setLayout(new BorderLayout());
-
-		statusLabel = new JLabel(message);
-		statusLabel.setForeground(new Color(0xFF, 0xFF, 0xFF));
-		bottomPanel.add(statusLabel, BorderLayout.WEST);
-
-		return bottomPanel;
-	}
 	
-	/* Execute a JRuby Script
-	 * If the script name is not null, this executes it.
+	/*************************************************
+	 * Initialize a Test Panel
+	 *  Returns: The test panel
 	 */
-	void executeJRubyScript(String scriptName) {
+	JPanel initTestPanel(String message) {
+
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(255, 255, 255));
+		panel.setLayout(new BorderLayout());
+		panel.setOpaque(true);
 		
-
-		if (scriptName != null) {
-			
-			ScriptRunner myScript = new ScriptRunner(jrubyPath + "jruby.bat", 
-			      	 								 jrubyPath + "jruby");
-
-			try {
-				myScript.run(scriptPath + scriptName);
-				System.out.println(myScript.getScriptOutput());
-				statusLabel.setText(" Script finished.");
-			} catch (Exception e) {
-				Base.showWarning("JRuby Error", "Could not find the JRuby Compiler\n", null);
-				e.printStackTrace();			
-			}
-			
-		} else {
-			/* Display the issue */
-			statusLabel.setText("Select a script to run.");
-		}
+		JLabel label = new JLabel(message);
+		label.setForeground(new Color(0, 0, 0));
+		
+		JPanel headerPanel = initTestPanelHeader(message);
+		
+		// Assemble the panel
+		panel.add(headerPanel, BorderLayout.NORTH);
+		panel.add(label, BorderLayout.CENTER);
+		return panel;
 	}
 	
-	/*************************************************
-	 * Initialize Panel Header
+
+	/**
+	 * Initialize a Test Panel Header
 	 *  Returns: a JPanel with a header text 
 	 */
-	JPanel initPanelHeader(String textDisplay) {
+	JPanel initTestPanelHeader(String textDisplay) {
 		
 		JPanel headerPanel = new JPanel();
 		headerPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
 		headerPanel.setLayout(new BorderLayout());
 
-		headerLabel = new JLabel(textDisplay);
-		
-		headerLabel.addMouseListener(new MouseListener() {
-
-			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				headerLabel.setForeground(Color.orange);
-				
-				// TODO Auto-generated method stub
-				String selectedItem = (String) scriptFileList.getSelectedValue();
-				if (selectedItem != null) {
-					statusLabel.setText(" Run " + selectedItem + " script");
-				} else {
-					statusLabel.setText(" Run script");
-				}
-				
-			}
-
-			public void mouseExited(MouseEvent arg0) {
-				headerLabel.setText(headerTextDefault);
-				headerLabel.setForeground(Color.white);
-			}
-
-			public void mousePressed(MouseEvent arg0) {
-				
-				String selectedItem = (String) scriptFileList.getSelectedValue();
-				if (selectedItem != null) {
-					statusLabel.setText(" Running " + selectedItem + " script");
-				} else {
-					statusLabel.setText(" Run script");
-				}
-			}
-
-			/* JRuby Script Execution
-			 */
-			public void mouseReleased(MouseEvent arg0) {
-				
-				/* Run the selected script */
-				executeJRubyScript((String) scriptFileList.getSelectedValue());
-
-			}});
+		JLabel headerLabel = new JLabel(textDisplay);
 		
 		headerLabel.setForeground(new Color(0xFF, 0xFF, 0xFF));
 		headerPanel.add(headerLabel, BorderLayout.CENTER);		
@@ -248,8 +178,10 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		return headerPanel;
 	}
 	
+
+	
 	/*************************************************
-	 * Initialize Reference Tab 
+	 * Initialize Reference Panel 
 	 *  Returns: a JPanel with the reference content 
 	 */
 	JPanel initReferencePanel(String defaultText) {
@@ -279,7 +211,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.textArea.addFocusListener(this);
 
 		//Build the header
-		JPanel headerPanel = initPanelHeader(" Module: TouchShield.txt ");
+		JPanel headerPanel = initTestPanelHeader(" Module: TouchShield.txt ");
 		
 		// Assemble the panel
 		panel.add(headerPanel, BorderLayout.NORTH);
@@ -291,69 +223,38 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 	}
 	
-	/*************************************************
-	 * Initialize Script Panel 
-	 *  Returns: a JPanel with the script content 
-	 */
-	JPanel initScriptPanel(String[] scriptList) {
-
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		
-		scriptFileList = new JList(scriptList);
-		scriptFileList.setCellRenderer(new ScriptCellRenderer());
-		
-		this.scrollPane = new JScrollPane(scriptFileList);
-		this.scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		this.scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		this.scrollPane.setVisible(true);
-		
-		JPanel headerPanel = initPanelHeader(headerTextDefault);
-		
-		// Assemble the panel
-		panel.add(headerPanel, BorderLayout.NORTH);
-		panel.add(this.scrollPane,BorderLayout.CENTER);
-		
-		return panel;
-
-	}
 
 	/*************************************************
-	 * Initialize the Center Panel
+	 * Initialize the Wing Body
 	 * 
-	 * The Center Panel always returns:  --------------
+	 * The Wing Body always returns:     --------------
 	 * 								      Header Panel
 	 * 						     	      Content Panel
 	 *								     ---------------
 	 */ 								
-	JPanel initCenterPanel(String tab) {
-		
-		//Find some files from the sketchbook/scripts directory
-		// For testing, lets create some default files
-		
-		// Grab the script files from the sketchbook directory
-		File scriptFolder = new File(scriptPath);
-		String fileList[] = scriptFolder.list(new FilenameFilter() {
-
-			public boolean accept(File dir, String name) {
-		        String extension = Utils.getExtension(name);
-		        if (extension != null) {
-		            if (extension.equals(Utils.rb) ){
-		                    return true;
-		            } 
-		        }
-		        
-				return false;
-			} });
+	JPanel initWingBody() {
 		
 		
-		  // Build and Return the script tab panel
-		  return initScriptPanel(fileList);
-		 
-		//return initReferencePanel("Here is some default text   \n" +
-		//					    "from the TouchShield module \n" +
-		//					    "Line 3                      \n" +
-		//					    "Line 4                      \n");
+		  /* Build each panel */
+		  wingPanels[0] = initReferencePanel("Here is some default text   \n" +
+							    			"from the TouchShield module \n" +
+							    			"Line 3                      \n" +
+							    			"Line 4                      \n");
+		  
+		  String scriptPath = new String(Sketchbook.getSketchbookPath() + File.separator); 
+		  wingPanels[1] = new WingPanelScripts(scriptPath, 
+				  							   wingFooter, 
+				  							   cachedWidth, 
+				  							   cachedHeight);
+		  
+		  wingPanels[2] = initTestPanel("Test1");
+		  wingPanels[3] = initTestPanel("Test2");
+		  
+		  /* Retrieve the previous focused index */
+		  wingFocusedIndex = 0;
+		  
+		  return wingPanels[wingFocusedIndex];
+		  
 	}
 
 	/*************************************************
@@ -371,13 +272,14 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.setSize(cachedWidth, cachedHeight);
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		
-		JPanel topPanel    = initWingHeaderPanel(new String[] {" Reference ", " Scripts ", " Wiring ", " Plugin "});
-		JPanel centerPanel = initCenterPanel("Scripts");
-		JPanel bottomPanel = initWingStatusPanel(" Scripts loaded.");
+		wingHeader = initWingHeader(new String[] {" Reference ", " Scripts ", " Wiring ", " Plugin "});
+		wingFooter = new WingFooter(" Scripts loaded.", cachedWidth, 15);
+		wingBody   = initWingBody();
+		
 
-		this.getContentPane().add(centerPanel, BorderLayout.CENTER);
-		this.getContentPane().add(topPanel, BorderLayout.NORTH);
-		this.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
+		this.getContentPane().add(wingBody, BorderLayout.CENTER);
+		this.getContentPane().add(wingHeader, BorderLayout.NORTH);
+		this.getContentPane().add(wingFooter, BorderLayout.SOUTH);
 
 		this.scrollPane.setVisible(true);
 	}
@@ -455,7 +357,30 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		// TODO Auto-generated method stub
 		WingTab selected = (WingTab)object;
 		
-		System.out.println(selected.txt);
+		/* A tab was selected, update the focus of all items */
+		for (int x=0; x<wingTabs.length; x++) {
+			
+			if (wingTabs[x].txt == selected.txt) {
+
+				/* Enable the other tabs and panels */
+				wingFocusedIndex = x;			//Store the focused Id
+				wingTabs[x].setFocused(true);
+				
+				/* Load the new center panel */
+				wingBody = wingPanels[x];
+				this.getContentPane().add(wingBody, BorderLayout.CENTER);
+				wingPanels[x].setEnabled(true);
+				wingPanels[x].setVisible(true);
+				
+			} else {
+				
+				 /* Disable the other tabs and panels */
+				 wingTabs[x].setFocused(false);
+				 wingPanels[x].setEnabled(false);
+				 wingPanels[x].setVisible(false);
+			}
+			
+		}
 		
 	}
 	

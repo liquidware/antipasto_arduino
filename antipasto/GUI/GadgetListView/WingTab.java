@@ -80,10 +80,6 @@ public class WingTab extends JComponent implements MouseListener {
 			roundRect = new RoundRectangle2D.Double(0, 5, width, 25 , 10, 10);
 			rect = new Rectangle2D.Double(0,10,width, 15);
 			
-			if (isFocused) {
-				this.bgColor = this.bgHoverColor;
-			}
-			
 			graphics2.setColor(this.bgColor);
 			graphics2.fill(roundRect);
 			graphics2.fill(rect);
@@ -101,7 +97,16 @@ public class WingTab extends JComponent implements MouseListener {
 	  */
 	public void setFocused(boolean focus) {
 		this.isFocused = focus;
-		System.out.println("hi");
+		
+		if (isFocused) {
+			this.bgColor   = this.bgHoverColor;
+			this.textColor = this.textHoverColor;
+		} else {
+			this.bgColor   = this.bgDefaultColor;
+			this.textColor = this.textDefaultColor;
+		}
+		
+		this.repaint();
 	}
 	
 	/**
@@ -118,26 +123,32 @@ public class WingTab extends JComponent implements MouseListener {
 
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		this.isSelected = true;
-		fireSelectedEvent();
+
 	}
 
 	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		this.textColor = this.textHoverColor;
-		this.bgColor = this.bgHoverColor;
-		this.repaint();
+		if (!isFocused) {
+			this.textColor = this.textHoverColor;
+			this.bgColor = this.bgHoverColor;
+			this.repaint();
+		}
 	}
 
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		this.textColor = this.textDefaultColor;
-		this.bgColor = this.bgDefaultColor;
-		this.repaint();
+		
+		if (!isFocused) {
+			this.textColor = this.textDefaultColor;
+			this.bgColor = this.bgDefaultColor;
+			this.repaint();
+		}
 	}
 
 	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
+		this.isSelected = true;
+		fireSelectedEvent();
 	}
 
 	public void mouseReleased(MouseEvent arg0) {
