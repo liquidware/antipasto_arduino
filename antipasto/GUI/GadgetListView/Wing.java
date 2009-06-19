@@ -54,44 +54,35 @@ import antipasto.Util.ScriptFileFilter;
 import antipasto.Util.Utils;
 import processing.app.*;
 
-public class ReferencePanel extends JDialog implements ComponentListener,
+public class Wing extends JDialog implements ComponentListener,
 		IActiveGadgetChangedEventListener, FocusListener, ISelectedItemListener {
 
 	// The standard width and height for the dialog
 	private int cachedHeight = 425;
 	private int cachedWidth = 300;
-	private JTextArea textArea;
-
 	
 	private JFrame component;
 	private IModule activeModule;
-	private JScrollPane scrollPane;
-
-	
-	private String userdir = System.getProperty("user.dir") + File.separator;
 
 	private JPanel	   wingHeader;
 	private JPanel	   wingBody;
 	private WingFooter wingFooter;
 	
-	private WingPanelScripts scriptPanel;
+	private WingPanelScripts   wingPanelScripts;
+	private WingPanelReference wingPanelReference;
 	
 	private String[]  wingTabNames = {""};
 	private WingTab[] wingTabs   = {null,null,null,null};
 	private JPanel[]  wingPanels = {null,null,null,null};
 	private int		  wingFocusedIndex = 0;
 	
-	public ReferencePanel(JFrame parent) {
+	public Wing(JFrame parent) {
 		super(parent, false);
 		component = parent;
 		this.setUndecorated(true);
 		this.init();
 		parent.addComponentListener(this);
 		this.addComponentListener(this);
-	}
-
-	public void LoadText(String txt) {
-		this.textArea.setText(txt);
 	}
 	
 	/**
@@ -179,51 +170,6 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	}
 	
 
-	
-	/*************************************************
-	 * Initialize Reference Panel 
-	 *  Returns: a JPanel with the reference content 
-	 */
-	JPanel initReferencePanel(String defaultText) {
-
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		
-		this.getContentPane().setLayout(new BorderLayout());
-		this.textArea = new JTextArea(defaultText);
-
-		this.setSize(cachedWidth, cachedHeight);
-		this.setBackground(new Color(0x04, 0x4F, 0x6F));
-
-		this.scrollPane = new JScrollPane(this.textArea);
-		this.scrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		this.scrollPane
-				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-		this.textArea.setWrapStyleWord(true);
-		this.textArea.setLineWrap(true);
-		this.textArea.setBounds(this.scrollPane.getBounds());
-
-		this.textArea.setVisible(true);
-		this.scrollPane.setVisible(true);
-
-		this.textArea.addFocusListener(this);
-
-		//Build the header
-		JPanel headerPanel = initTestPanelHeader(" Module: TouchShield.txt ");
-		
-		// Assemble the panel
-		panel.add(headerPanel, BorderLayout.NORTH);
-		panel.add(this.scrollPane,BorderLayout.CENTER);
-
-		return panel;		
-		
-		
-		
-	}
-	
-
 	/*************************************************
 	 * Initialize the Wing Body
 	 * 
@@ -236,22 +182,26 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		
 		
 		  /* Build each panel */
-		  wingPanels[0] = initReferencePanel("Here is some default text   \n" +
-							    			"from the TouchShield module \n" +
-							    			"Line 3                      \n" +
-							    			"Line 4                      \n");
+		  wingPanelReference =  new WingPanelReference("This is the reference panel", 
+							    						wingFooter,
+							    						cachedWidth,
+							    						cachedHeight);
 		  
 		  String scriptPath = new String(Sketchbook.getSketchbookPath() + File.separator); 
-		  wingPanels[1] = new WingPanelScripts(scriptPath, 
-				  							   wingFooter, 
-				  							   cachedWidth, 
-				  							   cachedHeight);
+		  wingPanelScripts = new WingPanelScripts(	scriptPath, 
+				  							   		wingFooter, 
+				  							   		cachedWidth, 
+				  							   		cachedHeight);
 		  
+
+		  wingPanels[0] = wingPanelReference;
+		  wingPanels[1] = wingPanelScripts;
 		  wingPanels[2] = initTestPanel("Test1");
 		  wingPanels[3] = initTestPanel("Test2");
 		  
 		  /* Retrieve the previous focused index */
 		  wingFocusedIndex = 0;
+		  wingTabs[wingFocusedIndex].setFocused(true); //focus the tab
 		  
 		  return wingPanels[wingFocusedIndex];
 		  
@@ -272,16 +222,16 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 		this.setSize(cachedWidth, cachedHeight);
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		
+		
 		wingHeader = initWingHeader(new String[] {" Reference ", " Scripts ", " Wiring ", " Plugin "});
 		wingFooter = new WingFooter(" Scripts loaded.", cachedWidth, 15);
 		wingBody   = initWingBody();
 		
-
+		
 		this.getContentPane().add(wingBody, BorderLayout.CENTER);
 		this.getContentPane().add(wingHeader, BorderLayout.NORTH);
 		this.getContentPane().add(wingFooter, BorderLayout.SOUTH);
 
-		this.scrollPane.setVisible(true);
 	}
 
 	
@@ -317,20 +267,20 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 
 	public void onActiveGadgetChanged(ActiveGadgetObject obj) {
 		if (obj != null) {
-			System.out
-					.println("Active gadget chainging in the reference panel");
 			this.activeModule = obj.getModule();
 			if (this.activeModule.getReferenceText() != null
 					|| this.activeModule.getReferenceText()
 							.equalsIgnoreCase("")) {
-				this.LoadText(this.activeModule.getReferenceText());
+				
+				// Disabled until reference text is written..
+				// wingPanelReference.setText(this.activeModule.getReferenceText());
+				wingPanelReference.setText(this.activeModule.getName() + " reference text here.");
 			} else {
-				System.out.println("No text found");
-				this.textArea.setText("");
+				System.out.println("No reference text found, defaulting ");
+				wingPanelReference.setText(this.activeModule.getName() + " reference text here.");
 			}
 		} else {
-			this.textArea.setText("");
-			System.out.println("Setting text to blank");
+			wingPanelReference.setText("Reference text area.");
 		}
 	}
 
@@ -339,20 +289,21 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 	}
 
 	public void focusLost(FocusEvent arg0) {
+		
+		/* Disabled until Omar needs this ;-)
 		if (this.activeModule != null) {
-			this.activeModule.setReferenceText(this.textArea.getText());
+			this.activeModule.setReferenceText(wingPanelReference.getText());
 			System.out.println("setting the text");
 		} else {
 			System.out.println("Text being set to null");
 		}
-	}
-	
-	public void message(String s) {
-		System.out.println(s);
+		*/
 	}
 
-
-	@Override
+	/**
+	 * Tab Selection Control. 
+	 * This event handles the tab and panel selection changes.
+	 */
 	public void onSelected(Object object) {
 		// TODO Auto-generated method stub
 		WingTab selected = (WingTab)object;
@@ -366,7 +317,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 				wingFocusedIndex = x;			//Store the focused Id
 				wingTabs[x].setFocused(true);
 				
-				/* Load the new center panel */
+				/* Load a new Body panel */
 				wingBody = wingPanels[x];
 				this.getContentPane().add(wingBody, BorderLayout.CENTER);
 				wingPanels[x].setEnabled(true);
@@ -374,7 +325,7 @@ public class ReferencePanel extends JDialog implements ComponentListener,
 				
 			} else {
 				
-				 /* Disable the other tabs and panels */
+				 /* Disable the other tabs and Body panels */
 				 wingTabs[x].setFocused(false);
 				 wingPanels[x].setEnabled(false);
 				 wingPanels[x].setVisible(false);

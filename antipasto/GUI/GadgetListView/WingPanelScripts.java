@@ -79,17 +79,16 @@ public class WingPanelScripts extends JPanel {
 
 		this.width = width;
 		this.height = height;
+		this.wingFooter = (WingFooter)wingFooter;
 		
 		/* Setup the panel */
 		setSize(width, height);
 		setBackground(bgDefaultColor);
 		setLayout(new BorderLayout());
 		
-		headerPanel = initScriptPanelHeader(" | Run | ");
+		headerPanel = initPanelHeader(" | Run | ");
 		
 		setDirectory(scriptDirectory); 
-		
-		this.wingFooter = (WingFooter)wingFooter;
 		
 		/* Add */
 		add(headerPanel, BorderLayout.NORTH);
@@ -97,11 +96,11 @@ public class WingPanelScripts extends JPanel {
 	}
 	
 	/**
-	 * Initialize a Script Panel Header
+	 * Initialize a Panel Header
 	 * @param textDisplay The button text
 	 * @return: a JPanel with a button
 	 */
-	JPanel initScriptPanelHeader(String textDisplay) {
+	JPanel initPanelHeader(String textDisplay) {
 		
 		JPanel headerPanel = new JPanel();
 		headerPanel.setBackground(new Color(0x04, 0x4F, 0x6F));
@@ -160,10 +159,10 @@ public class WingPanelScripts extends JPanel {
 	}
 	
 	/**
-	 * Initialize Script Body 
+	 * Initialize the panel's Body 
 	 * @param scriptList A list of files from the scriptDirectory
 	 */
-	void initScriptBody(String[] scriptList) {
+	void initBody(String[] scriptList) {
 		
 		scriptFileList = new JList(scriptList);
 		scriptFileList.setCellRenderer(new ScriptCellRenderer());
@@ -209,7 +208,9 @@ public class WingPanelScripts extends JPanel {
 	public void setDirectory(String scriptDirectory) {
 		scriptPath = scriptDirectory;
 		
-		initScriptBody(readScripts());
+		initBody(readScripts());
+		
+		wingFooter.setText("Scripts loaded from sketchbook directory.");
 	}
 	
 	/**

@@ -182,7 +182,7 @@ public class Editor extends JFrame
   FindReplace find;
   public JFrame _frame;
   public GadgetPanel gadgetPanel ;
-  public ReferencePanel referencePanel;
+  public Wing referencePanel;
 
   //static Properties keywords; // keyword -> reference html lookup
 
@@ -318,8 +318,7 @@ public class Editor extends JFrame
 		}
     });
     
-    referencePanel = new ReferencePanel(this);
-    
+    referencePanel = new Wing(this);
     
    	imageListPanel = new ImageListPanel(this.gadgetPanel, new FlashTransfer());
 	
