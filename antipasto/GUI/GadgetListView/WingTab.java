@@ -44,7 +44,7 @@ public class WingTab extends JComponent implements MouseListener {
 	private Color textHoverColor = Color.BLACK;
 	private Color textColor;
 	
-	private double width = 0; 
+	private double width; 
 	private double height = 20;
 	private boolean isFocused = false;
 	private boolean isSelected = false;
@@ -60,20 +60,28 @@ public class WingTab extends JComponent implements MouseListener {
         int size = 18;
 		
 		this.font = new Font(family, style, size);
-		this.setVisible(true);
 		obj = valueHolder;
 		
 		this.addMouseListener(this);
-
+		
+		/* Dynamically adjust size based on text width */
+		this.width = (this.txt.length() * 6) + 10;
+		
 		this.setPreferredSize(new Dimension((int)this.width, (int)this.height));
-		this.repaint();
+		//this.setSize(new Dimension((int) this.width, (int)height));
 		
 	}
 	
 	 public void paint(Graphics g) {
 	        Graphics2D graphics2 = (Graphics2D) g;
 	        
-	        this.width = font.getStringBounds(this.txt,graphics2.getFontRenderContext()).getWidth()-10;
+	        //FontMetrics metrics = g.getFontMetrics(font);
+	        //this.width =  ((metrics.getStringBounds(txt, g).getWidth() / 2) * 1.4) +5;
+	        //this.width = (int)this.txt.length() * 8;
+	        //this.width = font.getStringBounds(this.txt,graphics2.getFontRenderContext()).getWidth()-10;
+	        
+	        //this.setSize(new Dimension((int) this.width, (int)height));
+			//this.setPreferredSize(new Dimension((int) this.width, (int)height));
 	        
 			String printTxt = this.txt;
 			
@@ -88,7 +96,6 @@ public class WingTab extends JComponent implements MouseListener {
 			
 	        graphics2.setColor(this.textColor);
 	        graphics2.drawString(printTxt, 5,(int)height - 2 );
-			this.setPreferredSize(new Dimension((int) this.width+20, (int)height));
 	    }
 	 
 	 /**

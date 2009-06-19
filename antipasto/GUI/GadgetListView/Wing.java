@@ -5,6 +5,7 @@ import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -100,7 +101,7 @@ public class Wing extends JDialog implements ComponentListener,
 		JPanel tabPanel = new JPanel();
 		tabPanel.setBackground(new Color(0x21, 0x68, 0x86));
 		tabPanel.setSize(cachedWidth, 15);
-		tabPanel.setLayout(new BoxLayout(tabPanel,BoxLayout.X_AXIS));
+		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
 		tabPanel.setOpaque(true);
 		
 		/* Create the tabs */
@@ -223,7 +224,7 @@ public class Wing extends JDialog implements ComponentListener,
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		
 		
-		wingHeader = initWingHeader(new String[] {" Reference ", " Scripts ", " Wiring ", " Plugin "});
+		wingHeader = initWingHeader(new String[] {"Reference", "Scripts", "Test 1", "Test 2"});
 		wingFooter = new WingFooter(" Scripts loaded.", cachedWidth, 15);
 		wingBody   = initWingBody();
 		
@@ -253,6 +254,7 @@ public class Wing extends JDialog implements ComponentListener,
 
 	public void componentMoved(ComponentEvent arg0) {
 		setLocation();
+		repaint();
 	}
 
 	public void componentResized(ComponentEvent arg0) {
