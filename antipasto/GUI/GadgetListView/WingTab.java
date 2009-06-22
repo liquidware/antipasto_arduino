@@ -65,7 +65,7 @@ public class WingTab extends JComponent implements MouseListener {
 		this.addMouseListener(this);
 		
 		/* Dynamically adjust size based on text width */
-		this.width = (this.txt.length() * 6) + 10;
+		this.width = (this.txt.length() * 7) + 10;
 		
 		this.setPreferredSize(new Dimension((int)this.width, (int)this.height));
 		//this.setSize(new Dimension((int) this.width, (int)height));

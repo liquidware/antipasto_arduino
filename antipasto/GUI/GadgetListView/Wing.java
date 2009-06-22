@@ -201,7 +201,11 @@ public class Wing extends JDialog implements ComponentListener,
 		  wingPanels[3] = initTestPanel("Test2");
 		  
 		  /* Retrieve the previous focused index */
-		  wingFocusedIndex = 0;
+		try {
+			wingFocusedIndex = Preferences.getInteger("editor.rightWing.selectedTabIndex");
+		} catch (Exception e) {
+			wingFocusedIndex = 0;
+		}
 		  wingTabs[wingFocusedIndex].setFocused(true); //focus the tab
 		  
 		  return wingPanels[wingFocusedIndex];
@@ -317,6 +321,7 @@ public class Wing extends JDialog implements ComponentListener,
 
 				/* Enable the other tabs and panels */
 				wingFocusedIndex = x;			//Store the focused Id
+				Preferences.setInteger("editor.rightWing.selectedTabIndex", wingFocusedIndex);
 				wingTabs[x].setFocused(true);
 				
 				/* Load a new Body panel */
