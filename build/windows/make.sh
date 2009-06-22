@@ -70,7 +70,7 @@ else
   unzip -q  -d work/hardware dist/avr_tools.zip
 
   echo Extracting JRuby Compiler ...
-  unzip -q  -d work/hardware/tools ../shared/dist/jruby.zip
+  unzip -q  -d work/hardware/tools ../shared/jruby.zip
 
   # take care of the examples
   cp -r ../shared/dist/examples work/
@@ -88,15 +88,32 @@ cd ../..
 
 cd processing/app
 
-CLASSPATH="..\\..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\..\\build\\windows\\work\\lib\\mrj.jar;..\\..\\build\\windows\\work\\lib\antlr.jar;..\\..\\build\\windows\\work\\lib\\oro.jar;..\\..\\build\\windows\\work\\lib\\registry.jar;..\\..\\build\\windows\\work\\java\\lib\\rt.jar"
+LIBDIR="..\\..\\build\\windows\\work\\lib"
 
-# compile the code as java 1.3, so that the application will run and
-# show the user an error, rather than crapping out with some strange
-# "class not found" crap
-# need to do this twice because otherwise dependencies aren't resolved right.
-#../../build/windows/work/java  -target 1.5 +D -classpath "$CLASSPATH;..\\..\\build\\windows\\work\\classes" -d ..\\..\\build\\windows\\work\\classes  preproc/*.java syntax/*.java tools/*.java *.java ../../antipasto/Util/*.java ../../antipasto/*.java ../../antipasto/Interfaces/*.java  ../../antipasto/GUI/GadgetListView/*.java ../../antipasto/GUI/GadgetListView/GadgetPanelEvents/*.java ../../antipasto/GUI/GadgetListView/AddGadgetActions/*.java ../../antipasto/ModuleRules/*.java ../../antipasto/GUI/ImageListView/*.java
-../../build/windows/work/java/bin/java -classpath "..\\..\\build\\windows\\work\\java\\lib\\tools.jar" com.sun.tools.javac.Main -deprecation -Xlint:unchecked -source 1.6 -target 1.6 -classpath "$CLASSPATH;"  -d ..\\..\\build\\windows\\work\\classes ../core/*.java *.java preproc/*.java syntax/*.java tools/*.java preproc/*.java  ../../antipasto/Util/*.java ../../antipasto/*.java ../../antipasto/Interfaces/*.java  ../../antipasto/GUI/GadgetListView/*.java ../../antipasto/GUI/GadgetListView/GadgetPanelEvents/*.java ../../antipasto/GUI/GadgetListView/AddGadgetActions/*.java ../../antipasto/ModuleRules/*.java ../../antipasto/GUI/ImageListView/*.java
-#../../build/windows/work/java/bin/java  -classpath "$CLASSPATH;" ..\\..\\build\\windows\\work\\classes" -d ..\\..\\build\\windows\\work\\classes \ ../core/*.java *.java preproc/*.java syntax/*.java tools/*.java preproc/*.java  ../../antipasto/Util/*.java ../../antipasto/*.java ../../antipasto/Interfaces/*.java  ../../antipasto/GUI/GadgetListView/*.java ../../antipasto/GUI/GadgetListView/GadgetPanelEvents/*.java ../../antipasto/GUI/GadgetListView/AddGadgetActions/*.java ../../antipasto/ModuleRules/*.java ../../antipasto/GUI/ImageListView/*.java
+LIBRARIES="$LIBDIR\\junit.jar;\
+$LIBDIR\\sax2.jar;\
+$LIBDIR\\filterbuilder.jar;\
+$LIBDIR\\htmllexer.jar;\
+$LIBDIR\\htmlparser.jar;\
+$LIBDIR\\thumbelina.jar;\
+$LIBDIR\\RXTXcomm.jar;\
+$LIBDIR\\mrj.jar;\
+$LIBDIR\\antlr.jar;\
+$LIBDIR\\oro.jar;\
+$LIBDIR\\registry.jar;\
+$LIBDIR\\rt.jar"
+
+../../build/windows/work/java/bin/java \
+                                        -classpath "..\\..\\build\\windows\\work\\java\\lib\\tools.jar" com.sun.tools.javac.Main \
+                                        -deprecation \
+                                        -Xlint:unchecked \
+                                        -source 1.6 \
+                                        -target 1.6 \
+                                        -classpath "$LIBRARIES;" \
+                                        -d ..\\..\\build\\windows\\work\\classes ../core/*.java *.java preproc/*.java syntax/*.java tools/*.java preproc/*.java  ../../antipasto/Util/*.java ../../antipasto/*.java ../../antipasto/Interfaces/*.java  ../../antipasto/GUI/GadgetListView/*.java ../../antipasto/GUI/GadgetListView/GadgetPanelEvents/*.java ../../antipasto/GUI/GadgetListView/AddGadgetActions/*.java ../../antipasto/ModuleRules/*.java ../../antipasto/GUI/ImageListView/*.java
+
+
+
 
 cd ../../build/windows/work/classes
 rm -f ../lib/pde.jar

@@ -13,8 +13,9 @@ import java.awt.event.MouseListener;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
+import java.net.*;
+import java.util.Properties;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -64,7 +65,7 @@ public class WingPanelReference extends JPanel {
 	
 	/**
 	 * Creates a new Wing Panel for Reference
-	 * @param referenceFile The file that contains the reference.
+	 * @param text The text string that contains the reference.
 	 * @param wingFooter The panel to display status to the user
 	 * @param width The width of the panel
 	 * @param height The height of the panel
@@ -110,9 +111,8 @@ public class WingPanelReference extends JPanel {
 		
 		headerLabel.addMouseListener(new MouseListener() {
 
-			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+			public void mouseClicked(MouseEvent arg0) { 
+				;
 			}
 
 			public void mouseEntered(MouseEvent arg0) {

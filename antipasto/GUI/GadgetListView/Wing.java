@@ -69,8 +69,9 @@ public class Wing extends JDialog implements ComponentListener,
 	private JPanel	   wingBody;
 	private WingFooter wingFooter;
 	
-	private WingPanelScripts   wingPanelScripts;
 	private WingPanelReference wingPanelReference;
+	private WingPanelScripts   wingPanelScripts;
+	private WingPanelAppStore wingPanelAppStore;
 	
 	private String[]  wingTabNames = {""};
 	private WingTab[] wingTabs   = {null,null,null,null};
@@ -194,10 +195,13 @@ public class Wing extends JDialog implements ComponentListener,
 				  							   		cachedWidth, 
 				  							   		cachedHeight);
 		  
+		  wingPanelAppStore =  new WingPanelAppStore(	wingFooter,
+														cachedWidth,
+														cachedHeight);
 
 		  wingPanels[0] = wingPanelReference;
 		  wingPanels[1] = wingPanelScripts;
-		  wingPanels[2] = initTestPanel("Test1");
+		  wingPanels[2] = wingPanelAppStore;
 		  wingPanels[3] = initTestPanel("Test2");
 		  
 		  /* Retrieve the previous focused index */
@@ -228,7 +232,7 @@ public class Wing extends JDialog implements ComponentListener,
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		
 		
-		wingHeader = initWingHeader(new String[] {"Reference", "Scripts", "Test 1", "Test 2"});
+		wingHeader = initWingHeader(new String[] {"Reference", "Scripts", "App Store", "Test 2"});
 		wingFooter = new WingFooter(" Scripts loaded.", cachedWidth, 15);
 		wingBody   = initWingBody();
 		

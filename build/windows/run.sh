@@ -1,7 +1,23 @@
 #!/bin/sh
 
 PATH=lib:$PATH
-CLASSPATH=\"java\\lib\\rt.jar\;lib\\RXTXcomm.jar\;lib\;lib\\build\;lib\\pde.jar\;lib\\mrj.jar\;lib\\liquidware.jar\;lib\\antlr.jar\;lib\\oro.jar\;lib\\registry.jar\"
+CLASSPATH=\"java\\lib\\rt.jar\;\
+lib\\RXTXcomm.jar\;\
+lib\;\
+lib\\build\;\
+lib\\pde.jar\;\
+lib\\mrj.jar\;\
+lib\\liquidware.jar\;\
+lib\\antlr.jar\;\
+lib\\oro.jar\;\
+lib\\registry.jar\;\
+lib\\junit.jar\;\
+lib\\sax2.jar\;\
+lib\\filterbuilder.jar\;\
+lib\\htmllexer.jar\;\
+lib\\htmlparser.jar\;\
+lib\\thumbelina.jar\;\"
+
 export PATH
 export CLASSPATH
 
