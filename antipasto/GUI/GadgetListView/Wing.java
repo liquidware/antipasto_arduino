@@ -71,11 +71,11 @@ public class Wing extends JDialog implements ComponentListener,
 	
 	private WingPanelReference wingPanelReference;
 	private WingPanelScripts   wingPanelScripts;
-	private WingPanelAppStore wingPanelAppStore;
+	//private WingPanelAppStore wingPanelAppStore;
 	
 	private String[]  wingTabNames = {""};
-	private WingTab[] wingTabs   = {null,null,null,null};
-	private JPanel[]  wingPanels = {null,null,null,null};
+	private WingTab[] wingTabs   = {null,null};
+	private JPanel[]  wingPanels = {null,null};
 	private int		  wingFocusedIndex = 0;
 	
 	public Wing(JFrame parent) {
@@ -195,24 +195,29 @@ public class Wing extends JDialog implements ComponentListener,
 				  							   		cachedWidth, 
 				  							   		cachedHeight);
 		  
-		  wingPanelAppStore =  new WingPanelAppStore(	wingFooter,
-														cachedWidth,
-														cachedHeight);
+		  //wingPanelAppStore =  new WingPanelAppStore(	wingFooter,
+		  //											cachedWidth,
+		  //											cachedHeight);
 
 		  wingPanels[0] = wingPanelReference;
 		  wingPanels[1] = wingPanelScripts;
-		  wingPanels[2] = wingPanelAppStore;
-		  wingPanels[3] = initTestPanel("Test2");
+		  //wingPanels[2] = wingPanelAppStore;
+		  //wingPanels[3] = initTestPanel("Test2");
 		  
-		  /* Retrieve the previous focused index */
+		/* Retrieve the previous focused index */
 		try {
 			wingFocusedIndex = Preferences.getInteger("editor.rightWing.selectedTabIndex");
 		} catch (Exception e) {
 			wingFocusedIndex = 0;
 		}
-		  wingTabs[wingFocusedIndex].setFocused(true); //focus the tab
-		  
-		  return wingPanels[wingFocusedIndex];
+		
+		// Error checking
+		if (wingFocusedIndex >= wingTabs.length ) {
+			wingFocusedIndex = 0;
+		}
+		
+		wingTabs[wingFocusedIndex].setFocused(true); //focus the tab
+		return wingPanels[wingFocusedIndex];
 		  
 	}
 
@@ -232,7 +237,7 @@ public class Wing extends JDialog implements ComponentListener,
 		this.setBackground(new Color(0x04, 0x4F, 0x6F));
 		
 		
-		wingHeader = initWingHeader(new String[] {"Reference", "Scripts", "App Store", "Test 2"});
+		wingHeader = initWingHeader(new String[] {"Reference", "Scripts"});
 		wingFooter = new WingFooter(" Scripts loaded.", cachedWidth, 15);
 		wingBody   = initWingBody();
 		
