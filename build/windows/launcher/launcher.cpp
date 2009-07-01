@@ -47,8 +47,6 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
   // them without the user knowing. so who knows where and when the
   // quotes will show up. this is a guess at dealing with the things, 
   // without spending a whole day to make it overly robust. [fry]
-
-  
   
 
   // test to see if running with a java runtime nearby or not
@@ -73,105 +71,38 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
   // and causes more trouble than it's worth [0060]
   env_classpath[0] = 0;
 
-  /*
-  // keep this code around since may be re-enabled later
-  if (getenv("CLASSPATH") != NULL) {
-    strcpy(env_classpath, getenv("CLASSPATH"));
-    if (env_classpath[0] == '\"') {
-      // starting quote in classpath.. yech
-      env_classpath++;  // shitty.. i know..
-
-      int len = strlen(env_classpath);
-      if (env_classpath[len-1] == '\"') {
-        env_classpath[len-1] = 0;
-      } else {
-        // a starting quote but no ending quote.. ugh
-        // maybe throw an error
-      }
-    }
-    int last = strlen(env_classpath);
-    env_classpath[last++] = ';';
-    env_classpath[last] = 0;
-  } else {
-    env_classpath[0] = 0;
-  }
-  */
-/* WE DUNNO NEED QUICKTIME JAVA FOR ARDUINO
-  char *qtjava_path = (char *)malloc(16384 * sizeof(char));
-  qtjava_path[0] = 0;
-
-  if (getenv("WINDIR") == NULL) {
-    // uh-oh.. serious problem.. gonna have to report this
-    // but hopefully WINDIR is set on win98 too
-
-  } else {
-    strcpy(qtjava_path, getenv("WINDIR"));
-    strcat(qtjava_path, "\\SYSTEM32\\QTJava.zip");
-
-    FILE *fp = fopen(qtjava_path, "rb");
-    if (fp != NULL) {
-      fclose(fp);  // found it, all set
-      strcat(qtjava_path, ";"); // add path separator
-
-    } else {
-      strcpy(qtjava_path, getenv("WINDIR"));
-      strcat(qtjava_path, "\\SYSTEM\\QTJava.zip");
-
-      fp = fopen(qtjava_path, "rb");
-      if (fp != NULL) {
-        fclose(fp);  // found it, all set
-        strcat(qtjava_path, ";"); // add path separator
-
-      } else {
-        // doesn't seem to be installed, which is a problem.
-        // but the error will be reported by the pde
-        qtjava_path[0] = 0;
-      }
-    }
-  }
-END WE DUNNO NEED QUICKTIME JAVA FOR ARDUINO*/  
   // NO! put quotes around contents of cp, because %s might have spaces in it.
   // don't put quotes in it, because it's setting the environment variable
   // for CLASSPATH, not being included on the command line. so setting the
   // env var it's ok to have spaces, and the quotes prevent 
   // javax.comm.properties from being found.
   sprintf(cp,	
-          //"\""   // begin quote
-          //"'"
-
           "%s"  // local jre or blank
-          //"%s"  // qtjava path
           ""
-
           "%s\\lib;"
           "%s\\lib\\build;"
           "%s\\lib\\pde.jar;"
-          //"%s\\lib\\core.jar;"
           "%s\\lib\\mrj.jar;"
           "%s\\lib\\RXTXcomm.jar;"
           "%s\\lib\\oro.jar;"
+
+          "%s\\lib\\junit.jar;"
+          "%s\\lib\\sax2.jar;"
+          "%s\\lib\\filterbuilder.jar;"
+          "%s\\lib\\htmllexer.jar;"
+          "%s\\lib\\htmlparser.jar;"
+          "%s\\lib\\thumbelina.jar;"
+
           "%s\\lib\\registry.jar;"
           "%s\\lib\\antlr.jar;"
           
           "%s",  // original CLASSPATH
-          
-
-          //"C:\\WINNT\\system32\\QTJava.zip;"  // worthless
-          //"C:\\WINDOWS\\system32\\QTJava.zip;"
-
-          //"\"",   // end quote
-          //"'",
-          //,
-
-          // the first three %s args
-          //local_jre_installed ? "java\\lib\\rt.jar;java\\lib\\jaws.jar;" : "", 
           local_jre_installed ? "java\\lib\\rt.jar;" : "", 
-          //qtjava_path,
           loaddir, loaddir, loaddir, loaddir, 
-          loaddir, loaddir, loaddir, loaddir, 
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir, loaddir, 
           env_classpath);
-
-  //MessageBox(NULL, cp, "it's twoo! it's twoo!", MB_OK);
 
   if (!SetEnvironmentVariable("CLASSPATH", cp)) {
     MessageBox(NULL, "Could not set CLASSPATH environment variable",
@@ -197,8 +128,6 @@ END WE DUNNO NEED QUICKTIME JAVA FOR ARDUINO*/
     
 	
   }
-
-  //MessageBox(NULL, cp, "whaadddup", MB_OK);
 
   // add the name of the class to execute and a space before the next arg
   strcat(outgoing_cmdline, JAVA_MAIN_CLASS " ");

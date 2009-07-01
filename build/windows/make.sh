@@ -51,10 +51,6 @@ else
   make && cp arduino.exe ../work/
   cd ..
 
-  # get jikes and depedencies
-  #cp dist/jikes.exe work/
-  #chmod +x work/jikes.exe
-
   cp dist/ICE_JNIRegistry.dll work/
 
   cp -r ../../hardware work/
@@ -66,14 +62,19 @@ else
 #  echo Extracting Java Compiler ...
 #  unzip -q  -d work/hardware/tools jre.zip
 
-  echo Extracting AVR Compiler ...
+  echo Extracting AVR Compiler...
   unzip -q  -d work/hardware dist/avr_tools.zip
 
-  echo Extracting JRuby Compiler ...
-  unzip -q  -d work/hardware/tools ../shared/jruby.zip
+  echo Extracting JRuby Compiler...
+  rm work/jruby.zip
+  unzip -q  -d work/hardware/tools ../shared/jruby.zip  
+  
 
   # take care of the examples
   cp -r ../shared/dist/examples work/
+
+  #clean the remaining dist directory away 
+  rm -rf work/dist
 
   # chmod +x the crew
   find work -name "*.dll" -exec chmod +x {} ';'
