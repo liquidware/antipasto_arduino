@@ -38,11 +38,13 @@ rm -rf Arduino                                  # Remove existing packages
 
 if test -d $PACKAGING_BASE_DIR/$PACKAGE_FOLDER  # Remove Temp directory
 then
+  echo Cleaning $PACKAGING_BASE_DIR/$PACKAGE_FOLDER ...
   rm -rf $PACKAGING_BASE_DIR/$PACKAGE_FOLDER
 fi
 
 if test -d $PACKAGING_BASE_DIR/$PACKAGER_DIR    # Remove packager
 then
+  echo Cleaning $PACKAGING_BASE_DIR/$PACKAGER_DIR ...
   rm -rf $PACKAGING_BASE_DIR/$PACKAGER_DIR
 fi
 

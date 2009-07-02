@@ -88,8 +88,8 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="Default" Root="0" Key=".gdt" Value="AntipastoGadget" Component_="Default"/>
-    <ROW Registry="Default_1" Root="0" Key="AntipastoGadget\DefaultIcon" Name="(Default)" Value="[APPDIR][ProductName]\[ProductName]\arduino.exe,1" Component_="Default_1"/>
-    <ROW Registry="Default_2" Root="0" Key="AntipastoGadget\shell\open\command" Name="(Default)" Value="[APPDIR][ProductName]\[ProductName]\arduino.exe %1" Component_="Default_2"/>
+    <ROW Registry="Default_1" Root="0" Key="AntipastoGadget\DefaultIcon" Name="(Default)" Value="[APPDIR][ProductName]\arduino.exe,1" Component_="Default_1"/>
+    <ROW Registry="Default_2" Root="0" Key="AntipastoGadget\shell\open\command" Name="(Default)" Value="[APPDIR][ProductName]\arduino.exe %1" Component_="Default_2"/>
     <ROW Registry="Default_3" Root="0" Key="AntipastoGadget" Name="(Default)" Value="AntipastoGadget" Component_="Default_3"/>
     <ROW Registry="_" Root="0" Key=".pde" Value="AntipastoGadget" Component_="_"/>
     <ROW Registry="gdt" Root="0" Key=".gdt" Name="*" Component_="gdt"/>

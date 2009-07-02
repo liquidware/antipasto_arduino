@@ -21,6 +21,7 @@
 //*******************************************************************************
 //*	Detailed Edit history
 //*	<MLS>	=	Mark Sproul, msproul@jove.rutgers.edu
+//* <TWH>	=	Thom Holtquist, ctsfutures.com
 //*******************************************************************************
 //*	Nov 30,	2008	<inthebitz> Version 0.1 This is the beginnings of the "Sub-Processing" for TouchShield library
 //*	Dec  4,	2008	<Chris> Version 0.2 Merged into the TouchShield core
@@ -38,6 +39,16 @@
 //*	Jan  2,	2009	<MLS> Changed args in orientation() to LONG, fixed bug in filled triangles
 //*	Jan  3,	2009	<MLS> Added OffsetRect
 //*	Jan  3,	2009	<MLS> Changed my_point to gMostRecentTouchPt
+//* Jun 14, 2009	<TWH> Added anti-aliasing support; accessed through smoothingMode
+//* Jun 14, 2009	<TWH> Added clipping support; accessed through setClip & resetClip
+//* Jun 14, 2009	<TWH> Added HMI: call updatePen() inside of void loop to access
+//* Jun 14, 2009	<TWH> Improved HMI: accessed pen, penDown, penTap & penHold
+//* Jun 14, 2009	<TWH> Added alphablending: alphaBlend()
+//* Jun 14, 2009	<TWH> Added inverting: invertColor()
+//* Jun 14, 2009	<TWH> Added getPixel()
+//* Jun 14, 2009	<TWH> Updated beginCanvas to work w/ new commands
+//* Jun 14, 2009	<TWH> Added new color support to methods
+//* Jun 14, 2009	<TWH> Extended support to Hershey
 //*******************************************************************************
 //*	<MLS> Programming style
 //*			never use 1 letter variable names, use LONG names, 
@@ -62,7 +73,6 @@
 #include	<stdlib.h>
 #include	"wiring.h"
 
-
 #ifndef _HARDWARE_DEF_H_
 	#include	"HardwareDef.h"
 #endif
@@ -70,17 +80,17 @@
 #ifndef _SUBP_OPTIONS_H_
 	#include	"SubPOptions.h"
 #endif
+
 #ifndef SUBPGRAPHICS_H
 	#include	"SubPGraphics.h"
 #endif
 #include	"QuickDraw.h"
+
 #ifndef GRAPHICS_H
 	#include	"graphics.h"
 #endif
 
-//#define	incx() x++, dxt += d2xt, t += dxt
 #define	incx() xx++, dxt += d2xt, t += dxt
-//#define	incy() y--, dyt += d2yt, t += dyt
 #define	incy() yy--, dyt += d2yt, t += dyt
 
 #define MIN3(a,b,c) ((((a)<(b))&&((a)<(c))) ? (a) : (((b)<(c)) ? (b) : (c)))
@@ -90,18 +100,15 @@
 //*******************************************************************************
 //*	GLOBAL CONSTANTS AND VARIABLES
 //*******************************************************************************
+const int	SMOOTHING_OFF	=	0;
+const int	SMOOTHING_QUICK	=	1;
+const int	SMOOTHING_HIGH	=	2;
 
 //* INPUT VARIABLES
 COLOR	fcolor		=	{ 255, 255, 255 };
 COLOR	bcolor		=	{ 0, 0, 0 };
-//COLOR	green		=	{ 0, 255, 0 };
-//COLOR	blue		=	{0,0,255};
-//COLOR	yellow		=	{255,255,0};
-//COLOR	grey		=	{0x77,0x77,0x77};
-//COLOR	red			=	{255,0,0};
-//COLOR	black		=	{0,0,0};
-//COLOR	white		=	{255,255,255};
-//COLOR	mycolor		=	{255, 255, 255};
+
+int		smoothingMode	=	SMOOTHING_OFF;
 
 int		brightness	=	BRIGHT_MAX;
 POINT	gMostRecentTouchPt;
@@ -111,146 +118,39 @@ int		mouseX			=	screen.width / 2;
 int		mouseY			=	screen.height / 2;
 int		width			=	kSCREEN_X_size;		//screen.width;
 int		height			=	kSCREEN_Y_size;		//screen.height;
-int		strokeWeightVal	=	1;
-uint8_t	strokeEnb		=	true;
-uint8_t	fillEnb			=	true;
 uint8_t	cptr;
 uint8_t	buf[32];
 uint8_t	serverEnb		=	false;
 char	command[16];
+int		strokeWeightVal	=	1;
 
+boolean	penDown			=	false;
+boolean	penHold			=	false;
+boolean penAuto			=	false;
+boolean penTap			=	false;
+POINT	pen;
 
 //*******************************************************************************
 //* LOCAL FUNCTION PROTOTYPES
 //*******************************************************************************
 void	dispFillEllipse(int xCenter, int yCenter, int xRadius, int yRadius);
 void	dispOutlineEllipse(unsigned int xc,unsigned int yc,unsigned int a,unsigned int b);
-void	dispWuLine( int X0, int Y0, int X1, int Y1); 
-void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3);
+void	dispWuLine( int X0, int Y0, int X1, int Y1, COLOR col);
+void	dispQSLine(int x1, int y1, int x2, int y2, COLOR col);
+void	dispHSLine(int x1, int y1, int x2, int y2, COLOR col);
 int		point_triangle_intersection(int px, int py, int x1, int y1, int x2, int y2, int x3, int y3);
 int		orientation (long x1, long y1, long x2, long y2, long px, long py);
 void	getstring(uint8_t *buf, int bufsize);
 void	sendStringL( char *buf, int size);
 void	drawNumber(unsigned long n, uint8_t base, int xLoc, int yLoc);
-
+int		alphaBlendVal(float bkg, float fore, float a);
+float	getPointSpacing(int radius);
+void	dispEllipse(int x, int y, int xRadius, int yRadius, COLOR col);
+void	dispSMEllipse(int x, int y, int xRadius, int yRadius, COLOR col);
 //*******************************************************************************
 //*	LOCAL FUNCTIONS
 //*******************************************************************************
-
-//*******************************************************************************
-void	dispOutlineEllipse( int xCenter, int yCenter, int xRadius, int yRadius)
-{
-int		xx		=	0;
-int		yy		=	yRadius;
-long	a2		=	(long)xRadius * xRadius;
-long	b2		=	(long)yRadius * yRadius;
-long	crit1	=	-(a2 / 4 + xRadius % 2 + b2);
-long	crit2	=	-(b2 / 4 + yRadius % 2 + a2);
-long	crit3	=	-(b2 / 4 + yRadius % 2);
-long	t		=	-a2 * yy; /* e(x+1/2,y-1/2) - (a^2+b^2)/4 */
-long	dxt		=	2 * b2 * xx;
-long	dyt		=	-2 * a2 * yy;
-long	d2xt	=	2 * b2;
-long	d2yt	=	2 * a2;
-
-	while (yy >= 0 && xx <= xRadius)
-	{
-		dispPixel(xCenter	+ xx, yCenter + yy);
-		if (xx != 0 || yy != 0)
-		{
-			dispPixel(xCenter - xx, yCenter - yy);
-		}
-		if (xx != 0 && yy != 0)
-		{
-			dispPixel(xCenter + xx, yCenter - yy);
-			dispPixel(xCenter - xx, yCenter + yy);
-		}
-		if (t + b2 * xx <= crit1 ||	/* e(x+1,y-1/2) <= 0 */
-			t + a2 * yy <= crit3)	 /* e(x+1/2,y) <= 0 */
-		{
-			incx();
-		}
-		else if (t - a2 * yy > crit2) /* e(x+1/2,y-1) > 0 */
-		{
-			incy();
-		}
-		else
-		{
-			incx();
-			incy();
-		}
-	}
-}
-
-//*******************************************************************************
-//*	e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2
-//*	a	=	xRadius
-//*	b	=	yRadius
-//*******************************************************************************
-void	dispFillEllipse(int xCenter, int yCenter, int xRadius, int yRadius)
-{
-int				xx		=	0;
-int				yy		=	yRadius;
-unsigned int	width	=	1;
-long			a2		=	(long)xRadius * xRadius;
-long			b2		=	(long)yRadius * yRadius;
-long			crit1	=	-(a2 / 4 + xRadius % 2 + b2);
-long			crit2	=	-(b2 / 4 + yRadius % 2 + a2);
-long			crit3	=	-(b2/4 + yRadius % 2);
-long			t		=	-a2 * yy; /* e(x+1/2,y-1/2) - (a^2+b^2)/4 */
-long			dxt		=	2 * b2 * xx;
-long			dyt		=	-2 * a2 * yy;
-long			d2xt	=	2 * b2;
-long			d2yt	=	2 * a2;
-
-	while (yy >= 0 &&  xx <= xRadius)
-	{
-		if (t + b2 * xx <= crit1 ||	 /* e(x+1,y-1/2) <= 0 */
-			t + a2 * yy <= crit3) 
-		{
-			/* e(x+1/2,y) <= 0 */
-			incx();
-			width	+=	2;
-		}
-		else if (t - a2 * yy > crit2) 
-		{
-			/* e(x+1/2,y-1) > 0 */
-			//dispRectangle(xCenter - x, yCenter - y, width, 1);
-			dispRectangle(xCenter - xx, yCenter - yy, width, 1);
-			if (yy != 0)
-			{
-				//dispRectangle(xCenter- xx, yCenter + y, width, 1);
-				dispRectangle(xCenter - xx, yCenter + yy, width, 1);
-			}
-			incy();
-		}
-		else
-		{
-			//dispRectangle(xCenter - xx, yCenter - y, width, 1);
-			dispRectangle(xCenter - xx, yCenter - yy, width, 1);
-			if (yy != 0)
-			{
-				//dispRectangle(xCenter - xx, yCenter + y, width, 1);
-				dispRectangle(xCenter - xx, yCenter + yy, width, 1);
-			}
-			incx();
-			incy();
-			width	+=	2;
-		}
-	}
-	if (yRadius == 0)
-	{
-		//dispRectangle(xCenter - xRadius, yCenter, 2 * xRadius + 1, 1);
-		dispRectangle(xCenter - xRadius, yCenter, 2 * xRadius + 1, 1);
-	}
-} 
- 
-//*******************************************************************************
-//There's definitely an easier way to do this, but for now I'll use some help from:
-//http://www.codeproject.com/KB/GDI/antialias.aspx#dwuln
-//Edited by inthebitz
-//*******************************************************************************
-void	dispWuLine( int X0, int Y0, int X1, int Y1)
+void	dispWuLine( int X0, int Y0, int X1, int Y1, COLOR col)
 {
 unsigned short	IntensityShift, ErrorAdj, ErrorAcc;
 unsigned short	ErrorAccTemp, Weighting, WeightingComplementMask;
@@ -258,6 +158,8 @@ short			DeltaX, DeltaY, Temp, XDir;
 short			BaseColor		=	0;
 short			NumLevels		=	2;
 unsigned short	IntensityBits	=	2;
+
+    dispColor(col);
 
 	/* Make sure the line runs top to bottom */
 	if (Y0 > Y1)
@@ -392,54 +294,412 @@ unsigned short	IntensityBits	=	2;
 	/* Draw the final pixel, which is always exactly intersected by the line
 		and so needs no weighting */
 	dispPixel(X1, Y1);
+
+	/* set dispColor to fcolor for backwards compatibility */
+	dispColor(fcolor);
 }
-
 //*******************************************************************************
-//	http://www.swissdelphicenter.ch/en/showcode.php?id=2400
-//	http://tog.acm.org/GraphicsGems/gemsiii/triangleCube.c
-//	I'm sure there's a more elegant and cleaner way, but with help from the links above I was able to cludge
-//	this together, so that it at least works! 
-//*******************************************************************************
-void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3) 
+void dispQSLine(int x1, int y1, int x2, int y2, COLOR fgcol, COLOR bgcol)
 {
-
-	if (strokeEnb) 
+  float  xScope;
+  float  yScope;
+  float  dirX;
+  float  dirY;
+  float  linearDeviance;
+  float  counter;
+  float  aaStrength;
+  float  endpointIntensity;
+  float  halfIntensity = 50;
+  
+  xScope = x2 - x1;
+  yScope = y2 - y1;
+  
+  if (xScope < 0)
+  {
+    xScope = abs(xScope);
+    dirX = -1;
+  }
+  else
+  {
+    dirX = 1;
+  }
+  
+  if (yScope < 0)
+  {
+    yScope = abs(yScope);
+    dirY = -1;
+  }
+  else
+  {
+    dirY = 1;
+  }  
+  
+  //* No point in drawing a 0 length line
+  if (xScope + yScope == 0) return;
+  
+  if (xScope > yScope)
+  {
+    endpointIntensity = (33 * yScope) / xScope;
+    setForecolor(alphaBlend(fgcol,bgcol,endpointIntensity));
+    setPixel(x1 - dirX, y1 - dirY);
+    setPixel(x2 + dirX, y2 + dirY);
+    setForecolor(alphaBlend(fgcol,bgcol,halfIntensity));
+    setPixel(x1 - dirX, y1);
+    setPixel(x2 + dirX, y2);
+    
+    setForecolor(fgcol);
+    linearDeviance = xScope / 2;
+    for (counter = 0; counter < xScope; counter++)
 	{
-		dispColor(fcolor);
-		dispWuLine ( x1, y1, x2, y2);
-		dispWuLine ( x2, y2, x3, y3);
-		dispWuLine ( x3, y3, x1, y1);
-	}
+      
+      setForecolor(fgcol);
+      setPixel(x1,y1);
+      aaStrength = (linearDeviance * 100) / xScope;
+      
+      setForecolor(alphaBlend(fgcol,bgcol,100-aaStrength));
+      setPixel(x1,y1-dirY);
+      
+      setForecolor(alphaBlend(fgcol,bgcol,aaStrength));
+      setPixel(x1,y1+dirY);
+      
+      linearDeviance = (linearDeviance + yScope);
+      if (linearDeviance >= xScope)
+	  {
+        linearDeviance = linearDeviance - xScope;
+        y1 = y1 + dirY;
+      }
+      x1 = x1 + dirX;
+    }
+  }
+  else
+  {
+    endpointIntensity = (33 * xScope) / yScope;
+    setForecolor(alphaBlend(fgcol,bgcol,endpointIntensity));
+    setPixel(x1-dirX,y1-dirY);
+    setPixel(x2+dirX,y2+dirY);
+    setForecolor(alphaBlend(fgcol,bgcol,halfIntensity));
+    setPixel(x1,y1-dirY);
+    setPixel(x2,y2+dirY);
+    
+    linearDeviance = yScope / 2;
+    for (counter = 0; counter < yScope; counter++)
+    {
+      setForecolor(fgcol);
+      setPixel(x1,y1);
+      
+      aaStrength = (linearDeviance * 100) / yScope;
 
-	if (fillEnb) 
+      setForecolor(alphaBlend(fgcol,bgcol,100-aaStrength));
+      setPixel(x1 - dirX,y1);
+      
+      setForecolor(alphaBlend(fgcol,bgcol,aaStrength));
+      setPixel(x1- dirX,y1);
+
+      linearDeviance = (linearDeviance + xScope);
+      if (linearDeviance >= yScope)
+	  {
+        linearDeviance = linearDeviance - yScope;
+        x1 = x1 + dirX;
+      }
+      y1 = y1 + dirY;
+
+    }
+  } 
+}
+//*******************************************************************************
+void dispHSLine(int x1, int y1, int x2, int y2, COLOR col) {
+  long  xScope;
+  long  yScope;
+  long  dirX;
+  long  dirY;
+  long  linearDeviance;
+  long  counter;
+  long  aaStrength;
+  long  endpointIntensity;
+  long  halfIntensity = 50;
+  
+  xScope = x2 - x1;
+  yScope = y2 - y1;
+  
+  if (xScope < 0) {
+    xScope = abs(xScope);
+    dirX = -1;
+  } else {
+    dirX = 1;
+  }
+  
+  if (yScope < 0) {
+    yScope = abs(yScope);
+    dirY = -1;
+  } else {
+    dirY = 1;
+  }  
+  
+  //* No point in drawing a 0 length line
+  if (xScope + yScope == 0) return;
+  
+  if (xScope > yScope) {
+    endpointIntensity = (85 * yScope) / xScope;
+    
+    getPixel(&bcolor,x1 - dirX, y1 - dirY);
+    setForecolor(alphaBlend(col,bcolor,endpointIntensity));
+    setPixel(x1 - dirX, y1 - dirY);
+    
+    getPixel(&bcolor,x2 + dirX, y2 + dirY);
+    setForecolor(alphaBlend(col,bcolor,endpointIntensity));    
+    setPixel(x2 + dirX, y2 + dirY);
+    
+    getPixel(&bcolor,x1 - dirX, y1);
+    setForecolor(alphaBlend(col,bcolor,halfIntensity));
+    setPixel(x1 - dirX, y1);
+ 
+    getPixel(&bcolor,x2 + dirX, y2);
+    setForecolor(alphaBlend(col,bcolor,halfIntensity));   
+    setPixel(x2 + dirX, y2);
+    
+    linearDeviance = xScope / 2;
+    for (counter = 0; counter < xScope; counter++) {
+      
+      setForecolor(col);
+      setPixel(x1,y1);
+      aaStrength = (linearDeviance * 100) / xScope;
+      
+      getPixel(&bcolor,x1,y1-dirY);
+      setForecolor(alphaBlend(col,bcolor,100-aaStrength));
+      setPixel(x1,y1-dirY);
+      
+      getPixel(&bcolor,x1,y1+dirY);
+      setForecolor(alphaBlend(col,bcolor,aaStrength));
+      setPixel(x1,y1+dirY);
+      
+      linearDeviance = (linearDeviance + yScope);
+      if (linearDeviance >= xScope) {
+        linearDeviance = linearDeviance - xScope;
+        y1 = y1 + dirY;
+      }
+      x1 = x1 + dirX;
+    }
+  } else {
+    endpointIntensity = (85 * xScope) / yScope;
+    
+    getPixel(&bcolor,y1 - dirY, x1 - dirX);
+    setForecolor(alphaBlend(col,bcolor,endpointIntensity));
+    setPixel(y1 - dirY, x1 - dirX);
+    
+    getPixel(&bcolor,x2 + dirY, y2 + dirX);
+    setForecolor(alphaBlend(col,bcolor,endpointIntensity));    
+    setPixel(x2 + dirY, y2 + dirX);
+    
+    getPixel(&bcolor,y1 - dirY, x1);
+    setForecolor(alphaBlend(col,bcolor,halfIntensity));
+    setPixel(y1 - dirY, x1);
+ 
+    getPixel(&bcolor,x2 + dirY, y2);
+    setForecolor(alphaBlend(col,bcolor,halfIntensity));   
+    setPixel(x2 + dirY, y2);
+    
+    linearDeviance = yScope / 2;
+    for (counter = 0; counter < yScope; counter++)
+    {
+      setForecolor(col);
+      setPixel(x1,y1);
+      
+      aaStrength = (linearDeviance * 100) / yScope;
+
+      getPixel(&bcolor,x2 + dirY, y2);
+      setForecolor(alphaBlend(col,bcolor,100-aaStrength));
+      setPixel(x1 - dirX,y1);
+
+      getPixel(&bcolor,x2 + dirY, y2);     
+      setForecolor(alphaBlend(col,bcolor,aaStrength));
+      setPixel(x1- dirX,y1);
+
+      linearDeviance = (linearDeviance + xScope);
+      if (linearDeviance >= yScope)
+	  {
+        linearDeviance = linearDeviance - yScope;
+        x1 = x1 + dirX;
+      }
+      y1 = y1 + dirY;
+    }
+  }
+}
+//*******************************************************************************
+void dispEllipse(int x, int y, int xRadius, int yRadius, COLOR col)
+{
+int		xx		=	0;
+int		yy		=	yRadius;
+long	a2		=	(long)xRadius * xRadius;
+long	b2		=	(long)yRadius * yRadius;
+long	crit1	=	-(a2 / 4 + xRadius % 2 + b2);
+long	crit2	=	-(b2 / 4 + yRadius % 2 + a2);
+long	crit3	=	-(b2 / 4 + yRadius % 2);
+long	t		=	-a2 * yy; /* e(x+1/2,y-1/2) - (a^2+b^2)/4 */
+long	dxt		=	2 * b2 * xx;
+long	dyt		=	-2 * a2 * yy;
+long	d2xt	=	2 * b2;
+long	d2yt	=	2 * a2;
+
+	dispColor(col);
+	while (yy >= 0 && xx <= x)
 	{
-	int		xx;
-	int		yy;
-	int		startX;
-	int		endX;
-	int		startY;
-	int		endY;
-	
-		//*	figure out the left most and right most points
-		startX	=	MIN3(x1, x2, x3);
-		endX	=	MAX3(x1, x2, x3);
-		//*	figure out the top most and bottom most points
-		startY	=	MIN3(y1,y2,y3);
-		endY	=	MAX3(y1,y2,y3);
-		dispColor(bcolor);
-		for (xx = startX; xx < endX; xx++) 
+		dispPixel(x	+ xx, y + yy);
+		if (xx != 0 || yy != 0)
 		{
-			for (yy = startY; yy < endY; yy++) 
-			{
-				if (point_triangle_intersection(xx, yy, x1, y1, x2, y2, x3, y3) ) 
-				{
-					dispPixel(xx , yy);
-				}
-			}
+			dispPixel(x - xx, y - yy);
+		}
+		if (xx != 0 && yy != 0)
+		{
+			dispPixel(x + xx, y - yy);
+			dispPixel(x - xx, y + yy);
+		}
+		if (t + b2 * xx <= crit1 ||	/* e(x+1,y-1/2) <= 0 */
+			t + a2 * yy <= crit3)	 /* e(x+1/2,y) <= 0 */
+		{
+			incx();
+		}
+		else if (t - a2 * yy > crit2) /* e(x+1/2,y-1) > 0 */
+		{
+			incy();
+		}
+		else
+		{
+			incx();
+			incy();
 		}
 	}
 }
-
+//*******************************************************************************
+void dispSMEllipse(int x, int y, int xRadius, int yRadius, COLOR col)
+{
+  float    radius;
+  int    quadrant;
+  int    c1;
+  float    alpha;
+  float    alphaI;
+  float  pointSpacing;
+  float  angle;
+  float  halfPi = 1.570796;
+  float  x2;
+  float  y2;
+  float  aX;
+  float  aY;
+  float  bX;
+  float  bY;
+  float  rX1;
+  float  rX2;
+  float  rY1;
+  float  rY2;
+  float  xp5;
+  float  L1;
+  float  L2;
+  float  L3;
+  float  L4;
+  float  savX[4];
+  float  savY[4];
+  float  savA[4];
+  float  x4;
+  float  y4;
+  
+  if (xRadius > yRadius)
+  {
+    radius = xRadius;
+  }
+  else
+  {
+    radius = yRadius;
+  }
+  
+  pointSpacing = getPointSpacing(radius);
+  
+  for (angle = 0; angle < halfPi; angle = angle + pointSpacing)
+  {
+    x2 = (xRadius * cos(angle)) + 0.001;
+    y2 = (yRadius * sin(angle)) + 0.001;
+    for (quadrant = 0; quadrant < 4; quadrant++)
+    {
+      switch(quadrant)
+      {
+        case 0: //* 0-90 degrees
+          aX = x2 + x - 0.5;
+          aY = -y2 + y - 0.5;
+          break;
+        case 1: //* 90-180
+          aX = x2 + x - 0.5;
+          aY = y2 + y - 0.5;
+          break;
+        case 2: // 180-270
+          aX = -x2 + x - 0.5;
+          aY = y2 + y - 0.5;
+          break;
+        case 3: //270-360
+          aX = -x2 + x - 0.5;
+          aY = -y2 + y - 0.5;
+          break; 
+      }
+      
+      bX = aX + 1;
+      bY = aY + 1;
+      
+      rX1 = aX;
+      rX2 = rX1 + 1;
+      
+      xp5 = rX1 + 0.5;
+      
+      rY1 = aY;
+      rY2 = bY;
+      
+      L1 = rY1 + 0.5 - aY;
+      L2 = 256 * (xp5 - aX) - xp5 + aX;
+      L3 = 255 - L2;
+      L4 = bY - rY2 + 0.5;
+      
+      savX[0] = rX1;
+      savY[0] = rY1;
+      
+      savX[1] = rX2;
+      savY[1] = rY1;
+      
+      savX[2] = rX1;
+      savY[2] = rY2;
+      
+      savX[3] = rX2;
+      savY[3] = rY2;
+      
+      savA[0] = L1 * L2;
+      savA[1] = L1 * L3;
+      savA[2] = L4 * L2;
+      savA[3] = L4 * L3;
+      
+      for (c1 = 0; c1 < 4; c1++)
+      {
+        x4 = savX[c1];
+        y4 = savY[c1];
+		if (smoothingMode == 2) getPixel(&bcolor,x4,y4);
+        alpha = (savA[c1] / 255) * 100;
+        setForecolor(alphaBlend(col,bcolor,savA[c1]));
+        setPixel(x4,y4);
+      }
+    }
+  }
+}
+//*******************************************************************************
+float getPointSpacing(int radius)
+{
+  float ls = 1.06814128;
+  if (radius < 0)
+  {
+    return -ls / radius;
+  }
+  else if (radius == 0)
+  {
+    return ls;
+  }
+  else
+  {
+    return ls / radius;
+  }
+}
 //*******************************************************************************
 int point_triangle_intersection(int px, int py, int x1, int y1, int x2, int y2, int x3, int y3)
 {
@@ -498,248 +758,143 @@ long	orin;
 //*******************************************************************************
 
 //*******************************************************************************
-void	background(uint8_t backGroundColor)
-{
-	setbcolor(backGroundColor, backGroundColor, backGroundColor);
-	fillback();
+
+unsigned long  _mPenDown    = 0;      // MS at which Pen was last down
+unsigned long  _mPenHold    = 0;      // MS at which Pen started HOLD state
+int     _mWaitDown   = 10;     // MS to wait before calling PenDown
+int     _mWaitUp     = 100;    // MS to wait before calling PenUp
+int     _mWaitHold   = 1500;   // MS to wait before calling PenHold
+int     _mWaitAuto   = 100;    // MS to wait AFTER PenHold for PenAuto
+int     _iHoldRadius = 20;     // Distance allowed to move & still trigger HOLD
+boolean _bNoHold     = false;  // Ignore HOLD for this down?
+POINT   _pPenHold;             // Point pen is HELD at
+//*******************************************************************************
+int alphaBlendVal(float fgcolor, float bgcolor, float a) {
+	if (a >= 98) return fgcolor;
+	float p1 = (100 - a) / 100;
+	float p2 = a / 100;
+	return (bgcolor * p1) + (fgcolor * p2);
+	//return bgcolor - ((bgcolor - fgcolor) * (a / 100));
+}
+//*******************************************************************************
+COLOR alphaBlend(COLOR forecolor, COLOR backcolor, int opacity) {
+  COLOR reslt;
+  reslt.red = alphaBlendVal(forecolor.red, backcolor.red, opacity);
+  reslt.green = alphaBlendVal(forecolor.green, backcolor.green, opacity);
+  reslt.blue = alphaBlendVal(forecolor.blue, backcolor.blue, opacity);
+  return reslt;
+}
+//*******************************************************************************
+void updatePen() {
+  //* Reset 'PUBLIC' variables
+  penTap	= false;
+  penAuto	= false;
+
+  unsigned long mil = millis();
+  
+  if (touch_getCursor(&pen)) {
+    //* Pen ADC reads DOWN
+    if (penDown == false) {
+      //* Check for Pen Down
+      if (mil >= (_mPenDown + _mWaitDown)) {
+        //* Pen is down
+        _mPenDown	= mil;
+        penDown		= true;
+        _pPenHold	= pen; //* We'll use this Point to decide if we HOLD
+      }
+    } else {
+      if (penHold) {
+        //* Pen already HELD check for auto
+        if (mil >= (_mPenHold + _mWaitAuto)) {
+         _mPenHold = mil;
+         penAuto	= true; 
+        }
+      } else {
+        if (!_bNoHold) {
+          //* Only care if we're not ignoring HOLDs
+          if (dist(pen,_pPenHold) >= _iHoldRadius) {
+            //* We've moved too much for it to be a hold
+            _bNoHold = true;
+          } else {
+            //* We're ok on point, how about time?
+            if (mil >= (_mPenDown + _mWaitHold)) {
+              penHold	= true;
+            }
+          }
+        }
+      }
+    }
+  } else {
+    //* Pen ADC reads UP    
+    if (penDown == true && mil >= (_mPenDown + _mWaitUp)) {
+      penHold	= false;
+      _bNoHold  = false;
+      penDown	= false;
+	  penTap	= true;
+    }
+  }
+}
+
+float dist(POINT p1, POINT p2) {
+	return dist(p1.x, p1.y, p2.x, p2.y);
 }
 
 //*******************************************************************************
-void	background(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
-{
-	setbcolor(redValue, greenValue, blueValue);
-	fillback();
+void clear(void) {
+	clear(bcolor);
 }
-
 //*******************************************************************************
-void	clearscreen( void)
-{
-	setbcolor( 0, 0, 0);
-	fillback();
+void clear(int r, int g, int b) {
+	COLOR col = {r,g,b};
+	clear(col);
 }
-
 //*******************************************************************************
-float dist(float x1, float y1, float x2, float y2)
-{
-int	xx	=	(x2 - x1);
-int	yy	=	(y2 - y1);
-
-	return sqrt( (xx * xx)+(yy * yy));
+void clear(COLOR col) {
+	bcolor = col;
+	fillRect(-1, -1, width + 1, height + 1, col);
 }
-
 //*******************************************************************************
-void	drawchar( int xLoc, int yLoc, char theChar)
+void drawEllipse(int x, int y, int xRadius, int yRadius)
 {
-	dispPutC(theChar, xLoc, yLoc, fcolor, bcolor);
+	drawEllipse(x,y,xRadius,yRadius,fcolor);
 }
-
 //*******************************************************************************
-void	drawcircle( int xLoc, int yLoc, int radius)
+void drawEllipse(int x, int y, int xRadius, int yRadius, COLOR col)
 {
-	ellipse(xLoc, yLoc, radius, radius);
-}
-
-//*******************************************************************************
-void	drawrect( int xLoc, int yLoc, int width, int height)
-{
-	rect(xLoc, yLoc, width, height);
-}
-
-//*******************************************************************************
-void	drawstring( int xLoc, int yLoc, char *text)
-{
-	dispPutS(text, xLoc, yLoc, fcolor, bcolor);
-}
-
-//*******************************************************************************
-void	ellipse( int xLoc, int yLoc, int radx, int rady)
-{
-
-	//fill
-	if (fillEnb) 
+	if (smoothingMode == 0)
 	{
-		dispColor(bcolor);
-		dispFillEllipse(xLoc, yLoc, radx-1, rady-1);
-	}
-	
-	//stroke
-	if (strokeEnb)
-	{
-		dispColor(fcolor);
-		for(int i=0; i<strokeWeightVal; i++)
-		{
-			dispOutlineEllipse(xLoc, yLoc, radx+i, rady+i);
-		}
-	}
-}
-
-
-//*******************************************************************************
-void	fadein( int time)
-{
-uint8_t ii;
-
-	for (ii = 0; ii<(brightness+1); ii++) 
-	{
-	#if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
-		dispBrightness((uint8_t)ii);
-	#else
-		oled_brightness((uint8_t)ii);
-	#endif
-		delay(time / brightness);
-	}
-}
-
-//*******************************************************************************
-void	fadeout( int time)
-{
-uint8_t ii;
-
-	for (ii = brightness; ii>0; ii--) 
-	{
-	#if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
-		dispBrightness((uint8_t)ii);
-	#else
-		oled_brightness((uint8_t)ii);
-	#endif
-		delay(time / brightness);
-	}
-}
-
-//*******************************************************************************
-void	fill(int fillColor)
-{
-	fillEnb	=	true;
-	setbcolor(fillColor, fillColor, fillColor);
-}
-
-//*******************************************************************************
-void	fill(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
-{
-	fillEnb	=	true;
-	setbcolor(redValue, greenValue, blueValue);
-}
-
-
-//*******************************************************************************
-void	fillback(void)
-{
-	dispColor(bcolor);
-	rect(-1, -1, width+1, height+1);
-}
-
-//*******************************************************************************
-boolean	gettouch(void)
-{
-boolean	isTouching;
-
-	if (touch_getCursor(&gMostRecentTouchPt))
-	{
-		mouseX	=	gMostRecentTouchPt.x;
-		mouseY	=	gMostRecentTouchPt.y;
-		isTouching	=	true;
+		dispEllipse(x,y,xRadius,yRadius,col);
 	}
 	else
 	{
-		isTouching	=	false;
-	}
-	return(isTouching);
-}
-
-//*******************************************************************************
-void	line(int x1, int y1, int x2, int y2)
-{
-int	temp;
-
-//	if (y2 < y1)
-//	{
-//		temp	=	y1;
-//		y1		=	y2;
-//		y2		=	temp;
-//	}
-//	if (x2 < x1)
-//	{
-//		temp	=	x1;
-//		x1		=	x2;
-//		x2		=	temp;
-//	}
-	dispColor(fcolor);
-
-	dispWuLine (x1, y1, x2, y2);
-}
-
-//*******************************************************************************
-void	noFill(void)
-{
-	fillEnb	=	false;
-}
-
-//*******************************************************************************
-void	noStroke(void)
-{
-	strokeEnb		=	false;
-	strokeWeightVal	=	0;
-}
-
-//*******************************************************************************
-void	point( int xLoc, int yLoc)
-{
-	dispColor(fcolor);
-	dispPixel( xLoc, yLoc);
-}
-
-//*******************************************************************************
-void	quad( int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
-{
-	/* Save the stroke state */
-	uint8_t prevStroke	=	strokeEnb;
-
-	if (fillEnb) 
-	{
-		/* Disable stroke */
-		noStroke();
-		triangle(x1, y1, x2, y2, x3, y3);
-		triangle(x2, y2, x3, y3, x4, y4);
-		triangle(x1, y1, x3, y3, x4, y4);
-
-		/* Restore Stroke */
-		if (prevStroke)
-		{
-			strokeEnb	=	true;
-		}
-	}
-
-	if (strokeEnb) 
-	{
-		line(x1,y1,x2,y2);
-		line(x2,y2,x3,y3);
-		line(x3,y3,x4,y4);
-		line(x4,y4,x1,y1);
+		dispSMEllipse(x,y,xRadius,yRadius,col);
 	}
 }
-
-
 //*******************************************************************************
-//*	Dec 28,	2008	<MLS> Separated rect into framerect and rect
-void	framerect(int xLeft, int yTop, int width, int height)
+void drawRect(int x, int y, int width, int height)
+{
+	drawRect(x,y,width,height,fcolor);
+}
+//*******************************************************************************
+void drawRect(int x, int y, int width, int height, COLOR col)
 {
 	if ((width > 0) && (height > 0))
 	{
-		dispColor(fcolor);
+		dispColor(col);
 		if (strokeWeightVal > 1)
 		{
 		//stroke
-		int		left	=	xLeft - 1;
-		int		top		=	yTop - 1;
-		int		right	=	xLeft + width;
-		int		bottom	=	yTop + height;
+		int		left	=	x - 1;
+		int		top		=	y - 1;
+		int		right	=	x + width;
+		int		bottom	=	y + height;
 
 			for(int i=0; i<strokeWeightVal; i++)
 			{
-				line(left,	top,	right,	top);
-				line(left,	top,	left,	bottom);
-				line(left,	bottom,	right,	bottom);
-				line(right,	top,	right,	bottom);
+				dispWuLine(left,	top,	right,	top, col);
+				dispWuLine(left,	top,	left,	bottom, col);
+				dispWuLine(left,	bottom,	right,	bottom, col);
+				dispWuLine(right,	top,	right,	bottom, col);
 				left--;
 				top--;
 				bottom++;
@@ -748,47 +903,322 @@ void	framerect(int xLeft, int yTop, int width, int height)
 		}
 		else
 		{
-			line(xLeft,			yTop,			xLeft + width,	yTop);				//*	top line
-			line(xLeft,			yTop + height,	xLeft + width,	yTop + height);		//*	bottom line
-			
-			line(xLeft,			yTop,			xLeft,			yTop + height);		//*	left line
-			line(xLeft + width,	yTop,			xLeft + width,	yTop + height);		//*	right line
+			dispWuLine(x, y, x + width, y, col);				//*	top line
+			dispWuLine(x, y + height, x + width, y + height, col);		//*	bottom line
+			dispWuLine(x, y, x, y + height, col);		//*	left line
+			dispWuLine(x + width, y, x + width, y + height, col);		//*	right line
 		}
 
 	}
+
 }
 //*******************************************************************************
-//*	Dec 27,	2008	<MLS> Rewriting rect because it doesnt work when compiled on Mac
-void	rect(int xLeft, int yTop, int width, int height)
+void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+{
+	drawTriangle(x1,y1,x2,y2,x3,y3,fcolor);
+}
+//*******************************************************************************
+void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, COLOR col)
+{
+	switch(smoothingMode) {
+	case 0:
+		dispWuLine (x1, y1, x2, y2, col);
+		dispWuLine (x2, y2, x3, y3, col);
+		dispWuLine (x3, y3, x1, y1, col);
+		break;
+	case 1:
+		dispQSLine (x1, y1, x2, y2, col, bcolor);
+		dispQSLine (x2, y2, x3, y3, col, bcolor);
+		dispQSLine (x3, y3, x1, y1, col, bcolor);
+		break;
+	case 2:
+		dispHSLine (x1, y1, x2, y2, col);
+		dispHSLine (x2, y2, x3, y3, col);
+		dispHSLine (x3, y3, x1, y1, col);
+		break;
+	}
+}
+//*******************************************************************************
+void drawQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+{
+	drawQuad(x1,y1,x2,y2,x3,y3,x4,y4,fcolor);
+}
+//*******************************************************************************
+void drawQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, COLOR col)
 {
 
-	if ((width > 0) && (height > 0))
+	switch(smoothingMode) {
+	case 0:
+		dispWuLine ( x1, y1, x2, y2, col);
+		dispWuLine ( x2, y2, x3, y3, col);
+		dispWuLine ( x3, y3, x4, y4, col);
+		dispWuLine ( x4, y4, x1, y1, col);
+		break;
+	case 1:
+		dispQSLine ( x1, y1, x2, y2, col, bcolor);
+		dispQSLine ( x2, y2, x3, y3, col, bcolor);
+		dispQSLine ( x3, y3, x4, y4, col, bcolor);
+		dispQSLine ( x4, y4, x1, y1, col, bcolor);
+		break;
+	case 2:
+		dispHSLine ( x1, y1, x2, y2, col);
+		dispHSLine ( x2, y2, x3, y3, col);
+		dispHSLine ( x3, y3, x4, y4, col);
+		dispHSLine ( x4, y4, x1, y1, col);
+	break;
+	}
+
+}
+//*******************************************************************************
+float dist(float x1, float y1, float x2, float y2)
+{
+	int	xx	=	(x2 - x1);
+	int	yy	=	(y2 - y1);
+	return sqrt((xx * xx)+(yy * yy));
+}
+//*******************************************************************************
+void	fadeIn( int time)
+{
+
+	uint8_t ii;
+	float dlx = time / BRIGHT_MAX;
+
+	for (ii = 0; ii<BRIGHT_MAX - 1; ii++) 
 	{
-		//	fill
-		if (fillEnb)
-		{
-			dispColor(bcolor);
-			dispRectangle(xLeft, yTop, width, height); 
-		}
+	#if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
+		dispBrightness((uint8_t)ii);
+	#else
+		oled_brightness((uint8_t)ii);
+	#endif
+		delay(dlx);
+	}
+}
+//*******************************************************************************
+void	fadeOut( int time)
+{
+	if (brightness == 0) return;
 
-		if (strokeEnb)
+	uint8_t ii;
+	float dlx = time / brightness;
+
+	for (ii = brightness; ii > 0; ii--)
+	{
+		#if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
+			dispBrightness((uint8_t)ii);
+		#else
+			oled_brightness((uint8_t)ii);
+		#endif
+		delay(dlx);
+	}
+
+}
+//*******************************************************************************
+void	setBackcolor(COLOR bkgColor)
+{
+	bcolor = bkgColor;
+}
+//*******************************************************************************
+void	setBackcolor(uint8_t redVal, uint8_t greenVal, uint8_t blueVal)
+{
+	bcolor.red		=	redVal;
+	bcolor.green	=	greenVal;
+	bcolor.blue		=	blueVal;
+}
+//*******************************************************************************
+void	setForecolor(COLOR foreColor)
+{
+	fcolor = foreColor;
+}
+//*******************************************************************************
+void	setForecolor(uint8_t redVal, uint8_t greenVal, uint8_t blueVal)
+{
+	fcolor.red		=	redVal;
+	fcolor.green	=	greenVal;
+	fcolor.blue		=	blueVal;
+}
+//*******************************************************************************
+void fillEllipse(int x, int y, int xRadius, int yRadius)
+{
+	fillEllipse(x,y,xRadius,yRadius,fcolor);
+}
+//*******************************************************************************
+void fillEllipse(int x, int y, int xRadius, int yRadius, COLOR col)
+{
+int				xx		=	0;
+int				yy		=	yRadius;
+unsigned int	width	=	1;
+long			a2		=	(long)xRadius * xRadius;
+long			b2		=	(long)yRadius * yRadius;
+long			crit1	=	-(a2 / 4 + xRadius % 2 + b2);
+long			crit2	=	-(b2 / 4 + yRadius % 2 + a2);
+long			crit3	=	-(b2/4 + yRadius % 2);
+long			t		=	-a2 * yy; /* e(x+1/2,y-1/2) - (a^2+b^2)/4 */
+long			dxt		=	2 * b2 * xx;
+long			dyt		=	-2 * a2 * yy;
+long			d2xt	=	2 * b2;
+long			d2yt	=	2 * a2;
+
+	if (smoothingMode > 0) drawEllipse(x,y,xRadius,yRadius,col);
+
+	dispColor(col);
+	while (yy >= 0 &&  xx <= xRadius)
+	{
+		if (t + b2 * xx <= crit1 ||	 /* e(x+1,y-1/2) <= 0 */
+			t + a2 * yy <= crit3) 
 		{
-			//*	frame the rect
-			framerect(xLeft, yTop, width, height);
+			/* e(x+1/2,y) <= 0 */
+			incx();
+			width	+=	2;
+		}
+		else if (t - a2 * yy > crit2) 
+		{
+			/* e(x+1/2,y-1) > 0 */
+			//dispRectangle(xCenter - x, yCenter - y, width, 1);
+			dispRectangle(x - xx, y - yy, width, 1);
+			if (yy != 0)
+			{
+				//dispRectangle(xCenter- xx, yCenter + y, width, 1);
+				dispRectangle(x - xx, y + yy, width, 1);
+			}
+			incy();
+		}
+		else
+		{
+			//dispRectangle(xCenter - xx, yCenter - y, width, 1);
+			dispRectangle(x - xx, y - yy, width, 1);
+			if (yy != 0)
+			{
+				//dispRectangle(xCenter - xx, yCenter + y, width, 1);
+				dispRectangle(x - xx, y + yy, width, 1);
+			}
+			incx();
+			incy();
+			width	+=	2;
+		}
+	}
+	if (yRadius == 0)
+	{
+		//dispRectangle(xCenter - xRadius, yCenter, 2 * xRadius + 1, 1);
+		dispRectangle(x - xRadius, y, 2 * xRadius + 1, 1);
+	}
+}
+//*******************************************************************************
+void	fillRect(int x, int y, int width, int height)
+{
+	fillRect(x,y,width,height,fcolor);
+}
+//*******************************************************************************
+void	fillRect(int x, int y, int width, int height, COLOR col)
+{
+	dispColor(col);
+	dispRectangle(x, y, width, height); 
+}
+//*******************************************************************************
+void	fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+{
+	fillTriangle(x1,y1,x2,y2,x3,y3,fcolor);
+}
+//*******************************************************************************
+void	fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3, COLOR col)
+{
+	int		xx;
+	int		yy;
+	int		startX;
+	int		endX;
+	int		startY;
+	int		endY;
+
+	if (smoothingMode > 0) {
+		drawTriangle(x1,y1,x2,y2,x3,y3,col);
+	}
+
+	//*	figure out the left most and right most points
+	startX	=	MIN3(x1, x2, x3);
+	endX	=	MAX3(x1, x2, x3);
+	//*	figure out the top most and bottom most points
+	startY	=	MIN3(y1,y2,y3);
+	endY	=	MAX3(y1,y2,y3);
+	dispColor(col);
+	for (xx = startX; xx < endX; xx++) 
+	{
+		for (yy = startY; yy < endY; yy++) 
+		{
+			if (point_triangle_intersection(xx, yy, x1, y1, x2, y2, x3, y3) ) 
+			{
+				dispPixel2(xx , yy);
+			}
 		}
 	}
 }
-
 //*******************************************************************************
-void	setbcolor(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
+void fillQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 {
-	bcolor.red		=	redValue;
-	bcolor.green	=	greenValue;
-	bcolor.blue		=	blueValue;
+	fillQuad(x1,y1,x2,y2,x3,y3,x4,y4,fcolor);
 }
-
 //*******************************************************************************
-void	setbrightness( int bright)
+void fillQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, COLOR col)
+{
+	fillTriangle(x1,y1,x2,y2,x4,y4,col);
+	fillTriangle(x2,y2,x4,y4,x3,y3,col);
+}
+//*******************************************************************************
+COLOR	invertColor(COLOR col)
+{
+	COLOR rt;
+	rt.red = 255 - col.red;
+	rt.green = 255 - col.green;
+	rt.blue = 255 - col.blue;
+	return rt;
+}
+//*******************************************************************************
+void	line(int x1, int y1, int x2, int y2)
+{
+	line(x1,y1,x2,y2,fcolor);
+}
+//*******************************************************************************
+void	line(int x1, int y1, int x2, int y2, COLOR col)
+{
+	switch(smoothingMode) {
+	case 0:
+		dispWuLine(x1, y1, x2, y2, fcolor);
+		break;
+	case 1:
+		dispQSLine(x1, y1, x2, y2, fcolor, bcolor);
+		break;
+	case 2:
+		dispHSLine(x1, y1, x2, y2, fcolor);
+		break;
+	}
+}
+//*******************************************************************************
+boolean	pointInRect(POINT pt, RECT rt)
+{
+	return pointInRect(pt.x,pt.y,rt.left,rt.top,rt.right,rt.bottom);
+}
+//*******************************************************************************
+boolean	pointInRect(int pX, int pY, int rLeft, int rTop, int rRight, int rBottom)
+{
+	if (pX >= rLeft && pX <= rRight && pY >= rTop && pY <= rBottom)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+//*******************************************************************************
+void	resetClip()
+{
+	dispSetClip(0,0,width,height);
+}
+//*******************************************************************************
+int		getBrightness()
+{
+	return	brightness;
+}
+//*******************************************************************************
+void	setBrightness( int bright)
 {
 #if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
 	dispBrightness(bright);
@@ -797,60 +1227,52 @@ void	setbrightness( int bright)
 #endif
 	brightness = bright;
 }
-
 //*******************************************************************************
-void	setfcolor(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
+void	setClip(int x, int y, int width, int height)
 {
-	fcolor.red		=	redValue;
-	fcolor.green	=	greenValue;
-	fcolor.blue		=	blueValue;
+	dispSetClip(x,y,width,height);
 }
-
 //*******************************************************************************
-void	size(int w, int h)
+void	getPixel(COLOR *buffer, int x, int y)
 {
-#ifdef _SUPPORT_CLIPPING_
-	dispClip(w,h); //set the clipping region
-#endif
-	width	=	w; 
-	height	=	h;
-	mouseX	=	w / 2; //reset the mouse
-	mouseY	=	h / 2; //reset the mouse
+	dispRead(buffer, x, y);
 }
-
-
 //*******************************************************************************
-void	stroke( int s)
+void setPixel(int x, int y)
 {
-	strokeEnb = true;
-	setfcolor(s,s,s);
+	setPixel(x,y,fcolor);
 }
-
+//*******************************************************************************
+void setPixel(int x, int y, COLOR col)
+{
+	dispColor(col);
+	dispPixel2(x,y);
+}
 //*******************************************************************************
 void	strokeWeight(int s)
 {
 	strokeWeightVal=s;
 }
-
-//*******************************************************************************
-void	stroke(uint8_t redValue, uint8_t greenValue, uint8_t blueValue)
-{
-	strokeEnb = true;
-	setfcolor(redValue, greenValue, blueValue);
-}
-
 //*******************************************************************************
 void	text(char *textString, int xLoc, int yLoc)
 {
 	dispPutS(textString, xLoc, yLoc, fcolor, bcolor);
 }
-
+//*******************************************************************************
+void	text(char *textString, int xLoc, int yLoc, COLOR col)
+{
+	dispPutS(textString, xLoc, yLoc, col, bcolor);
+}
 //*******************************************************************************
 void	text(char theChar, int xLoc, int yLoc)
 {
 	dispPutC(theChar, xLoc, yLoc, fcolor, bcolor);
 }
-
+//*******************************************************************************
+void	text(char theChar, int xLoc, int yLoc, COLOR col)
+{
+	dispPutC(theChar, xLoc, yLoc, col, bcolor);
+}
 //*******************************************************************************
 void	text(int data, int xLoc, int yLoc)
 {
@@ -858,14 +1280,23 @@ void	text(int data, int xLoc, int yLoc)
 	dtostrf(data,4,0,out);
 	text(out, xLoc, yLoc);
 }
-
+//*******************************************************************************
+void	text(int data, int xLoc, int yLoc, COLOR col)
+{
+	char out[10];
+	dtostrf(data,4,0,out);
+	text(out, xLoc, yLoc, col);
+}
 //*******************************************************************************
 void	text(unsigned int data, int xLoc, int yLoc)
 {
 	text((int)data,  xLoc,  yLoc);
 }
-
-
+//*******************************************************************************
+void	text(unsigned int data, int xLoc, int yLoc, COLOR col)
+{
+	text((int)data,  xLoc,  yLoc, col);
+}
 //*******************************************************************************
 void	text(long data, int xLoc, int yLoc)
 {
@@ -873,7 +1304,13 @@ void	text(long data, int xLoc, int yLoc)
 	dtostrf(data,4,0,out);
 	text(out, xLoc, yLoc);
 }
-
+//*******************************************************************************
+void	text(long data, int xLoc, int yLoc, COLOR col)
+{
+	char out[10];
+	dtostrf(data,4,0,out);
+	text(out, xLoc, yLoc, col);
+}
 //*******************************************************************************
 void	text(double data, int xLoc, int yLoc)
 {
@@ -881,25 +1318,78 @@ void	text(double data, int xLoc, int yLoc)
 	dtostrf(data,4,3,out);
 	text(out, xLoc, yLoc);
 }
-
 //*******************************************************************************
-void	text(char *textString, int xLoc, int yLoc, int height)
+void	text(double data, int xLoc, int yLoc, COLOR col)
 {
-    HersheyDrawCString(0, xLoc, yLoc, textString, height, 0, 1); 
+	char out[12];
+	dtostrf(data,4,3,out);
+	text(out, xLoc, yLoc, col);
+}
+//*******************************************************************************
+void	text(char *textString, int xLoc, int yLoc, int size)
+{
+    HersheyDrawCString(0, xLoc, yLoc, textString, size, 0, strokeWeightVal); 
 }
 
 //*******************************************************************************
-void	text(char *textString, int xLoc, int yLoc, int width, int height)
+void	text(char *textString, int xLoc, int yLoc, int size, int angle)
 {
-    HersheyDrawCString(0, xLoc, yLoc, textString, height, 0, 1); 
+    HersheyDrawCString(0, xLoc, yLoc, textString, size, angle, strokeWeightVal); 
 }
- 
 //*******************************************************************************
-void	triangle( int x1, int y1, int x2, int y2, int x3, int y3) 
-{ 
-	dispTriangle(x1, y1, x2, y2, x3, y3);
+void	text(char *textString, int xLoc, int yLoc, int size, COLOR col)
+{
+	fcolor = col;
+    HersheyDrawCString(0, xLoc, yLoc, textString, size, 0, strokeWeightVal); 
+}
+
+//*******************************************************************************
+void	text(char *textString, int xLoc, int yLoc, int size, int angle, COLOR col)
+{
+	fcolor = col;
+    HersheyDrawCString(0, xLoc, yLoc, textString, size, angle, strokeWeightVal); 
+}
+//*******************************************************************************
+void	getstring(uint8_t *buf, int bufsize)
+{
+int	ii;
+	
+	//*	Send the termination command, we're ready
+	serialWrite(0);
+
+	/* Read data */
+	for (ii=0; ii<bufsize - 1; ++ii)
+	{
+		while(!serialAvailable())
+		{
+			;	//*	do nothing
+		}
+		buf[ii]	=	serialRead();
+		
+		if (buf[ii] == 0)	// is it the terminator byte?
+		{
+			if (ii > 9) break;
+		}
+	}
+	
+	buf[ii]	=	0; // 0 string terminator just in case
+}
+//*******************************************************************************
+void	sendStringL( char *buf, int size)
+{
+int	ii;
+
+	for (ii = 0;ii < size; ii++)
+	{
+		delay(2);
+		serialWrite(buf[ii]);
+	}
 } 
-
+//*******************************************************************************
+void	drawchar( int xLoc, int yLoc, char theChar)
+{
+	dispPutC(theChar, xLoc, yLoc, fcolor, bcolor);
+}
 //*******************************************************************************
 void	beginCanvas(void)
 {
@@ -927,45 +1417,46 @@ void	beginCanvas(void)
 		switch(buf[cptr]) 
 		{
 		case kSubP_SETFCOLOR:
-			setfcolor( buf[cptr+1], buf[cptr+2], buf[cptr+3]);
+			setForecolor( buf[cptr+1], buf[cptr+2], buf[cptr+3]);
 			break;
 
 		case kSubP_SETBCOLOR:
-			setbcolor( buf[cptr+1], buf[cptr+2], buf[cptr+3]); 
+			setBackcolor( buf[cptr+1], buf[cptr+2], buf[cptr+3]); 
 			break;
 
 		case kSubP_FILLBACK:
-			fillback();		
+			clear(bcolor);
+			//fillback();		
 			break;
 
 		case kSubP_SET_BRIGHTNESS:
-			setbrightness(buf[cptr+1]);
+			setBrightness(buf[cptr+1]);
 			break;
 
 		case kSubP_FADEOUT:
-			fadeout((buf[cptr+2] << 8) + buf[cptr+1]);
+			fadeOut((buf[cptr+2] << 8) + buf[cptr+1]);
 			break;
 
 		case kSubP_FADEIN:
-			fadein((buf[cptr+2] << 8) + buf[cptr+1]);
+			fadeIn((buf[cptr+2] << 8) + buf[cptr+1]);
 			break;
 
 		case kSubP_DRAWPOINT:
-			point((buf[cptr+2] << 8) + buf[cptr+1],
+			setPixel((buf[cptr+2] << 8) + buf[cptr+1],
 				(buf[cptr+4] << 8) + buf[cptr+3]);
 			break;
 
 		case kSubP_CIRCLE:
 			int r;
 			r	=	(buf[cptr+6] << 8) + buf[cptr+5];
-			ellipse((buf[cptr+2] << 8) + buf[cptr+1], 
+			drawEllipse((buf[cptr+2] << 8) + buf[cptr+1], 
 					(buf[cptr+4] << 8) + buf[cptr+3],
 					r,
 					r);
 			break;
 
 		case kSubP_RECT:
-			rect((buf[cptr+2] << 8) + buf[cptr+1], 
+			drawRect((buf[cptr+2] << 8) + buf[cptr+1], 
 				(buf[cptr+4] << 8) + buf[cptr+3], 
 				(buf[cptr+6] << 8) + buf[cptr+5], 
 				(buf[cptr+8] << 8) + buf[cptr+7]);
@@ -986,25 +1477,41 @@ void	beginCanvas(void)
 			break;
 
 		case kSubP_STRING:
-			drawstring((buf[cptr+2] << 8) + buf[cptr+1], 
-					 (buf[cptr+4] << 8) + buf[cptr+3],
-					 (char*)&buf[cptr+8]);
+			text((char*)&buf[cptr+8],
+					 (buf[cptr+2] << 8) + buf[cptr+1], 
+					 (buf[cptr+4] << 8) + buf[cptr+3]
+					 );
 			break;
 
 		case kSubP_GET_TOUCH:
-			gettouch();
-			delay(2);
+			//gettouch();
+			//delay(2);
+			//POINT pt = pen;
 			serialWrite('|');
 			delay(2);
-			serialWrite((unsigned char)mouseX);
+			serialWrite((unsigned char)pen.x);
 			delay(2);
-			serialWrite((unsigned char)(mouseX>>8));
+			serialWrite((unsigned char)(pen.x>>8));
 			delay(2);
-			serialWrite((unsigned char)mouseY);
+			serialWrite((unsigned char)pen.y);
 			delay(2);
-			serialWrite((unsigned char)(mouseY>>8));
+			serialWrite((unsigned char)(pen.y>>8));
 			delay(2);
 			serialWrite((unsigned char)0);
+
+			//gettouch();
+			//delay(2);
+			//serialWrite('|');
+			//delay(2);
+			//serialWrite((unsigned char)mouseX);
+			//delay(2);
+			//serialWrite((unsigned char)(mouseX>>8));
+			//delay(2);
+			//serialWrite((unsigned char)mouseY);
+			//delay(2);
+			//serialWrite((unsigned char)(mouseY>>8));
+			//delay(2);
+			//serialWrite((unsigned char)0);
 			break;
 
 		case kSubP_GET_SCREEN_SIZE:
@@ -1032,7 +1539,7 @@ void	beginCanvas(void)
 			break;
 			
 		case kSubP_ELLIPSE:
-			ellipse((buf[cptr+2] << 8) + buf[cptr+1], 
+			drawEllipse((buf[cptr+2] << 8) + buf[cptr+1], 
 					(buf[cptr+4] << 8) + buf[cptr+3],
 					(buf[cptr+6] << 8) + buf[cptr+5],
 					(buf[cptr+8] << 8) + buf[cptr+7]);
@@ -1048,7 +1555,7 @@ void	beginCanvas(void)
 		case kSubP_TRIANGLE2:
 			trix3	=	(buf[cptr+2] << 8) + buf[cptr+1];
 			triy3	=	(buf[cptr+4] << 8) + buf[cptr+3];
-			triangle(trix1, triy1, trix2, triy2, trix3, triy3);
+			drawTriangle(trix1, triy1, trix2, triy2, trix3, triy3);
 			break;
 			
 		default:
@@ -1057,43 +1564,6 @@ void	beginCanvas(void)
 	}
 }
 
-//*******************************************************************************
-void	getstring(uint8_t *buf, int bufsize)
-{
-int	ii;
-	
-	//*	Send the termination command, we're ready
-	serialWrite(0);
-
-	/* Read data */
-	for (ii=0; ii<bufsize - 1; ++ii)
-	{
-		while(!serialAvailable())
-		{
-			;	//*	do nothing
-		}
-		buf[ii]	=	serialRead();
-		
-		if (buf[ii] == 0)	// is it the terminator byte?
-		{
-			if (ii > 9) break;
-		}
-	}
-	
-	buf[ii]	=	0; // 0 string terminator just in case
-}
- 
-//*******************************************************************************
-void	sendStringL( char *buf, int size)
-{
-int	ii;
-
-	for (ii = 0;ii < size; ii++)
-	{
-		delay(2);
-		serialWrite(buf[ii]);
-	}
-} 
 
 #pragma mark -
 //*******************************************************************************
@@ -1105,19 +1575,19 @@ int	ii;
 //*******************************************************************************
 void	RGBForeColor(COLOR *theColor)
 {
-	setfcolor(theColor->red, theColor->green, theColor->blue);
+	setForecolor(theColor->red, theColor->green, theColor->blue);
 }
 
 //*******************************************************************************
 void	RGBBackColor(COLOR *theColor)
 {
-	setbcolor(theColor->red, theColor->green, theColor->blue);
+	setBackcolor(theColor->red, theColor->green, theColor->blue);
 }
 
 //*******************************************************************************
 void	FrameRect(RECT *theRect)
 {
-	framerect(theRect->left, theRect->top, (theRect->right - theRect->left), (theRect->bottom - theRect->top));
+	drawRect(theRect->left, theRect->top, (theRect->right - theRect->left), (theRect->bottom - theRect->top));
 }
 
 //*******************************************************************************
@@ -1524,8 +1994,7 @@ void	lcd_rectangle(int x1, int y1, int x2, int y2, COLOR outline_color, COLOR fi
 
 	bcolor	=	fill_color;
 	fcolor	=	outline_color;
-	fillEnb	=	true;
-	drawrect(x1, y1, (x2 - x1), (y2, y1));
+	fillRect(x1, y1, (x2 - x1), (y2, y1));
 }
 
 //*******************************************************************************

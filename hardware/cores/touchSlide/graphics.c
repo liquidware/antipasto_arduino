@@ -16,11 +16,12 @@
 //*	Jan  2,	2009	<MLS> Added negitive checking to w/h of dispRectangle
 //*	Jan  3,	2009	<MLS> dispRectangle, changed xLoc, yLoc back to signed ints
 //*	Jan 14,	2009	<MLS> Changed all 320/240/319/239 number constants to define constants
+//* Jun 14, 2009    <TWH> Added clip support
+//* Jun 14, 2009	<TWH> Added non-checked set pixel2 for use ONLY by self-checking methods
 //*******************************************************************************
 
-
 //*******************************************************************************
-//*	Includeds
+//*	Includes
 //*******************************************************************************
 #include	<avr/io.h>
 #include	<avr/pgmspace.h>
@@ -36,6 +37,11 @@
 #endif
 #include	"bitops.h"
 #include	"font.h"
+
+int		clipX	= 0;
+int		clipY	= 0;
+int		clipW	= kSCREEN_X_size;
+int		clipH	= kSCREEN_Y_size;
 
 #define incx() x++, dxt += d2xt, t += dxt
 #define incy() y--, dyt += d2yt, t += dyt
@@ -72,7 +78,27 @@ SCREEN	screen	=	{
 
 
 #ifdef _TOUCH_SLIDE_
+//*******************************************************************************
+void	dispSetClip(int x, int y, int width, int height)
+{
+	if ((x < 0) || (y < 0) || (x > kSCREEN_X_size) || (y > kSCREEN_Y_size) || (width < 1) || (height < 1)) 
+	{
+		return;
+	}
 
+	clipX = x;
+	clipY = y;
+	clipW = width;
+	clipH = height;
+}
+//*******************************************************************************
+void	dispRemoveClip()
+{
+		clipX	= 0;
+		clipY	= 0;
+		clipW	= kSCREEN_X_size;
+		clipH	= kSCREEN_Y_size;
+}
 //*******************************************************************************
 void	dispCommand(unsigned char command)
 {
@@ -240,6 +266,31 @@ void	dispPixel(int x, int y)
 	SETBIT(OLED_CTRL_PORT,OLED_WR);
 	SETBIT(OLED_CTRL_PORT,OLED_CS);
 
+}
+
+//*******************************************************************************
+void	dispPixel2(int x, int y)
+{
+	//* dispPixel2 should ONLY be used if bounds have ALREADY BEEN CHECK
+/* Set XY location   */
+	dispCommand(0x20); //Specify the x address in RAM
+	dispData(0x00FF & y);
+
+	dispCommand(0x21); //Specify the y address in RAM
+	dispData(0x01FF & x);
+
+	dispCommand(0x22); //RAM write	
+
+/* Draw pixel */
+	CLRBIT(OLED_CTRL_PORT,OLED_CS);
+	CLRBIT(OLED_CTRL_PORT,OLED_WR);
+
+	OLED_DATA_LOW	=	GraphicsColor.blue;
+	OLED_DATA_MED	=	GraphicsColor.green;
+	OLED_DATA_HIGH	=	GraphicsColor.red;
+
+	SETBIT(OLED_CTRL_PORT,OLED_WR);
+	SETBIT(OLED_CTRL_PORT,OLED_CS);
 }
 
 //*******************************************************************************
