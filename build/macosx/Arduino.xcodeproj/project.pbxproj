@@ -348,6 +348,12 @@
 		3AE93F3F0F2D793E00B94BD9 /* libquaqua.jnilib in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F380F2D793E00B94BD9 /* libquaqua.jnilib */; };
 		3AE93F400F2D793E00B94BD9 /* librxtxSerial.jnilib in Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F390F2D793E00B94BD9 /* librxtxSerial.jnilib */; };
 		3AE93F410F2D793E00B94BD9 /* quaqua.jar in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 3AE93F3A0F2D793E00B94BD9 /* quaqua.jar */; };
+		3AF95DBC0FFEA9C7001F00F6 /* thumbelina.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AF95DB60FFEA9C6001F00F6 /* thumbelina.jar */; };
+		3AF95DBD0FFEA9C7001F00F6 /* sax2.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AF95DB70FFEA9C6001F00F6 /* sax2.jar */; };
+		3AF95DBE0FFEA9C7001F00F6 /* junit.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AF95DB80FFEA9C6001F00F6 /* junit.jar */; };
+		3AF95DBF0FFEA9C7001F00F6 /* htmlparser.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AF95DB90FFEA9C6001F00F6 /* htmlparser.jar */; };
+		3AF95DC00FFEA9C7001F00F6 /* htmllexer.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AF95DBA0FFEA9C6001F00F6 /* htmllexer.jar */; };
+		3AF95DC10FFEA9C7001F00F6 /* filterbuilder.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AF95DBB0FFEA9C6001F00F6 /* filterbuilder.jar */; };
 		A337296F0D22505C00E82412 /* librxtxSerial.jnilib in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = A33729630D224FA700E82412 /* librxtxSerial.jnilib */; };
 		A3688DF40D284554003CBAA1 /* applet.html in Resources */ = {isa = PBXBuildFile; fileRef = 33AF620B0965D67900B514A9 /* applet.html */; };
 /* End PBXBuildFile section */
@@ -658,6 +664,12 @@
 		3AE93F390F2D793E00B94BD9 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
 		3AE93F3A0F2D793E00B94BD9 /* quaqua.jar */ = {isa = PBXFileReference; explicitFileType = archive.jar; name = quaqua.jar; path = ../../dist/quaqua.jar; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE93F3B0F2D793E00B94BD9 /* tools-universal.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = "tools-universal.zip"; sourceTree = "<group>"; };
+		3AF95DB60FFEA9C6001F00F6 /* thumbelina.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = thumbelina.jar; sourceTree = "<group>"; };
+		3AF95DB70FFEA9C6001F00F6 /* sax2.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = sax2.jar; sourceTree = "<group>"; };
+		3AF95DB80FFEA9C6001F00F6 /* junit.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = junit.jar; sourceTree = "<group>"; };
+		3AF95DB90FFEA9C6001F00F6 /* htmlparser.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = htmlparser.jar; sourceTree = "<group>"; };
+		3AF95DBA0FFEA9C6001F00F6 /* htmllexer.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = htmllexer.jar; sourceTree = "<group>"; };
+		3AF95DBB0FFEA9C6001F00F6 /* filterbuilder.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = filterbuilder.jar; sourceTree = "<group>"; };
 		A33729630D224FA700E82412 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = librxtxSerial.jnilib; path = ../../dist/librxtxSerial.jnilib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -672,6 +684,12 @@
 				3A1221F30F2D920700F72906 /* quaqua.jar in Frameworks */,
 				3A1221F40F2D920700F72906 /* registry.jar in Frameworks */,
 				3A1221F70F2D921200F72906 /* antlr.jar in Frameworks */,
+				3AF95DBC0FFEA9C7001F00F6 /* thumbelina.jar in Frameworks */,
+				3AF95DBD0FFEA9C7001F00F6 /* sax2.jar in Frameworks */,
+				3AF95DBE0FFEA9C7001F00F6 /* junit.jar in Frameworks */,
+				3AF95DBF0FFEA9C7001F00F6 /* htmlparser.jar in Frameworks */,
+				3AF95DC00FFEA9C7001F00F6 /* htmllexer.jar in Frameworks */,
+				3AF95DC10FFEA9C7001F00F6 /* filterbuilder.jar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -704,6 +722,12 @@
 				33AF620C0965D67900B514A9 /* mrj.jar */,
 				33AF620D0965D67900B514A9 /* oro.jar */,
 				33AF620E0965D67A00B514A9 /* registry.jar */,
+				3AF95DB60FFEA9C6001F00F6 /* thumbelina.jar */,
+				3AF95DB70FFEA9C6001F00F6 /* sax2.jar */,
+				3AF95DB80FFEA9C6001F00F6 /* junit.jar */,
+				3AF95DB90FFEA9C6001F00F6 /* htmlparser.jar */,
+				3AF95DBA0FFEA9C6001F00F6 /* htmllexer.jar */,
+				3AF95DBB0FFEA9C6001F00F6 /* filterbuilder.jar */,
 				33AF620F0965D67A00B514A9 /* RXTXcomm.jar */,
 				33FF01DE0965BD160016AC38 /* about.jpg */,
 				33FF02770965BD160016AC38 /* buttons.gif */,
