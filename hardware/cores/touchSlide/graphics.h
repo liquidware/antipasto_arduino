@@ -1,7 +1,6 @@
 //*******************************************************************************
 //*	Detailed Edit history
 //*	<MLS>	=	Mark Sproul, msproul@jove.rutgers.edu
-//* <TWH>	=	Thom Holtquist, ctsfutures.com
 //*******************************************************************************
 //*	Dec 27,	2008	<MLS> Changed RECT_T to RECT
 //*	Dec 28,	2008	<MLS> Changed SCREEN_T to SCREEN
@@ -9,8 +8,6 @@
 //*	Dec 31,	2008	<MLS> Got 0012LW from Chris, making previous changes to this new version
 //*	Dec 31,	2008	<MLS> Copied dispBrightness from 0012
 //*	Jan  2,	2009	<MLS> Added negitive checking to w/h of dispRectangle
-//* Jun 14, 2009    <TWH> Added clip support
-//* Jun 14, 2009	<TWH> Added non-checked set pixel2 for use ONLY by self-checking methods
 //*******************************************************************************
 
 #ifndef __STDINT_H_
@@ -49,10 +46,6 @@ typedef struct
 
 extern	SCREEN	screen;
 extern	COLOR	GraphicsColor;
-
-void	dispSetClip(int x, int y, int width, int height);
-void	dispRemoveClip();
-void	dispPixel2(int x, int y);
 
 void	dispClearScreen();
 void	dispColor(COLOR c);

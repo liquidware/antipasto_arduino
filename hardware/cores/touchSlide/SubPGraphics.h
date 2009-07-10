@@ -40,15 +40,16 @@
 	#include	"SubPOptions.h"
 #endif
 
+
+
 #ifndef Wiring_h
 	#include	"wiring.h"
 #endif
-
 #ifndef _HARDWARE_DEF_H_
 	#include	"HardwareDef.h"
 #endif
 
-#define	kSubP_VersionString	"SubP Ver 0.3"
+#define	kSubP_VersionString	"SubP Ver 0.2"
 
 /*==============================================================================
 * TYPES
@@ -87,22 +88,22 @@ typedef enum
 /* None */
 
 /* OUTPUT VARIABLES */
-extern	COLOR	fcolor;
+extern	COLOR	fCOLOR;
 extern	COLOR	bcolor;
-extern	int		smoothingMode;
+extern	COLOR	green;
+extern	COLOR	blue;
+extern	COLOR	yellow;
+extern	COLOR	grey;
+extern	COLOR	red;
+extern	COLOR	black;
+extern	COLOR	white;
+extern	COLOR	mycolor;
 
 extern	POINT	gMostRecentTouchPt;
 extern	int		mouseX;
 extern	int		mouseY;
 extern	int		width;
 extern	int		height;
-
-extern	boolean	penDown;
-extern	boolean	penHold;
-extern	boolean penAuto;
-extern	boolean penTap;
-
-extern	POINT	pen;
 
 //extern int max_distance;
  
@@ -112,47 +113,34 @@ extern	POINT	pen;
  * GLOBAL FUNCTION PROTOTYPES
  *============================================================================*/
 
-COLOR	alphaBlend(COLOR forecolor, COLOR backcolor, int Opacity);
+void	background(uint8_t backGroundColor);
+void	background(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
 void	beginCanvas();
-void	clear(void);
-void	clear(COLOR col);
-void	clear(int r, int g, int b);
+void	clearscreen( void);
 float	dist(float x1, float y1, float x2, float y2);
-float	dist(POINT p1, POINT p2);
-void	drawEllipse( int xLoc, int yLoc, int width, int height);
-void	drawEllipse(int x, int y, int width, int height, COLOR col);
-void	drawQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
-void	drawQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, COLOR col);
-void	drawRect( int xLoc, int yLoc, int width, int height);
-void	drawRect(int x, int y, int width, int height, COLOR col);
-void	drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
-void	drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, COLOR col);
-void	fadeIn( int time);
-void	fadeOut( int time);
-void	fillEllipse( int xLoc, int yLoc, int width, int height);
-void	fillEllipse(int x, int y, int width, int height, COLOR col);
-void	fillQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
-void	fillQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, COLOR col);
-void	fillRect( int xLoc, int yLoc, int width, int height);
-void	fillRect(int x, int y, int width, int height, COLOR col);
-void	fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
-void	fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3, COLOR col);
-int		getBrightness();
-void	getPixel(COLOR *buffer, int x, int y);
-COLOR	invertColor(COLOR col);
+void	drawchar( int xLoc, int yLoc, char text);
+void	drawcircle( int xLoc, int yLoc, int radius); 
+void	drawrect( int xLoc, int yLoc, int width, int height);
+void	drawstring( int xLoc, int yLoc, char *text);
+void	ellipse( int xLoc, int yLoc, int radx, int rady);
+void	fadein( int time);
+void	fadeout( int time);
+void	fill(int fillColor);
+void	fill(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
+void	fillback( void);
+boolean	gettouch(void);
 void	line( int x1, int y1, int x2, int y2);
-void	line( int x1, int y1, int x2, int y2, COLOR col);
-boolean	pointInRect(POINT pt, RECT rt);
-boolean	pointInRect(int pX, int pY, int rLeft, int rTop, int rRight, int rBottom);
-void	resetClip();
-void	setBackcolor(COLOR bkgColor);
-void	setBackcolor(uint8_t redVal, uint8_t greenVal, uint8_t blueVal);
-void	setBrightness(int bright);
-void	setClip(int x, int y, int width, int height);
-void	setForecolor(COLOR foreColor);
-void	setForecolor(uint8_t redVal, uint8_t greenVal, uint8_t blueVal);
-void	setPixel(int x, int y);
-void	setPixel(int x, int y, COLOR col);
+void	noStroke(void);
+void	noFill(void);
+void	point( int xLoc, int yLoc);
+void	quad( int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
+void	rect(int xLeft, int yTop, int width, int height);
+void	setbcolor(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
+void	setbrightness( int bright);
+void	setfcolor(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
+void	size(int width, int height);
+void	stroke( int s);
+void	stroke(uint8_t redValue, uint8_t greenValue, uint8_t blueValue);
 void	strokeWeight(int s);
 void	text(char theChar, int xLoc, int yLoc);
 void	text(char *textString, int xLoc, int yLoc);
@@ -160,17 +148,12 @@ void	text(int data,int xLoc, int yLoc);
 void	text(unsigned int data, int xLoc, int yLoc);
 void	text(long data, int xLoc, int yLoc);
 void	text(double data, int xLoc, int yLoc);
-void	text(char theChar, int xLoc, int yLoc, COLOR col);
-void	text(char *textString, int xLoc, int yLoc, COLOR col);
-void	text(int data,int xLoc, int yLoc, COLOR col);
-void	text(unsigned int data, int xLoc, int yLoc, COLOR col);
-void	text(long data, int xLoc, int yLoc, COLOR col);
-void	text(double data, int xLoc, int yLoc, COLOR col);
-void	text(char *textString, int xLoc, int yLoc, int size);
-void	text(char *textString, int xLoc, int yLoc, int size, int angle);
-void	text(char *textString, int xLoc, int yLoc, int size, COLOR col);
-void	text(char *textString, int xLoc, int yLoc, int size, int angle, COLOR col);
-void	updatePen();
+void	text(char *textString, int xLoc, int yLoc, int height);
+void	text(char *textString, int xLoc, int yLoc, int width, int height);
+void	triangle( int x1, int y1, int x2, int y2, int x3, int y3);
+
+
+
 
 #ifdef _SUBP_OPTION_7_SEGMENT_
 	void	Display7SegmentDigit(int xLeft, int yTop, char decimalDigit, char segmentLength);
@@ -260,6 +243,8 @@ void	DrawKeyPadButton(Button *theButton);
 	void			lcd_dimWindow(unsigned char left, unsigned char top, unsigned char right, unsigned char bottom);  
 
 	void			lcd_rect(LCD_RECT r, COLOR outline_color, COLOR fill_color);
+
+	char			pointInRect(POINT p, LCD_RECT r);
 
 	void			dispColor(COLOR c);
 	void			dispClearScreen();
