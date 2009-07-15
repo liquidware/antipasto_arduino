@@ -95,13 +95,14 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
 
           "%s\\lib\\registry.jar;"
           "%s\\lib\\antlr.jar;"
-          
+          "%s\\jar\\Antipasto_Arduino.jar;"
+
           "%s",  // original CLASSPATH
           local_jre_installed ? "java\\lib\\rt.jar;" : "", 
           loaddir, loaddir, loaddir, loaddir, 
           loaddir, loaddir, loaddir, loaddir,
           loaddir, loaddir, loaddir, loaddir,
-          loaddir, loaddir, 
+          loaddir, loaddir, loaddir,
           env_classpath);
 
   if (!SetEnvironmentVariable("CLASSPATH", cp)) {
