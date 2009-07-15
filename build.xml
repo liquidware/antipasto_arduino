@@ -1,5 +1,5 @@
 <project name="Antipasto_Arduino" basedir="." default="main">
-    
+    <loadproperties srcFile="build.properties" />
     <property name="lib.dir"     value="build/shared/lib"/>
     <property name="main-class"  value="processing.app.Base"/>
     <property name="jnidir" value="lib"/>
@@ -193,8 +193,6 @@
         <jar-lib />
         <chmod dir="${build.dir}" perm="ugo+rx" includes="**/*" type="both" />
         <chmod file="${build.dir}/arduino" perm="ugo+rx" />
-        
-        <zip destfile="build/linux/Arduino.zip" basedir="${build.dir}"/>
     </target>
 
     <target name="dist-macosx">
@@ -204,7 +202,62 @@
         <compile />
         <jar-lib />
         <chmod dir="${build.dir}" perm="ugo+rx" includes="**/*" type="both" />
+    </target>
 
+    <target name="package-windows">
+        <delete dir="build/windows/package" />
+        <delete dir="build/windows/packager" />
+        <delete file="build/windows/Arduino_win32.msi" />
+
+        <unzip src="build/windows/packager.zip" dest="build/windows" />
+        <copy file="build/windows/Antipasto-package.aip" todir="build/windows/package" />
+        <copy todir="build/windows/package/Arduino">
+            <fileset dir="build/windows/work" includes="**/*.*" />
+        </copy>
+
+        <exec executable="build/windows/packager/AdvancedInstaller.com" >
+            <arg value="/edit" />
+            <arg value="build\windows\package\Antipasto-package.aip" />
+            <arg value="/AddFolder" />
+            <arg value="APPDIR" />
+            <arg value="build\windows\package\Arduino" />
+        </exec>
+        <exec executable="build/windows/packager/AdvancedInstaller.com" >
+            <arg value="/edit" />
+            <arg value="build\windows\package\Antipasto-package.aip" />
+            <arg value="/SetVersion" />
+            <arg value="${build.version}" />
+        </exec>
+        <exec executable="build/windows/packager/AdvancedInstaller.com" >
+            <arg value="/edit" />
+            <arg value="build\windows\package\Antipasto-package.aip" />
+            <arg value="/NewShortcut" />
+            <arg value="-name" />
+            <arg value="Arduino" />
+            <arg value="-target" />
+            <arg value="APPDIR\Arduino\arduino.exe" />
+            <arg value="-dir" />
+            <arg value="ProgramMenuFolder\Arduino" />
+        </exec>
+        <exec executable="build/windows/packager/AdvancedInstaller.com" >
+            <arg value="/build" />
+            <arg value="build\windows\package\Antipasto-package.aip" />
+        </exec>
+        <move file="build/windows/package/Antipasto-package.msi" tofile="build/windows/Arduino_win32.msi" />
+    </target>
+
+    <target name="package-linux">
+        <delete file="build/linux/Arduino_linux.zip" />
+
+        <property name="build.dir"   value="build/linux/work"/>
+        <zip destfile="build/linux/Arduino_linux.zip" basedir="${build.dir}"/>
+    </target>
+
+    <target name="package-macosx">
+        <delete file="build/linux/Arduino_macosx.zip" />
+
+        <property name="build.dir"   value="build/macosx/work"/>
+        <zip destfile="build/macosx/Arduino_macosx.zip" basedir="${build.dir}"/>
     </target>
 
     <target name="main" depends="run-windows"/>
