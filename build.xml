@@ -1,0 +1,215 @@
+<project name="Antipasto_Arduino" basedir="." default="main">
+    
+    <property name="lib.dir"     value="build/shared/lib"/>
+    <property name="main-class"  value="processing.app.Base"/>
+    <property name="jnidir" value="lib"/>
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/> 
+    </path>
+    
+
+    <macrodef name="compile">
+        <sequential>
+            <property name="classes.dir" value="${build.dir}/classes"/>
+    
+            <property name="src.java.antipasto"     value="antipasto"/>
+            <property name="src.java.processing"    value="processing"/>
+    
+                <mkdir dir="${classes.dir}"/>
+                <javac srcdir="${src.java.antipasto};
+                               ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath"/> 
+        </sequential>
+
+    </macrodef>
+
+    <macrodef name="compile-win-launcher">
+        <sequential>
+        <exec dir="build/windows/launcher" executable="make" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jar-lib">
+        <sequential>
+            <property name="jar.dir"     value="${build.dir}/jar"/>
+    
+            <mkdir dir="${jar.dir}"/>
+            <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+                <manifest>
+                    <attribute name="Main-Class" value="${main-class}"/>
+                </manifest>
+            </jar>
+        </sequential>
+    </macrodef>
+    
+
+    <target name="compile-windows">
+        <property name="build.dir"   value="build/windows/work"/> 
+        <compile />
+    </target>
+
+    <target name="compile-linux">
+        <property name="build.dir"   value="build/linux/work"/> 
+        <compile />
+    </target>
+
+    <target name="compile-macosx">
+        <property name="build.dir"   value="build/macosx/work"/> 
+        <compile />
+    </target>
+
+
+
+    <macrodef name="setup-shared">
+        <sequential>
+            <copy todir="${build.dir}/lib">
+                <fileset dir="build/shared/lib"/>
+            </copy>
+            <copy todir="${build.dir}/hardware">
+                <fileset dir="hardware"/>
+            </copy>
+            <copy todir="${build.dir}">
+                <fileset dir="build/shared/dist"/>
+            </copy>
+            
+            <unzip src="build/shared/reference.zip" dest="${build.dir}" />
+            <unzip src="build/shared/jruby.zip"     dest="${build.dir}/hardware/tools" />
+        </sequential>
+    </macrodef>
+
+    
+    <macrodef name="setup-win">
+        <sequential>
+            <copy todir="${build.dir}/lib">
+                <fileset dir="build/windows/dist">
+                    <include name="*.dll"/>
+                </fileset>
+            </copy>
+            <copy todir="${build.dir}/drivers">
+                <fileset dir="build/windows/dist/drivers" /> 
+            </copy>
+            <unzip src="build/windows/dist/avr_tools.zip"    dest="${build.dir}/hardware"/>
+            <unzip src="build/windows/jre.zip"    dest="${build.dir}"/>            
+        </sequential>
+    </macrodef>
+
+    <macrodef name="setup-linux">
+        <sequential>
+            <copy todir="${build.dir}/lib">
+                <fileset dir="build/linux/dist/lib" />
+            </copy>
+            <copy file="build/linux/dist/arduino" todir="${build.dir}" />
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="setup-macosx">
+        <sequential>
+            <copy todir="${build.dir}/lib">
+                <fileset dir="build/macosx/dist">
+                    <include name="*.jnilib"/>
+                    <include name="*.jar"/>
+                </fileset>
+            </copy>
+            <copy todir="${build.dir}/drivers">
+                <fileset dir="build/macosx/dist/drivers" /> 
+            </copy>
+            <unzip src="build/macosx/dist/tools-universal.zip"    dest="${build.dir}/hardware"/>            
+        </sequential>
+    </macrodef>
+    
+
+    <target name="jar-windows" depends="compile-windows">
+        <property name="build.dir"   value="build/windows/work"/>
+        <jar-lib />
+    </target>
+
+    <target name="jar-linux" depends="compile-linux">
+        <property name="build.dir"   value="build/linux/work"/>
+        <jar-lib />
+    </target>
+
+    <target name="jar-macosx" depends="compile-macosx">
+        <property name="build.dir"   value="build/macosx/work"/>
+        <jar-lib />
+    </target>
+
+    <macrodef name="run">
+        <sequential>
+	        <java fork="true" classname="${main-class}" dir="${build.dir}">
+	            <sysproperty key="java.library.path" value="${jnidir}"/>
+	            <classpath>
+		        <path refid="classpath"/>
+		        <path location="${jar.dir}/${ant.project.name}.jar"/>
+	            </classpath>
+	        </java>
+        </sequential>
+    </macrodef>
+
+
+
+    <target name="run-windows" >
+        <property name="build.dir"   value="build/windows/work"/>
+        <exec executable="${build.dir}/arduino" /> 
+    </target>
+
+    <target name="run-linux" >
+        <property name="build.dir"   value="build/linux/work"/>
+        <exec dir="${build.dir}" executable="./arduino" /> 
+    </target>
+
+    <target name="run-macosx" depends="jar-macosx">
+        <run />
+    </target>
+
+    <target name="clean-windows">
+        <property name="build.dir"   value="build/windows/work"/>
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="clean-linux">
+        <property name="build.dir"   value="build/linux/work"/>
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="clean-macosx">
+        <property name="build.dir"   value="build/macosx/work"/>
+        <delete dir="${build.dir}"/>
+    </target>
+    
+    <target name="dist-windows" depends="clean-windows">
+        <property name="build.dir"   value="build/windows/work"/>
+        <setup-shared />
+        <setup-win /> 
+        <compile />
+        <jar-lib />
+        <compile-win-launcher />
+        <copy file="build/windows/launcher/arduino.exe" todir="${build.dir}"/>
+    </target>
+
+    <target name="dist-linux" depends="clean-linux">
+        <property name="build.dir"   value="build/linux/work"/>
+        <setup-shared />
+        <setup-linux />
+        <compile />
+        <jar-lib />
+        <chmod dir="${build.dir}" perm="ugo+rx" includes="**/*" type="both" />
+        <chmod file="${build.dir}/arduino" perm="ugo+rx" />
+        
+        <zip destfile="build/linux/Arduino.zip" basedir="${build.dir}"/>
+    </target>
+
+    <target name="dist-macosx">
+        <property name="build.dir"   value="build/macosx/work"/>
+        <setup-shared />
+        <setup-macosx />
+        <compile />
+        <jar-lib />
+        <chmod dir="${build.dir}" perm="ugo+rx" includes="**/*" type="both" />
+
+    </target>
+
+    <target name="main" depends="run-windows"/>
+
+
+</project>
+
+
