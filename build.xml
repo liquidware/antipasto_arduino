@@ -211,7 +211,7 @@
         <compile />
         <jar-lib />
 
-        <set-permissions />
+        <set-permissions dir="${build.dir}"/>
 
         <chmod file="${build.dir}/arduino" perm="ugo+rx" />
     </target>
@@ -237,21 +237,17 @@
                 <include name="*.jar"/>
             </fileset>
         </move>
-
-        <exec executable="chmod">
-            <arg value="-R" />
-            <arg value="777" />
-            <arg value="${build.dir}" />
-        </exec>
+        <set-permissions dir="${build.dir}" />
     </target>
 
 
     <macrodef name="set-permissions">
+        <attribute name="dir" />
         <sequential>
             <exec executable="chmod">
                 <arg value="-R" />
                 <arg value="777" />
-                <arg value="${build.dir}" />
+                <arg value="@{dir}" />
             </exec>
         </sequential>
     </macrodef>
@@ -310,11 +306,11 @@
         <copy todir="${package.dir}/Arduino" >
             <fileset dir="${build.dir}" />
         </copy>
-        <set-permissions />
-        <exec executable="tar">
+        <set-permissions dir="${package.dir}/Arduino" />
+        <exec executable="tar" searchpath="true" dir="${package.dir}">
                 <arg value="czvf" />
-                <arg value="${package.dir}/${package.linux.name}" />
-                <arg value="build/linux/package/Arduino" />
+                <arg value="${package.linux.name}" />
+                <arg value="Arduino" />
         </exec>
     </target>
 
