@@ -198,7 +198,13 @@
         <setup-linux />
         <compile />
         <jar-lib />
-        <chmod dir="${build.dir}" perm="ugo+rx" includes="**/*" type="both" />
+        
+        <exec executable="chmod">
+            <arg value="-R" />
+            <arg value="777" />
+            <arg value="${build.dir}" />
+        </exec>
+        
         <chmod file="${build.dir}/arduino" perm="ugo+rx" />
     </target>
 
@@ -224,9 +230,13 @@
             </fileset>
         </move>
         
-        <chmod dir="${build.dir}" perm="ugo+rx" includes="**/*" type="both" />
-
+        <exec executable="chmod">
+            <arg value="-R" />
+            <arg value="777" />
+            <arg value="${build.dir}" />
+        </exec>
     </target>
+
 
     <target name="package-windows">
         <delete dir="build/windows/package" />
