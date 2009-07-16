@@ -172,8 +172,8 @@
         <exec dir="${build.dir}" executable="./arduino" />
     </target>
 
-    <target name="run-macosx" depends="jar-macosx">
-        <run />
+    <target name="run-macosx" >
+        <exec dir="${build.dir}" executable="./Arduino.app/Contents/MacOS/Arduino" />
     </target>
 
     <target name="clean-windows">
