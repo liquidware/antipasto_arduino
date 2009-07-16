@@ -17,7 +17,8 @@
     
                 <mkdir dir="${classes.dir}"/>
                 <javac srcdir="${src.java.antipasto};
-                               ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath"/> 
+                               ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath" source="1.5" target="jsr14"/> 
+                               
         </sequential>
 
     </macrodef>
@@ -105,10 +106,16 @@
         <sequential>
             <copy todir="${build.dir}/lib">
                 <fileset dir="build/macosx/dist">
-                    <include name="*.jnilib"/>
                     <include name="*.jar"/>
                 </fileset>
+                <fileset dir="build/macosx/dist">
+                    <include name="*.jnilib"/>
+                </fileset>
             </copy>
+            <copy todir="${build.dir}/Arduino.app">
+                <fileset dir="build/macosx/dist/Arduino.app" />
+            </copy>
+            
             <copy todir="${build.dir}/drivers">
                 <fileset dir="build/macosx/dist/drivers" /> 
             </copy>
@@ -195,13 +202,30 @@
         <chmod file="${build.dir}/arduino" perm="ugo+rx" />
     </target>
 
-    <target name="dist-macosx">
+    <target name="dist-macosx" depends="clean-macosx">
         <property name="build.dir"   value="build/macosx/work"/>
         <setup-shared />
         <setup-macosx />
         <compile />
         <jar-lib />
+        
+        <copy todir="${build.dir}/Arduino.app/Contents/Resources" >
+            <fileset dir="${build.dir}/lib" >
+                <include name="**/*" />
+            </fileset>
+            <fileset dir="${build.dir}/jar" >
+                <include name="**/*" />
+            </fileset>            
+        </copy>
+        <move todir="${build.dir}/Arduino.app/Contents/Resources/Java">
+            <fileset dir="${build.dir}/Arduino.app/Contents/Resources">
+                <include name="*.jnilib"/>
+                <include name="*.jar"/>
+            </fileset>
+        </move>
+        
         <chmod dir="${build.dir}" perm="ugo+rx" includes="**/*" type="both" />
+
     </target>
 
     <target name="package-windows">
@@ -257,8 +281,13 @@
         <delete file="build/linux/Arduino_macosx.zip" />
 
         <property name="build.dir"   value="build/macosx/work"/>
-        <zip destfile="build/macosx/Arduino_macosx.zip" basedir="${build.dir}"/>
+
+        <tar destfile="build/macosx/Arduino_macosx.tar" longfile="gnu" basedir="${build.dir}" />
+        <gzip destfile="build/macosx/Arduino_macosx.tar.gz" src="build/macosx/Arduino_macosx.tar" />
     </target>
+    
+
+
 
     <target name="main" depends="run-windows"/>
 

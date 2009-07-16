@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>pde</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>arduino.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/plain</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Arduino Source File</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TEXT</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>Arduino</string>
+	<key>CFBundleIconFile</key>
+	<string>arduino.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>cc.arduino.Arduino</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Arduino</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+	<key>Java</key>
+	<dict>
+		<key>ClassPath</key>
+		<array>
+			<string>$JAVAROOT/antlr.jar</string>
+			<string>$JAVAROOT/oro.jar</string>
+			<string>$JAVAROOT/mrj.jar</string>
+			<string>$JAVAROOT/registry.jar</string>
+			<string>$JAVAROOT/RXTXcomm.jar</string>
+			<string>$JAVAROOT/quaqua.jar</string>
+			<string>$JAVAROOT/filterbuilder.jar</string>
+			<string>$JAVAROOT/htmllexer.jar</string>
+			<string>$JAVAROOT/htmlparser.jar</string>
+			<string>$JAVAROOT/junit.jar</string>
+			<string>$JAVAROOT/sax2.jar</string>
+			<string>$JAVAROOT/Antipasto_Arduino.jar</string>
+			<string>/System/Library/Java</string>
+		</array>
+		<key>JVMVersion</key>
+		<string>1.4+</string>
+		<key>MainClass</key>
+		<string>processing.app.Base</string>
+		<key>Properties</key>
+		<dict>
+			<key>apple.laf.useScreenMenuBar</key>
+			<string>true</string>
+			<key>Arduino.app-resources</key>
+			<string>$APP_PACKAGE/Contents/Resources</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
