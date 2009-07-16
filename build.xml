@@ -4,21 +4,24 @@
     <property name="main-class"  value="processing.app.Base"/>
     <property name="jnidir" value="lib"/>
     <path id="classpath">
-        <fileset dir="${lib.dir}" includes="**/*.jar"/> 
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
     </path>
-    
+
+
+    <property name="package.macosx.name" value="Arduino_macosx.tar.gz" />
+
 
     <macrodef name="compile">
         <sequential>
             <property name="classes.dir" value="${build.dir}/classes"/>
-    
+
             <property name="src.java.antipasto"     value="antipasto"/>
             <property name="src.java.processing"    value="processing"/>
-    
+
                 <mkdir dir="${classes.dir}"/>
                 <javac srcdir="${src.java.antipasto};
-                               ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath" source="1.5" target="jsr14"/> 
-                               
+                               ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath" source="1.5" target="jsr14"/>
+
         </sequential>
 
     </macrodef>
@@ -32,7 +35,7 @@
     <macrodef name="jar-lib">
         <sequential>
             <property name="jar.dir"     value="${build.dir}/jar"/>
-    
+
             <mkdir dir="${jar.dir}"/>
             <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
                 <manifest>
@@ -41,20 +44,20 @@
             </jar>
         </sequential>
     </macrodef>
-    
+
 
     <target name="compile-windows">
-        <property name="build.dir"   value="build/windows/work"/> 
+        <property name="build.dir"   value="build/windows/work"/>
         <compile />
     </target>
 
     <target name="compile-linux">
-        <property name="build.dir"   value="build/linux/work"/> 
+        <property name="build.dir"   value="build/linux/work"/>
         <compile />
     </target>
 
     <target name="compile-macosx">
-        <property name="build.dir"   value="build/macosx/work"/> 
+        <property name="build.dir"   value="build/macosx/work"/>
         <compile />
     </target>
 
@@ -71,13 +74,13 @@
             <copy todir="${build.dir}">
                 <fileset dir="build/shared/dist"/>
             </copy>
-            
+
             <unzip src="build/shared/reference.zip" dest="${build.dir}" />
             <unzip src="build/shared/jruby.zip"     dest="${build.dir}/hardware/tools" />
         </sequential>
     </macrodef>
 
-    
+
     <macrodef name="setup-win">
         <sequential>
             <copy todir="${build.dir}/lib">
@@ -86,10 +89,11 @@
                 </fileset>
             </copy>
             <copy todir="${build.dir}/drivers">
-                <fileset dir="build/windows/dist/drivers" /> 
+                <fileset dir="build/windows/dist/drivers" />
             </copy>
-            <unzip src="build/windows/dist/avr_tools.zip"    dest="${build.dir}/hardware"/>
-            <unzip src="build/windows/jre.zip"    dest="${build.dir}"/>            
+            <unzip src="build/windows/dist/avr_tools.zip"   dest="${build.dir}/hardware"/>
+            <unzip src="build/windows/dist/arm_tools.zip"   dest="${build.dir}/hardware/tools" />
+            <unzip src="build/windows/jre.zip"    dest="${build.dir}"/>
         </sequential>
     </macrodef>
 
@@ -98,10 +102,15 @@
             <copy todir="${build.dir}/lib">
                 <fileset dir="build/linux/dist/lib" />
             </copy>
+            <mkdir dir="${build.dir}/hardware/tools/avr/bin" />
+            <mkdir dir="${build.dir}/hardware/tools/avr/etc" />
+            <unzip src="build/linux/dist/arm_tools.zip"   dest="${build.dir}/hardware/tools" />
+            <copy todir="${build.dir}/hardware/tools/avr/bin" file="build/linux/dist/tools/avrdude" />
+            <copy todir="${build.dir}/hardware/tools/avr/etc" file="build/linux/dist/tools/avrdude.conf" />
             <copy file="build/linux/dist/arduino" todir="${build.dir}" />
         </sequential>
     </macrodef>
-    
+
     <macrodef name="setup-macosx">
         <sequential>
             <copy todir="${build.dir}/lib">
@@ -115,14 +124,14 @@
             <copy todir="${build.dir}/Arduino.app">
                 <fileset dir="build/macosx/dist/Arduino.app" />
             </copy>
-            
+
             <copy todir="${build.dir}/drivers">
-                <fileset dir="build/macosx/dist/drivers" /> 
+                <fileset dir="build/macosx/dist/drivers" />
             </copy>
-            <unzip src="build/macosx/dist/tools-universal.zip"    dest="${build.dir}/hardware"/>            
+            <unzip src="build/macosx/dist/tools-universal.zip"    dest="${build.dir}/hardware"/>
         </sequential>
     </macrodef>
-    
+
 
     <target name="jar-windows" depends="compile-windows">
         <property name="build.dir"   value="build/windows/work"/>
@@ -155,12 +164,12 @@
 
     <target name="run-windows" >
         <property name="build.dir"   value="build/windows/work"/>
-        <exec executable="${build.dir}/arduino" /> 
+        <exec executable="${build.dir}/arduino" />
     </target>
 
     <target name="run-linux" >
         <property name="build.dir"   value="build/linux/work"/>
-        <exec dir="${build.dir}" executable="./arduino" /> 
+        <exec dir="${build.dir}" executable="./arduino" />
     </target>
 
     <target name="run-macosx" depends="jar-macosx">
@@ -170,22 +179,25 @@
     <target name="clean-windows">
         <property name="build.dir"   value="build/windows/work"/>
         <delete dir="${build.dir}"/>
+        <delete dir="build/windows/package" />
     </target>
 
     <target name="clean-linux">
         <property name="build.dir"   value="build/linux/work"/>
         <delete dir="${build.dir}"/>
+        <delete dir="build/linux/package" />
     </target>
 
     <target name="clean-macosx">
         <property name="build.dir"   value="build/macosx/work"/>
         <delete dir="${build.dir}"/>
+        <delete dir="build/macosx/package" />
     </target>
-    
+
     <target name="dist-windows" depends="clean-windows">
         <property name="build.dir"   value="build/windows/work"/>
         <setup-shared />
-        <setup-win /> 
+        <setup-win />
         <compile />
         <jar-lib />
         <compile-win-launcher />
@@ -198,13 +210,9 @@
         <setup-linux />
         <compile />
         <jar-lib />
-        
-        <exec executable="chmod">
-            <arg value="-R" />
-            <arg value="777" />
-            <arg value="${build.dir}" />
-        </exec>
-        
+
+        <set-permissions />
+
         <chmod file="${build.dir}/arduino" perm="ugo+rx" />
     </target>
 
@@ -214,14 +222,14 @@
         <setup-macosx />
         <compile />
         <jar-lib />
-        
+
         <copy todir="${build.dir}/Arduino.app/Contents/Resources" >
             <fileset dir="${build.dir}/lib" >
                 <include name="**/*" />
             </fileset>
             <fileset dir="${build.dir}/jar" >
                 <include name="**/*" />
-            </fileset>            
+            </fileset>
         </copy>
         <move todir="${build.dir}/Arduino.app/Contents/Resources/Java">
             <fileset dir="${build.dir}/Arduino.app/Contents/Resources">
@@ -229,7 +237,7 @@
                 <include name="*.jar"/>
             </fileset>
         </move>
-        
+
         <exec executable="chmod">
             <arg value="-R" />
             <arg value="777" />
@@ -238,10 +246,21 @@
     </target>
 
 
-    <target name="package-windows">
+    <macrodef name="set-permissions">
+        <sequential>
+            <exec executable="chmod">
+                <arg value="-R" />
+                <arg value="777" />
+                <arg value="${build.dir}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+
+    <target name="package-windows" >
+        <property name="package.windows.name" value="Arduino_win32.msi" />
+
         <delete dir="build/windows/package" />
-        <delete dir="build/windows/packager" />
-        <delete file="build/windows/Arduino_win32.msi" />
 
         <unzip src="build/windows/packager.zip" dest="build/windows" />
         <copy file="build/windows/Antipasto-package.aip" todir="build/windows/package" />
@@ -277,25 +296,35 @@
             <arg value="/build" />
             <arg value="build\windows\package\Antipasto-package.aip" />
         </exec>
-        <move file="build/windows/package/Antipasto-package.msi" tofile="build/windows/Arduino_win32.msi" />
+        <move file="build/windows/package/Antipasto-package.msi" tofile="build/windows/package/${package.windows.name}" />
+        <delete dir="build/windows/packager" />
     </target>
 
     <target name="package-linux">
-        <delete file="build/linux/Arduino_linux.zip" />
+        <property name="build.dir"      value="build/linux/work"/>
+        <property name="package.dir"    value="build/linux/package"/>
+        <property name="package.linux.name" value="Arduino_linux.tgz" />
 
-        <property name="build.dir"   value="build/linux/work"/>
-        <zip destfile="build/linux/Arduino_linux.zip" basedir="${build.dir}"/>
+        <delete dir="${package.dir}" />
+        <mkdir  dir="${package.dir}" />
+        <copy todir="${package.dir}/Arduino" >
+            <fileset dir="${build.dir}" />
+        </copy>
+        <set-permissions />
+        <exec executable="tar">
+                <arg value="czvf" />
+                <arg value="${package.dir}/${package.linux.name}" />
+                <arg value="build/linux/package/Arduino" />
+        </exec>
     </target>
 
     <target name="package-macosx">
-        <delete file="build/linux/Arduino_macosx.zip" />
-
         <property name="build.dir"   value="build/macosx/work"/>
 
-        <tar destfile="build/macosx/Arduino_macosx.tar" longfile="gnu" basedir="${build.dir}" />
-        <gzip destfile="build/macosx/Arduino_macosx.tar.gz" src="build/macosx/Arduino_macosx.tar" />
+        <delete dir="build/macosx/package" />
+        <mkdir  dir="build/macosx/package" />
     </target>
-    
+
 
 
 
