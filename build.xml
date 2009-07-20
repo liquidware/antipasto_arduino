@@ -7,10 +7,6 @@
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
     </path>
 
-
-    <property name="package.macosx.name" value="Arduino_macosx.tar.gz" />
-
-
     <macrodef name="compile">
         <sequential>
             <property name="classes.dir" value="${build.dir}/classes"/>
@@ -133,7 +129,14 @@
             <copy todir="${build.dir}/drivers">
                 <fileset dir="build/macosx/dist/drivers" />
             </copy>
-            <unzip src="build/macosx/dist/tools-universal.zip"    dest="${build.dir}/hardware"/>
+            
+            <exec executable="unzip" searchpath="true">
+                <arg value="-X" />
+                <arg value="build/macosx/dist/tools-universal.zip" />
+                <arg value="-d" />
+                <arg value="${build.dir}/hardware" />
+            </exec>
+            <unzip src="build/macosx/dist/arm_tools_macosx.zip"    dest="${build.dir}/hardware/tools"/>
         </sequential>
     </macrodef>
 
@@ -257,6 +260,32 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="set-perm">
+        <attribute name="dir" />
+        <attribute name="mode" />
+        <sequential>
+            <exec executable="chmod">
+                <arg value="-R" />
+                <arg value="@{mode}" />
+                <arg value="@{dir}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="set-owner">
+        <attribute name="dir" />
+        <attribute name="user" />
+        <attribute name="group" />
+        <sequential>
+            <echo message="Setting owner" />
+            <exec executable="chown" searchpath="true">
+                <arg value="-R" />
+                <arg value="@{user}:@{group}" />
+                <arg value="@{dir}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
 
     <target name="package-windows" >
         <property name="package.windows.name" value="Arduino_win32.msi" />
@@ -321,9 +350,57 @@
 
     <target name="package-macosx">
         <property name="build.dir"   value="build/macosx/work"/>
+        <property name="dist.dir"   value="build/macosx/dist"/>
+        <property name="package.dir" value="build/macosx/package"/>
+        <property name="package.macosx.name" value="Arduino_MacOSX.pkg" />
+        
+        <delete dir="${package.dir}" />
+        
+        <mkdir  dir="${package.dir}" />
+        <mkdir  dir="${package.dir}/Package_Root"/>
+        <mkdir  dir="${package.dir}/Package_Root/Applications"/>
+        <mkdir  dir="${package.dir}/Package_Root/usr/local"/>
+        <mkdir  dir="${package.dir}/Resources"/>
 
-        <delete dir="build/macosx/package" />
-        <mkdir  dir="build/macosx/package" />
+        <exec executable="unzip" searchpath="true">
+            <arg value="-X" />
+            <arg value="${dist.dir}/avr_tools_macosx.zip" />
+            <arg value="-d" />
+            <arg value="${package.dir}/Package_Root/usr/local" />
+        </exec>
+        
+        <exec executable="mv" searchpath="true">
+            <arg value="${build.dir}" />
+            <arg value="${package.dir}/Package_Root/Applications/Arduino" />
+        </exec>
+
+        
+        <copy file="build/macosx/dist/Info.plist"        todir="${package.dir}/Resources" />
+        <copy file="build/macosx/dist/Description.plist" todir="${package.dir}/Resources" /> 
+        
+        <set-perm  dir="${package.dir}" mode="755" />
+        <set-owner dir="${package.dir}" user="root" group="wheel" />
+        <set-owner dir="${package.dir}/Package_Root/Applications" user="root" group="admin" />
+        
+        <exec executable="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker">
+            <arg value="-build" />
+            <arg value="-ds" />
+            <arg value="-p"/>
+            <arg value="${package.dir}/${package.macosx.name}"/>
+            <arg value="-f" />
+            <arg value="${package.dir}/Package_Root"/>
+            <arg value="-r" />
+            <arg value="${package.dir}/Resources"/>
+            <arg value="-i" />
+            <arg value="${package.dir}/Resources/Info.plist"/>
+            <arg value="-d" />
+            <arg value="${package.dir}/Resources/Description.plist"/>
+        </exec>
+        
+        <exec executable="mv" searchpath="true">
+            <arg value="${package.dir}/Package_Root/Applications/Arduino" />
+            <arg value="${build.dir}" />
+        </exec>
     </target>
 
 
