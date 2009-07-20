@@ -145,7 +145,7 @@ public class AvrdudeUploader extends Uploader  {
     } else {
       // ???: is it better to have Linux users install avrdude themselves, in
       // a way that it can find its own configuration file?
-      commandDownloader.add("-C" + "hardware/tools/avrdude.conf");
+      commandDownloader.add("-C" + "hardware/tools/avr/etc/avrdude.conf");
     }
 
     if (Preferences.getBoolean("upload.verbose")) {

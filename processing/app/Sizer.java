@@ -45,7 +45,7 @@ public class Sizer implements MessageConsumer {
     	avrBasePath = new String("hardware/tools/avr/bin/"); 
     }
     else if(Base.isLinux()) {
-    	avrBasePath = new String("");     	
+    	avrBasePath = new String("hardware/tools/avr/bin/");     	
     }
     else {
     	avrBasePath = new String(userdir + "hardware/tools/avr/bin/"); 

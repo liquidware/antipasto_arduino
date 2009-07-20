@@ -29,7 +29,7 @@ public class ScriptRunner implements MessageConsumer {
 	 */
 	public ScriptRunner(String winBinFileName, String macBinFileName) {
 		
-		if (Base.isMacOS()) {
+		if (Base.isMacOS() || Base.isLinux()) {
 			this.binFileName = macBinFileName;
 		} else {
 			this.binFileName = winBinFileName;

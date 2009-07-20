@@ -104,10 +104,15 @@
             </copy>
             <mkdir dir="${build.dir}/hardware/tools/avr/bin" />
             <mkdir dir="${build.dir}/hardware/tools/avr/etc" />
-            <unzip src="build/linux/dist/arm_tools.zip"   dest="${build.dir}/hardware/tools" />
-            <copy todir="${build.dir}/hardware/tools/avr/bin" file="build/linux/dist/tools/avrdude" />
-            <copy todir="${build.dir}/hardware/tools/avr/etc" file="build/linux/dist/tools/avrdude.conf" />
-            <copy file="build/linux/dist/arduino" todir="${build.dir}" />
+            <unzip src="build/linux/dist/arm_tools_linux.zip"   dest="${build.dir}/hardware/tools" />
+            <unzip src="build/linux/dist/avr_tools_linux.zip"   dest="${build.dir}/hardware/tools" />
+	   
+            <delete file="${build.dir}/hardware/tools/avr/bin/avrdude" />
+	    <delete file="${build.dir}/hardware/tools/avr/etc/avrdude.conf" />
+
+	    <copy file="build/linux/dist/tools/avrdude"         todir="${build.dir}/hardware/tools/avr/bin" />
+	    <copy file="build/linux/dist/tools/avrdude.conf"    todir="${build.dir}/hardware/tools/avr/etc" />
+            <copy file="build/linux/dist/Arduino" todir="${build.dir}" />
         </sequential>
     </macrodef>
 
@@ -213,7 +218,7 @@
 
         <set-permissions dir="${build.dir}"/>
 
-        <chmod file="${build.dir}/arduino" perm="ugo+rx" />
+        <chmod file="${build.dir}/Arduino" perm="ugo+rx" />
     </target>
 
     <target name="dist-macosx" depends="clean-macosx">
