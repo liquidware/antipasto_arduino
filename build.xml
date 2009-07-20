@@ -102,7 +102,7 @@
             <mkdir dir="${build.dir}/hardware/tools/avr/etc" />
             <unzip src="build/linux/dist/arm_tools_linux.zip"   dest="${build.dir}/hardware/tools" />
             <unzip src="build/linux/dist/avr_tools_linux.zip"   dest="${build.dir}/hardware/tools" />
-	   
+
             <delete file="${build.dir}/hardware/tools/avr/bin/avrdude" />
 	    <delete file="${build.dir}/hardware/tools/avr/etc/avrdude.conf" />
 
@@ -129,7 +129,7 @@
             <copy todir="${build.dir}/drivers">
                 <fileset dir="build/macosx/dist/drivers" />
             </copy>
-            
+
             <exec executable="unzip" searchpath="true">
                 <arg value="-X" />
                 <arg value="build/macosx/dist/tools-universal.zip" />
@@ -177,7 +177,7 @@
 
     <target name="run-linux" >
         <property name="build.dir"   value="build/linux/work"/>
-        <exec dir="${build.dir}" executable="./arduino" />
+        <exec dir="${build.dir}" executable="./Arduino" />
     </target>
 
     <target name="run-macosx" >
@@ -203,6 +203,7 @@
     </target>
 
     <target name="dist-windows" depends="clean-windows">
+        <record name="build.log" action="start"/>
         <property name="build.dir"   value="build/windows/work"/>
         <setup-shared />
         <setup-win />
@@ -210,9 +211,11 @@
         <jar-lib />
         <compile-win-launcher />
         <copy file="build/windows/launcher/arduino.exe" todir="${build.dir}"/>
+        <record name="build.log" action="stop"/>
     </target>
 
     <target name="dist-linux" depends="clean-linux">
+        <record name="build.log" action="start"/>
         <property name="build.dir"   value="build/linux/work"/>
         <setup-shared />
         <setup-linux />
@@ -222,9 +225,11 @@
         <set-permissions dir="${build.dir}"/>
 
         <chmod file="${build.dir}/Arduino" perm="ugo+rx" />
+        <record name="build.log" action="stop"/>
     </target>
 
     <target name="dist-macosx" depends="clean-macosx">
+        <record name="build.log" action="start"/>
         <property name="build.dir"   value="build/macosx/work"/>
         <setup-shared />
         <setup-macosx />
@@ -246,6 +251,7 @@
             </fileset>
         </move>
         <set-permissions dir="${build.dir}" />
+        <record name="build.log" action="stop"/>
     </target>
 
 
@@ -352,10 +358,10 @@
         <property name="build.dir"   value="build/macosx/work"/>
         <property name="dist.dir"   value="build/macosx/dist"/>
         <property name="package.dir" value="build/macosx/package"/>
-        <property name="package.macosx.name" value="Arduino_MacOSX.pkg" />
-        
+        <property name="package.macosx.name" value="Arduino_macosx" />
+
         <delete dir="${package.dir}" />
-        
+
         <mkdir  dir="${package.dir}" />
         <mkdir  dir="${package.dir}/Package_Root"/>
         <mkdir  dir="${package.dir}/Package_Root/Applications"/>
@@ -368,25 +374,25 @@
             <arg value="-d" />
             <arg value="${package.dir}/Package_Root/usr/local" />
         </exec>
-        
+
         <exec executable="mv" searchpath="true">
             <arg value="${build.dir}" />
             <arg value="${package.dir}/Package_Root/Applications/Arduino" />
         </exec>
 
-        
+
         <copy file="build/macosx/dist/Info.plist"        todir="${package.dir}/Resources" />
-        <copy file="build/macosx/dist/Description.plist" todir="${package.dir}/Resources" /> 
-        
+        <copy file="build/macosx/dist/Description.plist" todir="${package.dir}/Resources" />
+
         <set-perm  dir="${package.dir}" mode="755" />
         <set-owner dir="${package.dir}" user="root" group="wheel" />
         <set-owner dir="${package.dir}/Package_Root/Applications" user="root" group="admin" />
-        
+
         <exec executable="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker">
             <arg value="-build" />
             <arg value="-ds" />
             <arg value="-p"/>
-            <arg value="${package.dir}/${package.macosx.name}"/>
+            <arg value="${package.dir}/${package.macosx.name}.pkg"/>
             <arg value="-f" />
             <arg value="${package.dir}/Package_Root"/>
             <arg value="-r" />
@@ -396,15 +402,30 @@
             <arg value="-d" />
             <arg value="${package.dir}/Resources/Description.plist"/>
         </exec>
-        
+
         <exec executable="mv" searchpath="true">
             <arg value="${package.dir}/Package_Root/Applications/Arduino" />
             <arg value="${build.dir}" />
         </exec>
     </target>
 
+    <target name="upload-windows" >
 
+        <scp file="build/windows/package/Arduino_win32.msi"
+             todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+    </target>
 
+    <target name="upload-linux" >
+
+        <scp file="build/linux/package/Arduino_linux.tgz"
+             todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+    </target>
+
+    <target name="upload-macosx" >
+
+        <scp file="build/macosx/package/Arduino_macosx.dmg"
+             todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+    </target>
 
     <target name="main" depends="run-windows"/>
 
