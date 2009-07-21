@@ -384,7 +384,7 @@
         <copy file="build/macosx/dist/Info.plist"        todir="${package.dir}/Resources" />
         <copy file="build/macosx/dist/Description.plist" todir="${package.dir}/Resources" />
 
-        <set-perm  dir="${package.dir}" mode="755" />
+        <set-perm  dir="${package.dir}" mode="777" />
         <set-owner dir="${package.dir}" user="root" group="wheel" />
         <set-owner dir="${package.dir}/Package_Root/Applications" user="root" group="admin" />
 
@@ -407,6 +407,15 @@
             <arg value="${package.dir}/Package_Root/Applications/Arduino" />
             <arg value="${build.dir}" />
         </exec>
+        
+        <exec executable="hdiutil" searchpath="true">
+            <arg value="create" />
+            <arg value="-srcfolder" />
+            <arg value="${package.dir}/${package.macosx.name}.pkg" />
+            <arg value="${package.dir}/${package.macosx.name}.dmg" />
+        </exec>
+        
+        
     </target>
 
     <target name="upload-windows" >
