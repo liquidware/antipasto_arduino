@@ -33,6 +33,8 @@ import java.util.zip.*;
 
 import javax.swing.JOptionPane;
 
+import org.arduino.tools.AntRunner;
+
 import com.oroinc.text.regex.*;
 
 
@@ -87,7 +89,9 @@ public class Sketch {
   String libraryPath;
   boolean externalRuntime;
   public Vector importedLibraries; // vec of Library objects
-
+  String suggestedClassName = "sketch";
+  AntRunner ant = new AntRunner();
+  
   /**
    * path is location of the main .pde file, because this is also
    * simplest to use when opening the file from the finder/explorer.
@@ -1238,15 +1242,15 @@ public class Sketch {
 
     // make up a temporary class name to suggest.
     // name will only be used if the code is not in ADVANCED mode.
-    String suggestedClassName =
-      ("Temporary_" + String.valueOf((int) (Math.random() * 10000)) +
-       "_" + String.valueOf((int) (Math.random() * 10000)));
-
+    //String suggestedClassName =
+    //  ("Temporary_" + String.valueOf((int) (Math.random() * 10000)) +
+    //   "_" + String.valueOf((int) (Math.random() * 10000)));
+    
+    
     // handle preprocessing the main file's code
     //mainClassName = build(TEMP_BUILD_PATH, suggestedClassName);
-    mainClassName =
-      build(target, tempBuildFolder.getAbsolutePath(), suggestedClassName);
-    size(tempBuildFolder.getAbsolutePath(), name);
+    mainClassName = build(target, tempBuildFolder.getAbsolutePath(), this.name);
+    size(tempBuildFolder.getAbsolutePath(), name, target, this.name);
     // externalPaths is magically set by build()
 
     if (!externalRuntime) {  // only if not running externally already
@@ -1279,10 +1283,10 @@ public class Sketch {
   protected String build(Target target, String buildPath, String suggestedClassName)
     throws RunnerException {
 
-      System.out.println("Preparing libraries with target=" + target + " build path=" + buildPath);
+     // System.out.println("Preparing libraries with target=" + target + " build path=" + buildPath);
     // build unbuilt buildable libraries
     // completely independent from sketch, so run all the time
-    editor.prepareLibraries();
+//    editor.prepareLibraries();
 
     // make sure the user didn't hide the sketch folder
     ensureExistence();
@@ -1309,7 +1313,7 @@ public class Sketch {
       //classPath += File.pathSeparator +
       //Compiler.contentsToClassPath(codeFolder);
       classPath =
-        Compiler.contentsToClassPath(codeFolder) +
+//        Compiler.contentsToClassPath(codeFolder) +
         File.pathSeparator + classPath;
 
       //codeFolderPackages = Compiler.packageListFromClassPath(classPath);
@@ -1368,18 +1372,6 @@ public class Sketch {
         code[i].preprocName = null;  // don't compile me
       }
     }
-
-    // since using the special classloader,
-    // run externally whenever there are extra classes defined
-/*    if ((bigCode.indexOf(" class ") != -1) ||
-        (bigCode.indexOf("\nclass ") != -1)) {
-      externalRuntime = true;
-    }
-*/
-    // if running in opengl mode, this is gonna be external
-    //if (Preferences.get("renderer").equals("opengl")) {
-    //externalRuntime = true;
-    //}
 
     // 2. run preproc on that code using the sugg class name
     //    to create a single .java file and write to buildpath
@@ -1516,37 +1508,6 @@ public class Sketch {
       throw new RunnerException(e.getMessage());
     }
 
-    //for (int i = 0; i < imports.length; i++) {
-      /*
-      // remove things up to the last dot
-      String entry = imports[i].substring(0, imports[i].lastIndexOf('.'));
-      //System.out.println("found package " + entry);
-      File libFolder = (File) Sketchbook.importToLibraryTable.get(entry);
-
-      if (libFolder == null) {
-        //throw new RunnerException("Could not find library for " + entry);
-        continue;
-      }
-
-      importedLibraries.add(libFolder);
-      libraryPath += File.pathSeparator + libFolder.getAbsolutePath();
-      */
-      /*
-      String list[] = libFolder.list();
-      if (list != null) {
-        for (int j = 0; j < list.length; j++) {
-          // this might have a dll/jnilib/so packed,
-          // so add it to the library path
-          if (list[j].toLowerCase().endsWith(".jar")) {
-            libraryPath += File.pathSeparator +
-              libFolder.getAbsolutePath() + File.separator + list[j];
-          }
-        }
-      }
-      */
-    //}
-
-
     // 3. then loop over the code[] and save each .java file
 
     for (int i = 0; i < codeCount; i++) {
@@ -1557,7 +1518,7 @@ public class Sketch {
         // shtuff so that unicode bunk is properly handled
         String filename = code[i].name + flavorExtensionsReal[code[i].flavor];
         try {
-          Base.saveFile(code[i].program, new File(buildPath, filename));
+          Base.saveFile(code[i].program, new File(buildPath+File.separator+ "tmp", filename));
         } catch (IOException e) {
           e.printStackTrace();
           throw new RunnerException("Problem moving " + filename +
@@ -1573,7 +1534,7 @@ public class Sketch {
     // note: this has been changed to catch build exceptions, adjust
     // line number for number of included prototypes, and rethrow
     
-    Compiler compiler = new Compiler();
+    Compiler compiler = new Compiler(ant);
     boolean success;
     try {
       success = compiler.compile(this, buildPath, target);
@@ -1590,8 +1551,34 @@ public class Sketch {
     return success ? primaryClassName : null;
   }
   
-  protected void size(String buildPath, String suggestedClassName)
-    throws RunnerException {
+  protected void size(String buildPath, 
+		  			  String suggestedClassName, 
+		  			  Target target, 
+		  			  String sketchName) throws RunnerException {
+	
+	//Check for a successful compile run
+	if (ant.getLastRunStatus() == true) {
+		
+		//Run the sizer
+		ant.setOutputLevel(AntRunner.MSG_INFO);
+		String buildFile = target.path + File.separator + "build.xml";
+		ant.run(buildFile,"size.all", new String[] {
+				"build.dest",  buildPath,
+				"sketch.name", sketchName});
+		
+		//Busy-wait loop for the run to finish
+		while(ant.isRunning()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	 /* 
     long size = 0;
     long maxsize = Preferences.getInteger("boards." + Preferences.get("board") + ".upload.maximum_size");
     Sizer sizer = new Sizer(buildPath, suggestedClassName);
@@ -1606,16 +1593,40 @@ public class Sketch {
     if (size > maxsize)
       throw new RunnerException(
         "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it.");
+    
+    */
   }
 
-  protected String upload(String buildPath, String suggestedClassName)
-    throws RunnerException {
-    
-    Uploader uploader;
+  protected String upload(String buildPath, 
+		  				  String suggestedClassName,
+		  				  Target target,
+		  				  String sketchName) throws RunnerException {
+	  
+ //   Uploader uploader;
 
     // download the program
     //
-    uploader = new AvrdudeUploader();
+	//Check for a successful compile run
+	if (ant.getLastRunStatus() == true) {
+		//Run the uploader
+		ant.setOutputLevel(AntRunner.MSG_VERBOSE);
+		String buildFile = target.path + File.separator + "build.xml";
+		ant.run(buildFile,"upload.all", new String[] {
+				"build.dest",  buildPath,
+				"sketch.name", sketchName,
+				"upload.port", (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port")});
+		
+		//Busy-wait loop for the run to finish
+		while(ant.isRunning()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+//    uploader = new AvrdudeUploader();
     // macos9 now officially broken.. see PdeCompilerJavac
     //PdeCompiler compiler =
     //  ((PdeBase.platform == PdeBase.MACOS9) ?
@@ -1630,10 +1641,11 @@ public class Sketch {
     //PrintStream leechErr = new PrintStream(messageStream);
     //boolean result = compiler.compileJava(leechErr);
     //return compiler.compileJava(leechErr);
-    boolean success =
-      uploader.uploadUsingPreferences(buildPath, suggestedClassName);
+ //   boolean success =
+ //    uploader.uploadUsingPreferences(buildPath, suggestedClassName);
 
-    return success ? suggestedClassName : null;
+ //   return success ? suggestedClassName : null;
+	return null;
   }
 
 
@@ -1645,7 +1657,7 @@ public class Sketch {
     }
     return count;
   }
-
+  
 
   /**
    * Initiate export to applet.
@@ -1697,9 +1709,12 @@ public class Sketch {
     appletFolder.mkdirs();
 
     // build the sketch
-    String foundName = build(target, appletFolder.getPath(), name);
-    size(appletFolder.getPath(), name);
-    foundName = upload(appletFolder.getPath(), name);
+//    String foundName = build(target, appletFolder.getPath(), name);
+    String foundName = build(target, tempBuildFolder.getPath(), this.name);
+//    size(appletFolder.getPath(), name, target, this.name);
+    size(tempBuildFolder.getAbsolutePath(), name, target, this.name);
+//    foundName = upload(appletFolder.getPath(), name, target, this.name);
+    foundName = upload(tempBuildFolder.getPath(), name, target, this.name);
     // (already reported) error during export, exit this function
     if (foundName == null) return false;
 

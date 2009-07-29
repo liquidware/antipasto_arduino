@@ -304,10 +304,10 @@ public class PdePreprocessor {
     if (name == null) return null;
 
     // output the code
-    File streamFile = new File(buildPath, name + ".cpp");
+    File streamFile = new File(buildPath, name + ".pde");
     PrintStream stream = new PrintStream(new FileOutputStream(streamFile));
 
-    writeHeader(stream);
+    writeHeader(stream, target);
     //added to write the pde code to the cpp file
     writeProgram(stream, program, prototypes);
     writeFooter(stream, target);
@@ -321,7 +321,7 @@ public class PdePreprocessor {
     int prototypeInsertionPoint = firstStatement(program);
   
     out.print(program.substring(0, prototypeInsertionPoint));
-    out.print("#include \"WProgram.h\"\n");    
+    //out.print("#include \"WProgram.h\"\n");    <-- Removed this functionality for ANT build process
     
     // print user defined prototypes
     for (int i = 0; i < prototypes.size(); i++) {
@@ -337,18 +337,22 @@ public class PdePreprocessor {
    *
    * @param out                 PrintStream to write it to.
    */
-  void writeHeader(PrintStream out) throws IOException {}
-
+  void writeHeader(PrintStream out, Target target) throws IOException {
+	  ;
+  }
+  
   /**
    * Write any necessary closing text.
    *
    * @param out         PrintStream to write it to.
    */
   void writeFooter(PrintStream out, Target target) throws java.lang.Exception {
+	/*
     // Open the file main.cxx and copy its entire contents to the bottom of the
     // generated sketch .cpp file...
 
-    String mainFileName = target.getPath() + File.separator + "main.cxx";
+	mainFileName = target.getPath() + File.separator + "main.cxx";
+	
     FileReader reader = null;
     reader = new FileReader(mainFileName);
 
@@ -360,6 +364,7 @@ public class PdePreprocessor {
     }
 
     mainfile.close();
+    */
   }
 
 

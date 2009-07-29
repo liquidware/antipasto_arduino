@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+   Arduino plugin Buildfile - Gets the plugins for the Arduino IDE
+   Copyright (C) 2009 Christopher Ladden All rights reserved.
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+   USA
+-->
+<project name="plugins" default="build.all">
+
+    <!--
+        ===================================================================
+         Load the project's properties
+        ===================================================================
+    -->
+
+    <!--
+        ===================================================================
+          The project's target definitions
+        ===================================================================
+    -->
+    <target name="clean.all" depends="clean.plugins"/>
+    <target name="build.all" depends="get.all, build.jar"/>
+
+    <!--
+        ===================================================================
+          The project's targets
+        ===================================================================
+    -->
+
+    <target name="clean.plugins">
+          <delete includeemptydirs="true">
+              <fileset dir=".">
+                  <include name="**/*"/>
+                  <exclude name="build.xml"/>
+              </fileset>
+          </delete>
+    </target>
+
+    <target name="get.all" depends="clean.plugins">
+        <git action="clone"    args="-v git://github.com/liquidware/AntRunner.git" dir="." />
+    </target> 
+
+    <target name="build.jar">
+        <ant dir="AntRunner"  target="build.all" inheritAll="false"/>
+    </target>
+
+    <!--
+        ===================================================================
+          The project's macros
+        ===================================================================
+    -->    
+    <macrodef name="git">
+        <attribute name="action"/>
+        <attribute name="args"/>
+        <attribute name="dir"/>
+        <sequential>
+            <exec executable="git" dir="@{dir}" failonerror="true" searchpath="true">
+                <arg value="@{action}"/>
+                <arg line="@{args}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+</project>

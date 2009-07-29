@@ -36,6 +36,8 @@ import java.util.*;
 import java.util.zip.*;
 import javax.swing.*;
 
+import org.arduino.tools.AntRunner;
+
 public class Compiler implements MessageConsumer {
   static final String BUGS_URL =
     "https://developer.berlios.de/bugs/?group_id=3590";
@@ -44,32 +46,68 @@ public class Compiler implements MessageConsumer {
 
   Sketch sketch;
   String buildPath;
-
-  //String buildPath;
-  //String className;
-  //File includeFolder;
   RunnerException exception;
-  //Editor editor;
+   
+  AntRunner ant;
+  
+  /**
+   * 
+   * @param ant
+   * Give as a reference to an AntRunner. 
+   * The AntRunner is used to run the compilation.
+   */
+  public Compiler(AntRunner ant) { 
+	  
+	this.ant = ant;  
+  } 
 
-  /*
-  public Compiler(String buildPath, String className,
-                     File includeFolder, Editor editor) {
-    this.buildPath = buildPath;
-    this.includeFolder = includeFolder;
-    this.className = className;
-    this.editor = editor;
+
+  /**
+   * 
+   * @param target
+   * The target core to find the buildfile in. 
+   * @return
+   * Returns the build file found in the specified core. 
+   * If the file is not found, it returns null.
+   */
+  public File getBuildFile(Target target) {
+	 File buildFile = new File(target.path + File.separator + "build.xml");
+	 
+	 if (!buildFile.exists()) {
+		 buildFile = null;
+	 }
+	
+	 return buildFile;
   }
-
-
-  public boolean compile(PrintStream leechErr) {
-  */
-
-  public Compiler() { }  // consider this a warning, you werkin soon.
-
-
+  
   public boolean compile(Sketch sketch, String buildPath, Target target)
     throws RunnerException {
-
+	 
+	// Try to get the buildfile
+	File buildFile = getBuildFile(target);
+	
+	if (buildFile != null) {
+		if(!ant.isRunning()){
+			//Compile the sketch!
+			ant.setOutputVerbose();
+			ant.run(buildFile.toString(),"build.all", new String[] {
+					"build.dest",  buildPath,
+					"sketch.name", sketch.name});
+		
+			//Busy-wait loop for the run to finish
+			while(ant.isRunning()) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	/*
+	
     this.sketch = sketch;
     this.buildPath = buildPath;
 
@@ -268,6 +306,8 @@ public class Compiler implements MessageConsumer {
 
     // success would mean that 'result' is set to zero
     return (result == 0); // ? true : false;
+    */
+    return true;
   }
   
   public int execAsynchronously(List commandList)

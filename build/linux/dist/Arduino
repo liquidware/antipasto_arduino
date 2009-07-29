@@ -11,6 +11,34 @@ CLASSPATH=`pwd`/lib/RXTXcomm.jar:\
 `pwd`/lib/registry.jar:\
 `pwd`/lib/sax2.jar:\
 `pwd`/lib/thumbelina.jar:\
+`pwd`/lib/ant.jar:\
+`pwd`/lib/ant-antlr.jar:\
+`pwd`/lib/ant-apache-bcel.jar:\
+`pwd`/lib/ant-apache-bsf.jar:\
+`pwd`/lib/ant-apache-log4j.jar:\
+`pwd`/lib/ant-apache-oro.jar:\
+`pwd`/lib/ant-apache-regexp.jar:\
+`pwd`/lib/ant-apache-resolver.jar:\
+`pwd`/lib/ant-commons-logging.jar:\
+`pwd`/lib/ant-commons-net.jar:\
+`pwd`/lib/ant-jai.jar:\
+`pwd`/lib/ant-javamail.jar:\
+`pwd`/lib/ant-jdepend:\
+`pwd`/lib/ant-jmf.jar:\
+`pwd`/lib/ant-jsch.jar:\
+`pwd`/lib/ant-junit.jar:\
+`pwd`/lib/ant-launcher.jar:\
+`pwd`/lib/ant-netrexx.jar:\
+`pwd`/lib/ant-nodeps.jar:\
+`pwd`/lib/ant-starteam.jar:\
+`pwd`/lib/ant-stylebook.jar:\
+`pwd`/lib/ant-swing.jar:\
+`pwd`/lib/ant-testutil.jar:\
+`pwd`/lib/ant-trax.jar:\
+`pwd`/lib/ant-weblogic.jar:\
+`pwd`/lib/xercesImpl.jar:\
+`pwd`/lib/xml-apis.jar:\     
+`pwd`/lib/AntRunner.jar:\ 
 `pwd`/jar/Antipasto_Arduino.jar
 export CLASSPATH
 

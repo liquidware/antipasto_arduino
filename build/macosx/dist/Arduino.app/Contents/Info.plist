@@ -58,6 +58,34 @@
 			<string>$JAVAROOT/htmlparser.jar</string>
 			<string>$JAVAROOT/junit.jar</string>
 			<string>$JAVAROOT/sax2.jar</string>
+                        <string>$JAVAROOT/ant.jar</string>
+                        <string>$JAVAROOT/ant-antlr.jar</string>
+                        <string>$JAVAROOT/ant-apache-bcel.jar</string>
+                        <string>$JAVAROOT/ant-apache-bsf.jar</string>
+                        <string>$JAVAROOT/ant-apache-log4j.jar</string>
+                        <string>$JAVAROOT/ant-apache-oro.jar</string>
+                        <string>$JAVAROOT/ant-apache-regexp.jar</string>
+                        <string>$JAVAROOT/ant-apache-resolver.jar</string>
+                        <string>$JAVAROOT/ant-commons-logging.jar</string>
+                        <string>$JAVAROOT/ant-commons-net.jar</string>
+                        <string>$JAVAROOT/ant-jai.jar</string>
+                        <string>$JAVAROOT/ant-javamail.jar</string>
+                        <string>$JAVAROOT/ant-jdepend</string>
+                        <string>$JAVAROOT/ant-jmf.jar</string>
+                        <string>$JAVAROOT/ant-jsch.jar</string>
+                        <string>$JAVAROOT/ant-junit.jar</string>
+                        <string>$JAVAROOT/ant-launcher.jar</string>
+                        <string>$JAVAROOT/ant-netrexx.jar</string>
+                        <string>$JAVAROOT/ant-nodeps.jar</string>
+                        <string>$JAVAROOT/ant-starteam.jar</string>
+                        <string>$JAVAROOT/ant-stylebook.jar</string>
+                        <string>$JAVAROOT/ant-swing.jar</string>
+                        <string>$JAVAROOT/ant-testutil.jar</string>
+                        <string>$JAVAROOT/ant-trax.jar</string>
+                        <string>$JAVAROOT/ant-weblogic.jar</string>
+                        <string>$JAVAROOT/xercesImpl.jar</string>
+                        <string>$JAVAROOT/xml-apis.jar</string>     
+                        <string>$JAVAROOT/AntRunner.jar</string> 
 			<string>$JAVAROOT/Antipasto_Arduino.jar</string>
 			<string>/System/Library/Java</string>
 		</array>

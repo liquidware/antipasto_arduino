@@ -85,21 +85,55 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
           "%s\\lib\\mrj.jar;"
           "%s\\lib\\RXTXcomm.jar;"
           "%s\\lib\\oro.jar;"
-
           "%s\\lib\\junit.jar;"
           "%s\\lib\\sax2.jar;"
           "%s\\lib\\filterbuilder.jar;"
           "%s\\lib\\htmllexer.jar;"
           "%s\\lib\\htmlparser.jar;"
           "%s\\lib\\thumbelina.jar;"
-
           "%s\\lib\\registry.jar;"
           "%s\\lib\\antlr.jar;"
+          "%s\\lib\\ant.jar;"
+          "%s\\lib\\ant-antlr.jar;"
+          "%s\\lib\\ant-apache-bcel.jar;"
+          "%s\\lib\\ant-apache-bsf.jar;"
+          "%s\\lib\\ant-apache-log4j.jar;"
+          "%s\\lib\\ant-apache-oro.jar;"
+          "%s\\lib\\ant-apache-regexp.jar;"
+          "%s\\lib\\ant-apache-resolver.jar;"
+          "%s\\lib\\ant-commons-logging.jar;"
+          "%s\\lib\\ant-commons-net.jar;"
+          "%s\\lib\\ant-jai.jar;"
+          "%s\\lib\\ant-javamail.jar;"
+          "%s\\lib\\ant-jdepend"
+          "%s\\lib\\ant-jmf.jar;"
+          "%s\\lib\\ant-jsch.jar;"
+          "%s\\lib\\ant-junit.jar;"
+          "%s\\lib\\ant-launcher.jar;"
+          "%s\\lib\\ant-netrexx.jar;"
+          "%s\\lib\\ant-nodeps.jar;"
+          "%s\\lib\\ant-starteam.jar;"
+          "%s\\lib\\ant-stylebook.jar;"
+          "%s\\lib\\ant-swing.jar;"
+          "%s\\lib\\ant-testutil.jar;"
+          "%s\\lib\\ant-trax.jar;"
+          "%s\\lib\\ant-weblogic.jar;"
+          "%s\\lib\\xercesImpl.jar;"
+          "%s\\lib\\xml-apis.jar;"     
+          "%s\\lib\\AntRunner.jar;" 
           "%s\\jar\\Antipasto_Arduino.jar;"
 
           "%s",  // original CLASSPATH
           local_jre_installed ? "java\\lib\\rt.jar;" : "", 
           loaddir, loaddir, loaddir, loaddir, 
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir, loaddir, loaddir, loaddir,
+
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir, loaddir, loaddir, loaddir,
           loaddir, loaddir, loaddir, loaddir,
           loaddir, loaddir, loaddir, loaddir,
           loaddir, loaddir, loaddir,

@@ -3,12 +3,13 @@
     <property name="lib.dir"     value="build/shared/lib"/>
     <property name="main-class"  value="processing.app.Base"/>
     <property name="jnidir" value="lib"/>
-    <path id="classpath">
-        <fileset dir="${lib.dir}" includes="**/*.jar"/>
-    </path>
 
     <macrodef name="compile">
         <sequential>
+            <path id="classpath">
+                <fileset dir="${build.dir}/lib" includes="**/*.jar"/> 
+            </path>
+
             <property name="classes.dir" value="${build.dir}/classes"/>
 
             <property name="src.java.antipasto"     value="antipasto"/>
@@ -57,10 +58,24 @@
         <compile />
     </target>
 
-
-
-    <macrodef name="setup-shared">
+    <macrodef name="build-plugins">
         <sequential>
+            
+            <!-- Get and build all the plugins -->
+            <ant dir="plugins"  target="build.all" />
+
+            <!--Copy the plugin jars to the lib directory -->
+            <copy todir="${build.dir}/lib">
+                <fileset dir="plugins/AntRunner/lib/Ant" includes="*.jar"/>
+                <fileset dir="plugins/AntRunner/build/jar" includes="*.jar"/>
+            </copy>
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="setup-shared" >
+        <sequential>
+            <build-plugins/>
             <copy todir="${build.dir}/lib">
                 <fileset dir="build/shared/lib"/>
             </copy>
@@ -168,7 +183,7 @@
         </sequential>
     </macrodef>
 
-
+    
 
     <target name="run-windows" >
         <property name="build.dir"   value="build/windows/work"/>
