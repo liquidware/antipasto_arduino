@@ -6,6 +6,8 @@
 
     <macrodef name="compile">
         <sequential>
+            <!-- Substitute the token with the build version -->
+            <replace file="processing/app/Base.java" token="@BUILD_VERSION" value="${build.version}"/>
             <path id="classpath">
                 <fileset dir="${build.dir}/lib" includes="**/*.jar"/> 
             </path>
@@ -398,6 +400,12 @@
 
         <copy file="build/macosx/dist/Info.plist"        todir="${package.dir}/Resources" />
         <copy file="build/macosx/dist/Description.plist" todir="${package.dir}/Resources" />
+
+        <!-- Substitute the token with the build version -->
+        <replace file="${package.dir}/Resources/Info.plist" 
+                 token="@BUILD_VERSION" value="${build.version}"/>
+        <replace file="${package.dir}/Resources/Description.plist" 
+                 token="@BUILD_VERSION" value="${build.version}"/>
 
         <set-perm  dir="${package.dir}" mode="777" />
         <set-owner dir="${package.dir}" user="root" group="wheel" />
