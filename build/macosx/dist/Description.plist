@@ -10,7 +10,7 @@
 		<key>IFPkgDescriptionTitle</key>
 		<string>Antipasto Arduino</string>
 		<key>IFPkgDescriptionVersion</key>
-		<string>0.8.13</string>
+		<string>@BUILD_VERSION</string>
 </dict>
 </plist>
 

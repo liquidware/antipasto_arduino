@@ -10,7 +10,7 @@
 		<key>CFBundleName</key>
 		<string>Antipasto Arduino</string>
 		<key>CFBundleShortVersionString</key>
-		<string>0.8.13</string>
+		<string>@BUILD_VERSION</string>
 		<key>IFPkgFlagAuthorizationAction</key>
 		<string>AdminAuthorization</string>
 		<key>IFPkgFlagOverwritePermissions</key>
