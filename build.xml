@@ -64,10 +64,25 @@
         <sequential>
             <!-- Get and build all the plugins -->
             <ant dir="plugins"  target="build.all" />
-
-            <!--Copy the plugin jars to the lib directory -->
-            <copy todir="${build.dir}/lib" flatten="true">
+            
+            <!--Copy the plugin jars to the plugin directory -->
+            <mkdir dir="${build.dir}/plugins" />
+            <copy todir="${build.dir}/plugins" flatten="true">
                 <fileset dir="plugins">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </copy>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="build-external">
+        <sequential>
+            <!-- Get and build all external -->
+            <ant dir="external"  target="build.all" />
+
+            <!-- Copy the external jars to the lib directory -->
+            <copy todir="${build.dir}/lib" flatten="true">
+                <fileset dir="external">
                     <include name="**/*.jar"/>
                 </fileset>
             </copy>
@@ -76,6 +91,7 @@
 
     <macrodef name="setup-shared" >
         <sequential>
+            <build-external/>
             <build-plugins/>
             <copy todir="${build.dir}/lib">
                 <fileset dir="build/shared/lib"/>

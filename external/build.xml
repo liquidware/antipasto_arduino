@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-   Arduino plugin Buildfile - Gets the plugins for the Arduino IDE
+   Arduino external Buildfile - Gets and Builds the external sources of the Arduino IDE
    Copyright (C) 2009 Christopher Ladden All rights reserved.
 
    This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
    USA
 -->
-<project name="plugins" default="build.all">
+<project name="external" default="build.all">
 
     <!--
         ===================================================================
@@ -31,7 +31,7 @@
           The project's target definitions
         ===================================================================
     -->
-    <target name="clean.all" depends="clean.plugins"/>
+    <target name="clean.all" depends="clean.external"/>
     <target name="build.all" depends="get.all, build.jar"/>
 
     <!--
@@ -40,7 +40,7 @@
         ===================================================================
     -->
 
-    <target name="clean.plugins">
+    <target name="clean.external">
           <delete includeemptydirs="true">
               <fileset dir=".">
                   <include name="**/*"/>
@@ -49,16 +49,12 @@
           </delete>
     </target>
 
-    <target name="get.all" depends="clean.plugins">
-        <!-- Example of getting a plugin from git 
-        <git action="clone"    args="-v git://github.com/liquidware/my-plugin.git" dir="." />
-        -->
+    <target name="get.all" depends="clean.external">
+        <git action="clone"    args="-v git://github.com/liquidware/AntRunner.git" dir="." />
     </target> 
 
     <target name="build.jar">
-         <!-- Example of building a plugin 
-        <ant dir="my-plugin"  target="build.all" inheritAll="false"/>
-        -->
+        <ant dir="AntRunner"  target="build.all" inheritAll="false"/>
     </target>
 
     <!--
