@@ -62,16 +62,15 @@
 
     <macrodef name="build-plugins">
         <sequential>
-            
             <!-- Get and build all the plugins -->
             <ant dir="plugins"  target="build.all" />
 
             <!--Copy the plugin jars to the lib directory -->
-            <copy todir="${build.dir}/lib">
-                <fileset dir="plugins/AntRunner/lib/Ant" includes="*.jar"/>
-                <fileset dir="plugins/AntRunner/build/jar" includes="*.jar"/>
+            <copy todir="${build.dir}/lib" flatten="true">
+                <fileset dir="plugins">
+                    <include name="**/*.jar"/>
+                </fileset>
             </copy>
-
         </sequential>
     </macrodef>
 

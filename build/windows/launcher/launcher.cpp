@@ -93,6 +93,7 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
           "%s\\lib\\thumbelina.jar;"
           "%s\\lib\\registry.jar;"
           "%s\\lib\\antlr.jar;"
+
           "%s\\lib\\ant.jar;"
           "%s\\lib\\ant-antlr.jar;"
           "%s\\lib\\ant-apache-bcel.jar;"
@@ -119,7 +120,14 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
           "%s\\lib\\ant-trax.jar;"
           "%s\\lib\\ant-weblogic.jar;"
           "%s\\lib\\xercesImpl.jar;"
-          "%s\\lib\\xml-apis.jar;"     
+          "%s\\lib\\xml-apis.jar;"
+
+          "%s\\lib\\bcel-5.1.jar;"
+          "%s\\lib\\commons-httpclient-3.0.1.jar;"
+          "%s\\lib\\commons-logging-1.0.4.jar;"
+          "%s\\lib\\ivy-1.3.1.jar;"
+          "%s\\lib\\ant-contrib-1.0b3.jar;"
+
           "%s\\lib\\AntRunner.jar;" 
           "%s\\jar\\Antipasto_Arduino.jar;"
 
@@ -136,7 +144,8 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
           loaddir, loaddir, loaddir, loaddir,
           loaddir, loaddir, loaddir, loaddir,
           loaddir, loaddir, loaddir, loaddir,
-          loaddir, loaddir, loaddir,
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir, loaddir, loaddir, loaddir,
           env_classpath);
 
   if (!SetEnvironmentVariable("CLASSPATH", cp)) {
@@ -144,8 +153,6 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
                "Arduino Error", MB_OK);
     return 0;
   }
-  
-  
 
   // need to add the local jre to the path for 'java mode' in the env
   if (local_jre_installed) {
