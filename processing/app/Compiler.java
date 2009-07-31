@@ -49,16 +49,20 @@ public class Compiler implements MessageConsumer {
   RunnerException exception;
    
   AntRunner ant;
+  Editor editor;
   
   /**
    * 
    * @param ant
-   * Give as a reference to an AntRunner. 
-   * The AntRunner is used to run the compilation.
+   * A reference to an AntRunner. The AntRunner is used to run the compilation.
+   * 
+   * @param editor
+   * A reference to an Editor.
    */
-  public Compiler(AntRunner ant) { 
+  public Compiler(AntRunner ant, Editor editor) { 
 	  
-	this.ant = ant;  
+	this.ant = ant;
+	this.editor = editor;
   } 
 
 
@@ -80,6 +84,17 @@ public class Compiler implements MessageConsumer {
 	 return buildFile;
   }
   
+	/**
+	 * This function compiles the sketch.
+	 * 
+	 * @param sketch
+	 *            The current sketch.
+	 * @param buildPath
+	 *            The temporary build path
+	 * @param target
+	 *            The core to compile the sketch for.
+	 * @throws RunnerException
+	 */
   public boolean compile(Sketch sketch, String buildPath, Target target)
     throws RunnerException {
 	 
@@ -88,225 +103,25 @@ public class Compiler implements MessageConsumer {
 	
 	if (buildFile != null) {
 		if(!ant.isRunning()){
-			//Compile the sketch!
-			ant.setOutputVerbose();
+			
+			// Configure
+			if (Preferences.getBoolean("build.verbose")) {
+				ant.setOutputVerbose();
+			} else {
+				ant.setOutputQuiet();
+			}
+			
+			// Run
 			ant.run(buildFile.toString(),"build.all", new String[] {
 					"build.dest",  buildPath,
 					"sketch.name", sketch.name});
 		
-			//Busy-wait loop for the run to finish
-			while(ant.isRunning()) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+			// Wait to finish
+			ant.waitForCompletion();
 		}
+	} else {
+		System.out.println("No buildFile found in " + target.getPath());
 	}
-	
-	/*
-	
-    this.sketch = sketch;
-    this.buildPath = buildPath;
-
-    // the pms object isn't used for anything but storage
-    MessageStream pms = new MessageStream(this);
-
-    String userdir = System.getProperty("user.dir") + File.separator;
-    
-//    LibraryManager libraryManager;
-//
-//    try {
-//      libraryManager = new LibraryManager();
-//    } catch (IOException e) {
-//      throw new RunnerException(e.getMessage());
-//    }
-    String avrBasePath;
-    if(Base.isMacOS()) {
-    	avrBasePath = new String("hardware/tools/avr/bin/"); 
-    }
-    else if(Base.isLinux()) {
-    	avrBasePath = new String("hardware/tools/avr/bin/");     	
-    }
-    else {
-    	avrBasePath = new String(userdir + "hardware/tools/avr/bin/"); 
-    }
-    
-    List includePaths = new ArrayList();
-    includePaths.add(target.getPath());
-    // use lib directories as include paths
-    for (int i = 0; i < sketch.importedLibraries.size(); i++) {
-      includePaths.add(
-        ((Library) sketch.importedLibraries.get(i)).getFolder().getPath());
-    }
-    
-    List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
-      avrBasePath + "avr-gcc",
-      "-Os",
-      "-Wl,--gc-sections",
-      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
-      "-o",
-      buildPath + File.separator + sketch.name + ".elf"
-    }));
-    
-    String runtimeLibraryName = buildPath + File.separator + "core.a";
-
-    List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
-      avrBasePath + "avr-ar",
-      "rcs",
-      runtimeLibraryName
-    }));
-
-    // use lib object files
-    for (Iterator i = sketch.importedLibraries.iterator(); i.hasNext(); ) {
-      Library library = (Library) i.next();
-      File[] objectFiles = library.getObjectFiles();
-      for (int j = 0; j < objectFiles.length; j++)
-        baseCommandLinker.add(objectFiles[j].getPath());
-    }
-    
-    List baseCommandObjcopy = new ArrayList(Arrays.asList(new String[] {
-      avrBasePath + "avr-objcopy",
-      "-O",
-      "-R",
-    }));
-
-    // make list of code files that need to be compiled and the object files
-    // that they will be compiled to (includes code from the sketch and the
-    // library for the target platform)
-    List sourceNames = new ArrayList();
-    List sourceNamesCPP = new ArrayList();
-    List objectNames = new ArrayList();
-    List objectNamesCPP = new ArrayList();
-    List targetObjectNames = new ArrayList();
-    List sketchObjectNames = new ArrayList();
-    for (int i = 0; i < sketch.codeCount; i++) {
-      if (sketch.code[i].preprocName != null) {
-        if (sketch.code[i].preprocName.endsWith(".c")) {
-          sourceNames.add(buildPath + File.separator + sketch.code[i].preprocName);
-          objectNames.add(buildPath + File.separator + sketch.code[i].preprocName + ".o");
-          sketchObjectNames.add(buildPath + File.separator + sketch.code[i].preprocName + ".o");
-        } else if (sketch.code[i].preprocName.endsWith(".cpp")) {
-          sourceNamesCPP.add(buildPath + File.separator + sketch.code[i].preprocName);
-          objectNamesCPP.add(buildPath + File.separator + sketch.code[i].preprocName + ".o");
-          sketchObjectNames.add(buildPath + File.separator + sketch.code[i].preprocName + ".o");
-        } 
-      }
-    }
-    for (Iterator iter = target.getSourceFilenames().iterator(); iter.hasNext(); ) {
-      String filename = (String) iter.next();
-      if (filename != null) {
-        targetObjectNames.add(buildPath + File.separator + filename + ".o");
-        if (filename.endsWith(".c")) {
-          sourceNames.add(target.getPath() + File.separator + filename);
-          objectNames.add(buildPath + File.separator + filename + ".o");
-        } else if (filename.endsWith(".cpp")) {
-          sourceNamesCPP.add(target.getPath() + File.separator + filename);
-          objectNamesCPP.add(buildPath + File.separator + filename + ".o");
-        } 
-      }
-    }
-    
-    baseCommandLinker.addAll(sketchObjectNames);
-    baseCommandLinker.addAll(targetObjectNames);
-    //baseCommandLinker.add(runtimeLibraryName);
-    //baseCommandLinker.add("-L" + buildPath);
-    baseCommandLinker.add("-lm");
-
-    firstErrorFound = false;  // haven't found any errors yet
-    secondErrorFound = false;
-
-    int result = 0; // pre-initialized to quiet a bogus warning from jikes
-    try {
-      // execute the compiler, and create threads to deal
-      // with the input and error streams
-      //
-
-      Process process;
-      boolean compiling = true;
-      for(int i = 0; i < sourceNames.size(); i++) {
-        if (execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
-          (String) sourceNames.get(i), (String) objectNames.get(i))) != 0)
-          return false;
-      }
-
-      for(int i = 0; i < sourceNamesCPP.size(); i++) {
-        if (execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
-          (String) sourceNamesCPP.get(i), (String) objectNamesCPP.get(i))) != 0)
-          return false;
-      }
-
-//      for(int i = 0; i < targetObjectNames.size(); i++) {
-//        List commandAR = new ArrayList(baseCommandAR);
-//        commandAR.add(targetObjectNames.get(i));
-//        if (execAsynchronously(commandAR) != 0)
-//          return false;
-//      }
-
-      if (execAsynchronously(baseCommandLinker) != 0)
-        return false;
-
-      List commandObjcopy;
-
-      // Extract EEPROM data (from EEMEM directive) to .eep file.
-      commandObjcopy = new ArrayList(baseCommandObjcopy);
-      commandObjcopy.add(2, "ihex");
-      commandObjcopy.set(3, "-j");
-      commandObjcopy.add(".eeprom");
-      commandObjcopy.add("--set-section-flags=.eeprom=alloc,load");
-      commandObjcopy.add("--no-change-warnings");
-      commandObjcopy.add("--change-section-lma");
-      commandObjcopy.add(".eeprom=0");
-      commandObjcopy.add(buildPath + File.separator + sketch.name + ".elf");
-      commandObjcopy.add(buildPath + File.separator + sketch.name + ".eep");
-      if (execAsynchronously(commandObjcopy) != 0)
-        return false;
-
-      commandObjcopy = new ArrayList(baseCommandObjcopy);
-      commandObjcopy.add(2, "ihex");
-      commandObjcopy.add(".eeprom"); // remove eeprom data
-      commandObjcopy.add(buildPath + File.separator + sketch.name + ".elf");
-      commandObjcopy.add(buildPath + File.separator + sketch.name + ".hex");
-      if (execAsynchronously(commandObjcopy) != 0)
-        return false;
-    } catch (Exception e) {
-      String msg = e.getMessage();
-      if ((msg != null) && (msg.indexOf("avr-gcc: not found") != -1)) {
-        //System.err.println("jikes is missing");
-        Base.showWarning("Compiler error",
-                            "Could not find the compiler.\n" +
-                            "avr-gcc is missing from your PATH.", null);
-        return false;
-
-      } else {
-        e.printStackTrace();
-        result = -1;
-      }
-    }
-
-    // an error was queued up by message(), barf this back to build()
-    // which will barf it back to Editor. if you're having trouble
-    // discerning the imagery, consider how cows regurgitate their food
-    // to digest it, and the fact that they have five stomaches.
-    //
-    //System.out.println("throwing up " + exception);
-    if (exception != null) throw exception;
-
-    // if the result isn't a known, expected value it means that something
-    // is fairly wrong, one possibility is that jikes has crashed.
-    //
-    if (result != 0 && result != 1 ) {
-      //exception = new RunnerException(SUPER_BADNESS);
-      //editor.error(exception);  // this will instead be thrown
-      Base.openURL(BUGS_URL);
-      throw new RunnerException(SUPER_BADNESS);
-    }
-
-    // success would mean that 'result' is set to zero
-    return (result == 0); // ? true : false;
-    */
     return true;
   }
   
