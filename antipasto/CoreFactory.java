@@ -89,7 +89,7 @@ public class CoreFactory {
                         {
                             throw new FileNotFoundException("Couldn't find the file specified");
                         }
-                        System.out.println(fileName);
+                        //System.out.println(fileName);
                     }
                 }else if(nodes.item(i).getNodeName().equalsIgnoreCase("Compilers"))
                 {
@@ -290,7 +290,7 @@ public class CoreFactory {
     	for(int i=0; i < files.length; i++)
     	{
             File f = files[i];
-            System.out.println(name.toLowerCase());
+            //System.out.println(name.toLowerCase());
     		if(f.getName().toLowerCase().endsWith(name.toLowerCase()))
     		{
     			return f;

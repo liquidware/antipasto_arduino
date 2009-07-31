@@ -42,8 +42,8 @@ CLASSPATH=`pwd`/lib/RXTXcomm.jar:\
 `pwd`/lib/commons-httpclient-3.0.1.jar:\
 `pwd`/lib/commons-logging-1.0.4.jar:\
 `pwd`/lib/ivy-1.3.1.jar:\
-`pwd`/lib/ant-contrib-1.0b3.jar:\     
-`pwd`/lib/AntRunner.jar:\ 
+`pwd`/lib/ant-contrib-1.0b3.jar:\
+`pwd`/lib/AntRunner.jar:\
 `pwd`/jar/Antipasto_Arduino.jar
 export CLASSPATH
 
