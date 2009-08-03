@@ -69,7 +69,7 @@
             <mkdir dir="${build.dir}/plugins" />
             <copy todir="${build.dir}/plugins" flatten="true">
                 <fileset dir="plugins">
-                    <include name="**/*.jar"/>
+                    <include name="**/*.zip"/>
                 </fileset>
             </copy>
         </sequential>

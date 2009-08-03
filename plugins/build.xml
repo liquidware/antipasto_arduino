@@ -50,11 +50,11 @@
     </target>
 
     <target name="get.all" depends="clean.plugins">
-             <git action="clone"    args="-v git://github.com/mediacoder/bitcaps_antipasto_arduino_plugins.git" dir="." /> 
+             <git action="clone"    args="-v git://github.com/mediacoder/antipasto_arduino_plugins.git" dir="." /> 
     </target> 
 
     <target name="build.jar">
-             <ant dir="bitcaps_antipasto_arduino_plugins"  target="build.all" inheritAll="false"/>
+             <ant dir="antipasto_arduino_plugins"  target="build.all" inheritAll="false"/>
     </target>
 
     <!--
