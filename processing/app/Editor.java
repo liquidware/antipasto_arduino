@@ -154,7 +154,7 @@ public class Editor extends JFrame
   JMenu serialRateMenu;
   JMenu mcuMenu;
   
-  ImageListPanel imageListPanel;
+  public ImageListPanel imageListPanel;
   
   SerialMenuListener serialMenuListener;
 

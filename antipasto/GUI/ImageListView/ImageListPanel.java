@@ -248,7 +248,8 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	/*
 	 *Transfers the files
 	 */
-	private void transfer(){
+    /*made public for api..soon depracted*/
+	public void transfer(){
 		try {
 			final File fileList[] = this._module.getData();
 			final FlashTransfer transfer = imageTransfer;
