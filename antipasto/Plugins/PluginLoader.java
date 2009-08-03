@@ -177,6 +177,8 @@ public class PluginLoader {
     private void updatePlugins() {
 
         list = new JList();
+        PluginListRenderer renderer = new PluginListRenderer();
+        list.setCellRenderer(renderer);     
         list.setSize(300, 200);
 
         //int cellWidth = 300;

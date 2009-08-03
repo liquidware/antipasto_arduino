@@ -1,4 +1,4 @@
-package antipasto.Plugins.Interfaces;
+package antipasto.Plugins;
 
 import java.awt.*;
 import javax.swing.*;
