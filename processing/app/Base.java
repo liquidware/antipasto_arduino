@@ -41,6 +41,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
+import antipasto.Plugins.PluginLoader;
 
 import antipasto.GUI.ImageListView.ImageListPanel;
 import antipasto.GUI.ImageListView.ImageListView;
@@ -71,9 +72,11 @@ public class Base {
 
   /*made public for api..soon depracted*/
   static public Editor editor;
-
+  static private PluginLoader pluginloader;
 
   static public void main(String args[]) {
+
+    pluginloader = new PluginLoader();
 
     // make sure that this is running on java 1.4
 

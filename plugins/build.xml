@@ -50,15 +50,11 @@
     </target>
 
     <target name="get.all" depends="clean.plugins">
-        <!-- Example of getting a plugin from git 
-        <git action="clone"    args="-v git://github.com/liquidware/my-plugin.git" dir="." />
-        -->
+             <git action="clone"    args="-v git://github.com/mediacoder/bitcaps_antipasto_arduino_plugins.git" dir="." /> 
     </target> 
 
     <target name="build.jar">
-         <!-- Example of building a plugin 
-        <ant dir="my-plugin"  target="build.all" inheritAll="false"/>
-        -->
+             <ant dir="bitcaps_antipasto_arduino_plugins"  target="build.all" inheritAll="false"/>
     </target>
 
     <!--
