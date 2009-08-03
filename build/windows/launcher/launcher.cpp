@@ -128,6 +128,12 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
           "%s\\lib\\ivy-1.3.1.jar;"
           "%s\\lib\\ant-contrib-1.0b3.jar;"
 
+          "%s\\lib\\log4j.jar;"
+          "%s\\lib\\jpf.jar;"
+          "%s\\lib\\jpf-boot.jar;"
+          "%s\\lib\\jpf-tools.jar;"
+          "%s\\lib\\jxp.jar;"
+
           "%s\\lib\\AntRunner.jar;" 
           "%s\\jar\\Antipasto_Arduino.jar;"
 
@@ -146,6 +152,10 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
           loaddir, loaddir, loaddir, loaddir,
           loaddir, loaddir, loaddir, loaddir,
           loaddir, loaddir, loaddir, loaddir,
+
+          loaddir, loaddir, loaddir, loaddir,
+          loaddir,
+
           env_classpath);
 
   if (!SetEnvironmentVariable("CLASSPATH", cp)) {
