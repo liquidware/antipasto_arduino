@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.PluginLifecycleException;
-import org.java.plugin.PluginMa	nager;
+import org.java.plugin.PluginManager;
 import org.java.plugin.PluginManager.PluginLocation;
 import org.java.plugin.standard.StandardPluginLocation;
 import org.java.plugin.registry.Extension;
@@ -34,7 +34,8 @@ import org.java.plugin.util.IoUtil;
 import java.util.*;
 import java.io.*;
 
-import antipasto.Plugin.Manager.PluginListRenderer
+import antipasto.Plugins.Manager.PluginListRenderer;
+
 
 public class PluginLoader {
 
