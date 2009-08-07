@@ -18,7 +18,7 @@ public class EditorEvent extends AWTEvent
 	{
 		int id = getID();
 		String sid = String.valueOf(id);
-		if      (id == PAGESELECTED  ) sid = "PAGESELECTED";
+		if      (id == ALLPLUGINSLOADED  ) sid = "ALLPLUGINSLOADED";
 		else if (id == PAGEDESELECTED) sid = "PAGEDESELECTED";
 		else if (id == PAGECLOSED    ) sid = "PAGECLOSED";
 		else if (id == PAGEICONIZED  ) sid = "PAGEICONIZED";
@@ -26,8 +26,9 @@ public class EditorEvent extends AWTEvent
 		else if (id == PAGEOPENED)     sid = "PAGEOPENED";
       return "EditorEvent: ID="+sid+" Source="+getSource();
 	}
+	private static int RESERVED_ID_MAX = 0;
 	
-	public static final int PAGESELECTED   = RESERVED_ID_MAX + 2000;
+	public static final int ALLPLUGINSLOADED   = RESERVED_ID_MAX + 2000;
 	public static final int PAGEDESELECTED = RESERVED_ID_MAX + 2001;
 	public static final int PAGECLOSED     = RESERVED_ID_MAX + 2002;
 	public static final int PAGEICONIZED   = RESERVED_ID_MAX + 2003;

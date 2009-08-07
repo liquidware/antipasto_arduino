@@ -56,8 +56,8 @@ public class PluginLoader {
         startPlugins();
         setEventSender(eventsender);
         PluginPanel pp = new PluginPanel(this);
-        
-        getEventSender().broadcast(new EditorEvent(new EditorContext(),1));
+        //broadcasting pluginsLoaded
+        getEventSender().broadcast(new EditorEvent(new EditorContext(),2000));
         
     }
 
