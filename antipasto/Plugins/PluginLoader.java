@@ -36,12 +36,16 @@ import java.io.*;
 
 import antipasto.Plugins.Manager.PluginListModel;
 import antipasto.Plugins.Manager.PluginPanel;
+import antipasto.Plugins.Interfaces.EditorListener;
 
+//private EventSender sender = new EventSender();
+//getEventSender().broadcast(new EditorEvent());
 
 public class PluginLoader {
 
     public static final File pluginsDir = new File("plugins");
     private PluginManager pluginManager = null;
+    public EventSender eventsender = new EventSender();
     private static final String LINE_SEP = System.getProperty("line.separator");
     private Logger logger;
 
@@ -50,8 +54,11 @@ public class PluginLoader {
         initPluginManager();        
         loadPlugins();        
         startPlugins();
+        setEventSender(eventsender);
+        PluginPanel pp = new PluginPanel(this);
         
-        showPluginPanel();        
+        getEventSender().broadcast(new EditorEvent(new EditorContext(),1));
+        
     }
 
     public PluginManager setManager(PluginManager pluginManager) {
@@ -61,7 +68,15 @@ public class PluginLoader {
     public PluginManager getManager() {
         return this.pluginManager;
     }
-    public void prepareLoggers(){
+    public EventSender setEventSender(EventSender sender) {
+        return this.eventsender = sender;
+    }
+
+    public EventSender getEventSender() {
+        return this.eventsender;
+    }
+    
+    private void prepareLoggers(){
         logger = Logger.getLogger(PluginLoader.class);
         LogOutputStream outStream = new LogOutputStream();
         PrintStream sysOut = new PrintStream(outStream, true);
@@ -111,7 +126,7 @@ public class PluginLoader {
         
     }
 
-    void startPlugins() {
+    private void startPlugins() {
         try {
             PluginDescriptor core = getManager().getRegistry().getPluginDescriptor("com.plugin.core");
             ExtensionPoint point = getManager().getRegistry().getExtensionPoint(core.getId(), "Section");
@@ -120,23 +135,25 @@ public class PluginLoader {
                 Extension ext = (Extension) it.next();
                 System.out.println("activating: " + ext);
                 PluginDescriptor descr = ext.getDeclaringPluginDescriptor();
-                getManager().activatePlugin(descr.getId());
+                
+                PluginBase plug = (PluginBase) getManager().getPlugin(descr.getId());
+                plug.postInit();
+                
+              try{
+                ClassLoader classLoader = getManager().getPluginClassLoader(descr);
+                Class<?> pclass= classLoader.loadClass(ext.getParameter("class").valueAsString());           
+                getEventSender().addEventListener((EditorListener) plug,pclass);
+              }catch(Exception e){
+            	  System.out.println("ERROR starting plugin: " + e.getMessage());
+              }
+                
             }
 
         } catch (PluginLifecycleException e) {
             System.out.println("ERROR starting plugin: " + e.getMessage());
         }
 
-    }
-
-    void showPluginPanel() {
-
-    	PluginPanel pp = new PluginPanel(this);      
-
-    }
-
-   
-    
+    }  
 
     public PluginListModel listRegisteredPlugins() {
         PluginListModel listModel = new PluginListModel();
@@ -152,7 +169,7 @@ public class PluginLoader {
 
                 //ClassLoader classLoader = getManager().getPluginClassLoader(descr);
                 //Class<?> pclass= classLoader.loadClass(ext.getParameter("class").valueAsString());
-                //Plugin psec = (Plugin) pclass.newInstance();
+                //PluginBase psec = (PluginBase) pclass.newInstance();
 
 
                 listModel.addElement(descr, ext.getParameter("class").valueAsString());
