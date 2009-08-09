@@ -1172,7 +1172,7 @@ public class Sketch {
 		// the next time we start up, internal runs using Runner won't
 		// work because the build dir won't exist at startup, so the classloader
 		// will ignore the fact that that dir is in the CLASSPATH in run.sh
-		Base.removeDescendants(tempBuildFolder);
+		//Base.removeDescendants(tempBuildFolder);
 	}
 
 	/**
