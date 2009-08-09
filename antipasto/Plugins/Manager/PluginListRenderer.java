@@ -1,10 +1,10 @@
-package antipasto.Plugins;
+package antipasto.Plugins.Manager;
 
 import java.awt.*;
 import javax.swing.*;
 import processing.app.Base;
 
-class PluginListRenderer extends DefaultListCellRenderer {
+public class PluginListRenderer extends DefaultListCellRenderer {
 
     public Component getListCellRendererComponent(JList list, Object value,
             int index, boolean isSelected, boolean cellHasFocus) {

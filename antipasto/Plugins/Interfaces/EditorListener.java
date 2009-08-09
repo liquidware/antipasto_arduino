@@ -1,4 +1,10 @@
 package antipasto.Plugins.Interfaces;
 
-public interface EditorListener {
-}
+
+import java.util.EventListener;
+import java.util.EventObject;
+
+public interface EditorListener extends EventListener
+{
+   void handleEvent(EventObject event);
+} 

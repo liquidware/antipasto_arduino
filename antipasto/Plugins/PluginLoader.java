@@ -34,23 +34,31 @@ import org.java.plugin.util.IoUtil;
 import java.util.*;
 import java.io.*;
 
+import antipasto.Plugins.Manager.PluginListModel;
+import antipasto.Plugins.Manager.PluginPanel;
+import antipasto.Plugins.Interfaces.EditorListener;
+
+//private EventSender sender = new EventSender();
+//getEventSender().broadcast(new EditorEvent());
+
 public class PluginLoader {
 
     public static final File pluginsDir = new File("plugins");
     private PluginManager pluginManager = null;
-    private JPanel panel;
-    private JFrame jf;
-    private JScrollPane listpane;
-    private JList list;
+    public EventSender eventsender = new EventSender();
     private static final String LINE_SEP = System.getProperty("line.separator");
     private Logger logger;
 
     public PluginLoader() {
         prepareLoggers();
-        initPluginManager();
-        loadPlugins();
+        initPluginManager();        
+        loadPlugins();        
         startPlugins();
-        showPluginPanel();
+        setEventSender(eventsender);
+        PluginPanel pp = new PluginPanel(this);
+        
+        getEventSender().broadcast(new EditorEvent(new EditorContext(),1));
+        
     }
 
     public PluginManager setManager(PluginManager pluginManager) {
@@ -60,7 +68,15 @@ public class PluginLoader {
     public PluginManager getManager() {
         return this.pluginManager;
     }
-    public void prepareLoggers(){
+    public EventSender setEventSender(EventSender sender) {
+        return this.eventsender = sender;
+    }
+
+    public EventSender getEventSender() {
+        return this.eventsender;
+    }
+    
+    private void prepareLoggers(){
         logger = Logger.getLogger(PluginLoader.class);
         LogOutputStream outStream = new LogOutputStream();
         PrintStream sysOut = new PrintStream(outStream, true);
@@ -84,7 +100,7 @@ public class PluginLoader {
         }
     }
 
-    private void loadPlugins() {
+    public void loadPlugins() {
         try {
             File[] plugins = pluginsDir.listFiles(new FilenameFilter() {
 
@@ -107,9 +123,10 @@ public class PluginLoader {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        
     }
 
-    void startPlugins() {
+    private void startPlugins() {
         try {
             PluginDescriptor core = getManager().getRegistry().getPluginDescriptor("com.plugin.core");
             ExtensionPoint point = getManager().getRegistry().getExtensionPoint(core.getId(), "Section");
@@ -118,163 +135,27 @@ public class PluginLoader {
                 Extension ext = (Extension) it.next();
                 System.out.println("activating: " + ext);
                 PluginDescriptor descr = ext.getDeclaringPluginDescriptor();
-                getManager().activatePlugin(descr.getId());
+                
+                PluginBase plug = (PluginBase) getManager().getPlugin(descr.getId());
+                plug.postInit();
+                
+              try{
+                ClassLoader classLoader = getManager().getPluginClassLoader(descr);
+                Class<?> pclass= classLoader.loadClass(ext.getParameter("class").valueAsString());           
+                getEventSender().addEventListener((EditorListener) plug,pclass);
+              }catch(Exception e){
+            	  System.out.println("ERROR starting plugin: " + e.getMessage());
+              }
+                
             }
 
         } catch (PluginLifecycleException e) {
             System.out.println("ERROR starting plugin: " + e.getMessage());
         }
 
-    }
+    }  
 
-    void showPluginPanel() {
-
-        jf = new JFrame("PluginLoader - Manager");
-        jf.setSize(300, 300);
-        jf.setLayout(new BorderLayout());
-
-        JButton reload_btn = new JButton("reload list");
-        ActionListener actionListener = new ActionListener() {
-
-            public void actionPerformed(ActionEvent actionEvent) {
-                updatePlugins();
-            }
-        };
-        reload_btn.addActionListener(actionListener);
-
-
-        jf.add(reload_btn, BorderLayout.PAGE_START);
-
-        jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-        listpane = new JScrollPane();
-        //listpane.setLayout(new FlowLayout());
-        listpane.setSize(300, 150);
-        listpane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-
-
-        jf.add(listpane, BorderLayout.CENTER);
-
-        updatePlugins();
-
-        panel = new JPanel();
-
-        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-        panel.add(Box.createHorizontalGlue());
-        panel.add(Box.createRigidArea(new Dimension(10, 0)));
-        panel.setSize(300, 50);
-
-
-        //panel.setVisible(false);
-
-        jf.add(panel, BorderLayout.PAGE_END);
-        jf.setVisible(true);
-        listpane.revalidate();
-
-    }
-
-    private void updatePlugins() {
-
-        list = new JList();
-        PluginListRenderer renderer = new PluginListRenderer();
-        list.setCellRenderer(renderer);     
-        list.setSize(300, 200);
-
-        //int cellWidth = 300;
-        //list.setFixedCellWidth(cellWidth);
-        int cellHeight = 28;
-        list.setFixedCellHeight(cellHeight);
-
-        loadPlugins();
-        final PluginListModel listModel = listRegisteredPlugins();
-        list.setModel(listModel);
-        list.updateUI();
-        ListSelectionModel listSelectionModel = list.getSelectionModel();
-        listSelectionModel.addListSelectionListener(new ListSelectionListener() {
-
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting() == false) {
-                    if (list.getSelectedIndex() == -1) {
-                    } else {
-                        int idx = list.getSelectedIndex();
-                        selectPlugin(listModel.getDescriptorAt(idx));
-                    }
-                }
-            }
-        });
-        listpane.removeAll();
-        listpane.updateUI();
-        listpane.add(list);
-
-    }
-
-    private void selectPlugin(PluginDescriptor descr) {
-        System.out.println(descr.getLibraries());
-        panel.removeAll();
-        panel.updateUI();
-        Boolean isactive = getManager().isPluginActivated(descr);
-        Boolean isenabled = getManager().isPluginEnabled(descr);
-        final String id = descr.getId();
-        final PluginDescriptor pdescr = descr;
-        System.out.println("SELECTED: " + descr);
-        System.out.println("  active: " + isactive);
-        System.out.println("  isloaded: " + isenabled);
-
-        JTextField textField = new JTextField(20);
-        JButton enabledisable_btn = new JButton("enable plugin");
-        JButton startstop_btn = new JButton("start plugin");
-
-        panel.add(textField);
-        panel.add(Box.createRigidArea(new Dimension(10, 0)));
-        panel.add(enabledisable_btn);
-        panel.add(Box.createRigidArea(new Dimension(10, 0)));
-        panel.add(startstop_btn);
-
-        textField.setText(descr.toString());
-        enabledisable_btn.setLabel(!isenabled ? "Enable" : "Disable");
-        startstop_btn.setLabel(!isactive ? "Activate" : "Deactivate");
-
-        enabledisable_btn.addActionListener(
-                new ActionListener() {
-
-                    public final void actionPerformed(final ActionEvent event) {
-                        getManager().disablePlugin(pdescr);
-                        //getManager().enablePlugin(pdescr);
-                        updatePlugins();
-                    }
-                });
-
-        ActionListener al;
-
-        if (isactive) {
-            al = new ActionListener() {
-
-                public final void actionPerformed(final ActionEvent event) {
-                    getManager().deactivatePlugin(id);
-                    updatePlugins();
-                }
-            };
-        } else {
-            al = new ActionListener() {
-
-                public final void actionPerformed(final ActionEvent event) {
-                    try {
-                        getManager().activatePlugin(id);
-                        updatePlugins();
-                    } catch (Exception e) {
-                    }
-                }
-            };
-        }
-
-        startstop_btn.addActionListener(al);
-
-
-        panel.setVisible(true);
-    }
-
-    PluginListModel listRegisteredPlugins() {
+    public PluginListModel listRegisteredPlugins() {
         PluginListModel listModel = new PluginListModel();
         try {
             PluginDescriptor core = getManager().getRegistry().getPluginDescriptor("com.plugin.core");
@@ -288,7 +169,7 @@ public class PluginLoader {
 
                 //ClassLoader classLoader = getManager().getPluginClassLoader(descr);
                 //Class<?> pclass= classLoader.loadClass(ext.getParameter("class").valueAsString());
-                //Plugin psec = (Plugin) pclass.newInstance();
+                //PluginBase psec = (PluginBase) pclass.newInstance();
 
 
                 listModel.addElement(descr, ext.getParameter("class").valueAsString());
@@ -296,6 +177,7 @@ public class PluginLoader {
 
         } catch (Exception e) {
             System.out.println("ERROR listing plugins: " + e.getMessage());
+            return listModel;
         }
         return listModel;
     }
