@@ -19,7 +19,7 @@
 
                 <mkdir dir="${classes.dir}"/>
                 <javac srcdir="${src.java.antipasto};
-                               ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath" source="1.5" target="jsr14"/>
+                               ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath" />
 
         </sequential>
 
@@ -199,9 +199,7 @@
 	        </java>
         </sequential>
     </macrodef>
-
     
-
     <target name="run-windows" >
         <property name="build.dir"   value="build/windows/work"/>
         <exec executable="${build.dir}/arduino" />
@@ -213,7 +211,8 @@
     </target>
 
     <target name="run-macosx" >
-        <exec dir="${build.dir}" executable="./Arduino.app/Contents/MacOS/Arduino" />
+        <property name="build.dir"   value="${basedir}/build/macosx/work"/>        
+        <exec executable="./build/macosx/work/Arduino.app/Contents/MacOS/Arduino" />
     </target>
 
     <target name="clean-windows">
@@ -283,7 +282,19 @@
             </fileset>
         </move>
         <set-permissions dir="${build.dir}" />
+        
+        <!-- Remove the x86_64 Slice, so we always run in 32 bit mode -->
+        <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="lipo" searchpath="true">
+            <arg line="-remove x86_64 -output Arduino_32 Arduino"/>
+        </exec>
+        <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="mv" searchpath="true">
+            <arg line="Arduino Arduino_64"/>
+        </exec>  
+        <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="mv" searchpath="true">
+            <arg line="Arduino_32 Arduino"/>
+        </exec>       
         <record name="build.log" action="stop"/>
+        
     </target>
 
 
