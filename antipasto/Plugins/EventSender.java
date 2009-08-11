@@ -19,7 +19,7 @@ public class EventSender
       //FIXME: needs to be much more efficient
       for (Iterator i = listeners.iterator(); i.hasNext(); )
       {
-    	 System.out.println("DISPATCHING EVENT:"+ this.toString());
+    	 System.out.println("DISPATCHING EVENT TO:"+ this.toString());
          ListenerEntry l = (ListenerEntry) i.next();
          //if (l.getEntryClass().isAssignableFrom(event.getClass()))
          //{        	 

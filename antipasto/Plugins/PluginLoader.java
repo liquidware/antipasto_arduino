@@ -48,7 +48,6 @@ public class PluginLoader {
     public EventSender eventsender = new EventSender();
     private static final String LINE_SEP = System.getProperty("line.separator");
     private Logger logger;
-    private PluginPanel pluginPanel;
 
     public PluginLoader() {
         prepareLoggers();
@@ -56,17 +55,10 @@ public class PluginLoader {
         loadPlugins();        
         startPlugins();
         setEventSender(eventsender);
-        pluginPanel = new PluginPanel(this);
+        PluginPanel pp = new PluginPanel(this);
+        //broadcasting pluginsLoaded
+        getEventSender().broadcast(new EditorEvent(new EditorContext(),2000));
         
-        getEventSender().broadcast(new EditorEvent(new EditorContext(),1));
-        
-    }
-
-    /**
-     * Shows the plugin panel 
-     */
-    public void showPluginPanel(){
-        pluginPanel.showPluginPanel();
     }
 
     public PluginManager setManager(PluginManager pluginManager) {
@@ -135,34 +127,42 @@ public class PluginLoader {
     }
 
     private void startPlugins() {
-        try {
+        //try {
             PluginDescriptor core = getManager().getRegistry().getPluginDescriptor("com.plugin.core");
             ExtensionPoint point = getManager().getRegistry().getExtensionPoint(core.getId(), "Section");
 
             for (Iterator it = point.getConnectedExtensions().iterator(); it.hasNext();) {
-                Extension ext = (Extension) it.next();
-                System.out.println("activating: " + ext);
-                PluginDescriptor descr = ext.getDeclaringPluginDescriptor();
-                
-                PluginBase plug = (PluginBase) getManager().getPlugin(descr.getId());
-                plug.postInit();
-                
-              try{
-                ClassLoader classLoader = getManager().getPluginClassLoader(descr);
-                Class<?> pclass= classLoader.loadClass(ext.getParameter("class").valueAsString());           
-                getEventSender().addEventListener((EditorListener) plug,pclass);
-              }catch(Exception e){
-            	  System.out.println("ERROR starting plugin: " + e.getMessage());
-              }
-                
+            	Extension ext = (Extension) it.next();
+            	initializePlugin(ext);
             }
 
-        } catch (PluginLifecycleException e) {
-            System.out.println("ERROR starting plugin: " + e.getMessage());
-        }
+        //} catch (PluginLifecycleException e) {
+        //    System.out.println("ERROR starting plugin: " + e.getMessage());
+        //}
 
     }  
 
+    public void initializePlugin(Extension ext){
+        try{
+        System.out.println("activating: " + ext);
+        PluginDescriptor descr = ext.getDeclaringPluginDescriptor();
+        
+        PluginBase plug = (PluginBase) getManager().getPlugin(descr.getId());
+        plug.postInit();
+        
+      try{
+        ClassLoader classLoader = getManager().getPluginClassLoader(descr);
+        Class<?> pclass= classLoader.loadClass(ext.getParameter("class").valueAsString());           
+        getEventSender().addEventListener((EditorListener) plug,pclass);
+      }catch(Exception e){
+    	  System.out.println("ERROR starting plugin: " + e.getMessage());
+      }    	
+        }catch(Exception e){
+      	  System.out.println("ERROR starting plugin: " + e.getMessage());
+        }  
+        
+    }
+    
     public PluginListModel listRegisteredPlugins() {
         PluginListModel listModel = new PluginListModel();
         try {
