@@ -1,106 +1,171 @@
+<?xml version="1.0"?>
+<!--
+   ANT Buildfile - Builds the Arduino IDE
+   Copyright (C) 2009 Christopher Ladden All rights reserved.
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+   USA
+-->
 <project name="Antipasto_Arduino" basedir="." default="main">
-    <loadproperties srcFile="build.properties" />
-    <property name="lib.dir"     value="build/shared/lib"/>
-    <property name="main-class"  value="processing.app.Base"/>
-    <property name="jnidir" value="lib"/>
 
-    <macrodef name="compile">
-        <sequential>
-            <!-- Substitute the token with the build version -->
-            <replace file="processing/app/Base.java" token="@BUILD_VERSION" value="${build.version}"/>
-            <path id="classpath">
-                <fileset dir="${build.dir}/lib" includes="**/*.jar"/> 
-            </path>
+    <!--
+        ===================================================================
+         Load the project's resources (ANT libraries)
+        ===================================================================
+    -->
+    <typedef resource="net/sf/antcontrib/antlib.xml">
+        <classpath>
+             <pathelement location="tools/apache-ant/library/ant-contrib/ant-contrib-1.0b3.jar" />
+        </classpath>
+    </typedef>
 
-            <property name="classes.dir" value="${build.dir}/classes"/>
-
-            <property name="src.java.antipasto"     value="antipasto"/>
-            <property name="src.java.processing"    value="processing"/>
-
-                <mkdir dir="${classes.dir}"/>
-                <javac srcdir="${src.java.antipasto};
-                               ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath" />
-
-        </sequential>
-
-    </macrodef>
-
-    <macrodef name="compile-win-launcher">
-        <sequential>
-        <exec dir="build/windows/launcher" executable="make" />
-        </sequential>
-    </macrodef>
-
-    <macrodef name="jar-lib">
-        <sequential>
-            <property name="jar.dir"     value="${build.dir}/jar"/>
-
-            <mkdir dir="${jar.dir}"/>
-            <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
-                <manifest>
-                    <attribute name="Main-Class" value="${main-class}"/>
-                </manifest>
-            </jar>
-        </sequential>
-    </macrodef>
-
-
-    <target name="compile-windows">
-        <property name="build.dir"   value="build/windows/work"/>
-        <compile />
-    </target>
-
-    <target name="compile-linux">
-        <property name="build.dir"   value="build/linux/work"/>
-        <compile />
-    </target>
-
-    <target name="compile-macosx">
-        <property name="build.dir"   value="build/macosx/work"/>
-        <compile />
-    </target>
+    <!--
+        ===================================================================
+         Load the project's properties
+        ===================================================================
+    -->
+    <import file="build.properties.xml" />
     
-    <target name="get-plugins">
+    <target name="clean.all" depends="clean.external, clean.plugins, clean.OS"/>
+    <target name="get.all"   depends="get.plugins, get.external"/>
+    <target name="dist.all"  depends="clean.all, get.all, dist.OS"/>
+    <target name="build.all" depends="build.plugins, build.external, build.java"/>
+    <target name="package.all"  depends="package.OS"/>
+    <target name="upload.all"   depends="upload.OS"/>
+    <target name="run.all"      depends="run.OS"/>
+    <target name="main"         depends="build.all"/>
+
+
+    <!--
+        ===================================================================
+         Clean Targets
+        ===================================================================
+    -->
+    <target name="clean.plugins">
+        <ant dir="plugins"  target="clean.all" />
+    </target>
+
+    <target name="clean.external">
+        <ant dir="external"  target="clean.all" />
+    </target>
+
+    <target name="clean.OS">
+        <delete dir="${build.dir}" />
+        <delete dir="${package.dir}" />
+    </target>
+
+
+    <!--
+        ===================================================================
+         Get Targets
+        ===================================================================
+    -->
+    <target name="get.plugins">
         <ant dir="plugins"  target="get.all" />        
     </target>
 
-    <target name="get-external">
+    <target name="get.external">
         <ant dir="external"  target="get.all" />        
     </target>
 
-    <macrodef name="build-plugins">
-        <sequential>
-            <!-- Get and build all the plugins -->
-            <ant dir="plugins"  target="build.all" />
-            
-            <!--Copy the plugin jars to the plugin directory -->
-            <mkdir dir="${build.dir}/plugins" />
-            <copy todir="${build.dir}/plugins" flatten="true">
-                <fileset dir="plugins">
-                    <include name="**/*.zip"/>
-                </fileset>
-            </copy>
-        </sequential>
-    </macrodef>
 
-    <macrodef name="build-external">
-        <sequential>
-            <!-- Get and build all external -->
-            <ant dir="external"  target="build.all" />
+    <!--
+        ===================================================================
+         Build Targets
+        ===================================================================
+    -->
 
-            <!-- Copy the external jars to the lib directory -->
-            <copy todir="${build.dir}/lib" flatten="true">
-                <fileset dir="external">
-                    <include name="**/*.jar"/>
-                </fileset>
-            </copy>
-        </sequential>
-    </macrodef>
+    <!--
+        ===================================================================
+         Build the project's native Java source
+        ===================================================================
+    -->
+    <target name="build.java" >
+        <path id="classpath">
+            <fileset dir="${build.dir}/lib" includes="**/*.jar"/> 
+        </path>
+        <property name="classes.dir" value="${build.dir}/classes"/>
+        <property name="jar.dir"     value="${build.dir}/jar"/>
+        
+        <!-- Substitute the token with the build version -->
+        <replace file="processing/app/Base.java" token="@BUILD_VERSION" value="${build.version}"/>
 
-    <macrodef name="setup-shared" >
+        <!--  Compile -->
+        <property name="src.java.antipasto"     value="antipasto"/>
+        <property name="src.java.processing"    value="processing"/>
+    
+            <mkdir dir="${classes.dir}"/>
+            <javac srcdir="${src.java.antipasto};
+                           ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath" />
+
+
+        <!-- Jar -->
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+
+    </target>
+
+    <!--
+        ===================================================================
+         Build the project's plugins
+        ===================================================================
+    -->
+    <target name="build.plugins">
+
+        <!-- Build all the plugins -->
+        <ant dir="plugins"  target="build.all" />
+        
+        <!--Copy the plugins to the plugin directory -->
+        <mkdir dir="${build.dir}/plugins" />
+        <copy todir="${build.dir}/plugins" flatten="true">
+            <fileset dir="plugins">
+                <include name="**/*.zip"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <!--
+        ===================================================================
+         Build the project's external components
+        ===================================================================
+    -->
+    <target name="build.external">
+        <!-- Build all external -->
+        <ant dir="external"  target="build.all" />
+
+        <!-- Copy the external jars to the lib directory -->
+        <copy todir="${build.dir}/lib" flatten="true">
+            <fileset dir="external">
+                <include name="**/*.jar"/>
+            </fileset>
+        </copy>      
+    </target>
+
+
+    <!--
+        ===================================================================
+         Distribution Targets
+        ===================================================================
+    -->
+    <macrodef name="setup-shared">
         <sequential>
-            <build-external/>
-            <build-plugins/>
             <copy todir="${build.dir}/lib">
                 <fileset dir="build/shared/lib"/>
             </copy>
@@ -115,9 +180,8 @@
             <unzip src="build/shared/jruby.zip"     dest="${build.dir}/hardware/tools" />
         </sequential>
     </macrodef>
-
-
-    <macrodef name="setup-win">
+    
+    <macrodef name="setup-windows">
         <sequential>
             <copy todir="${build.dir}/lib">
                 <fileset dir="build/windows/dist">
@@ -127,8 +191,8 @@
             <copy todir="${build.dir}/drivers">
                 <fileset dir="build/windows/dist/drivers" />
             </copy>
-            <unzip src="build/windows/dist/avr_tools.zip"   dest="${build.dir}/hardware"/>
-            <unzip src="build/windows/dist/arm_tools.zip"   dest="${build.dir}/hardware/tools" />
+            <!--<unzip src="build/windows/dist/avr_tools.zip"   dest="${build.dir}/hardware"/>
+            <unzip src="build/windows/dist/arm_tools.zip"   dest="${build.dir}/hardware/tools" /> -->
             <unzip src="build/windows/jre.zip"    dest="${build.dir}"/>
         </sequential>
     </macrodef>
@@ -181,129 +245,108 @@
     </macrodef>
 
 
-    <target name="jar-windows" depends="compile-windows">
-        <property name="build.dir"   value="build/windows/work"/>
-        <jar-lib />
-    </target>
 
-    <target name="jar-linux" depends="compile-linux">
-        <property name="build.dir"   value="build/linux/work"/>
-        <jar-lib />
-    </target>
 
-    <target name="jar-macosx" depends="compile-macosx">
-        <property name="build.dir"   value="build/macosx/work"/>
-        <jar-lib />
-    </target>
+    <target name="dist.OS">
+        <!-- Distribute Shared files -->
+        <setup-shared/>
 
-    <macrodef name="run">
-        <sequential>
-	        <java fork="true" classname="${main-class}" dir="${build.dir}">
-	            <sysproperty key="java.library.path" value="${jnidir}"/>
-	            <classpath>
-		        <path refid="classpath"/>
-		        <path location="${jar.dir}/${ant.project.name}.jar"/>
-	            </classpath>
-	        </java>
-        </sequential>
-    </macrodef>
+        <!-- Distribute OS Specific files -->
+        <if>
+            <os family="windows" /> 
+            <then>
+                <!--- Windows -->
+                <setup-windows/>
+
+                <!--Compile the windows launcher -->
+                <exec dir="build/windows/launcher" executable="make" />
+                <copy file="build/windows/launcher/arduino.exe" todir="${build.dir}"/>
+            </then>
     
-    <target name="run-windows" >
-        <property name="build.dir"   value="build/windows/work"/>
-        <exec executable="${build.dir}/arduino" />
+        <elseif>
+            <os family="unix" /> 
+            <then>
+                <!--- Linux -->
+                <setup-linux/>
+
+                <set-permissions dir="${build.dir}"/>
+                <chmod file="${build.dir}/Arduino" perm="ugo+rx" />
+            </then>
+        </elseif>
+    
+        <elseif>
+            <os family="mac" /> 
+            <then>
+                <!--- Mac -->
+                <setup-macosx/>
+
+                <copy todir="${build.dir}/Arduino.app/Contents/Resources" >
+                    <fileset dir="${build.dir}/lib" >
+                        <include name="**/*" />
+                    </fileset>
+                    <fileset dir="${build.dir}/jar" >
+                        <include name="**/*" />
+                    </fileset>
+                </copy>
+                <move todir="${build.dir}/Arduino.app/Contents/Resources/Java">
+                    <fileset dir="${build.dir}/Arduino.app/Contents/Resources">
+                        <include name="*.jnilib"/>
+                        <include name="*.jar"/>
+                    </fileset>
+                </move>
+                <set-permissions dir="${build.dir}" />
+                
+                <!-- Remove the x86_64 Slice, so we always run in 32 bit mode -->
+                <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="lipo" searchpath="true">
+                    <arg line="-remove x86_64 -output Arduino_32 Arduino"/>
+                </exec>
+                <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="mv" searchpath="true">
+                    <arg line="Arduino Arduino_64"/>
+                </exec>  
+                <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="mv" searchpath="true">
+                    <arg line="Arduino_32 Arduino"/>
+                </exec>  
+
+            </then>
+        </elseif>
+    
+        </if>
+    </target>
+    
+
+    <!--
+        ===================================================================
+         Run Targets
+        ===================================================================
+    -->
+
+    <target name="run.OS">
+        <if>
+            <os family="windows" /> 
+            <then>
+                <!--- Windows -->
+                <exec executable="${build.dir}/arduino" />
+            </then>
+    
+        <elseif>
+            <os family="unix" /> 
+            <then>
+                <!--- Linux -->
+                <exec dir="${build.dir}" executable="./Arduino" />
+            </then>
+        </elseif>
+    
+        <elseif>
+            <os family="mac" /> 
+            <then>
+                <!--- Mac -->
+                <exec executable="./build/macosx/work/Arduino.app/Contents/MacOS/Arduino" />
+            </then>
+        </elseif>
+    
+        </if>        
     </target>
 
-    <target name="run-linux" >
-        <property name="build.dir"   value="build/linux/work"/>
-        <exec dir="${build.dir}" executable="./Arduino" />
-    </target>
-
-    <target name="run-macosx" >
-        <property name="build.dir"   value="${basedir}/build/macosx/work"/>        
-        <exec executable="./build/macosx/work/Arduino.app/Contents/MacOS/Arduino" />
-    </target>
-
-    <target name="clean-windows">
-        <property name="build.dir"   value="build/windows/work"/>
-        <delete dir="${build.dir}"/>
-        <delete dir="build/windows/package" />
-    </target>
-
-    <target name="clean-linux">
-        <property name="build.dir"   value="build/linux/work"/>
-        <delete dir="${build.dir}"/>
-        <delete dir="build/linux/package" />
-    </target>
-
-    <target name="clean-macosx">
-        <property name="build.dir"   value="build/macosx/work"/>
-        <delete dir="${build.dir}"/>
-        <delete dir="build/macosx/package" />
-    </target>
-
-    <target name="dist-windows" depends="clean-windows">
-        <record name="build.log" action="start"/>
-        <property name="build.dir"   value="build/windows/work"/>
-        <setup-shared />
-        <setup-win />
-        <compile />
-        <jar-lib />
-        <compile-win-launcher />
-        <copy file="build/windows/launcher/arduino.exe" todir="${build.dir}"/>
-        <record name="build.log" action="stop"/>
-    </target>
-
-    <target name="dist-linux" depends="clean-linux">
-        <record name="build.log" action="start"/>
-        <property name="build.dir"   value="build/linux/work"/>
-        <setup-shared />
-        <setup-linux />
-        <compile />
-        <jar-lib />
-
-        <set-permissions dir="${build.dir}"/>
-
-        <chmod file="${build.dir}/Arduino" perm="ugo+rx" />
-        <record name="build.log" action="stop"/>
-    </target>
-
-    <target name="dist-macosx" depends="clean-macosx">
-        <record name="build.log" action="start"/>
-        <property name="build.dir"   value="build/macosx/work"/>
-        <setup-shared />
-        <setup-macosx />
-        <compile />
-        <jar-lib />
-
-        <copy todir="${build.dir}/Arduino.app/Contents/Resources" >
-            <fileset dir="${build.dir}/lib" >
-                <include name="**/*" />
-            </fileset>
-            <fileset dir="${build.dir}/jar" >
-                <include name="**/*" />
-            </fileset>
-        </copy>
-        <move todir="${build.dir}/Arduino.app/Contents/Resources/Java">
-            <fileset dir="${build.dir}/Arduino.app/Contents/Resources">
-                <include name="*.jnilib"/>
-                <include name="*.jar"/>
-            </fileset>
-        </move>
-        <set-permissions dir="${build.dir}" />
-        
-        <!-- Remove the x86_64 Slice, so we always run in 32 bit mode -->
-        <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="lipo" searchpath="true">
-            <arg line="-remove x86_64 -output Arduino_32 Arduino"/>
-        </exec>
-        <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="mv" searchpath="true">
-            <arg line="Arduino Arduino_64"/>
-        </exec>  
-        <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="mv" searchpath="true">
-            <arg line="Arduino_32 Arduino"/>
-        </exec>       
-        <record name="build.log" action="stop"/>
-        
-    </target>
 
 
     <macrodef name="set-permissions">
@@ -343,158 +386,208 @@
         </sequential>
     </macrodef>
 
+    <!--
+        ===================================================================
+         Package Targets
+        ===================================================================
+    -->
 
-    <target name="package-windows" >
-        <property name="package.windows.name" value="Arduino_win32.msi" />
-
-        <delete dir="build/windows/package" />
-
-        <unzip src="build/windows/packager.zip" dest="build/windows" />
-        <copy file="build/windows/Antipasto-package.aip" todir="build/windows/package" />
-        <copy todir="build/windows/package/Arduino">
-            <fileset dir="build/windows/work" includes="**/*.*" />
-        </copy>
-
-        <exec executable="build/windows/packager/AdvancedInstaller.com" >
-            <arg value="/edit" />
-            <arg value="build\windows\package\Antipasto-package.aip" />
-            <arg value="/AddFolder" />
-            <arg value="APPDIR" />
-            <arg value="build\windows\package\Arduino" />
-        </exec>
-        <exec executable="build/windows/packager/AdvancedInstaller.com" >
-            <arg value="/edit" />
-            <arg value="build\windows\package\Antipasto-package.aip" />
-            <arg value="/SetVersion" />
-            <arg value="${build.version}" />
-        </exec>
-        <exec executable="build/windows/packager/AdvancedInstaller.com" >
-            <arg value="/edit" />
-            <arg value="build\windows\package\Antipasto-package.aip" />
-            <arg value="/NewShortcut" />
-            <arg value="-name" />
-            <arg value="Arduino" />
-            <arg value="-target" />
-            <arg value="APPDIR\Arduino\arduino.exe" />
-            <arg value="-dir" />
-            <arg value="ProgramMenuFolder\Arduino" />
-        </exec>
-        <exec executable="build/windows/packager/AdvancedInstaller.com" >
-            <arg value="/build" />
-            <arg value="build\windows\package\Antipasto-package.aip" />
-        </exec>
-        <move file="build/windows/package/Antipasto-package.msi" tofile="build/windows/package/${package.windows.name}" />
-        <delete dir="build/windows/packager" />
+    <target name="package.OS">
+        <if>
+            <os family="windows" /> 
+            <then>
+                <!--- Windows -->
+                <package-windows/>
+            </then>
+    
+        <elseif>
+            <os family="unix" /> 
+            <then>
+                <!--- Linux -->
+                <package-linux/>
+            </then>
+        </elseif>
+    
+        <elseif>
+            <os family="mac" /> 
+            <then>
+                <!--- Mac -->
+                <package-mac/>
+            </then>
+        </elseif>
+    
+        </if>         
     </target>
 
-    <target name="package-linux">
-        <property name="build.dir"      value="build/linux/work"/>
-        <property name="package.dir"    value="build/linux/package"/>
-        <property name="package.linux.name" value="Arduino_linux.tgz" />
-
-        <delete dir="${package.dir}" />
-        <mkdir  dir="${package.dir}" />
-        <copy todir="${package.dir}/Arduino" >
-            <fileset dir="${build.dir}" />
-        </copy>
-        <set-permissions dir="${package.dir}/Arduino" />
-        <exec executable="tar" searchpath="true" dir="${package.dir}">
-                <arg value="czvf" />
-                <arg value="${package.linux.name}" />
+    <macrodef name="package-windows" >
+        <sequential>
+            <property name="package.windows.name" value="Arduino_win32.msi" />
+    
+            <delete dir="build/windows/package" />
+    
+            <unzip src="build/windows/packager.zip" dest="build/windows" />
+            <copy file="build/windows/Antipasto-package.aip" todir="build/windows/package" />
+            <copy todir="build/windows/package/Arduino">
+                <fileset dir="build/windows/work" includes="**/*.*" />
+            </copy>
+    
+            <exec executable="build/windows/packager/AdvancedInstaller.com" >
+                <arg value="/edit" />
+                <arg value="build\windows\package\Antipasto-package.aip" />
+                <arg value="/AddFolder" />
+                <arg value="APPDIR" />
+                <arg value="build\windows\package\Arduino" />
+            </exec>
+            <exec executable="build/windows/packager/AdvancedInstaller.com" >
+                <arg value="/edit" />
+                <arg value="build\windows\package\Antipasto-package.aip" />
+                <arg value="/SetVersion" />
+                <arg value="${build.version}" />
+            </exec>
+            <exec executable="build/windows/packager/AdvancedInstaller.com" >
+                <arg value="/edit" />
+                <arg value="build\windows\package\Antipasto-package.aip" />
+                <arg value="/NewShortcut" />
+                <arg value="-name" />
                 <arg value="Arduino" />
-        </exec>
-    </target>
+                <arg value="-target" />
+                <arg value="APPDIR\Arduino\arduino.exe" />
+                <arg value="-dir" />
+                <arg value="ProgramMenuFolder\Arduino" />
+            </exec>
+            <exec executable="build/windows/packager/AdvancedInstaller.com" >
+                <arg value="/build" />
+                <arg value="build\windows\package\Antipasto-package.aip" />
+            </exec>
+            <move file="build/windows/package/Antipasto-package.msi" tofile="build/windows/package/${package.windows.name}" />
+            <delete dir="build/windows/packager" />
+        </sequential>
+    </macrodef>
 
-    <target name="package-macosx">
-        <property name="build.dir"   value="build/macosx/work"/>
-        <property name="dist.dir"   value="build/macosx/dist"/>
-        <property name="package.dir" value="build/macosx/package"/>
-        <property name="package.macosx.name" value="Arduino_macosx" />
-
-        <delete dir="${package.dir}" />
-
-        <mkdir  dir="${package.dir}" />
-        <mkdir  dir="${package.dir}/Package_Root"/>
-        <mkdir  dir="${package.dir}/Package_Root/Applications"/>
-        <mkdir  dir="${package.dir}/Package_Root/usr/local"/>
-        <mkdir  dir="${package.dir}/Resources"/>
-
-        <exec executable="unzip" searchpath="true">
-            <arg value="-X" />
-            <arg value="${dist.dir}/avr_tools_macosx.zip" />
-            <arg value="-d" />
-            <arg value="${package.dir}/Package_Root/usr/local" />
-        </exec>
-
-        <exec executable="mv" searchpath="true">
-            <arg value="${build.dir}" />
-            <arg value="${package.dir}/Package_Root/Applications/Arduino" />
-        </exec>
-
-
-        <copy file="build/macosx/dist/Info.plist"        todir="${package.dir}/Resources" />
-        <copy file="build/macosx/dist/Description.plist" todir="${package.dir}/Resources" />
-
-        <!-- Substitute the token with the build version -->
-        <replace file="${package.dir}/Resources/Info.plist" 
-                 token="@BUILD_VERSION" value="${build.version}"/>
-        <replace file="${package.dir}/Resources/Description.plist" 
-                 token="@BUILD_VERSION" value="${build.version}"/>
-
-        <set-perm  dir="${package.dir}" mode="777" />
-        <set-owner dir="${package.dir}" user="root" group="wheel" />
-        <set-owner dir="${package.dir}/Package_Root/Applications" user="root" group="admin" />
-
-        <exec executable="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker">
-            <arg value="-build" />
-            <arg value="-ds" />
-            <arg value="-p"/>
-            <arg value="${package.dir}/${package.macosx.name}.pkg"/>
-            <arg value="-f" />
-            <arg value="${package.dir}/Package_Root"/>
-            <arg value="-r" />
-            <arg value="${package.dir}/Resources"/>
-            <arg value="-i" />
-            <arg value="${package.dir}/Resources/Info.plist"/>
-            <arg value="-d" />
-            <arg value="${package.dir}/Resources/Description.plist"/>
-        </exec>
-
-        <exec executable="mv" searchpath="true">
-            <arg value="${package.dir}/Package_Root/Applications/Arduino" />
-            <arg value="${build.dir}" />
-        </exec>
+    <macrodef name="package-linux">
+        <sequential>
+            <property name="package.linux.name" value="Arduino_linux.tgz" />
+    
+            <delete dir="${package.dir}" />
+            <mkdir  dir="${package.dir}" />
         
-        <exec executable="hdiutil" searchpath="true">
-            <arg value="create" />
-            <arg value="-srcfolder" />
-            <arg value="${package.dir}/${package.macosx.name}.pkg" />
-            <arg value="${package.dir}/${package.macosx.name}.dmg" />
-        </exec>
+            <copy todir="${package.dir}/Arduino" >
+                <fileset dir="${build.dir}" />
+            </copy>
+            <set-permissions dir="${package.dir}/Arduino" />
+            <exec executable="tar" searchpath="true" dir="${package.dir}">
+                    <arg value="czvf" />
+                    <arg value="${package.linux.name}" />
+                    <arg value="Arduino" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="package-macosx">
+        <sequential>
+            
+            <property name="package.macosx.name" value="Arduino_macosx" />
+            
+            <delete dir="${package.dir}" />
+    
+            <mkdir  dir="${package.dir}" />
+            <mkdir  dir="${package.dir}/Package_Root"/>
+            <mkdir  dir="${package.dir}/Package_Root/Applications"/>
+            <mkdir  dir="${package.dir}/Package_Root/usr/local"/>
+            <mkdir  dir="${package.dir}/Resources"/>
+    
+            <exec executable="unzip" searchpath="true">
+                <arg value="-X" />
+                <arg value="${dist.dir}/avr_tools_macosx.zip" />
+                <arg value="-d" />
+                <arg value="${package.dir}/Package_Root/usr/local" />
+            </exec>
+    
+            <exec executable="mv" searchpath="true">
+                <arg value="${build.dir}" />
+                <arg value="${package.dir}/Package_Root/Applications/Arduino" />
+            </exec>
+    
+    
+            <copy file="build/macosx/dist/Info.plist"        todir="${package.dir}/Resources" />
+            <copy file="build/macosx/dist/Description.plist" todir="${package.dir}/Resources" />
+    
+            <!-- Substitute the token with the build version -->
+            <replace file="${package.dir}/Resources/Info.plist" 
+                     token="@BUILD_VERSION" value="${build.version}"/>
+            <replace file="${package.dir}/Resources/Description.plist" 
+                     token="@BUILD_VERSION" value="${build.version}"/>
+    
+            <set-perm  dir="${package.dir}" mode="777" />
+            <set-owner dir="${package.dir}" user="root" group="wheel" />
+            <set-owner dir="${package.dir}/Package_Root/Applications" user="root" group="admin" />
+    
+            <exec executable="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker">
+                <arg value="-build" />
+                <arg value="-ds" />
+                <arg value="-p"/>
+                <arg value="${package.dir}/${package.macosx.name}.pkg"/>
+                <arg value="-f" />
+                <arg value="${package.dir}/Package_Root"/>
+                <arg value="-r" />
+                <arg value="${package.dir}/Resources"/>
+                <arg value="-i" />
+                <arg value="${package.dir}/Resources/Info.plist"/>
+                <arg value="-d" />
+                <arg value="${package.dir}/Resources/Description.plist"/>
+            </exec>
+    
+            <exec executable="mv" searchpath="true">
+                <arg value="${package.dir}/Package_Root/Applications/Arduino" />
+                <arg value="${build.dir}" />
+            </exec>
+            
+            <exec executable="hdiutil" searchpath="true">
+                <arg value="create" />
+                <arg value="-srcfolder" />
+                <arg value="${package.dir}/${package.macosx.name}.pkg" />
+                <arg value="${package.dir}/${package.macosx.name}.dmg" />
+            </exec>
         
-        
+        </sequential>
+    </macrodef>
+
+
+    <!--
+        ===================================================================
+         Upload Targets
+        ===================================================================
+    -->
+
+    <target name="upload.OS">
+        <if>
+            <os family="windows" /> 
+            <then>
+                <!--- Windows -->
+                <scp file="build/windows/package/Arduino_win32.msi"
+                     todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+            </then>
+    
+        <elseif>
+            <os family="unix" /> 
+            <then>
+                <!--- Linux -->
+                <scp file="build/linux/package/Arduino_linux.tgz"
+                     todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+            </then>
+        </elseif>
+    
+        <elseif>
+            <os family="mac" /> 
+            <then>
+                <!--- Mac -->
+                <scp file="build/macosx/package/Arduino_macosx.dmg"
+                     todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+            </then>
+        </elseif>
+    
+        </if>         
     </target>
-
-    <target name="upload-windows" >
-
-        <scp file="build/windows/package/Arduino_win32.msi"
-             todir="${username}:${password}@liquidware.com:~/ide_builds/" />
-    </target>
-
-    <target name="upload-linux" >
-
-        <scp file="build/linux/package/Arduino_linux.tgz"
-             todir="${username}:${password}@liquidware.com:~/ide_builds/" />
-    </target>
-
-    <target name="upload-macosx" >
-
-        <scp file="build/macosx/package/Arduino_macosx.dmg"
-             todir="${username}:${password}@liquidware.com:~/ide_builds/" />
-    </target>
-
-    <target name="main" depends="run-windows"/>
-
 
 </project>
 
