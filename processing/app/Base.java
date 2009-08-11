@@ -72,7 +72,7 @@ public class Base {
 
   /*made public for api..soon depracted*/
   static public Editor editor;
-  static private PluginLoader pluginloader;
+  static public PluginLoader pluginloader;
 
   static public void main(String args[]) {
 

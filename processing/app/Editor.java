@@ -1096,6 +1096,16 @@ public class Editor extends JFrame
       bootloaderMenu.add(item);
     }
     menu.add(bootloaderMenu);
+    
+    
+    item = new JMenuItem("Plugins");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            Base.pluginloader.showPluginPanel();
+        }
+      });
+    menu.add(item);
+
         
     menu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}

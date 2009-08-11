@@ -127,34 +127,42 @@ public class PluginLoader {
     }
 
     private void startPlugins() {
-        try {
+        //try {
             PluginDescriptor core = getManager().getRegistry().getPluginDescriptor("com.plugin.core");
             ExtensionPoint point = getManager().getRegistry().getExtensionPoint(core.getId(), "Section");
 
             for (Iterator it = point.getConnectedExtensions().iterator(); it.hasNext();) {
-                Extension ext = (Extension) it.next();
-                System.out.println("activating: " + ext);
-                PluginDescriptor descr = ext.getDeclaringPluginDescriptor();
-                
-                PluginBase plug = (PluginBase) getManager().getPlugin(descr.getId());
-                plug.postInit();
-                
-              try{
-                ClassLoader classLoader = getManager().getPluginClassLoader(descr);
-                Class<?> pclass= classLoader.loadClass(ext.getParameter("class").valueAsString());           
-                getEventSender().addEventListener((EditorListener) plug,pclass);
-              }catch(Exception e){
-            	  System.out.println("ERROR starting plugin: " + e.getMessage());
-              }
-                
+            	Extension ext = (Extension) it.next();
+            	initializePlugin(ext);
             }
 
-        } catch (PluginLifecycleException e) {
-            System.out.println("ERROR starting plugin: " + e.getMessage());
-        }
+        //} catch (PluginLifecycleException e) {
+        //    System.out.println("ERROR starting plugin: " + e.getMessage());
+        //}
 
     }  
 
+    public void initializePlugin(Extension ext){
+        try{
+        System.out.println("activating: " + ext);
+        PluginDescriptor descr = ext.getDeclaringPluginDescriptor();
+        
+        PluginBase plug = (PluginBase) getManager().getPlugin(descr.getId());
+        plug.postInit();
+        
+      try{
+        ClassLoader classLoader = getManager().getPluginClassLoader(descr);
+        Class<?> pclass= classLoader.loadClass(ext.getParameter("class").valueAsString());           
+        getEventSender().addEventListener((EditorListener) plug,pclass);
+      }catch(Exception e){
+    	  System.out.println("ERROR starting plugin: " + e.getMessage());
+      }    	
+        }catch(Exception e){
+      	  System.out.println("ERROR starting plugin: " + e.getMessage());
+        }  
+        
+    }
+    
     public PluginListModel listRegisteredPlugins() {
         PluginListModel listModel = new PluginListModel();
         try {

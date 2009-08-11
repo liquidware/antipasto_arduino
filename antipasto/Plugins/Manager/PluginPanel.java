@@ -35,10 +35,17 @@ public class PluginPanel extends JFrame{
 	private JList list;
 	    
     public PluginPanel(PluginLoader l){
-    	setSize(300, 300);
+        setSize(300, 300);
         setLayout(new BorderLayout());
+
         loader = l;
         
+        buildPluginPanel();
+        hidePluginPanel();
+    }
+    
+    private void buildPluginPanel() {
+
         JButton reload_btn = new JButton("reload");
         ActionListener actionListener = new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -50,7 +57,7 @@ public class PluginPanel extends JFrame{
 
         add(reload_btn, BorderLayout.PAGE_START);
 
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
         
         
@@ -68,13 +75,30 @@ public class PluginPanel extends JFrame{
         panel.setSize(300, 50);
         panel.setVisible(false);
         add(panel, BorderLayout.PAGE_END);
-        
-        setVisible(true);
-        //listRegisteredPlugins();
-        //listpane.revalidate();   
+
         
     }
+
+    /**
+     * Shows the plugin panel
+     * 
+     */
+    public void showPluginPanel() {
+
+        setVisible(true);
+
+    }
     
+    /**
+     * Hides the plugin panel
+     * 
+     */
+    public void hidePluginPanel() {
+
+        setVisible(false);
+
+    }
+        
     private void updatePlugins() {
     	
     	loader.loadPlugins();
