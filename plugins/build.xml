@@ -32,7 +32,8 @@
         ===================================================================
     -->
     <target name="clean.all" depends="clean.plugins"/>
-    <target name="build.all" depends="get.all, build.jar"/>
+    <target name="build.all" depends="build.jar"/>
+    <target name="get.all" depends="clean.all, get.remote"/>
 
     <!--
         ===================================================================
@@ -49,8 +50,8 @@
           </delete>
     </target>
 
-    <target name="get.all" depends="clean.plugins">
-             <git action="clone"    args="-v git://github.com/mediacoder/antipasto_arduino_plugins.git" dir="." /> 
+    <target name="get.remote">
+             <git action="clone"    args="-v git@github.com:liquidware/antipasto_arduino_plugins.git" dir="." /> 
     </target> 
 
     <target name="build.jar">

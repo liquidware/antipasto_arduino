@@ -59,6 +59,14 @@
         <property name="build.dir"   value="build/macosx/work"/>
         <compile />
     </target>
+    
+    <target name="get-plugins">
+        <ant dir="plugins"  target="get.all" />        
+    </target>
+
+    <target name="get-external">
+        <ant dir="external"  target="get.all" />        
+    </target>
 
     <macrodef name="build-plugins">
         <sequential>
