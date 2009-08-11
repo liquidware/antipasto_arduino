@@ -48,6 +48,7 @@ public class PluginLoader {
     public EventSender eventsender = new EventSender();
     private static final String LINE_SEP = System.getProperty("line.separator");
     private Logger logger;
+    private PluginPanel pluginPanel;
 
     public PluginLoader() {
         prepareLoggers();
@@ -55,10 +56,17 @@ public class PluginLoader {
         loadPlugins();        
         startPlugins();
         setEventSender(eventsender);
-        PluginPanel pp = new PluginPanel(this);
+        pluginPanel = new PluginPanel(this);
         
         getEventSender().broadcast(new EditorEvent(new EditorContext(),1));
         
+    }
+
+    /**
+     * Shows the plugin panel 
+     */
+    public void showPluginPanel(){
+        pluginPanel.showPluginPanel();
     }
 
     public PluginManager setManager(PluginManager pluginManager) {
