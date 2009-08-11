@@ -51,7 +51,7 @@
     </target>
 
     <target name="get.remote">
-             <git action="clone"    args="-v git@github.com:liquidware/antipasto_arduino_plugins.git" dir="." /> 
+             <git action="clone"    args="-v git://github.com/liquidware/antipasto_arduino_plugins.git" dir="." /> 
     </target> 
 
     <target name="build.jar">
