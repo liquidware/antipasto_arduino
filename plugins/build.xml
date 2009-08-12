@@ -51,8 +51,8 @@
     </target>
 
     <target name="get.remote">
-             <git action="clone"    args="-v git://github.com/liquidware/antipasto_arduino_plugins.git" dir="." /> 
-    </target> 
+             <git action="clone"    args="git://github.com/liquidware/antipasto_arduino_plugins.git" dir="." />
+    </target>
 
     <target name="build.jar">
              <ant dir="antipasto_arduino_plugins"  target="build.all" inheritAll="false"/>
@@ -62,7 +62,7 @@
         ===================================================================
           The project's macros
         ===================================================================
-    -->    
+    -->
     <macrodef name="git">
         <attribute name="action"/>
         <attribute name="args"/>
