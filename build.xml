@@ -435,7 +435,7 @@
             <os family="mac" />
             <then>
                 <!--- Mac -->
-                <package-mac/>
+                <package-macosx/>
             </then>
         </elseif>
         
