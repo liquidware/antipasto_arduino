@@ -39,15 +39,15 @@
     <import file="build.properties.xml" />
 
     <target name="clean.all" depends="clean.external, clean.plugins, clean.OS"/>
-    <target name="get.all"   depends="get.plugins, get.external"/>
-    <target name="dist.all"  depends="clean.all, get.all, dist.OS"/>
+    <target name="get.all"   depends="get.plugins, get.external, get.OS"/>
     <target name="build.all" depends="build.plugins, build.external, build.java"/>
+    <target name="dist.all"  depends="clean.all, get.all, build.all, dist.OS"/>
     <target name="run.all"      depends="run.OS"/>
     <target name="package.all"  depends="package.OS"/>
     <target name="upload.all"   depends="upload.OS"/>
 
     <!-- The default target if no ant params are specified -->
-    <target name="main"         depends="dist.all, build.all, run.all"/>
+    <target name="main"         depends="dist.all, run.all"/>
 
 
     <!--
@@ -56,6 +56,7 @@
         ===================================================================
     -->
     <target name="clean.plugins">
+        <echoproperties/>
         <ant dir="plugins"  target="clean.all" />
     </target>
 
@@ -247,18 +248,45 @@
     </macrodef>
 
 
+    <target name="get.OS">
+        <!-- Get Shared files -->
+        <setup-shared/>
+        
+        <!-- Get OS Specific files -->
+        <if>
+            <os family="windows" />
+            <then>
+                <!--- Windows -->
+                <setup-windows/>
+            </then>
+
+        <elseif>
+            <os family="mac" />
+            <then>
+                <!--- Mac -->
+                <setup-macosx/>
+            </then>
+        </elseif>
+
+        <elseif>
+            <os family="unix" />
+            <then>
+                <!--- Linux -->
+                <setup-linux/>
+            </then>
+        </elseif>
+
+        </if>    
+    </target>
 
 
     <target name="dist.OS">
-        <!-- Distribute Shared files -->
-        <setup-shared/>
 
         <!-- Distribute OS Specific files -->
         <if>
             <os family="windows" />
             <then>
                 <!--- Windows -->
-                <setup-windows/>
 
                 <!--Compile the windows launcher -->
                 <exec dir="build/windows/launcher" executable="make" />
@@ -266,21 +294,9 @@
             </then>
 
         <elseif>
-            <os family="unix" />
-            <then>
-                <!--- Linux -->
-                <setup-linux/>
-
-                <set-permissions dir="${build.dir}"/>
-                <chmod file="${build.dir}/Arduino" perm="ugo+rx" />
-            </then>
-        </elseif>
-
-        <elseif>
             <os family="mac" />
             <then>
                 <!--- Mac -->
-                <setup-macosx/>
 
                 <copy todir="${build.dir}/Arduino.app/Contents/Resources" >
                     <fileset dir="${build.dir}/lib" >
@@ -312,6 +328,16 @@
             </then>
         </elseif>
 
+        <elseif>
+            <os family="unix" />
+            <then>
+                <!--- Linux -->
+                
+                <set-permissions dir="${build.dir}"/>
+                <chmod file="${build.dir}/Arduino" perm="ugo+rx" />
+            </then>
+        </elseif>
+
         </if>
     </target>
 
@@ -331,18 +357,18 @@
             </then>
 
         <elseif>
-            <os family="unix" />
-            <then>
-                <!--- Linux -->
-                <exec dir="${build.dir}" executable="./Arduino" />
-            </then>
-        </elseif>
-
-        <elseif>
             <os family="mac" />
             <then>
                 <!--- Mac -->
                 <exec executable="./build/macosx/work/Arduino.app/Contents/MacOS/Arduino" />
+            </then>
+        </elseif>
+
+        <elseif>
+            <os family="unix" />
+            <then>
+                <!--- Linux -->
+                <exec dir="${build.dir}" executable="./Arduino" />
             </then>
         </elseif>
 
@@ -403,18 +429,18 @@
             </then>
 
         <elseif>
-            <os family="unix" />
-            <then>
-                <!--- Linux -->
-                <package-linux/>
-            </then>
-        </elseif>
-
-        <elseif>
             <os family="mac" />
             <then>
                 <!--- Mac -->
                 <package-mac/>
+            </then>
+        </elseif>
+        
+        <elseif>
+            <os family="unix" />
+            <then>
+                <!--- Linux -->
+                <package-linux/>
             </then>
         </elseif>
 
@@ -571,19 +597,19 @@
             </then>
 
         <elseif>
-            <os family="unix" />
+            <os family="mac" />
             <then>
-                <!--- Linux -->
-                <scp file="build/linux/package/Arduino_linux.tgz"
+                <!--- Mac -->
+                <scp file="build/macosx/package/Arduino_macosx.dmg"
                      todir="${username}:${password}@liquidware.com:~/ide_builds/" />
             </then>
         </elseif>
 
         <elseif>
-            <os family="mac" />
+            <os family="unix" />
             <then>
-                <!--- Mac -->
-                <scp file="build/macosx/package/Arduino_macosx.dmg"
+                <!--- Linux -->
+                <scp file="build/linux/package/Arduino_linux.tgz"
                      todir="${username}:${password}@liquidware.com:~/ide_builds/" />
             </then>
         </elseif>

@@ -36,18 +36,18 @@
         </then>
 
     <elseif>
-        <os family="unix" /> 
-        <then>
-            <!--- Unix family properties here -->
-            <property name="build.arch" value="linux" />
-        </then>
-    </elseif>
-
-    <elseif>
         <os family="mac" /> 
         <then>
             <!--- Mac properties here -->
             <property name="build.arch" value="macosx" />
+        </then>
+    </elseif>
+    
+    <elseif>
+        <os family="unix" /> 
+        <then>
+            <!--- Unix family properties here -->
+            <property name="build.arch" value="linux" />
         </then>
     </elseif>
 

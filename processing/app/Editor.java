@@ -58,6 +58,7 @@ import antipasto.Util.AntipastoFileFilter;
 import antipasto.Util.GadgetFileFilter;
 import antipasto.Util.PDEFileFilter;
 import antipasto.Util.Utils;
+import antipasto.Plugins.Manager.PluginPanel;
 
 import com.apple.mrj.*;
 import com.oroinc.text.regex.*;
@@ -183,7 +184,9 @@ public class Editor extends JFrame
   public JFrame _frame;
   public GadgetPanel gadgetPanel ;
   public Wing referencePanel;
-
+  
+  public PluginPanel pluginPanel = new PluginPanel(Base.pluginloader);
+ 
   //static Properties keywords; // keyword -> reference html lookup
 
 
@@ -1101,7 +1104,7 @@ public class Editor extends JFrame
     item = new JMenuItem("Plugins");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Base.pluginloader.showPluginPanel();
+            pluginPanel.showPluginPanel();
         }
       });
     menu.add(item);
