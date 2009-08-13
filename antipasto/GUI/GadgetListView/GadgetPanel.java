@@ -19,6 +19,7 @@ import antipasto.Interfaces.IModule;
 import antipasto.Interfaces.IPackedFile;
 import antipasto.Interfaces.ITemporary;
 
+import processing.app.*;
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.Serial;
@@ -78,9 +79,11 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     public boolean gadgetIsLoaded = false;
     
     private JFrame parentFrame;
+    private String gadgetPath = "";
     
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
-    	super(frame, false);
+
+        super(frame, false);
     	editor = (Editor) frame;
     	parentFrame = frame;
         this.addMouseListener(new ModuleMouseAdapter());
@@ -88,6 +91,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         frame.addWindowListener(this);
         this.libraryDirectory = libraryDirectory;
         this.init();
+
     }
     
     private void reinit(){
@@ -246,20 +250,27 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     			editor.textarea.setVisible(false);
     		}
     		this.gadgetIsLoaded = true;
+            gadgetPath = gadget.getPath();
 	    	//Save this for later!
     		
     	}else{
     		this.setVisible(false);
-    		this.hide();				//gotta upgrade the java version....
     	}
     }
 
+    /**
+     * Gets the active gadget's path
+     * 
+     * @author christopher.ladden (8/13/2009)
+     * 
+     * @return String 
+     */
+    public String getGadgetPath() {
+        return gadgetPath;
+    }
+
     public void setVisible(boolean b){
-    	if(this._gadget != null){
-    		super.setVisible(b);
-    	}else{
-    		super.setVisible(b);
-    	}
+    	super.setVisible(b);
 		this.setSize(this.cachedWidth, this.cachedHeight);
     }
     
@@ -374,28 +385,30 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     	return this.activeModule;
     }
 
+    
+
 	public void componentHidden(ComponentEvent arg0) {
-		this.hide();
 	}
 
 	public void componentMoved(ComponentEvent arg0) {
 		Editor editor = (Editor) arg0.getComponent();
-		//int width = 300;
-        //this.setSize(width, editor.textarea.getHeight());
-		//this.setSize(this.cachedWidth, this.cachedHeight);
-		//System.out.println(editor.getLocationOnScreen().getY() - editor.centerPanel.getLocationOnScreen().getY());
-        this.setLocation(editor.getX() - this.getWidth(), editor.centerPanel.getLocationOnScreen().y);	
+
+        if(editor.isShowing()) {
+            if(this.isShowing()) {
+                this.setLocation(editor.getX() - this.cachedWidth, 
+                                 editor.centerPanel.getLocationOnScreen().y);	
+            }
+        }
+        
 	}
 
 	public void componentResized(ComponentEvent arg0) {
-		//Editor editor = (Editor) arg0.getComponent();
-        //this.setSize(this.cachedWidth, this.cachedHeight);
-        //this.setLocation(editor.getX() - this.getWidth(), editor.textarea.getLocationOnScreen().y);	
-		
+
 	}
 
 	public void componentShown(ComponentEvent arg0) {
-		this.show();
+                        this.setLocation(editor.getX() - this.cachedWidth, 
+                                 editor.centerPanel.getLocationOnScreen().y);
 	}
 	
 	public void closeActiveGadget(){
@@ -448,8 +461,19 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 
 	public void windowOpened(WindowEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
+
+    /**
+     * Usually called when the application is closing.
+     * 
+     * @author christopher.ladden (8/13/2009)
+     */
+    public void cleanup(){
+
+        if(this.isActive()){
+        	saveCurrentGadget();
+        }
+    }
 }
 
 

@@ -165,36 +165,16 @@ public class Base {
     // get things rawkin
     frame.pack();
 
+    editor.setVisible(true);
+
     // has to be here to set window size properly
     editor.restorePreferences();
 
-    // show the window
-    editor.show();
-
-    // attempt to build libraries
-    //editor.prepareLibraries(); 
-
-      
-    //editor.setSize(300, 600);
     frame.setSize(600, 600);
-   
-    editor.gadgetPanel.setSize(300, editor.textarea.getHeight() + 40);
-    int xLocation = editor.getX() - editor.gadgetPanel.getWidth();
-    editor.gadgetPanel.setLocation(xLocation, editor.textarea.getLocationOnScreen().y);	
-    //editor.gadgetPanel.setSize(300,600);
-    editor.addComponentListener(editor.gadgetPanel);
-      
-    // check for updates
-    //editor.gadgetPanel.setLocation((int)(editor.getX() - editor.gadgetPanel.getSize().getWidth()), editor.getY());
-    if(editor.gadgetPanel.getActiveGadget() != null){
-    	editor.gadgetPanel.setVisible(true);
-    }
-      
- //   FlashTransfer transfer = new FlashTransfer(editor.serialPort, "FlashFileSystem 0.1.0");
-  
- //   ImageListPanel imageListPanel = new ImageListPanel(editor.gadgetPanel, transfer);
- //   imageListPanel.setLocation(editor.getX() + editor.getWidth() + 3, editor.getY());
- //   imageListPanel.setSize(editor.gadgetPanel.getSize());
+    
+    
+    
+    
   
     if (Preferences.getBoolean("update.check")) {
       new UpdateCheck(editor);

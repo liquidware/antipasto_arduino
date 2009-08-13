@@ -129,18 +129,28 @@ public class EditorHeader extends JPanel {
         }
       });
     
-    tabHeader.setBackground(backgroundColor);    
+    //Setup the layout managers
+    this.setBackground(backgroundColor); 
+		this.setLayout(new FlowLayout(FlowLayout.LEFT,0,5));
+		this.setOpaque(true); 
+
+    tabHeader.setBackground(backgroundColor); 
+		tabHeader.setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
+		tabHeader.setOpaque(true);  
   }
 
 
   public void paintComponent(Graphics screen) {
+    
+
     if (screen == null) return;
 
     Sketch sketch = editor.sketch;
     if (sketch == null) return;  // ??
 
-    this.tabHeader.setLocation(0,0);
-    this.tabHeader.setSize(this.getWidth() - 100, this.getHeight());
+
+    //this.tabHeader.setLocation(0,0);
+    //this.tabHeader.setSize(this.getWidth() - 100, this.getHeight());
     
     Dimension size = getSize();
     if ((size.width != sizeW) || (size.height != sizeH)) {
@@ -208,7 +218,8 @@ public class EditorHeader extends JPanel {
     	}
     	
     	tabs.clear();
-    	
+      
+
 	    for (int i = 0; i < sketch.code.length; i++) {
 	    	this.tabHeader.setVisible(true);
 	      SketchCode code = sketch.code[i];
@@ -221,7 +232,7 @@ public class EditorHeader extends JPanel {
 	      editorTab.setBackground(this.backgroundColor);
 	      editorTab.paint(getGraphics());
 	      
-	      tabs.add(editorTab);
+        tabs.add(editorTab);
 	      
 	      this.tabHeader.add(editorTab);
 	      this.setVisible(true);
@@ -251,6 +262,7 @@ public class EditorHeader extends JPanel {
                 menuLeft, 0, null);
 
     screen.drawImage(offscreen, 0, 0, null);
+
   }
 
 

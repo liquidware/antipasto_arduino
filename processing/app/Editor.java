@@ -235,6 +235,7 @@ public class Editor extends JFrame
 
     _frame.setJMenuBar(menubar);
 
+    buildGadgetPanel();
     // doesn't matter when this is created, just make it happen at some point
     //find = new FindReplace(Editor.this);
 
@@ -391,18 +392,9 @@ public class Editor extends JFrame
     editorSection.add(rightWing, BorderLayout.EAST);
     
     upper.add(editorSection);
-    String libraryDirectory = System.getProperty("user.dir") + File.separator + "hardware" + 
-           File.separator + "OpenHardware" + File.separator + "Modules";
-    gadgetPanel = new GadgetPanel("", this, libraryDirectory);
-    gadgetPanel.addActiveGadgetChangedEventListener(this);
-    gadgetPanel.addActiveGadgetChangedEventListener(this.referencePanel);
-    
-    
-    gadgetPanel.setVisible(false);
     
 
     leftWing.setVisible(true);
-      //upper.add(gadgetPanel);
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                upper, consolePanel);
                                //textarea, consolePanel);
@@ -440,7 +432,7 @@ public class Editor extends JFrame
         public boolean importData(JComponent src, Transferable transferable) {
           DataFlavor[] flavors = transferable.getTransferDataFlavors();
 
-          gadgetPanel.setVisible(false);
+          //gadgetPanel.setVisible(false);
           
     /*
     DropTarget dt = new DropTarget(this, new DropTargetListener() {
@@ -520,9 +512,23 @@ public class Editor extends JFrame
           }
           return true;
         }
-      });
+      }); 
 
-      
+
+
+
+
+  }
+
+
+  public void buildGadgetPanel() {
+
+    String libraryDirectory = System.getProperty("user.dir") + File.separator + "hardware" + 
+           File.separator + "OpenHardware" + File.separator + "Modules";
+    gadgetPanel = new GadgetPanel("", this, libraryDirectory);
+    gadgetPanel.addActiveGadgetChangedEventListener(this);
+    gadgetPanel.addActiveGadgetChangedEventListener(this.referencePanel);
+    this.addComponentListener(gadgetPanel);
 
   }
 
@@ -622,8 +628,8 @@ public class Editor extends JFrame
       handleOpen2(Base.openedAtStartup);
 
     } else {
-      //String sketchName = Preferences.get("last.sketch.name");
-      String sketchPath = null/*Preferences.get("last.sketch.path")*/;
+      String sketchName = Preferences.get("last.sketch.name");
+      String sketchPath = Preferences.get("last.sketch.path");
       //Sketch sketchTemp = new Sketch(sketchPath);
 
       if ((sketchPath != null) && (new File(sketchPath)).exists()) {
@@ -715,9 +721,13 @@ public class Editor extends JFrame
     Preferences.setInteger("last.screen.height", screen.height);
 
     // last sketch that was in use
-    //Preferences.set("last.sketch.name", sketchName);
-    //Preferences.set("last.sketch.name", sketch.name);
-    Preferences.set("last.sketch.path", sketch.getMainFilePath());
+    if (gadgetPanel.getActiveGadget() != null) {
+        Preferences.set("last.sketch.path", 
+                        gadgetPanel.getGadgetPath());
+    } else {
+        Preferences.set("last.sketch.path", 
+                        sketch.getMainFilePath());
+    }
 
     // location for the console/editor area divider
     int location = splitPane.getDividerLocation();
@@ -811,6 +821,7 @@ public class Editor extends JFrame
     item = newJMenuItem("New", 'N');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
+          gadgetPanel.closeActiveGadget();
           handleNew(false);
         }
       });
@@ -1906,6 +1917,7 @@ public class Editor extends JFrame
    * Stop the applet but don't kill its window.
    */
   public void doStop() {
+
     //if (runtime != null) runtime.stop();
     if (debugging)  {
       status.unserial();
@@ -1952,22 +1964,17 @@ public class Editor extends JFrame
       }*/
     //} catch (Exception e) { }
     //buttons.clear();  // done by doStop
-
+    
     sketch.cleanup();
+
+    _frame.toFront();
 
     // [toxi 030903]
     // focus the PDE again after quitting presentation mode
-    _frame.toFront();
     
-    if(this.gadgetPanel.isActive()){
-    	this.gadgetPanel.saveCurrentGadget();
-    	Preferences.set("gadget.active", "true");
-    	try{
-    	Preferences.set("last.active.gadget", ((IPackedFile)this.gadgetPanel.getActiveGadget()).getPackedFile().getPath());
-    	}catch(Exception ex){
-    		//there is no gadget
-    	}
-    }
+    
+    gadgetPanel.cleanup();
+  
   }
 
 
@@ -2084,13 +2091,17 @@ public class Editor extends JFrame
 
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
+     
           doStop();
           handleNewShift = shift;
           handleNewLibrary = false;
           checkModified(HANDLE_NEW);
+          
         }});
     this.header.paintComponents(this.getGraphics());
   }
+
+
 
 
   /**
@@ -2325,7 +2336,7 @@ public class Editor extends JFrame
       
       this.gadgetPanel.setVisible(isGadgetFile);
       if(isGadgetFile){
-    	  gadgetPanel.show();
+    	  //gadgetPanel.show();
     	  /* The Boards menu doesn't 
     	   * make sense with a gadget .pde file, so disable it */
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
