@@ -258,3 +258,8 @@ mega.build.mcu=atmega1280
 mega.build.f_cpu=16000000L
 mega.build.core=arduino
 
+##############################################################
+
+ixm.name=Illuminato X Machina
+ixm.build.core=ixm
+
