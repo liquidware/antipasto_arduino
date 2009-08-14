@@ -79,7 +79,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     public boolean gadgetIsLoaded = false;
     
     private JFrame parentFrame;
-    private String gadgetPath = "";
+    private File gadgetPath;
     
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
 
@@ -96,16 +96,13 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     private void reinit(){
     	
+       
 		/* Remove the current panel GUI elements, because 
 		 * we're going to update them....
 		 */
-		scrollPanel.setVisible(false);
-    	this.remove(scrollPanel);
-		this.remove(messagePanel);
-		this.remove(gadgetDescPanel);
+         unloadPanels();
 		
 		/* Setup the new panels */
-
         
         scrollPanel = new JScrollPane();
         scrollPanel.setPreferredSize(new Dimension(300, 300));
@@ -118,10 +115,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         messageLabel.setText(" No Gadget Loaded");
         
         /* Add all the updated GUI elements back to the panel */
-        box.add(gadgetDescPanel);
-        box.add(scrollPanel);
-        box.add(messagePanel);
-        scrollPanel.setVisible(true);
+        reloadPanels();
     }
     
     public void Unload(){
@@ -181,17 +175,43 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         
         box.setBackground(new Color(0x04, 0x4F, 0x6F));
         
-        box.add(libDescPanel);
-        box.add(libPanel);
-        box.add(gadgetDescPanel);
-        box.add(scrollPanel);
-        box.add(messagePanel);
+        reloadPanels();
 
         this.getContentPane().add(box, BorderLayout.NORTH);
     }
+
+    /**
+     * Unloads all the GadgetPanel's JPanels. Usualy called before 
+     * changing the panels in a major way. 
+     * 
+     * @author christopher.ladden (8/14/2009)
+     */
+    private void unloadPanels() {
+    	scrollPanel.setVisible(false);
+        this.remove(gadgetDescPanel);
+        this.remove(libPanel);
+        this.remove(libDescPanel);
+        this.remove(scrollPanel);
+        this.remove(messagePanel);
+    }
+
+    /**
+     * Reloads all the GadgetPanel's JPanels. Usualy called after 
+     * changing the panels in a major way. 
+     * 
+     * @author christopher.ladden (8/14/2009)
+     */
+    private void reloadPanels() {
+        box.add(gadgetDescPanel);
+        box.add(libPanel);
+        box.add(libDescPanel);
+        box.add(scrollPanel);
+        box.add(messagePanel);
+        scrollPanel.setVisible(true);
+    }
     
     public void setMessage(String msg){
-    	this.gadgetDescLabel.setText(msg);
+    	this.messageLabel.setText(msg);
     }
     
     public void loadGadget(File gadget){
@@ -202,10 +222,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     		/* Remove the current panel GUI elements, because 
     		 * we're going to update them....
     		 */
-    		scrollPanel.setVisible(false);
-	    	this.remove(scrollPanel);
-    		this.remove(messagePanel);
-    		this.remove(gadgetDescPanel);
+            unloadPanels();
     		
     		/* Setup the new panels */
 	    	String dir = Base.createTempFolder(gadget.getName()).getPath();
@@ -226,14 +243,11 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
             /* Describe what's going on here to the user and 
              * display the description in the panel labels.
              */
-            gadgetDescLabel.setText(" Gadget: " + gadget.getName());
+            gadgetDescLabel.setText(gadget.getName() + " - ");
             messageLabel.setText(" Gadget Loaded.");
             
             /* Add all the updated GUI elements back to the panel */
-            box.add(gadgetDescPanel);
-            box.add(scrollPanel);
-            box.add(messagePanel);
-            scrollPanel.setVisible(true);
+            reloadPanels();
             
     	    list.addSketchChangingeListener(this);
     	    list.addListSelectionListener(this);
@@ -249,9 +263,9 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     			Editor editor = (Editor) this.parentFrame;
     			editor.textarea.setVisible(false);
     		}
+
     		this.gadgetIsLoaded = true;
-            gadgetPath = gadget.getPath();
-	    	//Save this for later!
+            gadgetPath = new File(gadget.getPath());
     		
     	}else{
     		this.setVisible(false);
@@ -266,7 +280,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
      * @return String 
      */
     public String getGadgetPath() {
-        return gadgetPath;
+        return gadgetPath.getPath();
     }
 
     public void setVisible(boolean b){
@@ -310,6 +324,7 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
                     Editor editor = (Editor) parentFrame;
                     editor.textarea.setVisible(true);
                     editor.textarea.setEnabled(true);
+                    //gadgetDescLabel.setText(gadgetPath.getName() + " - " + activeModule.getName());
     }
 
     public void addSketchBookChangedEventListener(IActiveSketchChangingListener listener){

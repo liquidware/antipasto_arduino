@@ -774,7 +774,7 @@ public class Editor extends JFrame
 	    			public void OkButton() {
 					try {
 						GadgetFactory fact = new GadgetFactory();
-					    File file = new File(baseDir + File.separator + editor.status.editField.getText() + ".gdt");
+					    File file = new File(baseDir + File.separator + editor.status.editField.getText());
 						System.out.println("Creating the Gadget!");
 						String dir = file.getPath();
 						if(file.getParentFile().isDirectory()){
@@ -1940,47 +1940,17 @@ public class Editor extends JFrame
    * mode, this will always be called instead of doStop().
    */
   public void doClose() {
-      
-      // I can't find who is calling doClose()
-      // but we'll find the offender sooner or later. 
-      // for now, duck out if things don't make sense.
-      if (sketch == null) {
-          return;
-      }
 
-    //if (presenting) {
-    //presentationWindow.hide();
-    //} else {
-    //try {
-      // the window will also be null the process was running
-      // externally. so don't even try setting if window is null
-      // since Runner will set the appletLocation when an
-      // external process is in use.
-//      if (runtime.window != null) {
-//        appletLocation = runtime.window.getLocation();
-//      }
-    //} catch (NullPointerException e) { }
-    //}
-
-    //if (running) doStop();
     doStop();  // need to stop if runtime error
-
-    //try {
-      /*if (runtime != null) {
-        runtime.close();  // kills the window
-        runtime = null; // will this help?
-      }*/
-    //} catch (Exception e) { }
-    //buttons.clear();  // done by doStop
     
-    sketch.cleanup();
-
-    _frame.toFront();
-
+    if (sketch != null){
+    sketch.cleanup(); 
+    }
+    
     // [toxi 030903]
     // focus the PDE again after quitting presentation mode
-    
-    
+    _frame.toFront();
+
     gadgetPanel.cleanup();
   
   }
@@ -1994,12 +1964,9 @@ public class Editor extends JFrame
    */
   protected void checkModified(int checkModifiedMode) {
     this.checkModifiedMode = checkModifiedMode;
-
-    // I can't find who is calling doClose()
-    // but we'll find the offender sooner or later. 
-    // for now, duck out if things don't make sense.
+    
     if (sketch==null) {
-        return;
+    	return;
     }
 
     if (!sketch.modified) {
@@ -2227,6 +2194,9 @@ public class Editor extends JFrame
    * need to be saved.
    */
   protected void handleOpen2(String path) {
+	 
+	  
+	  
     if (sketch != null) {
       // if leaving an empty sketch (i.e. the default) do an
       // auto-clean right away
@@ -2274,6 +2244,7 @@ public class Editor extends JFrame
         return;
       } else if (path.endsWith(".gdt")){
     	  try{
+    		
       	  	isGadgetFile = true;
     		this.gadgetPanel.loadGadget(new File(path));
     	  	path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
@@ -2283,6 +2254,8 @@ public class Editor extends JFrame
     	  }
       }else {
           try{
+
+        	  
         	  isGadgetFile = true;
         	  this.gadgetPanel.loadGadget(new File(path));
         	  IModule module = this.gadgetPanel.getActiveModule();
@@ -2355,18 +2328,18 @@ public class Editor extends JFrame
     	  /* The Boards menu doesn't 
     	   * make sense with a gadget .pde file, so disable it */
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
-    	  leftExpandLabel.setText(">");    	  
+    	  leftExpandLabel.setText(">"); 
+    	  System.out.println(path);
       }else{
     	  this.gadgetPanel.Unload(); 	//remove the gadget list and unload active module
     	  /* Use the Boards menu with a std .pde file */
     	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);
     	  gadgetPanel.hide();
+    	  sketch = new Sketch(this, path);
       }
       
-      sketch = new Sketch(this, path);
-      if(isGadgetFile){
-    	  System.out.println(path);
-      }
+      
+
       // TODO re-enable this once export application works
       //exportAppItem.setEnabled(false);
       //exportAppItem.setEnabled(false && !sketch.isLibrary());
