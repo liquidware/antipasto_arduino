@@ -1940,6 +1940,14 @@ public class Editor extends JFrame
    * mode, this will always be called instead of doStop().
    */
   public void doClose() {
+      
+      // I can't find who is calling doClose()
+      // but we'll find the offender sooner or later. 
+      // for now, duck out if things don't make sense.
+      if (sketch == null) {
+          return;
+      }
+
     //if (presenting) {
     //presentationWindow.hide();
     //} else {
@@ -1986,6 +1994,13 @@ public class Editor extends JFrame
    */
   protected void checkModified(int checkModifiedMode) {
     this.checkModifiedMode = checkModifiedMode;
+
+    // I can't find who is calling doClose()
+    // but we'll find the offender sooner or later. 
+    // for now, duck out if things don't make sense.
+    if (sketch==null) {
+        return;
+    }
 
     if (!sketch.modified) {
       checkModified2();
