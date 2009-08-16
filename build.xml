@@ -279,7 +279,13 @@
             </then>
         </elseif>
 
-        </if>    
+        </if>
+
+        <!-- Common OS actions -->
+
+        <!-- Slim down the installation -->
+        <delete dir="${build.dir}/hardware/tools/arm-none-eadi/share/doc/html"/>
+
     </target>
 
 
@@ -459,7 +465,7 @@
             <unzip src="build/windows/packager.zip" dest="build/windows" />
             <copy file="build/windows/Antipasto-package.aip" todir="build/windows/package" />
             <copy todir="build/windows/package/Arduino">
-                <fileset dir="build/windows/work" includes="**/*.*" />
+                <fileset dir="build/windows/work" />
             </copy>
 
             <exec executable="build/windows/packager/AdvancedInstaller.com" >
