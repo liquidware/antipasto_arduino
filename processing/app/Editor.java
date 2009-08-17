@@ -58,7 +58,9 @@ import antipasto.Util.AntipastoFileFilter;
 import antipasto.Util.GadgetFileFilter;
 import antipasto.Util.PDEFileFilter;
 import antipasto.Util.Utils;
+import antipasto.Plugins.Events.EditorEvent;
 import antipasto.Plugins.Manager.PluginPanel;
+import antipasto.Plugins.*;
 
 import com.apple.mrj.*;
 import com.oroinc.text.regex.*;
@@ -522,6 +524,8 @@ public class Editor extends JFrame
 
 
   public void buildGadgetPanel() {
+	
+	Base.pluginloader.getEventSender().broadcast(new EditorEvent(new EditorContext(this),2000));
 
     String libraryDirectory = System.getProperty("user.dir") + File.separator + "hardware" + 
            File.separator + "OpenHardware" + File.separator + "Modules";

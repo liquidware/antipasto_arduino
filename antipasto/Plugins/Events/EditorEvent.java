@@ -1,9 +1,12 @@
-package antipasto.Plugins;
+package antipasto.Plugins.Events;
 
 import java.awt.AWTEvent;
 
+import antipasto.Plugins.EditorContext;
+
 public class EditorEvent extends AWTEvent
 {
+	
 	public EditorEvent(EditorContext source, int id)
 	{
 		super(source,id);

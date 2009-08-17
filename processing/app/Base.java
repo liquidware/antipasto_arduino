@@ -41,7 +41,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
-import antipasto.Plugins.PluginLoader;
+import antipasto.Plugins.*;
 
 import antipasto.GUI.ImageListView.ImageListPanel;
 import antipasto.GUI.ImageListView.ImageListView;
@@ -50,6 +50,7 @@ import com.apple.mrj.*;
 import com.ice.jni.registry.*;
 
 import processing.core.*;
+
 
 
 /**
@@ -77,7 +78,7 @@ public class Base {
   static public void main(String args[]) {
 
     pluginloader = new PluginLoader();
-
+    
     // make sure that this is running on java 1.4
 
     if (PApplet.javaVersion < 1.4f) {

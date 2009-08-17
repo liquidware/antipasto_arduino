@@ -1,5 +1,5 @@
 
-package antipasto.Plugins;
+package antipasto.Plugins.Events;
 
 import java.util.EventObject;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import antipasto.Plugins.Interfaces.*;
 
 public class EventSender
 {
-   EventSender()
+   public EventSender()
    {
    }
    

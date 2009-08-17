@@ -1,19 +1,7 @@
 package antipasto.Plugins;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.event.*;
-
-import java.awt.event.*;
-
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.PropertyConfigurator;
-import org.java.plugin.JpfException;
 import org.apache.log4j.Logger;
-
 import org.java.plugin.ObjectFactory;
-import org.java.plugin.PluginLifecycleException;
 import org.java.plugin.PluginManager;
 import org.java.plugin.PluginManager.PluginLocation;
 import org.java.plugin.standard.StandardPluginLocation;
@@ -21,23 +9,17 @@ import org.java.plugin.registry.Extension;
 import org.java.plugin.registry.ExtensionPoint;
 import org.java.plugin.registry.PluginDescriptor;
 import org.java.plugin.util.ExtendedProperties;
-import org.java.plugin.PluginClassLoader;
-
-import org.java.plugin.boot.DefaultPluginsCollector;
-import org.java.plugin.registry.IntegrityCheckReport;
-import org.java.plugin.registry.ManifestProcessingException;
-import org.java.plugin.registry.PluginAttribute;
-import org.java.plugin.registry.PluginRegistry;
-import org.java.plugin.registry.IntegrityCheckReport.ReportItem;
-import org.java.plugin.util.IoUtil;
 
 import java.util.*;
 import java.io.*;
 
 import antipasto.Plugins.Manager.PluginListModel;
 import antipasto.Plugins.Manager.PluginPanel;
+import antipasto.Plugins.Events.EditorEvent;
+import antipasto.Plugins.Events.EventSender;
 import antipasto.Plugins.Interfaces.EditorListener;
 
+import processing.app.Base;
 //private EventSender sender = new EventSender();
 //getEventSender().broadcast(new EditorEvent());
 
@@ -48,6 +30,7 @@ public class PluginLoader {
     public EventSender eventsender = new EventSender();
     private static final String LINE_SEP = System.getProperty("line.separator");
     private Logger logger;
+    private PluginPanel pluginPanel;
 
     public PluginLoader() {
         prepareLoggers();
@@ -55,10 +38,14 @@ public class PluginLoader {
         loadPlugins();        
         startPlugins();
         setEventSender(eventsender);
-        PluginPanel pp = new PluginPanel(this);
+        pluginPanel = new PluginPanel(this);
         //broadcasting pluginsLoaded
-        getEventSender().broadcast(new EditorEvent(new EditorContext(),2000));
+        getEventSender().broadcast(new EditorEvent(new EditorContext(Base.editor),2000));
         
+    }
+
+    public void showPluginPanel(){
+        pluginPanel.showPluginPanel();
     }
 
     public PluginManager setManager(PluginManager pluginManager) {
