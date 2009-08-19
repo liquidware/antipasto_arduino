@@ -55,9 +55,9 @@ public class EditorHeader extends JPanel {
 
   int menuLeft;
   int menuRight;
-  
+
   ArrayList tabs = new ArrayList();
-  
+
   String previousSketch = "";
 
   static final String STATUS[] = { "unsel", "sel" };
@@ -76,10 +76,10 @@ public class EditorHeader extends JPanel {
   Image offscreen;
   int sizeW, sizeH;
   int imageW, imageH;
-  JPanel tabHeader = new JPanel(new FlowLayout());
+  JPanel tabHeader;
 
   public EditorHeader(Editor eddie) {
-	  
+
     this.editor = eddie; // weird name for listener
 
     pieces = new Image[STATUS.length][WHERE.length];
@@ -94,7 +94,7 @@ public class EditorHeader extends JPanel {
       //backgroundColor =
         //Preferences.getColor("header.bgcolor");
 	  // hardcoding new blue color scheme for consistency with images,
-	  // see EditorStatus.java for details.		
+	  // see EditorStatus.java for details.
       backgroundColor = new Color(0x21, 0x68, 0x86);
       textColor[SELECTED] =
         Preferences.getColor("header.text.selected.color");
@@ -102,115 +102,49 @@ public class EditorHeader extends JPanel {
         Preferences.getColor("header.text.unselected.color");
     }
 
-    if (0!=0) {
-    addMouseListener(new MouseAdapter() {
-        public void mousePressed(MouseEvent e) {
-          int x = e.getX();
-          int y = e.getY();
-
-          if ((x > menuLeft) && (x < menuRight)) {
-            popup.show(EditorHeader.this, x, y);
-            
-          } else {
-            for (int i = 0; i < editor.sketch.codeCount; i++) {
-              if ((x > tabLeft[i]) && (x < tabRight[i])) {
-                editor.sketch.setCurrent(i);
-                repaint();
-              }
-            }
-          }
-        }
-      });
-    }
-    
     //Setup the layout managers
-    this.setBackground(backgroundColor); 
+    this.setBackground(backgroundColor);
 		this.setLayout(new FlowLayout(FlowLayout.LEFT,0,5));
-		this.setOpaque(true); 
+		this.setOpaque(true);
 
-    tabHeader.setBackground(backgroundColor); 
+    rebuildHeaderBackground();
+
+  }
+
+  private void rebuildHeaderBackground() {
+
+    //Existance check
+    if (tabHeader != null) {
+      this.remove(tabHeader);
+    }
+
+    // Ditch the old one, make a new one
+    tabHeader = new JPanel(new FlowLayout());
+    tabHeader.setBackground(backgroundColor);
 		tabHeader.setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
-		tabHeader.setOpaque(true);  
-		
+		tabHeader.setOpaque(true);
+
     this.add(tabHeader);
-    tabHeader.setVisible(true);
   }
-
-
-  public void paintComponent(Graphics screen) {
-    
-    if ( (screen == null) || (editor.sketch == null)) {
-      return;
-    }
-
-    Dimension size = getSize();
-    if ((size.width != sizeW) || (size.height != sizeH)) {
-      // component has been resized
-
-      if ((size.width > imageW) || (size.height > imageH)) {
-        // nix the image and recreate, it's too small
-        offscreen = null;
-
-      } else {
-        // who cares, just resize
-        sizeW = size.width;
-        sizeH = size.height;
-        //userLeft = 0; // reset
-      }
-    }
-
-    if (offscreen == null) {
-      sizeW = size.width;
-      sizeH = size.height;
-      imageW = sizeW;
-      imageH = sizeH;
-      offscreen = createImage(imageW, imageH);
-    }
-
-    Graphics g = offscreen.getGraphics();
-    if (font == null) {
-      font = Preferences.getFont("header.text.font");
-    }
-    g.setFont(font);  // need to set this each time through
-    metrics = g.getFontMetrics();
-    fontAscent = metrics.getAscent();
-
-    // set the background for the offscreen
-    g.setColor(backgroundColor);
-    g.fillRect(0, 0, imageW, imageH);
-    
-    createNewTabs();
-    
-    menuLeft = sizeW - (16 + pieces[0][MENU].getWidth(this));
-    menuRight = sizeW - 16;
-    // draw the dropdown menu target
-    g.drawImage(pieces[popup.isVisible() ? SELECTED : UNSELECTED][MENU],
-                menuLeft, 0, null);
-
-    screen.drawImage(offscreen, 0, 0, null);
-
-  }
-
 
   private void createNewSketchTabs(Sketch sketch) {
 
 	    for (int i = 0; i < sketch.code.length; i++) {
-	    	this.tabHeader.setVisible(true);
-	      SketchCode code = sketch.code[i];
-	
-	      String codeName = (code.flavor == Sketch.PDE) ?
-	        code.name : code.file.getName();
-	      
-	      EditorTab editorTab = new EditorTab(new Color(0x54, 0x91, 0x9e), codeName, code, this.editor);
-	      editorTab.setPreferredSize(new Dimension(editorTab.WIDTH, this.getHeight() + 5));
-	      editorTab.setBackground(this.backgroundColor);
-	      editorTab.paint(getGraphics());
-	      
+
+        SketchCode code = sketch.code[i];
+
+        String codeName = (code.flavor == Sketch.PDE) ?
+          code.name : code.file.getName();
+
+
+        EditorTab editorTab = new EditorTab(new Color(0x54, 0x91, 0x9e), codeName, code, this.editor);
+        editorTab.setPreferredSize(new Dimension( (codeName.length() * 7) + 10,
+                                                 getHeight() + 5) );
+        editorTab.setBackground(this.backgroundColor);
+
         tabs.add(editorTab);
-	      
-	      this.tabHeader.add(editorTab);
-	      this.setVisible(true);
-	    }
+        tabHeader.add(editorTab);
+      }
 
   }
 
@@ -220,59 +154,40 @@ public class EditorHeader extends JPanel {
 		 if(editor.gadgetPanel.gadgetIsLoaded){
 	    	if(editor.gadgetPanel.getActiveModule().getData() != null||editor.gadgetPanel.getActiveModule().getData().length > 0){
 		    	EditorTab editorTab = new EditorTab(new Color(46, 163, 94), "Data", editor.gadgetPanel.getActiveModule(),this.editor);
-		    	editorTab.setPreferredSize(new Dimension(editorTab.WIDTH, this.getHeight() + 5));
+		    	editorTab.setPreferredSize(new Dimension( ("Data".length() * 7) + 10,
+                                                    this.getHeight() + 5));
 		    	editorTab.setBackground(this.backgroundColor);
 		    	tabs.add(editorTab);
 		    	this.tabHeader.add(editorTab);
-		    	editorTab.paint(getGraphics());
 	    	}
 		    }
 	    }
   }
 
-  private void createNewTabs() {
+  private void rebuildTabs() {
 
     Sketch sketch = editor.sketch;
-    
-    if ((tabLeft == null) ||
-        (tabLeft.length < sketch.codeCount)) {
-      tabLeft = new int[sketch.codeCount];
-      tabRight = new int[sketch.codeCount];
-    }
 
-    // disable hide on the first tab
-    hideItem.setEnabled(sketch.current != sketch.code[0]);
+    tabs.clear();
 
-    //here is where we're creating the code tabs....lets override this
-    if(!this.previousSketch.equalsIgnoreCase(sketch.name)){
-    	for(int i = 0; i < tabs.size(); i++){
-			((Component)tabs.get(i)).setVisible(false);
-    		this.remove((Component)tabs.get(i));
-    	}
-    	
-    	for(int i = 0; i < tabs.size(); i++){
-    		this.remove(((EditorTab)tabs.get(i)));
-    	}
-    	
-    	tabs.clear();
-      
-      createNewSketchTabs(sketch);
-      createNewDataTabs();
-
-	    this.previousSketch = sketch.name;
-    }
-
+    createNewSketchTabs(sketch);
+    createNewDataTabs();
+    this.previousSketch = sketch.name;
   }
 
 
   /**
-   * Called when a new sketch is opened.
+   * Usually called when a new sketch is opened.
    */
   public void rebuild() {
-    //System.out.println("rebuilding editor header");
-    rebuildMenu();
-    repaint();
+
+    System.out.println("Rebuilding header...");
+    rebuildHeaderBackground();
+    rebuildTabs();
+    revalidate();
+
   }
+
 
 
   public void rebuildMenu() {
@@ -471,4 +386,6 @@ public class EditorHeader extends JPanel {
     }
     return new Dimension(3000, Preferences.GRID_SIZE - 1);
   }
+
+
 }

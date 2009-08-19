@@ -19,7 +19,7 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-  
+
   $Id: EditorStatus.java 346 2007-10-06 20:26:45Z mellis $
 */
 
@@ -189,12 +189,12 @@ public class EditorStatus extends JPanel implements ActionListener {
     editField.setVisible(false);
     empty();
   }
-  
+
   public void serial()
   {
     mode = SERIAL;
     this.message = NO_MESSAGE;
-    
+
     sendButton.setVisible(true);
     serialRates.setVisible(true);
     serialField.setVisible(true);
@@ -203,7 +203,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 
     repaint();
   }
-  
+
   public void unserial()
   {
     sendButton.setVisible(false);
@@ -339,7 +339,7 @@ public class EditorStatus extends JPanel implements ActionListener {
             //System.out.println("got event " + event + "  " +
             // KeyEvent.VK_SPACE);
             int c = event.getKeyChar();
-            
+
             if (mode == EDIT) {
               if (c == KeyEvent.VK_ENTER) {  // accept the input
                 String answer = editField.getText();
@@ -412,27 +412,27 @@ public class EditorStatus extends JPanel implements ActionListener {
                 event.consume();
                 //System.out.println("code is " + code + "  char = " + c);
               }
-            } 
+            }
             //System.out.println("code is " + code + "  char = " + c);
           }
         });
       add(editField);
       editField.setVisible(false);
-            
+
       serialField = new JTextField();
       serialField.addActionListener(this);
 
       serialField.addKeyListener(new KeyAdapter() {
         public void keyTyped(KeyEvent event) {
           int c = event.getKeyChar();
-            
+
           if (c == KeyEvent.VK_ENTER) {  // accept the input
             editor.serialPort.write(serialField.getText());
             event.consume();
             serialField.setText("");
-          } 
+          }
         }});
-        
+
       add(serialField);
       serialField.setVisible(false);
 
@@ -440,18 +440,18 @@ public class EditorStatus extends JPanel implements ActionListener {
         "300","1200","2400","4800","9600","14400",
         "19200","28800","38400","57600","115200"
       };
-      
+
       serialRates = new JComboBox();
 
       if (Base.isMacOS())
         serialRates.setBackground(bgcolor[SERIAL]);
-        
+
       for (int i = 0; i < serialRateStrings.length; i++)
         serialRates.addItem(serialRateStrings[i] + " baud");
 
       serialRates.setSelectedItem(
         Preferences.get("serial.debug_rate") + " baud");
-      serialRates.addActionListener(this);      
+      serialRates.addActionListener(this);
       add(serialRates);
       serialRates.setVisible(false);
     }
@@ -545,8 +545,8 @@ public class EditorStatus extends JPanel implements ActionListener {
     }
   }
 
-  
-    
+
+
    /*
     * Generic method for creating a yes no message in the editor status screen.
     * */
@@ -554,11 +554,11 @@ public class EditorStatus extends JPanel implements ActionListener {
 	   final EditorStatus editorStatus = this;
 	   if(listener != null){
 		   this.yesButton.setVisible(true);
-		   this.noButton.setVisible(true);		   
+		   this.noButton.setVisible(true);
 		   this.yesButton.removeActionListener(this);
 		   this.yesButton.addMouseListener(new MouseListener(){
 				public void mouseClicked(MouseEvent arg0) {
-					listener.ResponseYes();	
+					listener.ResponseYes();
 					yesButton.addActionListener(editorStatus);
 					editorStatus.message = "";
 					yesButton.setVisible(false);
@@ -570,11 +570,11 @@ public class EditorStatus extends JPanel implements ActionListener {
 				}
 				public void mousePressed(MouseEvent arg0) {
 				}
-	
-				public void mouseReleased(MouseEvent arg0) {	
-				}				   
+
+				public void mouseReleased(MouseEvent arg0) {
+				}
 		   });
-		   
+
 		   this.noButton.removeActionListener(this);
 		   this.addMouseListener(new MouseListener(){
 			public void mouseClicked(MouseEvent e) {
@@ -599,7 +599,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 		   this.repaint();
 	   }
    }
-   
+
    public void CreateOkDialog(final IOkListener listener, String message){
 	   if(listener != null){
 		   final EditorStatus es = this;
@@ -612,7 +612,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 				listener.OkButton();
 				okButton.setVisible(false);
 				okButton.addActionListener(es);
-				editor.header.paintComponents(editor.getGraphics());
+				//editor.header.paintComponents(editor.getGraphics());
 			}
 			public void mouseEntered(MouseEvent arg0) {
 			}
@@ -620,15 +620,15 @@ public class EditorStatus extends JPanel implements ActionListener {
 			}
 			public void mousePressed(MouseEvent arg0) {
 			}
-			public void mouseReleased(MouseEvent arg0) {	
+			public void mouseReleased(MouseEvent arg0) {
 			}
 		   });
 	   }
-	   	   
+
    }
-   
+
    boolean ignoreFileName = true;
-   
+
     public void CreateOkEditDialog(final IOkListener listener, String message){
 	   if(listener != null){
 		   final EditorStatus es = this;
@@ -662,7 +662,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 				okButton.addActionListener(es);
 				cancelButton.setVisible(false);
 				editField.setVisible(false);
-				editor.header.paintComponents(editor.getGraphics());
+				//editor.header.paintComponents(editor.getGraphics());
 			}
 			public void mouseEntered(MouseEvent arg0) {
 			}
@@ -670,22 +670,22 @@ public class EditorStatus extends JPanel implements ActionListener {
 			}
 			public void mousePressed(MouseEvent arg0) {
 			}
-			public void mouseReleased(MouseEvent arg0) {	
+			public void mouseReleased(MouseEvent arg0) {
 			}
 		   });
 	   }
-	   	   
+
    }
 
-   
+
    private void CreateSerialDialog(final ISerialListener listener, String message){
-	   if(listener != null){		   
+	   if(listener != null){
 		   this.message = message;
 		   this.okButton.setVisible(true);
 		   this.okButton.removeActionListener(this);
 		   this.okButton.addMouseListener(new MouseListener(){
 			public void mouseClicked(MouseEvent e) {
-				
+
 			}
 			public void mouseEntered(MouseEvent e) {
 			}
@@ -695,7 +695,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 			}
 			public void mouseReleased(MouseEvent e) {
 			}
-			   
+
 		   });
 	   }
    }
