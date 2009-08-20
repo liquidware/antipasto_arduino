@@ -58,9 +58,10 @@ import antipasto.Util.AntipastoFileFilter;
 import antipasto.Util.GadgetFileFilter;
 import antipasto.Util.PDEFileFilter;
 import antipasto.Util.Utils;
-import antipasto.Plugins.Events.EditorEvent;
 import antipasto.Plugins.Manager.PluginPanel;
 import antipasto.Plugins.*;
+import antipasto.Plugins.EditorContext;
+import antipasto.Plugins.Events.EditorEvent;
 
 import com.apple.mrj.*;
 import com.oroinc.text.regex.*;
@@ -2191,16 +2192,8 @@ public class Editor extends JFrame
   }
 
 
-  /**
-   * Second stage of open, occurs after having checked to
-   * see if the modifications (if any) to the previous sketch
-   * need to be saved.
-   */
-  protected void handleOpen2(String path) {
+  protected void auto_clean(String path) {
 
-
-
-    if (sketch != null) {
       // if leaving an empty sketch (i.e. the default) do an
       // auto-clean right away
       try {
@@ -2215,10 +2208,21 @@ public class Editor extends JFrame
           }
         }
       } catch (Exception e) { }   // oh well
-    }
 
-    boolean isGadgetFile = false;
-    try {
+  }
+
+  /**
+   * 
+   * 
+   * @author christopher.ladden (8/20/2009)
+   * 
+   * @param path the path the pde file.
+   * 
+   * @return String 
+   * Returns the path string , modified if needed
+   */
+  protected String pdeFileCheck(String path ) {
+
       // check to make sure that this .pde file is
       // in a folder of the same name
       File file = new File(path);
@@ -2227,137 +2231,184 @@ public class Editor extends JFrame
       String pdeName = parentName + ".pde";
       File altFile = new File(file.getParent(), pdeName);
 
-      //System.out.println("path = " + file.getParent());
-      //System.out.println("name = " + file.getName());
-      //System.out.println("pname = " + parentName);
-
       if (pdeName.equals(file.getName())) {
         // no beef with this guy
-
+          return path;
       } else if (altFile.exists()) {
         // user selected a .java from the same sketch,
         // but open the .pde instead
-        path = altFile.getAbsolutePath();
+         return altFile.getAbsolutePath();
         //System.out.println("found alt file in same folder");
+      } else {
+          return path;
+      }
+  }
 
-      } else if (!path.endsWith(".pde") && !path.endsWith(".gdt")) {
-        Base.showWarning("Bad file selected",
-                            "Arduino can only open its own sketches\n" +
-                            "and other files ending in .pde", null);
-        return;
-      } else if (path.endsWith(".gdt")){
-    	  try{
+  protected void handleGadgetFileOpen(String path) {
+      boolean isGadgetFile;
 
-      	  	isGadgetFile = true;
-    		this.gadgetPanel.loadGadget(new File(path));
-    	  	path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
-    	  	this.loadGadget(this.gadgetPanel.getActiveGadget());
-    	  	this.lastActiveGadgetPath = path;
-    	  }catch(Exception ex){
-    	  }
-      }else {
-          try{
+      try{
+    
+            isGadgetFile = true;
+            this.gadgetPanel.loadGadget(new File(path));
+            path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
+            this.loadGadget(this.gadgetPanel.getActiveGadget());
+            this.lastActiveGadgetPath = path;
+
+            //do one last check
+            if (this.gadgetPanel.getActiveGadget() != null) {
+                for (int i = 0; i < gadgetPanel.getActiveGadget().getModules().length; i++) {
+                    if (gadgetPanel.getActiveGadget().getModules()[i].getSketchFile().getPath().equalsIgnoreCase(path)) {
+                        isGadgetFile = true;
+                        break;
+                    }
+                }
+            }
+            
+            this.gadgetPanel.setVisible(isGadgetFile);
+
+            //gadgetPanel.show();
+            /* The Boards menu doesn't
+             * make sense with a gadget .pde file, so disable it */
+            _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
+            leftExpandLabel.setText(">");
+            System.out.println(path);
+
+      }catch(Exception ex){
+          ex.printStackTrace();
+      }
+  }
+
+  protected void handleSketchFileOpen(String path) {
+            
+    // need to put this into the new/open menu
+    //this.gadgetPanel.Unload();    //remove the gadget list and unload active module
+    
+    /* Use the Boards menu with a std .pde file */
+    //_frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);
+    //gadgetPanel.hide();
+      try {
+          sketch = new Sketch(this, path);
+      } catch (Exception ex) {
+          ex.printStackTrace();
+      }
+            
+
+  }
+
+  protected void handleModuleFileOpen(String path) {
+  }
 
 
-        	  isGadgetFile = true;
-        	  this.gadgetPanel.loadGadget(new File(path));
-        	  IModule module = this.gadgetPanel.getActiveModule();
-        	  File sketchFile = module.getSketchFile();
-        	  path = sketchFile.getPath();
-        	  this.loadGadget(this.gadgetPanel.getActiveGadget());
-        	  this.lastActiveGadgetPath = path;
+  protected void handleDefaultFileOpen(String path) {
+    Base.showWarning("Bad file selected",
+                "Arduino can only open its own sketches\n" +
+                "and other files ending in .pde and .gdt", null);
+  }
 
-          }catch(Exception ex){
-        	  ex.printStackTrace();
-	        isGadgetFile = false;
-	        String properParent =
-	          file.getName().substring(0, file.getName().length() - 4);
-	        Object[] options = { "OK", "Cancel" };
-	        String prompt =
-	          "The file \"" + file.getName() + "\" needs to be inside\n" +
-	          "a sketch folder named \"" + properParent + "\".\n" +
-	          "Create this folder, move the file, and continue?";
+  protected boolean checkFileFormat(String path) {
 
-	        int result = JOptionPane.showOptionDialog(this,
-	                                                  prompt,
-	                                                  "Moving",
-	                                                  JOptionPane.YES_NO_OPTION,
-	                                                  JOptionPane.QUESTION_MESSAGE,
-	                                                  null,
-	                                                  options,
-	                                                  options[0]);
+      if (path.endsWith(".gdt")){
+          handleGadgetFileOpen(path);
+      } else if (path.endsWith(".pde")) {
+          handleSketchFileOpen(path);
+      } else {
+          handleDefaultFileOpen(path);
+          return false; //The file is not supported
+      }
+      
+      //The file was supported, and opened okay.
+      return true;
+  }
 
-	        if (result == JOptionPane.YES_OPTION) {
-	          // create properly named folder
-	          File properFolder = new File(file.getParent(), properParent);
-	          if (properFolder.exists()) {
-	            Base.showWarning("Error",
-	                                "A folder named \"" + properParent + "\" " +
-	                                "already exists. Can't open sketch.", null);
-	            return;
-	          }
-	          if (!properFolder.mkdirs()) {
-	            throw new IOException("Couldn't create sketch folder");
-	          }
-	          // copy the sketch inside
-	          File properPdeFile = new File(properFolder, file.getName());
-	          File origPdeFile = new File(path);
-	          Base.copyFile(origPdeFile, properPdeFile);
+   protected void handleFixSketchFile(String path, Exception ex) {
+        File file = new File(path);
 
-	          // remove the original file, so user doesn't get confused
-	          origPdeFile.delete();
+        ex.printStackTrace();
+        String properParent =
+          file.getName().substring(0, file.getName().length() - 4);
+        Object[] options = { "OK", "Cancel" };
+        String prompt =
+          "The file \"" + file.getName() + "\" needs to be inside\n" +
+          "a sketch folder named \"" + properParent + "\".\n" +
+          "Create this folder, move the file, and continue?";
+        
+        int result = JOptionPane.showOptionDialog(this,
+                                                  prompt,
+                                                  "Moving",
+                                                  JOptionPane.YES_NO_OPTION,
+                                                  JOptionPane.QUESTION_MESSAGE,
+                                                  null,
+                                                  options,
+                                                  options[0]);
+        
+        if (result == JOptionPane.YES_OPTION) {
+          // create properly named folder
+          File properFolder = new File(file.getParent(), properParent);
+          if (properFolder.exists()) {
+            Base.showWarning("Error",
+                                "A folder named \"" + properParent + "\" " +
+                                "already exists. Can't open sketch.", null);
+            return;
+          }
+          try {
+            if (!properFolder.mkdirs()) {
+               throw new IOException("Couldn't create sketch folder");
+            }
+          } catch (IOException e) {
+               
+          }
 
-	          // update with the new path
-	          path = properPdeFile.getAbsolutePath();
+          // copy the sketch inside
+          File properPdeFile = new File(properFolder, file.getName());
+          File origPdeFile = new File(path);
 
+          try {
+              Base.copyFile(origPdeFile, properPdeFile);
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+          
+          // remove the original file, so user doesn't get confused
+          origPdeFile.delete();
+        
+          // update with the new path
+          path = properPdeFile.getAbsolutePath();
+        
         } else if (result == JOptionPane.NO_OPTION) {
           return;
         }
-      }
-      }
-      //do one last check
-      if(this.gadgetPanel.getActiveGadget() != null){
-    	  for(int i = 0; i < gadgetPanel.getActiveGadget().getModules().length; i++){
-    		  if(gadgetPanel.getActiveGadget().getModules()[i].getSketchFile().getPath().equalsIgnoreCase(path)){
-    			 isGadgetFile = true;
-    			 break;
-    		  }
-    	  }
-      }
+   }
 
-      this.gadgetPanel.setVisible(isGadgetFile);
-      if(isGadgetFile){
-    	  //gadgetPanel.show();
-    	  /* The Boards menu doesn't
-    	   * make sense with a gadget .pde file, so disable it */
-    	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
-    	  leftExpandLabel.setText(">");
-    	  System.out.println(path);
-      }else{
-    	  this.gadgetPanel.Unload(); 	//remove the gadget list and unload active module
-    	  /* Use the Boards menu with a std .pde file */
-    	  _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);
-    	  gadgetPanel.hide();
-    	  sketch = new Sketch(this, path);
-      }
+    /**
+     * Second stage of open, occurs after having checked to
+     * see if the modifications (if any) to the previous sketch
+     * need to be saved.
+     */
+    protected void handleOpen2(String path) {
 
+        if (sketch != null) {
+            auto_clean(path);
+        }
 
+        boolean isGadgetFile = false;
 
-      // TODO re-enable this once export application works
-      //exportAppItem.setEnabled(false);
-      //exportAppItem.setEnabled(false && !sketch.isLibrary());
-      //buttons.disableRun(sketch.isLibrary());
-      header.rebuild();
-      if (Preferences.getBoolean("console.auto_clear")) {
-        console.clear();
-      }
+        try {
+            path = pdeFileCheck(path);
+        } catch (Exception ex) {
+            handleFixSketchFile(path, ex);
+        }
 
-    } catch (Exception e) {
-    	if(!isGadgetFile){
-    		error(e);
-    	}
+        if (!checkFileFormat(path)) {
+            return;
+        }
+
+        header.rebuild();
+
+        if (Preferences.getBoolean("console.auto_clear")) {
+            console.clear();
+        }
     }
-  }
 
 
   // there is no handleSave1 since there's never a need to prompt
