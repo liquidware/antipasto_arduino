@@ -2988,7 +2988,9 @@ public class Editor extends JFrame
     public void onActiveGadgetChanged(ActiveGadgetObject obj){
         this.gadgetPanel.saveCurrentGadget();
         if(gadgetPanel.getActiveModule() != null && gadgetPanel.getActiveGadget() != null){
-	        this.handleSave(true);
+	        if(this.sketch != null){
+	        	this.handleSave(true);
+	        }
         	CardLayout cl = (CardLayout) centerPanel.getLayout();
             cl.show(centerPanel, CODEEDITOR);
 	        File sketchFile = obj.getSketch();

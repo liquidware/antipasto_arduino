@@ -82,7 +82,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     private File gadgetPath;
     
     public GadgetPanel(String sketchBookDirectory, JFrame frame, String libraryDirectory) {
-
         super(frame, false);
     	editor = (Editor) frame;
     	parentFrame = frame;
@@ -90,8 +89,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         this.setUndecorated(true);
         frame.addWindowListener(this);
         this.libraryDirectory = libraryDirectory;
+        
         this.init();
-
     }
     
     private void reinit(){
@@ -225,11 +224,11 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     		
     		/* Setup the new panels */
 	    	String dir = Base.createTempFolder(gadget.getName()).getPath();
-    		IGadget book = fact.loadGadget(gadget, dir);
+    		IGadget tmpGadget = fact.loadGadget(gadget, dir);
 
-    		this._gadget = book;
+    		this._gadget = tmpGadget;
     		 
-	        list = new GadgetList(book, gadget.getParent());
+	        list = new GadgetList(tmpGadget, gadget.getParent());
 	        list.loadGadget(_gadget);
 	        list.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
 	        
@@ -288,6 +287,8 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     public void setVisible(boolean b){
     	super.setVisible(b);
 		this.setSize(this.cachedWidth, this.cachedHeight);
+		this.setLocation(editor.getX() - this.cachedWidth, 
+                editor.centerPanel.getLocationOnScreen().y);
     }
     
     /*
