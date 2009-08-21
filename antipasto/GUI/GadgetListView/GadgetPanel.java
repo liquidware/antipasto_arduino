@@ -216,7 +216,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
     
     public void loadGadget(File gadget){
     	if(gadget  != null){	
-    		
     		GadgetFactory fact = skbFact;
     		
     		/* Remove the current panel GUI elements, because 
@@ -249,10 +248,13 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
             /* Add all the updated GUI elements back to the panel */
             reloadPanels();
             
+            //this is adding itself to a sketch changed listener EVERY TIME!?
     	    list.addSketchChangingeListener(this);
     	    list.addListSelectionListener(this);
     	    
     		this.list.setSelectedIndex(0);
+    		//dirty...dirty...naughty code
+    		//Breaks law of demeter real
     		if(list._collection._gadgets.size() > 0){
 	    		this.activeModule = (IModule) list.getSelectedValue();
 	            this.onActiveGadgetChange(new ActiveGadgetObject(this,

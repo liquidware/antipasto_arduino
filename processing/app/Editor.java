@@ -60,7 +60,6 @@ import antipasto.Util.PDEFileFilter;
 import antipasto.Util.Utils;
 import antipasto.Plugins.Manager.PluginPanel;
 import antipasto.Plugins.*;
-import antipasto.Plugins.EditorContext;
 import antipasto.Plugins.Events.EditorEvent;
 
 import com.apple.mrj.*;
@@ -102,6 +101,8 @@ public class Editor extends JFrame
   String handleOpenPath;
   boolean handleNewShift;
   boolean handleNewLibrary;
+  
+  boolean gadgetIsLoading = false;
 
   PageFormat pageFormat;
   PrinterJob printerJob;
@@ -2248,24 +2249,22 @@ public class Editor extends JFrame
       boolean isGadgetFile;
 
       try{
-    
-            isGadgetFile = true;
-            this.gadgetPanel.loadGadget(new File(path));
-            path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
-            this.loadGadget(this.gadgetPanel.getActiveGadget());
-            this.lastActiveGadgetPath = path;
-
-            //do one last check
-            if (this.gadgetPanel.getActiveGadget() != null) {
-                for (int i = 0; i < gadgetPanel.getActiveGadget().getModules().length; i++) {
-                    if (gadgetPanel.getActiveGadget().getModules()[i].getSketchFile().getPath().equalsIgnoreCase(path)) {
-                        isGadgetFile = true;
-                        break;
-                    }
-                }
-            }
+    	  isGadgetFile = true;
+          this.gadgetPanel.loadGadget(new File(path));
+          path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
+           //this.loadGadget(this.gadgetPanel.getActiveGadget());
+          this.lastActiveGadgetPath = path;
             
-            this.gadgetPanel.setVisible(isGadgetFile);
+          try{
+        	  //this.gadgetIsLoading = true;
+        	  //sketch = new Sketch(this, path);
+           	  }catch(Exception ex){
+        		  ex.printStackTrace();
+        	  }
+        	  
+        	  //this.gadgetIsLoading = false;
+            
+        	  this.gadgetPanel.setVisible(isGadgetFile);
 
             //gadgetPanel.show();
             /* The Boards menu doesn't
@@ -2273,7 +2272,6 @@ public class Editor extends JFrame
             _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
             leftExpandLabel.setText(">");
             System.out.println(path);
-
       }catch(Exception ex){
           ex.printStackTrace();
       }
@@ -2285,8 +2283,13 @@ public class Editor extends JFrame
     //this.gadgetPanel.Unload();    //remove the gadget list and unload active module
     
     /* Use the Boards menu with a std .pde file */
-    //_frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);
-    //gadgetPanel.hide();
+    
+     if(gadgetPanel.gadgetIsLoaded && !gadgetIsLoading){
+    	 gadgetPanel.Unload();
+         gadgetPanel.hide();
+         _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(true);
+     }
+
       try {
           sketch = new Sketch(this, path);
       } catch (Exception ex) {
@@ -2502,10 +2505,8 @@ public class Editor extends JFrame
               if (file == null) {
                 return;
               }
-
 						String newParentDir = file.getParent();
 						String newName = file.getName();
-
 						if (newName != null){
 							String fileName;
 							if(newName.endsWith(".pde")){
@@ -2516,19 +2517,7 @@ public class Editor extends JFrame
 							}
 							//save the gadget file
 							GadgetFactory fact = new GadgetFactory();
-						/*	IPackedFile file = ((IPackedFile)gp.getActiveGadget());
-							File newGadget = new File(newParentDir + File.separator + fileName);
-							Base.copyFile(file.getPackedFile(), newGadget);
-							IGadget gadg = fact.loadGadget(newGadget, System.getProperty("java.io.tmpdir") + File.separator + newGadget.getName());
-							gadg.setName(newName);
-							((IPackedFile)gadg).setPackedFile(newGadget);
-							ITemporary tempDir = (ITemporary)gadg;
-							File dir = new File(tempDir.getTempDirectory());
-							dir.listFiles();
-							gp.loadGadget(newGadget);
-							gp.saveCurrentGadget();*/
 							File newFile = fact.copyGadget(gp.getActiveGadget(), newParentDir , newName);
-							//IGadget newGadget = fact.loadGadget(newFile, System.getProperty("java.io.tmpdir") + File.separator + newFile.getName());
 							gp.loadGadget(newFile);
 							gp.saveCurrentGadget();
 
@@ -2999,13 +2988,20 @@ public class Editor extends JFrame
     public void onActiveGadgetChanged(ActiveGadgetObject obj){
         this.gadgetPanel.saveCurrentGadget();
         if(gadgetPanel.getActiveModule() != null && gadgetPanel.getActiveGadget() != null){
-	        //this.handleSave(true);
+	        this.handleSave(true);
         	CardLayout cl = (CardLayout) centerPanel.getLayout();
             cl.show(centerPanel, CODEEDITOR);
 	        File sketchFile = obj.getSketch();
 	        File boardFile = obj.getBoards();
-	        this.handleOpen(sketchFile.getPath());
+	        //this.handleOpen(sketchFile.getPath());
 	        String board = gadgetPanel.getActiveModule().getTarget();
+	        try {
+				this.sketch = new Sketch(this, sketchFile.getPath());
+				this.header.rebuild();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	        this.curBoard = board;
 	        Preferences.set("board", board);
 	        Preferences.save();

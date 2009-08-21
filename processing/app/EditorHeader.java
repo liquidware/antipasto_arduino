@@ -180,12 +180,10 @@ public class EditorHeader extends JPanel {
    * Usually called when a new sketch is opened.
    */
   public void rebuild() {
-
     System.out.println("Rebuilding header...");
     rebuildHeaderBackground();
     rebuildTabs();
     revalidate();
-
   }
 
 
@@ -200,52 +198,11 @@ public class EditorHeader extends JPanel {
       popup = menu.getPopupMenu();
       add(popup);
       popup.setLightWeightPopupEnabled(true);
-
-      /*
-      popup.addPopupMenuListener(new PopupMenuListener() {
-          public void popupMenuCanceled(PopupMenuEvent e) {
-            // on redraw, the isVisible() will get checked.
-            // actually, a repaint may be fired anyway, so this
-            // may be redundant.
-            repaint();
-          }
-
-          public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
-          public void popupMenuWillBecomeVisible(PopupMenuEvent e) { }
-        });
-      */
     }
     JMenuItem item;
 
     // maybe this shouldn't have a command key anyways..
     // since we're not trying to make this a full ide..
-    //item = Editor.newJMenuItem("New", 'T');
-
-    /*
-    item = Editor.newJMenuItem("Previous", KeyEvent.VK_PAGE_UP);
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          System.out.println("prev");
-        }
-      });
-    if (editor.sketch != null) {
-      item.setEnabled(editor.sketch.codeCount > 1);
-    }
-    menu.add(item);
-
-    item = Editor.newJMenuItem("Next", KeyEvent.VK_PAGE_DOWN);
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          System.out.println("ext");
-        }
-      });
-    if (editor.sketch != null) {
-      item.setEnabled(editor.sketch.codeCount > 1);
-    }
-    menu.add(item);
-
-    menu.addSeparator();
-    */
 
     item = new JMenuItem("New Tab");
     final EditorHeader header = this;
@@ -311,40 +268,22 @@ public class EditorHeader extends JPanel {
     menu.add(unhide);
     menu.addSeparator();
 
-    //  KeyEvent.VK_LEFT and VK_RIGHT will make Windows beep
-
     int ctrlAlt = ActionEvent.ALT_MASK |
-      Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-    //item = Editor.newJMenuItem("Previous Tab", '[', true);
     item = new JMenuItem("Previous Tab");
-    //int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     KeyStroke ctrlAltLeft = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrlAlt);
     item.setAccelerator(ctrlAltLeft);
-    //int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-    //KeyStroke tabby = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, modifiers);
 
     // this didn't want to work consistently
-    /*
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          editor.sketch.prevCode();
-        }
-      });
-    */
+    
     menu.add(item);
 
     //item = Editor.newJMenuItem("Next Tab", ']', true);
     item = new JMenuItem("Next Tab");
     KeyStroke ctrlAltRight = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrlAlt);
     item.setAccelerator(ctrlAltRight);
-    /*
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          editor.sketch.nextCode();
-        }
-      });
-    */
+    
     menu.add(item);
 
     if (sketch != null) {
