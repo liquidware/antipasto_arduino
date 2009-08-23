@@ -539,6 +539,13 @@
                 <arg value="-d" />
                 <arg value="${package.dir}/Package_Root/usr/local" />
             </exec>
+            
+            <exec executable="unzip" searchpath="true">
+                <arg value="-X" />
+                <arg value="${dist.dir}/tools/osx_libraries.zip" />
+                <arg value="-d" />
+                <arg value="${package.dir}/Package_Root/usr/local" />
+            </exec>            
 
             <exec executable="mv" searchpath="true">
                 <arg value="${build.dir}" />
