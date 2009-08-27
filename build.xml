@@ -38,8 +38,8 @@
     -->
     <import file="build.properties.xml" />
 
-    <target name="clean.all" depends="clean.external, clean.plugins, clean.OS"/>
-    <target name="get.all"   depends="get.plugins, get.external, get.OS"/>
+    <target name="clean.all" depends="clean.cores, clean.external, clean.plugins, clean.OS"/>
+    <target name="get.all"   depends="get.cores, get.plugins, get.external, get.OS"/>
     <target name="build.all" depends="build.plugins, build.external, build.java"/>
     <target name="dist.all"  depends="clean.all, get.all, build.all, dist.OS"/>
     <target name="run.all"      depends="run.OS"/>
@@ -69,6 +69,11 @@
         <delete dir="${package.dir}" />
     </target>
 
+    <target name="clean.cores">
+        <!-- Clean Illuminato X Machina -->
+        <delete file="hardware/cores/ixm"/>
+    </target>
+
 
     <!--
         ===================================================================
@@ -81,6 +86,16 @@
 
     <target name="get.external">
         <ant dir="external"  target="get.all" />
+    </target>
+
+    <target name="get.cores">
+        <!-- Get Illuminato X Machina Core -->
+        <get src="http://livingcomputation.com/ixm/pub/sfb-latest.zip"
+             dest="hardware/cores/sfb-latest.zip"/>
+        <unzip src="hardware/cores/sfb-latest.zip" 
+               dest="hardware/cores"/>
+        <move file="hardware/cores/SFB" tofile="hardware/cores/ixm"/>
+        <delete file="hardware/cores/sfb-latest.zip"/>
     </target>
 
 
@@ -498,6 +513,7 @@
             </exec>
             <move file="build/windows/package/Antipasto-package.msi" tofile="build/windows/package/${package.windows.name}" />
             <delete dir="build/windows/packager" />
+            <echo file="${package.dir}/${package.windows.name}.txt">distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
 
@@ -517,6 +533,7 @@
                     <arg value="${package.linux.name}" />
                     <arg value="Arduino" />
             </exec>
+            <echo file="${package.dir}/${package.linux.name}.txt">distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
 
@@ -592,7 +609,7 @@
                 <arg value="${package.dir}/${package.macosx.name}.pkg" />
                 <arg value="${package.dir}/${package.macosx.name}.dmg" />
             </exec>
-
+            <echo file="${package.dir}/${package.macosx.name}.txt">distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
 
@@ -608,16 +625,24 @@
             <os family="windows" />
             <then>
                 <!--- Windows -->
+                <fileset id="upload.files" dir="${package.dir}">
+                    <include name="Arduino_win32.msi.txt"/>
+                </fileset>
+                <!--
                 <scp file="build/windows/package/Arduino_win32.msi"
-                     todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+                     todir="${username}:${password}@liquidware.com:~/ide_builds/" /> -->
             </then>
 
         <elseif>
             <os family="mac" />
             <then>
                 <!--- Mac -->
+                <fileset id="upload.files" dir="${package.dir}">
+                    <include name="Arduino_macosx.dmg.txt"/>
+                </fileset>
+                <!--
                 <scp file="build/macosx/package/Arduino_macosx.dmg"
-                     todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+                     todir="${username}:${password}@liquidware.com:~/ide_builds/" /> -->
             </then>
         </elseif>
 
@@ -625,12 +650,23 @@
             <os family="unix" />
             <then>
                 <!--- Linux -->
+                <fileset id="upload.files" dir="${package.dir}">
+                    <include name="Arduino_linux.tgz.txt"/>
+                </fileset>
+                <!--
                 <scp file="build/linux/package/Arduino_linux.tgz"
-                     todir="${username}:${password}@liquidware.com:~/ide_builds/" />
+                     todir="${username}:${password}@liquidware.com:~/ide_builds/" /> -->
             </then>
         </elseif>
-
         </if>
+        
+        <!-- Send the files -->
+        <ftp server="liquidware.org"
+             userid="${username}"
+             password="${password}"
+             remotedir="public_html/illuminatolabs/ide/">
+            <fileset refid="upload.files"/>
+        </ftp>
     </target>
 
 </project>
