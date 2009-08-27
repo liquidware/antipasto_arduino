@@ -71,7 +71,7 @@
 
     <target name="clean.cores">
         <!-- Clean Illuminato X Machina -->
-        <delete file="hardware/cores/ixm"/>
+        <delete dir="hardware/cores/ixm"/>
     </target>
 
 
