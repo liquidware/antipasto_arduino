@@ -69,6 +69,8 @@ import com.oroinc.text.regex.*;
 import com.apple.mrj.*;
 import gnu.io.*;
 
+import org.arduino.tools.AntRunner;
+
 public class Editor extends JFrame
   implements MRJAboutHandler, MRJQuitHandler, MRJPrefsHandler,
              MRJOpenDocumentHandler, IActiveGadgetChangedEventListener //, MRJOpenApplicationHandler
@@ -101,7 +103,7 @@ public class Editor extends JFrame
   String handleOpenPath;
   boolean handleNewShift;
   boolean handleNewLibrary;
-  
+
   boolean gadgetIsLoading = false;
 
   PageFormat pageFormat;
@@ -2213,13 +2215,13 @@ public class Editor extends JFrame
   }
 
   /**
-   * 
-   * 
+   *
+   *
    * @author christopher.ladden (8/20/2009)
-   * 
+   *
    * @param path the path the pde file.
-   * 
-   * @return String 
+   *
+   * @return String
    * Returns the path string , modified if needed
    */
   protected String pdeFileCheck(String path ) {
@@ -2254,16 +2256,16 @@ public class Editor extends JFrame
           path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
            //this.loadGadget(this.gadgetPanel.getActiveGadget());
           this.lastActiveGadgetPath = path;
-            
+
           try{
         	  //this.gadgetIsLoading = true;
         	  //sketch = new Sketch(this, path);
            	  }catch(Exception ex){
         		  ex.printStackTrace();
         	  }
-        	  
+
         	  //this.gadgetIsLoading = false;
-            
+
         	  this.gadgetPanel.setVisible(isGadgetFile);
 
             //gadgetPanel.show();
@@ -2278,12 +2280,12 @@ public class Editor extends JFrame
   }
 
   protected void handleSketchFileOpen(String path) {
-            
+
     // need to put this into the new/open menu
     //this.gadgetPanel.Unload();    //remove the gadget list and unload active module
-    
+
     /* Use the Boards menu with a std .pde file */
-    
+
      if(gadgetPanel.gadgetIsLoaded && !gadgetIsLoading){
     	 gadgetPanel.Unload();
          gadgetPanel.hide();
@@ -2295,7 +2297,7 @@ public class Editor extends JFrame
       } catch (Exception ex) {
           ex.printStackTrace();
       }
-            
+
 
   }
 
@@ -2319,7 +2321,7 @@ public class Editor extends JFrame
           handleDefaultFileOpen(path);
           return false; //The file is not supported
       }
-      
+
       //The file was supported, and opened okay.
       return true;
   }
@@ -2335,7 +2337,7 @@ public class Editor extends JFrame
           "The file \"" + file.getName() + "\" needs to be inside\n" +
           "a sketch folder named \"" + properParent + "\".\n" +
           "Create this folder, move the file, and continue?";
-        
+
         int result = JOptionPane.showOptionDialog(this,
                                                   prompt,
                                                   "Moving",
@@ -2344,7 +2346,7 @@ public class Editor extends JFrame
                                                   null,
                                                   options,
                                                   options[0]);
-        
+
         if (result == JOptionPane.YES_OPTION) {
           // create properly named folder
           File properFolder = new File(file.getParent(), properParent);
@@ -2359,7 +2361,7 @@ public class Editor extends JFrame
                throw new IOException("Couldn't create sketch folder");
             }
           } catch (IOException e) {
-               
+
           }
 
           // copy the sketch inside
@@ -2371,13 +2373,13 @@ public class Editor extends JFrame
           } catch (IOException e) {
               e.printStackTrace();
           }
-          
+
           // remove the original file, so user doesn't get confused
           origPdeFile.delete();
-        
+
           // update with the new path
           path = properPdeFile.getAbsolutePath();
-        
+
         } else if (result == JOptionPane.NO_OPTION) {
           return;
         }
@@ -2763,30 +2765,101 @@ public class Editor extends JFrame
     }
   }
 
-  protected void handleBurnBootloader(final String programmer) {
-    if(debugging)
-      doStop();
-    console.clear();
-    message("Burning bootloader to I/O Board (this may take a minute)...");
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        try {
-          Uploader uploader = new AvrdudeUploader();
-          if (uploader.burnBootloader(programmer)) {
-            message("Done burning bootloader.");
-          } else {
-            // error message will already be visible
-          }
-        } catch (RunnerException e) {
-          message("Error while burning bootloader.");
-          //e.printStackTrace();
-          error(e);
-        } catch (Exception e) {
-          e.printStackTrace();
+    /**
+     *
+     *  Uploads the the bootloader using the ANT buildfile targets
+     *  found in the core.
+     *
+     * @param target
+     *  The core target
+     *
+     * @return boolean
+     *  Returns true if the upload was successful
+     */
+    private boolean ANTBurnBootloader(Target target) {
+        AntRunner ant = new AntRunner();
+        String antTarget = Preferences.get("boards." +
+                                           Preferences.get("board") +
+                                           ".targets.bootloader.upload");
+        String uploadPort = (Base.isWindows() ? "\\\\.\\" : "") +
+                             Preferences.get("serial.port");
+
+        if (Preferences.getBoolean("upload.verbose")) {
+                ant.setOutputVerbose();
+        } else {
+                ant.setOutputQuiet();
         }
-        buttons.clear();
-      }});
+
+        // Run
+        ant.run(Compiler.getBuildFile(target).toString(),antTarget, new String[] {
+                        "build.dest",  Base.getBuildFolder().getAbsolutePath(),
+                        "sketch.name", sketch.name,
+                        "upload.port", uploadPort,
+                        });
+
+        // Wait to finish
+        ant.waitForCompletion();
+
+        return ant.getLastRunStatus();
   }
+
+    private boolean LegacyBurnBootloader(String programmer) {
+        try {
+            Uploader uploader = new AvrdudeUploader();
+            if (uploader.burnBootloader(programmer)) {
+                return true;
+            }
+        } catch (RunnerException e) {
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false; //shouldn't get here
+    }
+
+    protected void handleBurnBootloader(final String programmer) {
+        if (debugging)
+            doStop();
+        console.clear();
+        message("Burning bootloader to I/O Board (this may take a minute)...");
+        SwingUtilities.invokeLater(new Runnable() {
+                                       public void run() {
+                                           boolean result = false;
+
+                                           try {
+                                               Target target = new Target(System.getProperty("user.dir") + File.separator + "hardware" +
+                                                                          File.separator + "cores",
+                                                                          Preferences.get("boards." + Preferences.get("board") + ".build.core"));
+
+                                               //Check the programmer selection
+                                               if (programmer.indexOf("ant") == 0) {
+                                                   //check for a buildfile
+                                                   if (( Compiler.getBuildFile(target) != null)) {
+                                                       //let ant run the burn
+                                                       result = ANTBurnBootloader(target);
+                                                   } else {
+                                                       System.out.println("No buildFile found in " + target.getPath());
+                                                   }
+                                               } else {
+                                                   //legacy burn
+                                                   result = LegacyBurnBootloader(programmer);
+                                               }
+
+                                           } catch (Exception ex) {
+                                               ;
+                                           }
+
+                                           if (result) {
+                                               message("Done burning bootloader.");
+                                           } else {
+                                               message("Error burning bootloader.");
+                                           }
+
+                                           buttons.clear();
+                                       }
+                                   });
+    }
 
   public void highlightLine(int lnum) {
     if (lnum < 0) {

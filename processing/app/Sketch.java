@@ -1242,7 +1242,7 @@ public class Sketch {
 		// mainClassName = build(TEMP_BUILD_PATH, suggestedClassName);
 		mainClassName = build(target, tempBuildFolder.getAbsolutePath(),
 				this.name);
-		size(tempBuildFolder.getAbsolutePath(), name, target, this.name);
+		//size(tempBuildFolder.getAbsolutePath(), name, target, this.name);
 		// externalPaths is magically set by build()
 
 		if (!externalRuntime) { // only if not running externally already
@@ -1303,29 +1303,13 @@ public class Sketch {
 		// File codeFolder = new File(folder, "code");
 		if (codeFolder.exists()) {
 			externalRuntime = true;
-
-			// classPath += File.pathSeparator +
-			// Compiler.contentsToClassPath(codeFolder);
-			classPath =
-			// Compiler.contentsToClassPath(codeFolder) +
-			File.pathSeparator + classPath;
-
-			// codeFolderPackages =
-			// Compiler.packageListFromClassPath(classPath);
-			// codeFolderPackages =
-			// Compiler.packageListFromClassPath(codeFolder);
+			classPath = File.pathSeparator + classPath;
 			libraryPath = codeFolder.getAbsolutePath();
 
 			// get a list of .jar files in the "code" folder
 			// (class files in subfolders should also be picked up)
 			String codeFolderClassPath = Compiler
 					.contentsToClassPath(codeFolder);
-			// get list of packages found in those jars
-			// codeFolderPackages =
-			// Compiler.packageListFromClassPath(codeFolderClassPath);
-			// PApplet.println(libraryPath);
-			// PApplet.println("packages:");
-			// PApplet.printarr(codeFolderPackages);
 
 		} else {
 			// since using the special classloader,
@@ -1607,11 +1591,14 @@ public class Sketch {
 
 		// Check for a successful Sizer run
 		if (ant.getLastRunStatus() == true) {
-
 			// Configure
 			String buildFile = target.path + File.separator + "build.xml";
-			String uploadPort = (Base.isWindows() ? "\\\\.\\" : "")
-					+ Preferences.get("serial.port");
+			String uploadPort = (Base.isWindows() ? "\\\\.\\" : "")+
+					     Preferences.get("serial.port");
+			String antTarget = Preferences.get("boards." +
+					       Preferences.get("board") +
+					       ".targets.sketch.upload");
+
 			if (Preferences.getBoolean("upload.verbose")) {
 				ant.setOutputVerbose();
 			} else {
@@ -1619,9 +1606,10 @@ public class Sketch {
 			}
 
 			// Run
-			ant.run(buildFile, "upload.all", new String[] { "build.dest",
-					buildPath, "sketch.name", sketchName, "upload.port",
-					uploadPort });
+			ant.run(buildFile, antTarget, new String[] {
+					"build.dest", buildPath,
+					"sketch.name", sketchName,
+					"upload.port", uploadPort });
 
 			// Wait to finish
 			ant.waitForCompletion();

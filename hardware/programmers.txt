@@ -13,3 +13,9 @@ parallel.name=Parallel Programmer
 parallel.protocol=dapa
 parallel.force=true
 # parallel.delay=200
+
+ant.name=ANT Upload
+avrisp.communication=null
+avrisp.protocol=null
+
+

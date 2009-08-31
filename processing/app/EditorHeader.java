@@ -180,7 +180,6 @@ public class EditorHeader extends JPanel {
    * Usually called when a new sketch is opened.
    */
   public void rebuild() {
-    System.out.println("Rebuilding header...");
     rebuildHeaderBackground();
     rebuildTabs();
     revalidate();
@@ -276,14 +275,14 @@ public class EditorHeader extends JPanel {
     item.setAccelerator(ctrlAltLeft);
 
     // this didn't want to work consistently
-    
+
     menu.add(item);
 
     //item = Editor.newJMenuItem("Next Tab", ']', true);
     item = new JMenuItem("Next Tab");
     KeyStroke ctrlAltRight = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrlAlt);
     item.setAccelerator(ctrlAltRight);
-    
+
     menu.add(item);
 
     if (sketch != null) {
