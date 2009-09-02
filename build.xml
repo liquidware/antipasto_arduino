@@ -627,10 +627,8 @@
                 <!--- Windows -->
                 <fileset id="upload.files" dir="${package.dir}">
                     <include name="Arduino_win32.msi.txt"/>
+                    <include name="Arduino_win32.msi"/>
                 </fileset>
-                <!--
-                <scp file="build/windows/package/Arduino_win32.msi"
-                     todir="${username}:${password}@liquidware.com:~/ide_builds/" /> -->
             </then>
 
         <elseif>
@@ -639,10 +637,8 @@
                 <!--- Mac -->
                 <fileset id="upload.files" dir="${package.dir}">
                     <include name="Arduino_macosx.dmg.txt"/>
+                    <include name="Arduino_macosx.dmg"/>
                 </fileset>
-                <!--
-                <scp file="build/macosx/package/Arduino_macosx.dmg"
-                     todir="${username}:${password}@liquidware.com:~/ide_builds/" /> -->
             </then>
         </elseif>
 
@@ -652,10 +648,8 @@
                 <!--- Linux -->
                 <fileset id="upload.files" dir="${package.dir}">
                     <include name="Arduino_linux.tgz.txt"/>
+                    <include name="Arduino_linux.tgz"/>
                 </fileset>
-                <!--
-                <scp file="build/linux/package/Arduino_linux.tgz"
-                     todir="${username}:${password}@liquidware.com:~/ide_builds/" /> -->
             </then>
         </elseif>
         </if>

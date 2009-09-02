@@ -123,7 +123,6 @@ public class Editor extends JFrame
   JPanel rightWing;
   JLabel leftExpandLabel;
 
-
   // currently opened program
   public Sketch sketch;
 
@@ -156,6 +155,8 @@ public class Editor extends JFrame
   JMenuItem burnBootloader168DiecimilaParallelItem = null;
   JMenuItem burnBootloader168NGItem = null;
   JMenuItem burnBootloader168NGParallelItem = null;
+
+  JMenu boardsMenu;
 
   JMenu serialMenu;
   JMenu serialRateMenu;
@@ -629,9 +630,18 @@ public class Editor extends JFrame
                 Preferences.getInteger("last.window.height"));
     }
 
+    //Determine if the last board is still valid
+    String supportedBoard = "";
+    String lastBoard = Preferences.get("board");
+    for (Iterator i = Preferences.getSubKeys("boards"); i.hasNext(); ) {
+      supportedBoard = (String) i.next();
+      if (lastBoard.equals(supportedBoard)) {
+          break;
+      }
+    }
+    Preferences.set("board", supportedBoard);
 
     // last sketch that was in use, or used to launch the app
-
     if (Base.openedAtStartup != null) {
       handleOpen2(Base.openedAtStartup);
 
@@ -1032,23 +1042,6 @@ public class Editor extends JFrame
     item.addActionListener(new ActionListener() {
         synchronized public void actionPerformed(ActionEvent e) {
           new AutoFormat(Editor.this).show();
-
-          /*
-          Jalopy jalopy = new Jalopy();
-          jalopy.setInput(getText(), sketch.current.file.getAbsolutePath());
-          StringBuffer buffer = new StringBuffer();
-          jalopy.setOutput(buffer);
-          jalopy.setInspect(false);
-          jalopy.format();
-          setText(buffer.toString(), 0, 0);
-
-          if (jalopy.getState() == Jalopy.State.OK)
-            System.out.println("successfully formatted");
-          else if (jalopy.getState() == Jalopy.State.WARN)
-            System.out.println(" formatted with warnings");
-          else if (jalopy.getState() == Jalopy.State.ERROR)
-            System.out.println(" could not be formatted");
-          */
         }
       });
     menu.add(item);
@@ -1089,15 +1082,18 @@ public class Editor extends JFrame
     */
     menu.addSeparator();
 
-    JMenu boardsMenu = new JMenu("Board");
+    boardsMenu = new JMenu("Board");
     ButtonGroup boardGroup = new ButtonGroup();
     for (Iterator i = Preferences.getSubKeys("boards"); i.hasNext(); ) {
       String board = (String) i.next();
-      Action action = new BoardMenuAction(board);
-      item = new JRadioButtonMenuItem(action);
+      item = new JRadioButtonMenuItem();
+      Action action = new BoardMenuAction(board, item);
+      item.setAction(action);
+      
       String selectedBoard = Preferences.get("board");
-      if (board.equals(Preferences.get("board")))
-        item.setSelected(true);
+      if (board.equals(Preferences.get("board"))) {
+        action.actionPerformed(null);
+      }
       boardGroup.add(item);
       boardsMenu.add(item);
     }
@@ -1175,22 +1171,16 @@ public class Editor extends JFrame
 
   class BoardMenuAction extends AbstractAction {
     private String board;
-    public BoardMenuAction(String board) {
+    private JMenuItem menuItem;
+    public BoardMenuAction(String board, JMenuItem menuItem) {
       super(Preferences.get("boards." + board + ".name"));
       this.board = board;
+      this.menuItem = menuItem;
     }
     public void actionPerformed(ActionEvent actionevent) {
       System.out.println("Switching to " + board);
       Preferences.set("board", board);
-      try {
-        //LibraryManager libraryManager = new LibraryManager();
-        //libraryManager.rebuildAllBuilt();
-      } catch (Exception e) {
-        e.printStackTrace();
-      //} catch (RunnerException e) {
-      //  message("Error rebuilding libraries...");
-      //  error(e);
-      }
+      menuItem.setSelected(true);
     }
   }
 
