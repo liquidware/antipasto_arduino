@@ -235,6 +235,8 @@ public class Preferences {
     }
   }
 
+    JPanel myPanel;
+    JList prefPane;
 
   public Preferences() {
 
@@ -545,6 +547,33 @@ public class Preferences {
     externalEditorBox.setSelected(getBoolean("editor.external"));
     checkUpdatesBox.setSelected(getBoolean("update.check"));
 
+    //myPanel = new JPanel();
+    dialog = new JFrame("Preferences");
+    dialog.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+    dialog.setLocation((screen.width - wide) / 2,
+                      (screen.height - high) / 2);
+
+    dialog.pack(); // get insets
+    Insets insets = dialog.getInsets();
+    dialog.setSize(wide + insets.left + insets.right,
+                  high + insets.top + insets.bottom);
+
+    //Pref Pane
+    prefPane = new PreferencesView(table);
+    JScrollPane scrollPane = new JScrollPane(prefPane);
+    scrollPane.setVisible(true);
+    scrollPane.setPreferredSize(new Dimension(dialog.getWidth()-20,280));
+    //scrollPane.setVerticalScrollBarPolicy();
+
+    //Info Pane
+    JPanel prefInfo = new JPanel();
+    JLabel prefLocLabel = new JLabel(preferencesFile.getAbsolutePath());
+    prefInfo.add(prefLocLabel);
+
+    dialog.add(prefInfo);
+    dialog.add(scrollPane);
     dialog.show();
   }
 
