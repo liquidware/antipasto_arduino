@@ -887,13 +887,13 @@ public class Editor extends JFrame
       });
     menu.add(saveMenuItem);
 
-//    saveAsMenuItem = newJMenuItem("Save As...", 'S', true);
-//    saveAsMenuItem.addActionListener(new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//          handleSaveAs();
-//        }
-//      });
-//    menu.add(saveAsMenuItem);
+    saveAsMenuItem = newJMenuItem("Save As...", 'S', true);
+    saveAsMenuItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handleSaveAs();
+        }
+      });
+    menu.add(saveAsMenuItem);
 
     item = newJMenuItem("Upload to I/O Board", 'U');
     item.addActionListener(new ActionListener() {
@@ -2466,70 +2466,37 @@ public class Editor extends JFrame
   }
 
 
-  public void handleSaveAs() {
-    doStop();
+  public boolean handleSaveAs() {
+
+    handleStop();
     buttons.activate(EditorButtons.SAVE);
-    final GadgetPanel gp = this.gadgetPanel;
-    final Editor edit = this;
-    SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          message("Saving...");
-          try {
-			sketch.save();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-          try {
-              JFrame dialog;
-              dialog = new JFrame("Preferences");
-              dialog.setResizable(false);
 
-              javax.swing.filechooser.FileFilter filter[] = new javax.swing.filechooser.FileFilter[1];
-              filter[0] = new GadgetFileFilter();
+    message("Saving...");
+    try {
+      /* Gadget file check */
+      if (gadgetPanel.getActiveGadget() != null) {
+          message("Save as doesn't work for Gadget files, yet");
+          return false;
+      }
 
-              File dflt = new File(Sketchbook.getSketchbookPath());
-              File file = Base.selectFile("Save File as...",
-                        dflt,
-                        dialog,
-                        filter);
+      /* Otherwise, save the sketch file */
+      if (sketch.saveAs()) {
+        message("Done Saving.");
+      } else {
+        message("Save Canceled.");
+        return false;
+      }
 
-              /* Error checking and formatting */
-              if (file == null) {
-                return;
-              }
-						String newParentDir = file.getParent();
-						String newName = file.getName();
-						if (newName != null){
-							String fileName;
-							if(newName.endsWith(".pde")){
-								fileName = newName;
-								newName = newName.substring(0, newName.length() - 4);
-							}else{
-								fileName = newName + ".pde";
-							}
-							//save the gadget file
-							GadgetFactory fact = new GadgetFactory();
-							File newFile = fact.copyGadget(gp.getActiveGadget(), newParentDir , newName);
-							gp.loadGadget(newFile);
-							gp.saveCurrentGadget();
+    } catch (Exception e) {
+      // show the error as a message in the window
+      error(e);
 
-        		  }else{
-		            if (sketch.saveAs()) {
-		              message("Done Saving.");
-		              // Disabling this for 0125, instead rebuild the menu inside
-		              // the Save As method of the Sketch object, since that's the
-		              // only one who knows whether something was renamed.
-		              //sketchbook.rebuildMenusAsync();
-		            } else {
-		              message("Save Cancelled.");
-		            }
-        		  }
-          } catch (Exception e) {
-            // show the error as a message in the window
-            error(e);
-          }
-          buttons.clear();
-        }});
+    } finally {
+      // make sure the toolbar button deactivates
+        buttons.clear();
+    }
+
+    return true;
   }
 
 
