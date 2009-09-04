@@ -49,11 +49,8 @@ public class LibraryManager {
     libDir = new File(
       ((!Base.isMacOS()) ? "" : userDir) + "hardware" + File.separator +
       "libraries");
-    target = new Target(
-      System.getProperty("user.dir") + File.separator + "hardware" +
-      File.separator + "cores",
-      Preferences.get("boards." + Preferences.get("board") + ".build.core"));
-    refreshLibraries();
+
+      refreshLibraries();
   }
   
   public Target getTarget()

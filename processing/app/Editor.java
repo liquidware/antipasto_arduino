@@ -878,6 +878,7 @@ public class Editor extends JFrame
 
 
     menu.add(sketchbook.getOpenMenu());
+    menu.add(sketchbook.getExamplesMenu());
 
     saveMenuItem = newJMenuItem("Save", 'S');
     saveMenuItem.addActionListener(new ActionListener() {

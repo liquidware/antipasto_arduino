@@ -422,7 +422,24 @@ public class Sketchbook {
     } catch (IOException e) {
       e.printStackTrace();
     }
-  
+  }
+
+
+  public JMenu getOpenMenu() {
+    if (openMenu == null) rebuildMenus();
+    return openMenu;
+  }
+
+  /**
+   * Populate an Examples Menu from the disk
+   * 
+   * @author christopher.ladden (9/4/2009)
+   * 
+   * @return JMenu 
+   */
+  public JMenu getExamplesMenu() {
+    JMenu examplesMenu = new JMenu("Examples");
+
     ActionListener listener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           editor.handleOpen(e.getActionCommand());
@@ -431,33 +448,13 @@ public class Sketchbook {
 
     try {
       LibraryManager libManager = new LibraryManager();
-      JMenu examplesMenu = new JMenu("Examples");
       addSketches(examplesMenu, examplesFolder);
       libManager.populateExamplesMenu(examplesMenu, listener);
-      menu.add(examplesMenu);
     } catch (IOException e) {
       e.printStackTrace();
     }
 
-    /*
-    // don't do this until it's finished
-    // libraries don't show up as proper sketches anyway
-    try {
-      if (Preferences.getBoolean("export.library")) {
-        JMenu librariesMenu = new JMenu("Libraries");
-        addSketches(librariesMenu, librariesFolder);
-        menu.add(librariesMenu);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    */
-  }
-
-
-  public JMenu getOpenMenu() {
-    if (openMenu == null) rebuildMenus();
-    return openMenu;
+    return examplesMenu;
   }
 
 
