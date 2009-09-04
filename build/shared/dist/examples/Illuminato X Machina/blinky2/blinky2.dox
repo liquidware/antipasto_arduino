@@ -1,0 +1,8 @@
+/**
+  \example blinky2.cpp 
+
+  Here's a slightly 'neatened up' version of original 'blinky sketch',
+  using a few more SFB-native calls.  Just for variety, it blinks the
+  blue portion in the SFB's RGB (Red-Green-Blue) LED.
+
+ */

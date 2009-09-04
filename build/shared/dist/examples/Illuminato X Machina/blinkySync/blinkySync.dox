@@ -1,0 +1,17 @@
+/**
+  \example blinkySync.cpp 
+
+  This is a minimal 'LED synchronization' sketch.  This sketch is
+  typically preloaded on new IXM cells.
+
+  Note there are circumstances -- certain grid shapes and initial
+  conditions -- where this sketch will not work very well.  And, there
+  many other ways to synchronize IXM's -- many \e better ways to do
+  so, depending on what one means by "better".  (The primary virtue of
+  this one is code simplicity.)
+
+  For more information about synchronization in general, Steve
+  Strogatz' book \e Sync (ISBN:0786868449) is a wide-ranging and
+  easy-to-read introduction to the subject.
+
+ */

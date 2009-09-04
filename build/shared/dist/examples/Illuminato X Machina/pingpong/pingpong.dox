@@ -1,0 +1,19 @@
+/**
+  \example pingpong.cpp 
+
+  Here's a complete sketch showing how to respond to the arrival of a
+  packet.  When this sketch sees a "ping" packet, it responds with
+  "pong".  
+
+  Note that no explicit sketch code is needed to perform the reading
+  -- the core software collects input bytes as they arrive and
+  assembles them into packets.  Once a packet is complete, some
+  appropriate packet handler function -- if any -- is called to
+  respond to the packet.
+
+  Note also that this particular sketch \e responds to, but never
+  actually \e prints, a \c ping packet.  So if a bunch of IXMs were
+  plugged together all running this sketch, they would all just sit
+  there mute, waiting for somebody or something else to \c ping them.
+
+ */
