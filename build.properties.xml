@@ -21,30 +21,30 @@
 <project name="build.properties" basedir="." default="...">
 
 
-    <property name="build.version"    value="0.8.18"/>
-    
+    <property name="build.version"    value="0.8.19"/>
+
     <!--
         ===================================================================
                             OS specific properties
         ===================================================================
     -->
     <if>
-        <os family="windows" /> 
+        <os family="windows" />
         <then>
             <!--- Windows family properties here -->
             <property name="build.arch" value="windows" />
         </then>
 
     <elseif>
-        <os family="mac" /> 
+        <os family="mac" />
         <then>
             <!--- Mac properties here -->
             <property name="build.arch" value="macosx" />
         </then>
     </elseif>
-    
+
     <elseif>
-        <os family="unix" /> 
+        <os family="unix" />
         <then>
             <!--- Unix family properties here -->
             <property name="build.arch" value="linux" />
@@ -52,7 +52,7 @@
     </elseif>
 
     </if>
-    
+
     <!--
         ===================================================================
                             Common Properties
