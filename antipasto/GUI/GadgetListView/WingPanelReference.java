@@ -80,8 +80,7 @@ public class WingPanelReference extends JPanel {
 	 * @param width The width of the panel
 	 * @param height The height of the panel
 	 */
-	public WingPanelReference(String url,
-				  Object wingFooter,
+	public WingPanelReference(Object wingFooter,
 				  int width, int height){
 
 	    this.wingFooter = (WingFooter)wingFooter;
@@ -104,9 +103,6 @@ public class WingPanelReference extends JPanel {
 	    /* Assemble the Panel */
 	    add(headerPanel, BorderLayout.NORTH);
 	    add(scrollPane, BorderLayout.CENTER);
-
-	    /* Set the page*/
-	    setPage(url);
 	}
 
 	/**
@@ -184,10 +180,11 @@ public class WingPanelReference extends JPanel {
             textArea.addHyperlinkListener(listener);
             textArea.setVisible(true);
             textArea.setEditable(false);
+	    textArea.setEditorKit(new HTMLEditorKit());
 
             scrollPane = new JScrollPane(textArea);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setVisible(true);
 	}
 
@@ -197,12 +194,15 @@ public class WingPanelReference extends JPanel {
 	 */
 	public void setPage(String url) {
 	    try {
+		wingFooter.setText("Loading...");
 		textArea.setPage(url);
 		htmlHistory.add(textArea.getPage());
 		System.out.println(htmlHistory.get(htmlHistory.size()-1));
 	    } catch (IOException ioe) {
 		System.out.println("Error Loading: " + ioe);
+		
 	    }
+	    wingFooter.setText("Done.");
 	}
 
 	/**

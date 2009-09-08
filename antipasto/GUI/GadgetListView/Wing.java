@@ -69,7 +69,7 @@ IActiveGadgetChangedEventListener, FocusListener, ISelectedItemListener {
     private JPanel     wingBody;
     private WingFooter wingFooter;
 
-    private WingPanelReference wingPanelReference;
+    public WingPanelReference wingPanelReference;
     private WingPanelScripts   wingPanelScripts;
     //private WingPanelAppStore wingPanelAppStore;
 
@@ -185,8 +185,7 @@ IActiveGadgetChangedEventListener, FocusListener, ISelectedItemListener {
 
 
         /* Build each panel */
-        wingPanelReference =  new WingPanelReference("http://livingcomputation.com/s/doc/examples.html",
-                                                     wingFooter,
+        wingPanelReference =  new WingPanelReference(wingFooter,
                                                      cachedWidth,
                                                      cachedHeight);
 
@@ -273,7 +272,8 @@ IActiveGadgetChangedEventListener, FocusListener, ISelectedItemListener {
 
     public void componentResized(ComponentEvent arg0) {
         // TODO Auto-generated method stub
-
+        setLocation();
+        repaint();
     }
 
     public void componentShown(ComponentEvent arg0) {

@@ -2,6 +2,7 @@
 
 template.name=Template (not active)
 template.build.core=template
+template.reference=hardware/cores/arduino/reference/index.html
 
 #ANT core targets
 template.targets.sketch.verify=build.all
@@ -12,6 +13,7 @@ template.targets.bootloader.upload=upload.bootloader
 
 ixm.name=Illuminato X Machina
 ixm.build.core=ixm
+ixm.reference=hardware/cores/arduino/reference/index.html
 
 #ANT core targets
 ixm.targets.sketch.verify=build.all

@@ -193,8 +193,14 @@
             <copy todir="${build.dir}">
                 <fileset dir="build/shared/dist"/>
             </copy>
+            
+            <!-- Extract the Arduino Reference -->
+            <unzip src="build/shared/reference.zip" dest="${build.dir}/hardware/cores/arduino">
+                <patternset>
+                    <exclude name="**/*.css"/>
+                </patternset>
+            </unzip>
 
-            <unzip src="build/shared/reference.zip" dest="${build.dir}" />
             <unzip src="build/shared/jruby.zip"     dest="${build.dir}/hardware/tools" />
         </sequential>
     </macrodef>
