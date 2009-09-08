@@ -30,6 +30,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.JCheckBox;
 
 import antipasto.ModuleRules.IOkListener;
 import antipasto.ModuleRules.ISerialListener;
@@ -79,6 +80,7 @@ public class EditorStatus extends JPanel implements ActionListener {
   JTextField editField;
   JTextField serialField;
   JComboBox serialRates;
+  JCheckBox newlineChkBox;
 
   //Thread promptThread;
   int response;
@@ -198,6 +200,7 @@ public class EditorStatus extends JPanel implements ActionListener {
     sendButton.setVisible(true);
     serialRates.setVisible(true);
     serialField.setVisible(true);
+    newlineChkBox.setVisible(true);
     serialField.setText("");
     serialField.requestFocus();
 
@@ -207,32 +210,15 @@ public class EditorStatus extends JPanel implements ActionListener {
   public void unserial()
   {
     sendButton.setVisible(false);
+    newlineChkBox.setVisible(false);
     serialField.setVisible(false);
     serialRates.setVisible(false);
     empty();
   }
 
-
-  /*
-  public void update() {
-    Graphics g = this.getGraphics();
-    try {
-      setBackground(bgcolor[mode]);
-    } catch (NullPointerException e) { } // if not ready yet
-    if (g != null) paint(g);
-  }
-
-  public void update(Graphics g) {
-    paint(g);
-  }
-  */
-
-
   public void paintComponent(Graphics screen) {
-    //if (screen == null) return;
-    if (yesButton == null) setup();
 
-    //System.out.println("status.paintComponent");
+    if (yesButton == null) setup();
 
     Dimension size = getSize();
     if ((size.width != sizeW) || (size.height != sizeH)) {
@@ -310,7 +296,7 @@ public class EditorStatus extends JPanel implements ActionListener {
       add(noButton);
       add(cancelButton);
       add(okButton);
-      add(sendButton);
+
 
       yesButton.setVisible(false);
       noButton.setVisible(false);
@@ -419,6 +405,67 @@ public class EditorStatus extends JPanel implements ActionListener {
       add(editField);
       editField.setVisible(false);
 
+      //this.setLayout(new FlowLayout(FlowLayout.LEFT,10,5));
+
+      initSerialRates();
+      initNewLineCheckBox();
+      initSerialField();
+
+      add(serialRates);
+      add(newlineChkBox);
+      add(serialField);
+      add(sendButton);
+
+    }
+  }
+
+  public void initSerialRates() {
+
+     String[] serialRateStrings = {
+        "300","1200","2400","4800","9600","14400",
+        "19200","28800","38400","57600","115200"
+      };
+
+      //Serial Rates
+      serialRates = new JComboBox();
+
+      if (Base.isMacOS())
+        serialRates.setBackground(bgcolor[SERIAL]);
+
+      for (int i = 0; i < serialRateStrings.length; i++)
+        serialRates.addItem(serialRateStrings[i] + " baud");
+
+      serialRates.setSelectedItem(Preferences.get("serial.debug_rate") + " baud");
+      serialRates.addActionListener(this);
+      serialRates.setVisible(false);
+
+  }
+
+  public void initNewLineCheckBox() {
+
+      newlineChkBox = new JCheckBox("Send New Line",
+                                    Preferences.getBoolean("serial.sendNewLine"));
+      newlineChkBox.setBackground(bgcolor[SERIAL]);
+      newlineChkBox.setForeground(new Color(0xFF,0xFF,0xFF));
+
+      ActionListener newlineChkBoxListener = new ActionListener() {
+          public void actionPerformed(ActionEvent ev) {
+            JCheckBox checkbox = (JCheckBox)ev.getSource();
+            if (checkbox.isSelected()) {
+              Preferences.set("serial.sendNewLine","true");
+            } else {
+              Preferences.set("serial.sendNewLine","false");
+            }
+          }
+      };
+
+      newlineChkBox.addActionListener(newlineChkBoxListener);
+      newlineChkBox.setVisible(false);
+  }
+
+  public void initSerialField() {
+
+      //Serial Field
       serialField = new JTextField();
       serialField.addActionListener(this);
 
@@ -428,33 +475,17 @@ public class EditorStatus extends JPanel implements ActionListener {
 
           if (c == KeyEvent.VK_ENTER) {  // accept the input
             editor.serialPort.write(serialField.getText());
+            if (Preferences.getBoolean("serial.sendNewLine")) {
+              editor.serialPort.write('\n');
+            }
             event.consume();
             serialField.setText("");
           }
         }});
 
-      add(serialField);
+      serialField.setPreferredSize(new Dimension(100,20));
       serialField.setVisible(false);
 
-      String[] serialRateStrings = {
-        "300","1200","2400","4800","9600","14400",
-        "19200","28800","38400","57600","115200"
-      };
-
-      serialRates = new JComboBox();
-
-      if (Base.isMacOS())
-        serialRates.setBackground(bgcolor[SERIAL]);
-
-      for (int i = 0; i < serialRateStrings.length; i++)
-        serialRates.addItem(serialRateStrings[i] + " baud");
-
-      serialRates.setSelectedItem(
-        Preferences.get("serial.debug_rate") + " baud");
-      serialRates.addActionListener(this);
-      add(serialRates);
-      serialRates.setVisible(false);
-    }
   }
 
 
@@ -466,15 +497,6 @@ public class EditorStatus extends JPanel implements ActionListener {
     int noLeft     = cancelLeft - eachButton;
     int yesLeft    = noLeft     - eachButton;
 
-    yesButton.setLocation(yesLeft, top);
-    noButton.setLocation(noLeft, top);
-    cancelButton.setLocation(cancelLeft, top);
-    editField.setLocation(yesLeft - Preferences.BUTTON_WIDTH, top);
-    serialField.setLocation(yesLeft - Preferences.BUTTON_WIDTH, top);
-    okButton.setLocation(noLeft, top);
-    serialRates.setLocation(0, top);
-    sendButton.setLocation(cancelLeft, top);
-
     yesButton.setSize(      Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
     noButton.setSize(       Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
     cancelButton.setSize(   Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
@@ -483,6 +505,17 @@ public class EditorStatus extends JPanel implements ActionListener {
     serialRates.setSize(  3*Preferences.BUTTON_WIDTH/2, Preferences.BUTTON_HEIGHT);
     editField.setSize(    2*Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
     serialField.setSize(  3*Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    newlineChkBox.setSize((int)(1.5*Preferences.BUTTON_WIDTH), Preferences.BUTTON_HEIGHT);
+
+    yesButton.setLocation(yesLeft, top);
+    noButton.setLocation(noLeft, top);
+    cancelButton.setLocation(cancelLeft, top);
+    editField.setLocation(yesLeft - Preferences.BUTTON_WIDTH, top);
+    serialField.setLocation(yesLeft - Preferences.BUTTON_WIDTH, top);
+    okButton.setLocation(noLeft, top);
+    serialRates.setLocation(0, top);
+    newlineChkBox.setLocation(serialRates.getWidth() + 10, top);
+    sendButton.setLocation(cancelLeft, top);
   }
 
 
@@ -530,6 +563,9 @@ public class EditorStatus extends JPanel implements ActionListener {
       unedit();
     } else if (e.getSource() == sendButton) {
       editor.serialPort.write(serialField.getText());
+      if (Preferences.getBoolean("serial.sendNewLine")) {
+        editor.serialPort.write('\n');
+      }
       serialField.setText("");
     } else if (e.getSource() == serialRates) {
       String wholeString = (String) serialRates.getSelectedItem();

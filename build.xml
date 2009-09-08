@@ -92,7 +92,7 @@
         <!-- Get Illuminato X Machina Core -->
         <get src="http://livingcomputation.com/ixm/pub/sfb-latest.zip"
              dest="hardware/cores/sfb-latest.zip"/>
-        <unzip src="hardware/cores/sfb-latest.zip" 
+        <unzip src="hardware/cores/sfb-latest.zip"
                dest="hardware/cores"/>
         <move file="hardware/cores/SFB" tofile="hardware/cores/ixm"/>
         <delete file="hardware/cores/sfb-latest.zip"/>
@@ -269,7 +269,7 @@
     <target name="get.OS">
         <!-- Get Shared files -->
         <setup-shared/>
-        
+
         <!-- Get OS Specific files -->
         <if>
             <os family="windows" />
@@ -356,7 +356,7 @@
             <os family="unix" />
             <then>
                 <!--- Linux -->
-                
+
                 <set-permissions dir="${build.dir}"/>
                 <chmod file="${build.dir}/Arduino" perm="ugo+rx" />
             </then>
@@ -449,7 +449,7 @@
             <os family="windows" />
             <then>
                 <!--- Windows -->
-                <package-windows/>
+                <package-windows-zip/>
             </then>
 
         <elseif>
@@ -459,7 +459,7 @@
                 <package-macosx/>
             </then>
         </elseif>
-        
+
         <elseif>
             <os family="unix" />
             <then>
@@ -471,7 +471,27 @@
         </if>
     </target>
 
-    <macrodef name="package-windows" >
+    <macrodef name="package-windows-zip" >
+        <sequential>
+            <property name="package.windows.name" value="Arduino_win32.zip" />
+            <delete dir="${package.dir}" />
+
+            <!-- Move into a temporary area to create the zip -->
+            <copy todir="build/windows/package/Arduino">
+                <fileset dir="build/windows/work" />
+            </copy>
+
+            <!-- Create the zip package -->
+            <zip destfile="${package.dir}/${package.windows.name}"
+                 basedir="${package.dir}"
+                 includes="Arduino/*"/>
+            <echo file="${package.dir}/${package.windows.name}.txt">${line.separator}
+                distribution.name=Antipasto Arduino${line.separator}
+                distribution.version=${build.version}${line.separator}</echo>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="package-windows-msi" >
         <sequential>
             <property name="package.windows.name" value="Arduino_win32.msi" />
 
@@ -533,7 +553,9 @@
                     <arg value="${package.linux.name}" />
                     <arg value="Arduino" />
             </exec>
-            <echo file="${package.dir}/${package.linux.name}.txt">distribution.version=${build.version}</echo>
+            <echo file="${package.dir}/${package.linux.name}.txt">${line.separator}
+                distribution.name=Antipasto Arduino${line.separator}
+                distribution.version=${build.version}${line.separator}</echo>
         </sequential>
     </macrodef>
 
@@ -556,13 +578,13 @@
                 <arg value="-d" />
                 <arg value="${package.dir}/Package_Root/usr/local" />
             </exec>
-            
+
             <exec executable="unzip" searchpath="true">
                 <arg value="-X" />
                 <arg value="${dist.dir}/tools/osx_libraries.zip" />
                 <arg value="-d" />
                 <arg value="${package.dir}/Package_Root/usr/local" />
-            </exec>            
+            </exec>
 
             <exec executable="mv" searchpath="true">
                 <arg value="${build.dir}" />
@@ -609,7 +631,9 @@
                 <arg value="${package.dir}/${package.macosx.name}.pkg" />
                 <arg value="${package.dir}/${package.macosx.name}.dmg" />
             </exec>
-            <echo file="${package.dir}/${package.macosx.name}.txt">distribution.version=${build.version}</echo>
+            <echo file="${package.dir}/${package.macosx.name}.txt">${line.separator}
+                distribution.name=Antipasto Arduino${line.separator}
+                distribution.version=${build.version}${line.separator}</echo>
         </sequential>
     </macrodef>
 
@@ -626,8 +650,8 @@
             <then>
                 <!--- Windows -->
                 <fileset id="upload.files" dir="${package.dir}">
-                    <include name="Arduino_win32.msi.txt"/>
-                    <include name="Arduino_win32.msi"/>
+                    <include name="Arduino_win32.zip.txt"/>
+                    <include name="Arduino_win32.zip"/>
                 </fileset>
             </then>
 
@@ -653,7 +677,7 @@
             </then>
         </elseif>
         </if>
-        
+
         <!-- Send the files -->
         <ftp server="liquidware.org"
              userid="${username}"

@@ -3,7 +3,7 @@
 /*
   Part of the Arduino project - http://arduino.berlios.de
 
-  
+
 
   Based on processing http://www.processing.org
   Copyright (c) 2004-05 Ben Fry and Casey Reas
@@ -63,7 +63,7 @@ import processing.core.*;
 public class Base {
   static final String DIST_NAME = "Antipasto Arduino";
   static final int VERSION = 0;
-  static final String VERSION_NAME = "0.8.18";
+  static final String VERSION_NAME = "0.8.20";
 
   /**
    * Path of filename opened on the command line,
@@ -78,7 +78,7 @@ public class Base {
   static public void main(String args[]) {
 
     pluginloader = new PluginLoader();
-    
+
     // make sure that this is running on java 1.4
 
     if (PApplet.javaVersion < 1.4f) {
@@ -158,8 +158,8 @@ public class Base {
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       JFrame frame = new JFrame("Gadget Panel");
       frame.getContentPane().setLayout(new BorderLayout());
-      
-      
+
+
     // build the editor object
     editor = new Editor();
 
@@ -172,11 +172,11 @@ public class Base {
     editor.restorePreferences();
 
     frame.setSize(600, 600);
-    
-    
-    
-    
-  
+
+
+
+
+
     if (Preferences.getBoolean("update.check")) {
       new UpdateCheck(editor);
     }
@@ -582,7 +582,7 @@ public class Base {
       }
     }
     return null;
-  }  
+  }
 
   /**
    * Implementation for choosing directories that handles both the
