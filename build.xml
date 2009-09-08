@@ -338,7 +338,7 @@
                 </move>
                 <set-permissions dir="${build.dir}" />
 
-                <!-- Remove the x86_64 Slice, so we always run in 32 bit mode -->
+                <!-- Remove the x86_64 Slice, so we always run in 32 bit mode 
                 <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="lipo" searchpath="true">
                     <arg line="-remove x86_64 -output Arduino_32 Arduino"/>
                 </exec>
@@ -348,7 +348,7 @@
                 <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="mv" searchpath="true">
                     <arg line="Arduino_32 Arduino"/>
                 </exec>
-
+-->
             </then>
         </elseif>
 
