@@ -191,6 +191,9 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     public GadgetPanel gadgetPanel ;
     public Wing referencePanel;
 
+    private EventListenerList activeBoardChangedEventList = new EventListenerList();
+
+
     public PluginPanel pluginPanel = new PluginPanel(Base.pluginloader);
 
     //static Properties keywords; // keyword -> reference html lookup
@@ -300,7 +303,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         leftWing.setLayout(new BorderLayout());
         leftWing.add(leftExpandLabel, BorderLayout.CENTER);
 
-
+        
 
         leftWing.addMouseListener(new MouseListener() {
                                       public void mouseClicked(MouseEvent arg0) {
@@ -326,8 +329,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                           // TODO Auto-generated method stub
                                       }
                                   });
-
-        referencePanel = new Wing(this);
 
         imageListPanel = new ImageListPanel(this.gadgetPanel, new FlashTransfer());
 
@@ -357,40 +358,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         cl.show(centerPanel, CODEEDITOR);
 
-
-
-        rightWing = new JPanel();
-        rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
-        rightWing.setOpaque(true);
-        rightWing.setSize(15, 0);
-        rightWing.setPreferredSize(new Dimension(10, 0));
-        rightWing.setLayout(new BorderLayout());
-        final JLabel rightWingLabel = new JLabel(">");
-        rightWing.add(rightWingLabel, BorderLayout.CENTER);
-        rightWing.addMouseListener(new MouseListener() {
-
-                                       public void mouseClicked(MouseEvent arg0) {
-                                           if (referencePanel.isVisible()) {
-                                               referencePanel.setVisible(false);
-                                               rightWingLabel.setText(">");
-                                           } else {
-                                               referencePanel.setVisible(true);
-                                               rightWingLabel.setText("<");
-                                           }
-                                       }
-
-                                       public void mouseEntered(MouseEvent arg0) {
-                                       }
-
-                                       public void mouseExited(MouseEvent arg0) {
-                                       }
-
-                                       public void mousePressed(MouseEvent arg0) {
-                                       }
-
-                                       public void mouseReleased(MouseEvent arg0) {
-                                       }
-                                   });
+        buildReferencePanel();
 
         editorSection.add(leftWing, BorderLayout.WEST);
         editorSection.add(centerPanel, BorderLayout.CENTER);
@@ -523,6 +491,47 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
 
 
+    }
+
+
+
+    public void buildReferencePanel() {
+
+        referencePanel = new Wing(this);
+        addActiveBoardChangedEventListener(referencePanel);
+
+        rightWing = new JPanel();
+        rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
+        rightWing.setOpaque(true);
+        rightWing.setSize(15, 0);
+        rightWing.setPreferredSize(new Dimension(10, 0));
+        rightWing.setLayout(new BorderLayout());
+        final JLabel rightWingLabel = new JLabel(">");
+        rightWing.add(rightWingLabel, BorderLayout.CENTER);
+        rightWing.addMouseListener(new MouseListener() {
+
+                                       public void mouseClicked(MouseEvent arg0) {
+                                           if (referencePanel.isVisible()) {
+                                               referencePanel.setVisible(false);
+                                               rightWingLabel.setText(">");
+                                           } else {
+                                               referencePanel.setVisible(true);
+                                               rightWingLabel.setText("<");
+                                           }
+                                       }
+
+                                       public void mouseEntered(MouseEvent arg0) {
+                                       }
+
+                                       public void mouseExited(MouseEvent arg0) {
+                                       }
+
+                                       public void mousePressed(MouseEvent arg0) {
+                                       }
+
+                                       public void mouseReleased(MouseEvent arg0) {
+                                       }
+                                   });        
     }
 
 
@@ -1168,39 +1177,10 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             System.out.println("Switching to " + board);
             Preferences.set("board", board);
             menuItem.setSelected(true);
-            boardChangePostProcess();
+            onActiveBoardChange(new ActiveBoardObject(this,
+                                         /* name */   Preferences.get("boards." + board + ".name"),
+                                 /* referenceURL */   Preferences.get("boards." + Preferences.get("board") + ".reference")));
         }
-    }
-
-    /**
-     * The function does any post processing after a board change is
-     * called. 
-     * 
-     * @author christopher.ladden (9/8/2009)
-     */
-    private void boardChangePostProcess() {
-        loadBoardReference();
-    }
-
-    /**
-     * This function loads the reference URL specified in the 
-     * boards.txt file. 
-     * 
-     * @author christopher.ladden (9/8/2009)
-     */
-    private void loadBoardReference() {
-
-        /* Assign the reference pane URL */
-        try {
-            URL referenceURL = new URL("file:/" + System.getProperty("user.dir") + File.separator +
-                                       Preferences.get("boards." + Preferences.get("board") + ".reference"));
-            if ( (referenceURL != null) && (referencePanel != null)) {
-                referencePanel.wingPanelReference.setPage(referenceURL.toString()); 
-            }
-        } catch (Exception ex) {
-            System.out.println(Preferences.get("board") + ": Invalid reference URL format");
-        }
-
     }
 
     /**
@@ -1210,8 +1190,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
      * @author christopher.ladden (9/8/2009)
      */
     private void showBoardReference() {
-        referencePanel.setVisible(true);
-        loadBoardReference();
+        referencePanel.showBoardReference(Preferences.get("boards." + Preferences.get("board") + ".reference"));
     }
 
     class BootloaderMenuAction extends AbstractAction {
@@ -3247,6 +3226,26 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         }
         sketch.setCurrent(correctSketch);
         return retVal;
+    }
+
+    public void addActiveBoardChangedEventListener(IActiveBoardChangedEventListener listener) {
+        this.activeBoardChangedEventList.add(IActiveBoardChangedEventListener.class, listener);
+    }
+
+    public void removeActiveBoardChangedEventListener(IActiveBoardChangedEventListener listener) {
+        this.activeBoardChangedEventList.remove(IActiveBoardChangedEventListener.class, listener);
+    }
+
+    private void onActiveBoardChange(ActiveBoardObject evObj) {
+        System.out.println("Name: " + evObj.getName());
+         Object[] listeners = activeBoardChangedEventList.getListenerList();
+                    // Each listener occupies two elements - the first is the listener class
+                    // and the second is the listener instance
+                    for (int i=0; i<listeners.length; i+=2) {
+                        if (listeners[i]== IActiveBoardChangedEventListener.class) {
+                            ((IActiveBoardChangedEventListener)listeners[i+1]).onActiveBoardChanged(evObj);
+                        }
+                    }
     }
 
 }

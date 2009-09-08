@@ -13,7 +13,7 @@ template.targets.bootloader.upload=upload.bootloader
 
 ixm.name=Illuminato X Machina
 ixm.build.core=ixm
-ixm.reference=hardware/cores/arduino/reference/index.html
+ixm.reference=hardware/cores/ixm/reference/index.html
 
 #ANT core targets
 ixm.targets.sketch.verify=build.all

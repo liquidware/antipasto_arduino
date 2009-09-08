@@ -96,6 +96,13 @@
                dest="hardware/cores"/>
         <move file="hardware/cores/SFB" tofile="hardware/cores/ixm"/>
         <delete file="hardware/cores/sfb-latest.zip"/>
+        <!-- Get Illuminato X Machina Docs -->
+        <get src="http://livingcomputation.com/ixm/pub/sfb-latest-html-docs.zip"
+             dest="hardware/cores/ixm/sfb-latest-html-docs.zip"/>
+        <unzip src="hardware/cores/ixm/sfb-latest-html-docs.zip"
+               dest="hardware/cores/ixm"/>
+        <move file="hardware/cores/ixm/html" tofile="hardware/cores/ixm/reference"/>
+        <delete file="hardware/cores/ixm/sfb-latest-html-docs.zip"/>
     </target>
 
 

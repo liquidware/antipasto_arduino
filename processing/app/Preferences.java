@@ -561,7 +561,7 @@ public class Preferences {
                   high + insets.top + insets.bottom);
 
     //Pref Pane
-    prefPane = new PreferencesView(table);
+    prefPane = new PreferencesView(table, this);
     JScrollPane scrollPane = new JScrollPane(prefPane);
     scrollPane.setVisible(true);
     scrollPane.setPreferredSize(new Dimension(dialog.getWidth()-20,280));

@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
+import java.util.*;
+import java.net.*;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -44,10 +46,7 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneLayout;
 
 import antipasto.ScriptRunner;
-import antipasto.GUI.GadgetListView.GadgetPanelEvents.ActiveGadgetObject;
-import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveGadgetChangedEventListener;
-import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveSketchChangingListener;
-import antipasto.GUI.GadgetListView.GadgetPanelEvents.SketchChangingObject;
+import antipasto.GUI.GadgetListView.GadgetPanelEvents.*;
 import antipasto.GUI.ImageListView.ScriptCellRenderer;
 import antipasto.Interfaces.IModule;
 import antipasto.Util.GadgetFileFilter;
@@ -56,7 +55,9 @@ import antipasto.Util.Utils;
 import processing.app.*;
 
 public class Wing extends JDialog implements ComponentListener,
-IActiveGadgetChangedEventListener, FocusListener, ISelectedItemListener {
+                                             IActiveGadgetChangedEventListener, 
+                                             FocusListener, ISelectedItemListener, 
+                                             IActiveBoardChangedEventListener {
 
     // The standard width and height for the dialog
     private int cachedHeight = 425;
@@ -279,6 +280,57 @@ IActiveGadgetChangedEventListener, FocusListener, ISelectedItemListener {
     public void componentShown(ComponentEvent arg0) {
         setLocation();
         repaint();
+    }
+
+
+    /**
+     * This function loads the reference URL specified in the 
+     * boards.txt file. 
+     * 
+     * @author christopher.ladden (9/8/2009)
+     */
+    private void loadBoardReference(String referenceURL) {
+
+        /* Assign the reference pane URL */
+        try {
+            URL url = new URL("file:/" + 
+                              System.getProperty("user.dir") + File.separator +
+                              referenceURL);
+            if ( (url != null) && (this != null)) {
+                wingPanelReference.setPage(url.toString()); 
+            }
+        } catch (Exception ex) {
+            System.out.println("Invalid reference URL format");
+        }
+
+    }
+
+    /**
+     * Brings the reference panel in focus and visible.
+     * 
+     * @author christopher.ladden (9/8/2009)
+     * 
+     * @param referenceURL The url of the board reference 
+     */
+    public void showBoardReference(String referenceURL) {
+        this.setVisible(true); //show the wing
+        onSelected(new WingTab("Reference", null)); //focus the tab
+        loadBoardReference(referenceURL); //reload the reference URL
+    }
+
+
+    /**
+     * The event fires when the active board has changed. 
+     * 
+     * @author christopher.ladden (9/8/2009)
+     * 
+     * @param obj 
+     */
+    public void onActiveBoardChanged(ActiveBoardObject obj) {
+        if (obj != null) {
+            loadBoardReference(obj.getReferenceURL());
+            System.out.println("onActiveBoardChanged: Wing saw " + obj.getName());
+        }
     }
 
     public void onActiveGadgetChanged(ActiveGadgetObject obj) {
