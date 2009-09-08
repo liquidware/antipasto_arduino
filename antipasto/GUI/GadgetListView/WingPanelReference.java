@@ -197,7 +197,6 @@ public class WingPanelReference extends JPanel {
 		wingFooter.setText("Loading...");
 		textArea.setPage(url);
 		htmlHistory.add(textArea.getPage());
-		System.out.println(htmlHistory.get(htmlHistory.size()-1));
 	    } catch (IOException ioe) {
 		System.out.println("Error Loading: " + ioe);
 		

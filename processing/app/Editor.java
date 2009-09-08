@@ -1174,7 +1174,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             this.menuItem = menuItem;
         }
         public void actionPerformed(ActionEvent actionevent) {
-            System.out.println("Switching to " + board);
             Preferences.set("board", board);
             menuItem.setSelected(true);
             onActiveBoardChange(new ActiveBoardObject(this,
@@ -3237,7 +3236,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     }
 
     private void onActiveBoardChange(ActiveBoardObject evObj) {
-        System.out.println("Name: " + evObj.getName());
+        System.out.println("Switching board to: " + evObj.getName());
          Object[] listeners = activeBoardChangedEventList.getListenerList();
                     // Each listener occupies two elements - the first is the listener class
                     // and the second is the listener instance

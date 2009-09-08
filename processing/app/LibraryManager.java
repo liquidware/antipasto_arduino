@@ -68,11 +68,13 @@ public class LibraryManager {
         return file.isDirectory();
       }
     };
-    libraries.clear();
-    File[] libs = libDir.listFiles(onlyDirs);
-    for(int i = 0; i < libs.length; ++i){
-      libraries.add(new Library(this, libs[i]));
-    }
+    //The following is disabled until we do this ant style
+    // 
+    //libraries.clear();
+    //File[] libs = libDir.listFiles(onlyDirs);
+    //for(int i = 0; i < libs.length; ++i){
+    //  libraries.add(new Library(this, libs[i]));
+    //}
   }
 
   /*

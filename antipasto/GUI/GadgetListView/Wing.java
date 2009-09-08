@@ -329,7 +329,6 @@ public class Wing extends JDialog implements ComponentListener,
     public void onActiveBoardChanged(ActiveBoardObject obj) {
         if (obj != null) {
             loadBoardReference(obj.getReferenceURL());
-            System.out.println("onActiveBoardChanged: Wing saw " + obj.getName());
         }
     }
 
