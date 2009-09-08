@@ -485,9 +485,10 @@
             <zip destfile="${package.dir}/${package.windows.name}"
                  basedir="${package.dir}"
                  includes="Arduino/*"/>
-            <echo file="${package.dir}/${package.windows.name}.txt">${line.separator}
-                distribution.name=Antipasto Arduino${line.separator}
-                distribution.version=${build.version}${line.separator}</echo>
+            <echo file="${package.dir}/${package.windows.name}.txt">
+distribution.name=Antipasto Arduino
+distribution.file=${package.windows.name}
+distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
 
@@ -553,9 +554,10 @@
                     <arg value="${package.linux.name}" />
                     <arg value="Arduino" />
             </exec>
-            <echo file="${package.dir}/${package.linux.name}.txt">${line.separator}
-                distribution.name=Antipasto Arduino${line.separator}
-                distribution.version=${build.version}${line.separator}</echo>
+            <echo file="${package.dir}/${package.linux.name}.txt">
+distribution.name=Antipasto Arduino
+distribution.file=${package.linux.name}
+distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
 
@@ -631,9 +633,10 @@
                 <arg value="${package.dir}/${package.macosx.name}.pkg" />
                 <arg value="${package.dir}/${package.macosx.name}.dmg" />
             </exec>
-            <echo file="${package.dir}/${package.macosx.name}.txt">${line.separator}
-                distribution.name=Antipasto Arduino${line.separator}
-                distribution.version=${build.version}${line.separator}</echo>
+            <echo file="${package.dir}/${package.macosx.name}.txt">
+distribution.name=Antipasto Arduino
+distribution.file=${package.macosx.name}
+distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
 
