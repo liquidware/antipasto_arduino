@@ -635,7 +635,7 @@ distribution.version=${build.version}</echo>
                 <arg value="${package.dir}/${package.macosx.name}.pkg" />
                 <arg value="${package.dir}/${package.macosx.name}.dmg" />
             </exec>
-            <echo file="${package.dir}/${package.macosx.name}.txt">
+            <echo file="${package.dir}/${package.macosx.name}.dmg.txt">
 distribution.name=Antipasto Arduino
 distribution.file=${package.macosx.name}
 distribution.version=${build.version}</echo>
