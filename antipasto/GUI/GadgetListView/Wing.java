@@ -55,8 +55,8 @@ import antipasto.Util.Utils;
 import processing.app.*;
 
 public class Wing extends JDialog implements ComponentListener,
-                                             IActiveGadgetChangedEventListener, 
-                                             FocusListener, ISelectedItemListener, 
+                                             IActiveGadgetChangedEventListener,
+                                             FocusListener, ISelectedItemListener,
                                              IActiveBoardChangedEventListener {
 
     // The standard width and height for the dialog
@@ -284,20 +284,20 @@ public class Wing extends JDialog implements ComponentListener,
 
 
     /**
-     * This function loads the reference URL specified in the 
-     * boards.txt file. 
-     * 
+     * This function loads the reference URL specified in the
+     * boards.txt file.
+     *
      * @author christopher.ladden (9/8/2009)
      */
     private void loadBoardReference(String referenceURL) {
 
         /* Assign the reference pane URL */
         try {
-            URL url = new URL("file://" + 
+            URL url = new URL("file:///" +
                               System.getProperty("user.dir") + File.separator +
                               referenceURL);
             if ( (url != null) && (this != null)) {
-                wingPanelReference.setPage(url.toString()); 
+                wingPanelReference.setPage(url.toString());
             }
         } catch (Exception ex) {
             System.out.println("Invalid reference URL format");
@@ -307,10 +307,10 @@ public class Wing extends JDialog implements ComponentListener,
 
     /**
      * Brings the reference panel in focus and visible.
-     * 
+     *
      * @author christopher.ladden (9/8/2009)
-     * 
-     * @param referenceURL The url of the board reference 
+     *
+     * @param referenceURL The url of the board reference
      */
     public void showBoardReference(String referenceURL) {
         this.setVisible(true); //show the wing
@@ -320,11 +320,11 @@ public class Wing extends JDialog implements ComponentListener,
 
 
     /**
-     * The event fires when the active board has changed. 
-     * 
+     * The event fires when the active board has changed.
+     *
      * @author christopher.ladden (9/8/2009)
-     * 
-     * @param obj 
+     *
+     * @param obj
      */
     public void onActiveBoardChanged(ActiveBoardObject obj) {
         if (obj != null) {
