@@ -484,7 +484,9 @@
             <!-- Create the zip package -->
             <zip destfile="${package.dir}/${package.windows.name}"
                  basedir="${package.dir}"
-                 includes="Arduino/*"/>
+                 includes="Arduino/**/*"/>
+
+            <!-- Create the public version info file -->
             <echo file="${package.dir}/${package.windows.name}.txt">
 distribution.name=Antipasto Arduino
 distribution.file=${package.windows.name}
