@@ -344,8 +344,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
         Dimension dim = textarea.getSize();
 
-        System.out.println("The dimensions...." + dim);
-
         centerPanel.setLayout(new CardLayout());
 
 
@@ -672,10 +670,9 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         int location = Preferences.getInteger("last.divider.location");
         splitPane.setDividerLocation(location);
 
-
-        // read the preferences that are settable in the preferences window
-
         applyPreferences();
+
+        changeActiveBoard(Preferences.get("board"));
     }
 
 
@@ -1174,13 +1171,41 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             this.menuItem = menuItem;
         }
         public void actionPerformed(ActionEvent actionevent) {
-            Preferences.set("board", board);
-            menuItem.setSelected(true);
-            onActiveBoardChange(new ActiveBoardObject(this,
-                                         /* name */   Preferences.get("boards." + board + ".name"),
-                                 /* referenceURL */   Preferences.get("boards." + Preferences.get("board") + ".reference")));
+            changeActiveBoard(board);
         }
     }
+
+   /**
+    * Call this routine to change the active board.
+    * 
+    * @author christopher.ladden (9/9/2009)
+    * 
+    * @param board 
+    * This is value is usually checked against the list of 
+    * supported boards in the boards.txt file.
+    */
+   public void changeActiveBoard(String board) {
+        
+
+       /* Change to this board */
+       Preferences.set("board", board);        //set the board in the preferences
+
+       /* Find board menu item */
+       JMenuItem menuItem = new JMenuItem("");
+       for (int x=0; x < boardsMenu.getItemCount(); x++) {
+           menuItem = boardsMenu.getItem(x);
+           if (menuItem.getText().equals(Preferences.get("boards." + board + ".name"))) {
+               break;
+           }
+       }
+
+        /* Fire the board change event */    
+        onActiveBoardChange(new ActiveBoardObject(this,
+                             /* boardShortName */ board,
+                             /*  boardLongName */ Preferences.get("boards." + board + ".name"),
+                             /*   referenceURL */ Preferences.get("boards." + Preferences.get("board") + ".reference"),
+                             /*  boardMenuItem */ menuItem));
+   }
 
     /**
      * This function brings the right wing visible and reloads the 
@@ -2300,10 +2325,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     }
 
-    protected void handleModuleFileOpen(String path) {
-    }
-
-
     protected void handleDefaultFileOpen(String path) {
         Base.showWarning("Bad file selected",
                          "Arduino can only open its own sketches\n" +
@@ -3058,6 +3079,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     /*
     * Creates a back up of the current boards.txt file and returns the renamed file
     * */
+    /*
     private File backUpBoardsFile() {
         String boardFile = System.getProperty("user.dir") + File.separator + "hardware" +
                            File.separator + "boards.txt";
@@ -3074,7 +3096,8 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             boardsFileToRestore.renameTo(boardsFileToRestore);
         }
     }
-
+*/
+    /*
     private File writeBoardsToStandardLocation(File boardsFile) {
         File originalBoards = new File(System.getProperty("user.dir") + File.separator + "hardware" +
                                        File.separator + "boards.txt");
@@ -3100,7 +3123,8 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         this.buildToolsMenu();
         return copyFile;
     }
-
+*/
+    /*
     private void importBoardsFile(File boardsFile, String target) {
         String boardExists = Preferences.get("boards." + target + ".build.core");
         String originalBoardsFile = System.getProperty("user.dir") + File.separator + "hardware" +
@@ -3125,7 +3149,8 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                 e.printStackTrace();
             }
         }
-    }
+    } 
+    */ 
 
     public String getContents(File aFile) {
         //...checks on aFile are elided
@@ -3182,6 +3207,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         }
     }
 
+    /*
     private void loadGadget(IGadget gadget) {
         for (int i = 0; i < gadget.getModules().length; i++) {
             this.importModule(gadget.getModules()[i]);
@@ -3199,7 +3225,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                             File.separator + "cores" + File.separator + target;
             module.copyCoreToDirectory(cpyDir);
         }
-    }
+    } */
 
     public void setImageListVisable(IModule module) {
         this.imageListPanel.setModule(module);
@@ -3237,14 +3263,22 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     private void onActiveBoardChange(ActiveBoardObject evObj) {
         System.out.println("Switching board to: " + evObj.getName());
-         Object[] listeners = activeBoardChangedEventList.getListenerList();
-                    // Each listener occupies two elements - the first is the listener class
-                    // and the second is the listener instance
-                    for (int i=0; i<listeners.length; i+=2) {
-                        if (listeners[i]== IActiveBoardChangedEventListener.class) {
-                            ((IActiveBoardChangedEventListener)listeners[i+1]).onActiveBoardChanged(evObj);
-                        }
-                    }
+
+        /* Pre-event firing */
+        evObj.getBoardMenuItem().setSelected(true);                 //select the menu item
+
+        /* Fire the event! */
+        Object[] listeners = activeBoardChangedEventList.getListenerList();
+        // Each listener occupies two elements - the first is the listener class
+        // and the second is the listener instance
+        for (int i=0; i<listeners.length; i+=2) {
+            if (listeners[i]== IActiveBoardChangedEventListener.class) {
+                ((IActiveBoardChangedEventListener)listeners[i+1]).onActiveBoardChanged(evObj);
+            }
+        }
+
+        /* Post-event firing */
+        /* None */
     }
 
 }
