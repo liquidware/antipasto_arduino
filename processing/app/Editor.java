@@ -487,8 +487,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
 
 
-
-
     }
 
 
@@ -2544,7 +2542,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         console.clear();
         //String what = sketch.isLibrary() ? "Applet" : "Library";
         //message("Exporting " + what + "...");
-        message("Uploading to I/O Board...");
+        message("Uploading to I/O Board...", true);
         final GadgetPanel panel = this.gadgetPanel;
         this.isExporting = true;
 
@@ -2561,7 +2559,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                                                                                    File.separator + "cores",
                                                                                                    Preferences.get("boards." + Preferences.get("board") + ".build.core")));
                                                    if (success) {
-                                                       message("Done uploading.");
+                                                       message("Done uploading.", false);
                                                    } else {
                                                        // error message will already be visible
                                                    }
@@ -2573,7 +2571,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
                                                }
                                            } catch (RunnerException e) {
-                                               message("Error during upload.");
+                                               message("Error during upload.", false);
                                                //e.printStackTrace();
                                                error(e);
                                            } catch (Exception e) {
@@ -2960,6 +2958,10 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     public void message(String msg) {
         status.notice(msg);
+    }
+
+    public void message(String msg, boolean showActivity) {
+        status.notice(msg, showActivity);
     }
 
 

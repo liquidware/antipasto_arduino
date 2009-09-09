@@ -36,7 +36,7 @@ import antipasto.ModuleRules.IOkListener;
 import antipasto.ModuleRules.ISerialListener;
 import antipasto.ModuleRules.IYesNoListener;
 
-
+//import processing.app.InfiniteProgressPanel;
 
 /**
  * Panel just below the editing area that contains status messages.
@@ -84,7 +84,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 
   //Thread promptThread;
   int response;
-
+  InfiniteProgressPanel activityIndicator;
 
   public EditorStatus(Editor editor) {
     this.editor = editor;
@@ -127,6 +127,14 @@ public class EditorStatus extends JPanel implements ActionListener {
     repaint();
   }
 
+  public void notice(String message, boolean showActivity) {
+    notice(message);
+    if (showActivity) {
+      activityIndicator.start();
+    } else {
+      activityIndicator.stop();
+    }
+  }
 
   public void notice(String message) {
     mode = NOTICE;
@@ -261,7 +269,7 @@ public class EditorStatus extends JPanel implements ActionListener {
 
     g.setColor(fgcolor[mode]);
     g.setFont(font); // needs to be set each time on osx
-    g.drawString(message, Preferences.GUI_SMALL, (sizeH + ascent) / 2);
+    g.drawString(message, Preferences.GUI_SMALL + 24, (sizeH + ascent) / 2);
 
     screen.drawImage(offscreen, 0, 0, null);
   }
@@ -296,7 +304,16 @@ public class EditorStatus extends JPanel implements ActionListener {
       add(noButton);
       add(cancelButton);
       add(okButton);
+      this.setLayout(new FlowLayout(FlowLayout.LEFT));
 
+      //JPanel aiP = new JPanel("testdsfasdfsa");
+      activityIndicator = new InfiniteProgressPanel();
+      activityIndicator.setPreferredSize(new Dimension(24,24));
+      add(activityIndicator);
+
+      activityIndicator.stop();
+      //aiP.add(aiL);
+      //add
 
       yesButton.setVisible(false);
       noButton.setVisible(false);
