@@ -21,7 +21,7 @@
 <project name="build.properties" basedir="." default="...">
 
 
-    <property name="build.version"    value="0.8.24"/>
+    <property name="build.version"    value="0.8.25"/>
 
     <!--
         ===================================================================
