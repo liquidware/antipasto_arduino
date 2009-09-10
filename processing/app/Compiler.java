@@ -4,7 +4,8 @@
   Compiler - default compiler class that connects to avr-gcc
   Part of the Arduino project - http://www.arduino.cc/
 
-  Modified by David A. Mellis
+  Modified by Christopher Ladden
+              David A. Mellis
 
   Copyright (c) 2004-05 Hernando Barragan
 

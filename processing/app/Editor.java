@@ -195,6 +195,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
 
     public PluginPanel pluginPanel = new PluginPanel(Base.pluginloader);
+    AntRunner ant = new AntRunner();
 
     //static Properties keywords; // keyword -> reference html lookup
 
@@ -1704,6 +1705,12 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
 
     public void handleRun(final boolean present) throws IOException {
+        //Is ant is running another request?
+        if (ant.isRunning()) {
+            message("Please wait...");
+            return;
+        }
+
         System.out.println("handling the run");
         doClose();
         running = true;
@@ -2510,6 +2517,13 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
      * hitting export twice, quickly, and horking things up.
      */
     synchronized public void handleExport() {
+
+        //Is ant is running another request?
+        if (ant.isRunning()) {
+            message("Please wait...");
+            return;
+        }
+
         if (debugging)
             doStop();
         buttons.activate(EditorButtons.EXPORT);
@@ -2782,46 +2796,56 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     }
 
     protected void handleBurnBootloader(final String programmer) {
-        if (debugging)
+
+        //Is ant is running another request?
+        if (ant.isRunning()) {
+            message("Please wait...");
+            return;
+        }
+
+        if (debugging) {
             doStop();
+        }
+
         console.clear();
         message("Burning bootloader to I/O Board (this may take a minute)...", true);
-        SwingUtilities.invokeLater(new Runnable() {
-                                       public void run() {
-                                           boolean result = false;
+        Thread t = new Thread(new Runnable() {
+                                  public void run() {
+                                      boolean result = false;
 
-                                           try {
-                                               Target target = new Target(System.getProperty("user.dir") + File.separator + "hardware" +
-                                                                          File.separator + "cores",
-                                                                          Preferences.get("boards." + Preferences.get("board") + ".build.core"));
+                                      try {
+                                          Target target = new Target(System.getProperty("user.dir") + File.separator + "hardware" +
+                                                                     File.separator + "cores",
+                                                                     Preferences.get("boards." + Preferences.get("board") + ".build.core"));
 
-                                               //Check the programmer selection
-                                               if (programmer.indexOf("ant") == 0) {
-                                                   //check for a buildfile
-                                                   if (( Compiler.getBuildFile(target) != null)) {
-                                                       //let ant run the burn
-                                                       result = ANTBurnBootloader(target);
-                                                   } else {
-                                                       System.out.println("No buildFile found in " + target.getPath());
-                                                   }
-                                               } else {
-                                                   //legacy burn
-                                                   result = LegacyBurnBootloader(programmer);
-                                               }
+                                          //Check the programmer selection
+                                          if (programmer.indexOf("ant") == 0) {
+                                              //check for a buildfile
+                                              if (( Compiler.getBuildFile(target) != null)) {
+                                                  //let ant run the burn
+                                                  result = ANTBurnBootloader(target);
+                                              } else {
+                                                  System.out.println("No buildFile found in " + target.getPath());
+                                              }
+                                          } else {
+                                              //legacy burn
+                                              result = LegacyBurnBootloader(programmer);
+                                          }
 
-                                           } catch (Exception ex) {
-                                               ;
-                                           }
+                                      } catch (Exception ex) {
+                                          ;
+                                      }
 
-                                           if (result) {
-                                               message("Done burning bootloader.", false);
-                                           } else {
-                                               error("Error burning bootloader.");
-                                           }
+                                      if (result) {
+                                          message("Done burning bootloader.", false);
+                                      } else {
+                                          error("Error burning bootloader.");
+                                      }
 
-                                           buttons.clear();
-                                       }
-                                   });
+                                      buttons.clear();
+                                  }
+                              });
+        t.start();
     }
 
     public void highlightLine(int lnum) {

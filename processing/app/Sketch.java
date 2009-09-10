@@ -91,7 +91,7 @@ public class Sketch {
 	boolean externalRuntime;
 	public Vector importedLibraries; // vec of Library objects
 	String suggestedClassName = "sketch";
-	AntRunner ant = new AntRunner();
+	AntRunner ant;
 
 	/**
 	 * path is location of the main .pde file, because this is also simplest to
@@ -99,7 +99,7 @@ public class Sketch {
 	 */
 	public Sketch(Editor editor, String path) throws IOException {
 		this.editor = editor;
-
+		this.ant = editor.ant;
 		File mainFile = new File(path);
 		// System.out.println("main file is " + mainFile);
 
