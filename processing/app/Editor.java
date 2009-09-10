@@ -303,7 +303,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         leftWing.setLayout(new BorderLayout());
         leftWing.add(leftExpandLabel, BorderLayout.CENTER);
 
-        
+
 
         leftWing.addMouseListener(new MouseListener() {
                                       public void mouseClicked(MouseEvent arg0) {
@@ -407,30 +407,30 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
                                         /*
                                         DropTarget dt = new DropTarget(this, new DropTargetListener() {
-                                    
+
                                             public void dragEnter(DropTargetDragEvent event) {
                                               // debug messages for diagnostics
                                               //System.out.println("dragEnter " + event);
                                               event.acceptDrag(DnDConstants.ACTION_COPY);
                                             }
-                                    
+
                                             public void dragExit(DropTargetEvent event) {
                                               //System.out.println("dragExit " + event);
                                             }
-                                    
+
                                             public void dragOver(DropTargetDragEvent event) {
                                               //System.out.println("dragOver " + event);
                                               event.acceptDrag(DnDConstants.ACTION_COPY);
                                             }
-                                    
+
                                             public void dropActionChanged(DropTargetDragEvent event) {
                                               //System.out.println("dropActionChanged " + event);
                                             }
-                                    
+
                                             public void drop(DropTargetDropEvent event) {
                                               //System.out.println("drop " + event);
                                               event.acceptDrop(DnDConstants.ACTION_COPY);
-                                    
+
                                               Transferable transferable = event.getTransferable();
                                               DataFlavor flavors[] = transferable.getTransferDataFlavors();
                                         */
@@ -527,7 +527,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
                                        public void mouseReleased(MouseEvent arg0) {
                                        }
-                                   });        
+                                   });
     }
 
 
@@ -780,12 +780,12 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                                                                 dflt,
                                                                                 dialog,
                                                                                 filter);
-                                        
+
                                                             /* Error checking and formatting */
                                                     /*		if (file == null) {
                                                                 return;
                                                             }
-                                        
+
                                                     */
                                                     final String baseDir = Base.getDefaultSketchbookFolder().getPath();
                                                     IOkListener ourListener = new IOkListener() {
@@ -1175,15 +1175,15 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
    /**
     * Call this routine to change the active board.
-    * 
+    *
     * @author christopher.ladden (9/9/2009)
-    * 
-    * @param board 
-    * This is value is usually checked against the list of 
+    *
+    * @param board
+    * This is value is usually checked against the list of
     * supported boards in the boards.txt file.
     */
    public void changeActiveBoard(String board) {
-        
+
 
        /* Change to this board */
        Preferences.set("board", board);        //set the board in the preferences
@@ -1197,7 +1197,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
            }
        }
 
-        /* Fire the board change event */    
+        /* Fire the board change event */
         onActiveBoardChange(new ActiveBoardObject(this,
                              /* boardShortName */ board,
                              /*  boardLongName */ Preferences.get("boards." + board + ".name"),
@@ -1206,9 +1206,9 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
    }
 
     /**
-     * This function brings the right wing visible and reloads the 
-     * reference. 
-     * 
+     * This function brings the right wing visible and reloads the
+     * reference.
+     *
      * @author christopher.ladden (9/8/2009)
      */
     private void showBoardReference() {
@@ -1709,7 +1709,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         running = true;
         this.isExporting = false;
         buttons.activate(EditorButtons.RUN);
-        message("Compiling...");
+        message("Compiling...", true);
         // do this for the terminal window / dos prompt / etc
         for (int i = 0; i < 10; i++) System.out.println();
 
@@ -1771,94 +1771,68 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         } else {
             this.compile();
         }
-        // this doesn't seem to help much or at all
-        /*
-        final SwingWorker worker = new SwingWorker() {
-            public Object construct() {
-              try {
-                if (!sketch.handleRun()) return null;
-    
-                runtime = new Runner(sketch, Editor.this);
-                runtime.start(presenting ? presentLocation : appletLocation);
-                watcher = new RunButtonWatcher();
-                message("Done compiling.");
-    
-              } catch (RunnerException e) {
-                message("Error compiling...");
-                error(e);
-    
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-              return null;  // needn't return anything
-            }
-          };
-        worker.start();
-        */
-        //sketch.cleanup();  // where does this go?
+
         buttons.clear();
     }
 
     private void compile() {
         final Sketch sketch = this.sketch;
-        SwingUtilities.invokeLater(new Runnable() {
-                                       public void run() {
-                                           try {
-                                               if (gadgetPanel != null) {
-                                                   if (gadgetPanel.getActiveModule() != null) {
-                                                       prepareLibraries();
-                                                       IGadget book = gadgetPanel.getActiveGadget();
 
-                                                       IModule[] gadgets = book.getModules();
-                                                       IModule gadget = gadgetPanel.getActiveModule();
-                                                       File sketchFile = gadget.getSketchFile();
-                                                       Sketch currentSketch = new Sketch(new Editor(), sketchFile.getPath());
+        Thread t = new Thread(new Runnable() {
+                                  public void run() {
+                                      try {
+                                          boolean success = false;
 
-                                                       String target = gadget.getTarget();
+                                          if (gadgetPanel != null) {
+                                              if (gadgetPanel.getActiveModule() != null) {
+                                                  prepareLibraries();
+                                                  IGadget book = gadgetPanel.getActiveGadget();
+
+                                                  IModule[] gadgets = book.getModules();
+                                                  IModule gadget = gadgetPanel.getActiveModule();
+                                                  File sketchFile = gadget.getSketchFile();
+                                                  Sketch currentSketch = new Sketch(new Editor(), sketchFile.getPath());
+
+                                                  String target = gadget.getTarget();
 
 
-                                                       System.out.println("Running file with target : " + target);
-                                                       String boardName = Preferences.get("board");
-                                                       System.out.println(boardName);
-                                                       if (!currentSketch.handleRun(new Target(System.getProperty("user.dir") + File.separator + "hardware" +
-                                                                                               File.separator + "cores", Preferences.get("boards." + target + ".build.core")))) {
-                                                           System.out.println("Error compiling file");
+                                                  System.out.println("Running file with target : " + target);
+                                                  String boardName = Preferences.get("board");
+                                                  System.out.println(boardName);
+                                                  success = currentSketch.handleRun(new Target(System.getProperty("user.dir") + File.separator + "hardware" +
+                                                                                          File.separator + "cores", Preferences.get("boards." + target + ".build.core")));
 
-                                                       }
-                                                   } else {
-                                                       //There is no active gadget; we should do a classic run
-                                                       String boardName = Preferences.get("board");
-                                                       if (!sketch.handleRun(new Target(System.getProperty("user.dir") + File.separator + "hardware" +
-                                                                                        File.separator + "cores", Preferences.get("boards." + boardName + ".build.core")))) {
-                                                           System.out.println("Error compiling file");
+                                              } else {
 
-                                                       }
-                                                   }
-                                               } else {
-                                                   System.out.println("error getting the Gadget panel");
-                                               }
+                                                  //There is no active gadget; we should do a classic run
+                                                  String boardName = Preferences.get("board");
+                                                  success = sketch.handleRun(new Target(System.getProperty("user.dir") + File.separator + "hardware" +
+                                                                                   File.separator + "cores", Preferences.get("boards." + boardName + ".build.core")));
+                                              }
+                                          } else {
+                                              System.out.println("error getting the Gadget panel");
+                                          }
 
-                                               /* if (!sketch.handleRun(new Target(
-                                                    System.getProperty("user.dir") + File.separator + "hardware" +
-                                                    File.separator + "cores",
-                                                    Preferences.get("boards." + Preferences.get("board") + ".build.core"))))
-                                                  return;
-                                                 */
-                                               //runtime = new Runner(sketch, Editor.this);
-                                               //runtime.start(appletLocation);
-                                               watcher = new RunButtonWatcher();
-                                               message("Done compiling.");
-                                               if (watcher != null) watcher.stop();
+                                          watcher = new RunButtonWatcher();
 
-                                           } catch (RunnerException e) {
-                                               message("Error compiling...");
-                                               error(e);
+                                          if (success) {
+                                            message("Done compiling.", false);
+                                          } else {
+                                            error("Error compiling.");
+                                          }
 
-                                           } catch (Exception e) {
-                                               e.printStackTrace();
-                                           }
-                                       }
-                                   });
+                                          if (watcher != null) watcher.stop();
+
+                                      } catch (RunnerException e) {
+                                          error("Error compiling.");
+                                          //error(e);
+
+                                      } catch (Exception e) {
+                                          error("Error compiling.");
+                                      }
+                                  }
+                              });
+        t.start();
 
     }
 
@@ -1875,17 +1849,17 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             while (Thread.currentThread() == thread) {
                 /*if (runtime == null) {
                   stop();
-        
+
                 } else {
                   if (runtime.applet != null) {
                     if (runtime.applet.finished) {
                       stop();
                     }
                     //buttons.running(!runtime.applet.finished);
-        
+
                   } else if (runtime.process != null) {
                     //buttons.running(true);  // ??
-        
+
                   } else {
                     stop();
                   }
@@ -2542,44 +2516,47 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         console.clear();
         //String what = sketch.isLibrary() ? "Applet" : "Library";
         //message("Exporting " + what + "...");
-        message("Uploading to I/O Board...", true);
+
         final GadgetPanel panel = this.gadgetPanel;
         this.isExporting = true;
 
         this.saveSketches();
 
-        SwingUtilities.invokeLater(new Runnable() {
-                                       public void run() {
-                                           try {
-                                               //boolean success = sketch.isLibrary() ?
-                                               //sketch.exportLibrary() : sketch.exportApplet();
-                                               if (panel.getActiveGadget() == null) {
-                                                   boolean success = sketch.exportApplet(new Target(
-                                                                                                   System.getProperty("user.dir") + File.separator + "hardware" +
-                                                                                                   File.separator + "cores",
-                                                                                                   Preferences.get("boards." + Preferences.get("board") + ".build.core")));
-                                                   if (success) {
-                                                       message("Done uploading.", false);
-                                                   } else {
-                                                       // error message will already be visible
-                                                   }
-                                               } else {
-                                                   sketch.exportApplet(new Target(
-                                                                                 System.getProperty("user.dir") + File.separator + "hardware" +
-                                                                                 File.separator + "cores",
-                                                                                 Preferences.get("boards." + panel.getActiveModule().getTarget() + ".build.core")));
 
-                                               }
-                                           } catch (RunnerException e) {
-                                               message("Error during upload.", false);
-                                               //e.printStackTrace();
-                                               error(e);
-                                           } catch (Exception e) {
-                                               e.printStackTrace();
-                                           }
-                                           buttons.clear();
-                                       }
-                                   });
+        Thread t = new Thread(new Runnable() {
+                                  public void run() {
+                                      try {
+                                          message("Uploading to I/O Board...", true);
+                                          String board = Preferences.get("board");
+
+                                          if (panel.getActiveGadget() != null) {
+                                              board = panel.getActiveModule().getTarget();
+                                          }
+
+                                          boolean success = sketch.exportApplet(new Target(
+                                                                                          System.getProperty("user.dir") + File.separator + "hardware" +
+                                                                                          File.separator + "cores",
+                                                                                          Preferences.get("boards." + board + ".build.core")));
+
+                                          if (success) {
+                                              message("Done uploading.", false);
+                                          } else {
+                                              message("", false);
+                                              error("Error during upload.");
+                                          }
+
+                                      } catch (RunnerException e) {
+                                          //message("Error during upload.", false);
+                                          error(e);
+                                      } catch (Exception e) {
+                                          message("Error during upload.", false);
+                                          e.printStackTrace();
+                                      }
+                                      buttons.clear();
+                                  }
+                              });
+
+        t.start();
     }
 
 
@@ -2808,7 +2785,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         if (debugging)
             doStop();
         console.clear();
-        message("Burning bootloader to I/O Board (this may take a minute)...");
+        message("Burning bootloader to I/O Board (this may take a minute)...", true);
         SwingUtilities.invokeLater(new Runnable() {
                                        public void run() {
                                            boolean result = false;
@@ -2837,9 +2814,9 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                            }
 
                                            if (result) {
-                                               message("Done burning bootloader.");
+                                               message("Done burning bootloader.", false);
                                            } else {
-                                               message("Error burning bootloader.");
+                                               error("Error burning bootloader.");
                                            }
 
                                            buttons.clear();
@@ -3151,8 +3128,8 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                 e.printStackTrace();
             }
         }
-    } 
-    */ 
+    }
+    */
 
     public String getContents(File aFile) {
         //...checks on aFile are elided

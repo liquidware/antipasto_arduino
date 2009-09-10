@@ -84,51 +84,54 @@ public class Compiler implements MessageConsumer {
 	 return buildFile;
   }
 
-	/**
-	 * This function compiles the sketch.
-	 *
-	 * @param sketch
-	 *            The current sketch.
-	 * @param buildPath
-	 *            The temporary build path
-	 * @param target
-	 *            The core to compile the sketch for.
-	 * @throws RunnerException
-	 */
-  public boolean compile(Sketch sketch, String buildPath, Target target)
+    /**
+     * This function compiles the sketch.
+     *
+     * @param sketch
+     *            The current sketch.
+     * @param buildPath
+     *            The temporary build path
+     * @param target
+     *            The core to compile the sketch for.
+     * @throws RunnerException
+     */
+    public boolean compile(Sketch sketch, String buildPath, Target target)
     throws RunnerException {
 
-	// Try to get the buildfile
-	File buildFile = getBuildFile(target);
+        // Try to get the buildfile
+        File buildFile = getBuildFile(target);
 
-	if (buildFile != null) {
-		if(!ant.isRunning()){
+        if (buildFile != null) {
+            if (!ant.isRunning()) {
 
-      String antTarget = Preferences.get("boards." +
-                                         Preferences.get("board") +
-                                         ".targets.sketch.verify");
+                String antTarget = Preferences.get("boards." +
+                                                   Preferences.get("board") +
+                                                   ".targets.sketch.verify");
 
-			// Configure
-			if (Preferences.getBoolean("build.verbose")) {
-				ant.setOutputVerbose();
-			} else {
-				ant.setOutputQuiet();
-			}
+                // Configure
+                if (Preferences.getBoolean("build.verbose")) {
+                    ant.setOutputVerbose();
+                } else {
+                    ant.setOutputQuiet();
+                }
 
-			// Run
-			ant.run(buildFile.toString(),antTarget, new String[] {
-					"build.dest",  buildPath,
-					"sketch.name", sketch.name});
+                // Run
+                ant.run(buildFile.toString(),antTarget, new String[] {
+                            "build.dest",  buildPath,
+                            "sketch.name", sketch.name});
 
-			// Wait to finish
-			ant.waitForCompletion();
-		}
-	} else {
-		System.out.println("No buildFile found in " + target.getPath());
-    return false;
-	}
-    return true;
-  }
+                // Wait to finish
+                ant.waitForCompletion();
+
+                //Return the result
+                return ant.getLastRunStatus();
+            }
+        } else {
+            System.out.println("No buildFile found in " + target.getPath());
+            return false; //fail
+        }
+        return true; //ant is running
+    }
 
   boolean firstErrorFound;
   boolean secondErrorFound;

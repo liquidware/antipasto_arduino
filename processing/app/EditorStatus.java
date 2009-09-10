@@ -85,6 +85,7 @@ public class EditorStatus extends JPanel implements ActionListener {
   //Thread promptThread;
   int response;
   InfiniteProgressPanel activityIndicator;
+  boolean activityIndicatorRunning = false;
 
   public EditorStatus(Editor editor) {
     this.editor = editor;
@@ -128,12 +129,14 @@ public class EditorStatus extends JPanel implements ActionListener {
   }
 
   public void notice(String message, boolean showActivity) {
-    notice(message);
     if (showActivity) {
       activityIndicator.start();
+      activityIndicatorRunning = true;
     } else {
       activityIndicator.stop();
+      activityIndicatorRunning = false;
     }
+    notice(message);
   }
 
   public void notice(String message) {
@@ -149,9 +152,12 @@ public class EditorStatus extends JPanel implements ActionListener {
 
 
   public void error(String message) {
+    activityIndicator.stop();
+    activityIndicatorRunning = false;
     mode = ERR;
     this.message = message;
     repaint();
+
   }
 
 
@@ -226,6 +232,12 @@ public class EditorStatus extends JPanel implements ActionListener {
 
   public void paintComponent(Graphics screen) {
 
+    int textHOffset = 0;
+
+    if (activityIndicatorRunning) {
+      textHOffset = 26;             //to make room for the activity indicator
+    }
+
     if (yesButton == null) setup();
 
     Dimension size = getSize();
@@ -262,14 +274,12 @@ public class EditorStatus extends JPanel implements ActionListener {
       ascent = metrics.getAscent();
     }
 
-    //setBackground(bgcolor[mode]);  // does nothing
-
     g.setColor(bgcolor[mode]);
     g.fillRect(0, 0, imageW, imageH);
 
     g.setColor(fgcolor[mode]);
     g.setFont(font); // needs to be set each time on osx
-    g.drawString(message, Preferences.GUI_SMALL + 24, (sizeH + ascent) / 2);
+    g.drawString(message, Preferences.GUI_SMALL + textHOffset, (sizeH + ascent) / 2);
 
     screen.drawImage(offscreen, 0, 0, null);
   }

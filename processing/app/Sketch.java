@@ -1240,7 +1240,8 @@ public class Sketch {
 
 		// handle preprocessing the main file's code
 		// mainClassName = build(TEMP_BUILD_PATH, suggestedClassName);
-		mainClassName = build(target, tempBuildFolder.getAbsolutePath(),
+		boolean success = false;
+		success = build(target, tempBuildFolder.getAbsolutePath(),
 				this.name);
 		//size(tempBuildFolder.getAbsolutePath(), name, target, this.name);
 		// externalPaths is magically set by build()
@@ -1260,7 +1261,8 @@ public class Sketch {
 				}
 			}
 		}
-		return (mainClassName != null);
+
+		return success;
 	}
 
 	/**
@@ -1272,7 +1274,7 @@ public class Sketch {
 	 *
 	 * @return null if compilation failed, main class name if not
 	 */
-	protected String build(Target target, String buildPath,
+	protected boolean build(Target target, String buildPath,
 			String suggestedClassName) throws RunnerException {
 
 		// System.out.println("Preparing libraries with target=" + target +
@@ -1533,7 +1535,7 @@ public class Sketch {
 		}
 		// System.out.println("success = " + success + " ... " +
 		// primaryClassName);
-		return success ? primaryClassName : null;
+		return success;
 	}
 
 	/**
@@ -1573,6 +1575,7 @@ public class Sketch {
 		}
 	}
 
+
 	/**
 	 * This function uploads the binary sketch to the board.
 	 *
@@ -1586,38 +1589,36 @@ public class Sketch {
 	 *            The name of the current sketch.
 	 * @throws RunnerException
 	 */
-	protected String upload(String buildPath, String suggestedClassName,
-						    Target target, String sketchName) throws RunnerException {
+	protected boolean upload(String buildPath, String suggestedClassName,
+				 Target target, String sketchName) throws RunnerException {
 
-		// Check for a successful Sizer run
-		if (ant.getLastRunStatus() == true) {
-			// Configure
-			String buildFile = target.path + File.separator + "build.xml";
-			String uploadPort = (Base.isWindows() ? "\\\\.\\" : "")+
-					     Preferences.get("serial.port");
-			String antTarget = Preferences.get("boards." +
-					       Preferences.get("board") +
-					       ".targets.sketch.upload");
+            // Configure
+            String buildFile = target.path + File.separator + "build.xml";
+            String uploadPort = (Base.isWindows() ? "\\\\.\\" : "")+
+                                Preferences.get("serial.port");
+            String antTarget = Preferences.get("boards." +
+                                               Preferences.get("board") +
+                                               ".targets.sketch.upload");
 
-			if (Preferences.getBoolean("upload.verbose")) {
-				ant.setOutputVerbose();
-			} else {
-				ant.setOutputQuiet();
-			}
+            if (Preferences.getBoolean("upload.verbose")) {
+                ant.setOutputVerbose();
+            } else {
+                ant.setOutputQuiet();
+            }
 
-			// Run
-			ant.run(buildFile, antTarget, new String[] {
-					"build.dest", buildPath,
-					"sketch.name", sketchName,
-					"upload.port", uploadPort });
+            // Run
+            ant.run(buildFile, antTarget, new String[] {
+                        "build.dest", buildPath,
+                        "sketch.name", sketchName,
+                        "upload.port", uploadPort});
 
-			// Wait to finish
-			ant.waitForCompletion();
+            // Wait to finish
+            ant.waitForCompletion();
 
-		}
-
-		return null;
+            //return the status
+            return ant.getLastRunStatus();
 	}
+
 
 	protected int countLines(String what) {
 		char c[] = what.toCharArray();
@@ -1659,7 +1660,7 @@ public class Sketch {
 	 * +-------------------------------------------------------+
 	 * </PRE>
 	 */
-	public boolean exportApplet(Target target) throws RunnerException {
+	public boolean exportApplet(final Target target) throws RunnerException {
 		// make sure the user didn't hide the sketch folder
 		ensureExistence();
 
@@ -1680,16 +1681,30 @@ public class Sketch {
 		appletFolder.mkdirs();
 
 		// build the sketch
-		// String foundName = build(target, appletFolder.getPath(), name);
-		String foundName = build(target, tempBuildFolder.getPath(), this.name);
-		// size(appletFolder.getPath(), name, target, this.name);
-		size(tempBuildFolder.getAbsolutePath(), name, target, this.name);
-		// foundName = upload(appletFolder.getPath(), name, target, this.name);
-		foundName = upload(tempBuildFolder.getPath(), name, target, this.name);
-		// (already reported) error during export, exit this function
-		if (foundName == null)
-			return false;
+		//boolean success = false;
 
+		if ( build(target, tempBuildFolder.getPath(), this.name) &&
+		     upload(tempBuildFolder.getPath(), name, target, name) ) {
+		    return true;
+		} else {
+		    return false;
+		}
+
+		//size(tempBuildFolder.getAbsolutePath(), name, target, this.name);
+		//if (!success) {
+		//    return success;
+		//}
+
+		//success = ;
+//
+		//return success;
+
+		// (already reported) error during export, exit this function
+		//if ( (foundName == null) || (!success)) {
+		//	return false;
+		//}
+
+		/*
 		// if name != exportSketchName, then that's weirdness
 		// BUG unfortunately, that can also be a bug in the preproc :(
 		if (!name.equals(foundName)) {
@@ -1699,93 +1714,6 @@ public class Sketch {
 			return false;
 		}
 
-		/*
-		 * int wide = PApplet.DEFAULT_WIDTH; int high = PApplet.DEFAULT_HEIGHT;
-		 * String renderer = "";
-		 *
-		 * PatternMatcher matcher = new Perl5Matcher(); PatternCompiler compiler
-		 * = new Perl5Compiler();
-		 *
-		 * // this matches against any uses of the size() function, // whether
-		 * they contain numbers of variables or whatever. // this way, no
-		 * warning is shown if size() isn't actually // used in the applet,
-		 * which is the case especially for // beginners that are
-		 * cutting/pasting from the reference. // modified for 83 to match
-		 * size(XXX, ddd so that it'll // properly handle size(200, 200) and
-		 * size(200, 200, P3D) String sizing = // match the renderer string as
-		 * well
-		 * "[\\s\\;]size\\s*\\(\\s*(\\S+)\\s*,\\s*(\\d+),?\\s*([^\\)]*)\\s*\\)";
-		 * // match just the width and height
-		 * //"[\\s\\;]size\\s*\\(\\s*(\\S+)\\s*,\\s*(\\d+)(.*)\\)"; Pattern
-		 * pattern = compiler.compile(sizing);
-		 *
-		 * // adds a space at the beginning, in case size() is the very // first
-		 * thing in the program (very common), since the regexp // needs to
-		 * check for things in front of it. PatternMatcherInput input = new
-		 * PatternMatcherInput(" " + scrubComments(code[0].program)); if
-		 * (matcher.contains(input, pattern)) { MatchResult result =
-		 * matcher.getMatch();
-		 *
-		 * try { wide = Integer.parseInt(result.group(1).toString()); high =
-		 * Integer.parseInt(result.group(2).toString());
-		 *
-		 * renderer = result.group(3).toString(); //.trim();
-		 *
-		 * } catch (NumberFormatException e) { // found a reference to size, but
-		 * it didn't // seem to contain numbers final String message =
-		 * "The size of this applet could not automatically be\n" +
-		 * "determined from your code. You'll have to edit the\n" +
-		 * "HTML file to set the size of the applet.";
-		 *
-		 * Base.showWarning("Could not find applet size", message, null); } } //
-		 * else no size() command found
-		 *
-		 * // originally tried to grab this with a regexp matcher, // but it
-		 * wouldn't span over multiple lines for the match. // this could prolly
-		 * be forced, but since that's the case // better just to parse by hand.
-		 * StringBuffer dbuffer = new StringBuffer(); String lines[] =
-		 * PApplet.split(code[0].program, '\n'); for (int i = 0; i <
-		 * lines.length; i++) { if (lines[i].trim().startsWith("/**")) { // this
-		 * is our comment
-		 */// some smartass put the whole thing on the same line
-		// if (lines[j].indexOf("*/") != -1) break;
-		// for (int j = i+1; j < lines.length; j++) {
-		// if (lines[j].trim().endsWith("*/")) {
-		// remove the */ from the end, and any extra *s
-		// in case there's also content on this line
-		// nah, don't bother.. make them use the three lines
-		// break;
-		// }
-		/*
-		 * int offset = 0; while ((offset < lines[j].length()) &&
-		 * ((lines[j].charAt(offset) == '*') || (lines[j].charAt(offset) ==
-		 * ' '))) { offset++; } // insert the return into the html to help w/
-		 * line breaks dbuffer.append(lines[j].substring(offset) + "\n"); } } }
-		 * String description = dbuffer.toString();
-		 *
-		 * StringBuffer sources = new StringBuffer(); for (int i = 0; i <
-		 * codeCount; i++) { sources.append("<a href=\"" +
-		 * code[i].file.getName() + "\">" + code[i].name + "</a> "); }
-		 *
-		 * File htmlOutputFile = new File(appletFolder, "index.html");
-		 * FileOutputStream fos = new FileOutputStream(htmlOutputFile);
-		 * PrintStream ps = new PrintStream(fos);
-		 *
-		 * // @@sketch@@, @@width@@, @@height@@, @@archive@@, @@source@@ // and
-		 * now @@description@@
-		 *
-		 * InputStream is = null; // if there is an applet.html file in the
-		 * sketch folder, use that File customHtml = new File(folder,
-		 * "applet.html"); if (customHtml.exists()) { is = new
-		 * FileInputStream(customHtml); } if (is == null) { is =
-		 * Base.getStream("applet.html"); }
-		 *
-		 * // copy the loading gif to the applet String LOADING_IMAGE =
-		 * "loading.gif"; File loadingImage = new File(folder, LOADING_IMAGE);
-		 * if (!loadingImage.exists()) { loadingImage = new File("lib",
-		 * LOADING_IMAGE); } Base.copyFile(loadingImage, new File(appletFolder,
-		 * LOADING_IMAGE));
-		 */
 		// copy the source files to the target, since we like
 		// to encourage people to share their code
 		for (int i = 0; i < codeCount; i++) {
@@ -1797,84 +1725,6 @@ public class Sketch {
 			}
 		}
 
-		/*
-		 * // create new .jar file FileOutputStream zipOutputFile = new
-		 * FileOutputStream(new File(appletFolder, name + ".jar"));
-		 * ZipOutputStream zos = new ZipOutputStream(zipOutputFile); ZipEntry
-		 * entry; archives.append(name + ".jar");
-		 *
-		 * // add the manifest file addManifest(zos);
-		 *
-		 * // add the contents of the code folder to the jar // unpacks all jar
-		 * files, unless multi jar files selected in prefs if
-		 * (codeFolder.exists()) { String includes =
-		 * Compiler.contentsToClassPath(codeFolder);
-		 * packClassPathIntoZipFile(includes, zos); }
-		 *
-		 * // add contents of 'library' folders to the jar file // if a file
-		 * called 'export.txt' is in there, it contains // a list of the files
-		 * that should be exported. // otherwise, all files are exported.
-		 * Enumeration en = importedLibraries.elements(); while
-		 * (en.hasMoreElements()) { // in the list is a File object that points
-		 * the // library sketch's "library" folder File libraryFolder =
-		 * (File)en.nextElement(); File exportSettings = new File(libraryFolder,
-		 * "export.txt"); String exportList[] = null; if
-		 * (exportSettings.exists()) { String info[] =
-		 * Base.loadStrings(exportSettings); for (int i = 0; i < info.length;
-		 * i++) { if (info[i].startsWith("applet")) { int idx =
-		 * info[i].indexOf('='); // get applet= or applet = String commas =
-		 * info[i].substring(idx+1).trim(); exportList = PApplet.split(commas,
-		 * ", "); } } } else { exportList = libraryFolder.list(); } for (int i =
-		 * 0; i < exportList.length; i++) { if (exportList[i].equals(".") ||
-		 * exportList[i].equals("..")) continue;
-		 *
-		 * exportList[i] = PApplet.trim(exportList[i]); if
-		 * (exportList[i].equals("")) continue;
-		 *
-		 * File exportFile = new File(libraryFolder, exportList[i]); if
-		 * (!exportFile.exists()) { System.err.println("File " + exportList[i] +
-		 * " does not exist");
-		 *
-		 * } else if (exportFile.isDirectory()) {
-		 * System.err.println("Ignoring sub-folder \"" + exportList[i] + "\"");
-		 *
-		 * } else if (exportFile.getName().toLowerCase().endsWith(".zip") ||
-		 * exportFile.getName().toLowerCase().endsWith(".jar")) { if
-		 * (separateJar) { String exportFilename = exportFile.getName();
-		 * Base.copyFile(exportFile, new File(appletFolder, exportFilename)); if
-		 * (renderer.equals("OPENGL") && exportFilename.indexOf("natives") !=
-		 * -1) { // don't add these to the archives list } else {
-		 * archives.append("," + exportFilename); } } else {
-		 * packClassPathIntoZipFile(exportFile.getAbsolutePath(), zos); }
-		 *
-		 * } else { // just copy the file over.. prolly a .dll or something
-		 * Base.copyFile(exportFile, new File(appletFolder,
-		 * exportFile.getName())); } } }
-		 */
-		/*
-		 * String bagelJar = "lib/core.jar"; packClassPathIntoZipFile(bagelJar,
-		 * zos); }
-		 *
-		 * // files to include from data directory // TODO this needs to be
-		 * recursive if (dataFolder.exists()) { String dataFiles[] =
-		 * dataFolder.list(); for (int i = 0; i < dataFiles.length; i++) { //
-		 * don't export hidden files // skipping dot prefix removes all: . ..
-		 * .DS_Store if (dataFiles[i].charAt(0) == '.') continue;
-		 *
-		 * entry = new ZipEntry(dataFiles[i]); zos.putNextEntry(entry);
-		 * zos.write(Base.grabFile(new File(dataFolder, dataFiles[i])));
-		 * zos.closeEntry(); } }
-		 *
-		 * // add the project's .class files to the jar // just grabs everything
-		 * from the build directory // since there may be some inner classes //
-		 * (add any .class files from the applet dir, then delete them) // TODO
-		 * this needs to be recursive (for packages) String classfiles[] =
-		 * appletFolder.list(); for (int i = 0; i < classfiles.length; i++) { if
-		 * (classfiles[i].endsWith(".class")) { entry = new
-		 * ZipEntry(classfiles[i]); zos.putNextEntry(entry);
-		 * zos.write(Base.grabFile(new File(appletFolder, classfiles[i])));
-		 * zos.closeEntry(); } }
-		 */
 		String classfiles[] = appletFolder.list();
 		// remove the .class files from the applet folder. if they're not
 		// removed, the msjvm will complain about an illegal access error,
@@ -1890,14 +1740,16 @@ public class Sketch {
 				}
 			}
 		}
-
+*/
 		// close up the jar file
 		/*
 		 * zos.flush(); zos.close();
 		 */
-		if (Preferences.getBoolean("uploader.open_folder"))
-			Base.openFolder(appletFolder);
-		return true;
+		//if (Preferences.getBoolean("uploader.open_folder"))
+		//	Base.openFolder(appletFolder);
+
+		//return true;
+
 	}
 
 	static public String scrubComments(String what) {
@@ -1996,91 +1848,6 @@ public class Sketch {
 		return true;
 	}
 
-	/*
-	 * public void addManifest(ZipOutputStream zos) throws IOException {
-	 * ZipEntry entry = new ZipEntry("META-INF/MANIFEST.MF");
-	 * zos.putNextEntry(entry);
-	 *
-	 * String contents = "Manifest-Version: 1.0\n" + "Created-By: Processing " +
-	 * Base.VERSION_NAME + "\n" + "Main-Class: " + name + "\n"; // TODO not
-	 * package friendly zos.write(contents.getBytes()); zos.closeEntry();
-	 */
-	/*
-	 * for (int i = 0; i < bagelClasses.length; i++) { if
-	 * (!bagelClasses[i].endsWith(".class")) continue; entry = new
-	 * ZipEntry(bagelClasses[i]); zos.putNextEntry(entry);
-	 * zos.write(Base.grabFile(new File(exportDir + bagelClasses[i])));
-	 * zos.closeEntry(); }
-	 */
-	/* } */
-
-	/**
-	 * Slurps up .class files from a colon (or semicolon on windows) separated
-	 * list of paths and adds them to a ZipOutputStream.
-	 */
-	/*
-	 * public void packClassPathIntoZipFile(String path, ZipOutputStream zos)
-	 * throws IOException { String pieces[] = PApplet.split(path,
-	 * File.pathSeparatorChar);
-	 *
-	 * for (int i = 0; i < pieces.length; i++) { if (pieces[i].length() == 0)
-	 * continue;
-	 *
-	 * // is it a jar file or directory? if
-	 * (pieces[i].toLowerCase().endsWith(".jar") ||
-	 * pieces[i].toLowerCase().endsWith(".zip")) { try { ZipFile file = new
-	 * ZipFile(pieces[i]); Enumeration entries = file.entries(); while
-	 * (entries.hasMoreElements()) { ZipEntry entry = (ZipEntry)
-	 * entries.nextElement(); if (entry.isDirectory()) { // actually 'continue's
-	 * for all dir entries
-	 *
-	 * } else { String entryName = entry.getName(); // ignore contents of the
-	 * META-INF folders if (entryName.indexOf("META-INF") == 0) continue;
-	 *
-	 * // don't allow duplicate entries if (zipFileContents.get(entryName) !=
-	 * null) continue; zipFileContents.put(entryName, new Object());
-	 *
-	 * ZipEntry entree = new ZipEntry(entryName);
-	 *
-	 * zos.putNextEntry(entree); byte buffer[] = new byte[(int)
-	 * entry.getSize()]; InputStream is = file.getInputStream(entry);
-	 *
-	 * int offset = 0; int remaining = buffer.length; while (remaining > 0) {
-	 * int count = is.read(buffer, offset, remaining); offset += count;
-	 * remaining -= count; }
-	 *
-	 * zos.write(buffer); zos.flush(); zos.closeEntry(); } } } catch
-	 * (IOException e) { System.err.println("Error in file " + pieces[i]);
-	 * e.printStackTrace(); } } else { // not a .jar or .zip, prolly a directory
-	 * File dir = new File(pieces[i]); // but must be a dir, since it's one of
-	 * several paths // just need to check if it exists if (dir.exists()) {
-	 * packClassPathIntoZipFileRecursive(dir, null, zos); } } } }
-	 */
-
-	/**
-	 * Continue the process of magical exporting. This function can be called
-	 * recursively to walk through folders looking for more goodies that will be
-	 * added to the ZipOutputStream.
-	 */
-	/*
-	 * static public void packClassPathIntoZipFileRecursive(File dir, String
-	 * sofar, ZipOutputStream zos) throws IOException { String files[] =
-	 * dir.list(); for (int i = 0; i < files.length; i++) { // ignore . .. and
-	 * .DS_Store if (files[i].charAt(0) == '.') continue;
-	 *
-	 * File sub = new File(dir, files[i]); String nowfar = (sofar == null) ?
-	 * files[i] : (sofar + "/" + files[i]);
-	 *
-	 * if (sub.isDirectory()) { packClassPathIntoZipFileRecursive(sub, nowfar,
-	 * zos);
-	 *
-	 * } else { // don't add .jar and .zip files, since they only work // inside
-	 * the root, and they're unpacked if
-	 * (!files[i].toLowerCase().endsWith(".jar") &&
-	 * !files[i].toLowerCase().endsWith(".zip") && files[i].charAt(0) != '.') {
-	 * ZipEntry entry = new ZipEntry(nowfar); zos.putNextEntry(entry);
-	 * zos.write(Base.grabFile(sub)); zos.closeEntry(); } } } }
-	 */
 
 	/**
 	 * Make sure the sketch hasn't been moved or deleted by some nefarious user.
