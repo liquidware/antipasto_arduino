@@ -293,7 +293,7 @@ public class Wing extends JDialog implements ComponentListener,
 
         /* Assign the reference pane URL */
         try {
-            URL url = new URL("file:///" +
+            URL url = new URL("file:" +
                               System.getProperty("user.dir") + File.separator +
                               referenceURL);
             if ( (url != null) && (this != null)) {
