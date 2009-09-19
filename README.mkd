@@ -1,0 +1,24 @@
+Antipasto Arduino IDE
+=====================
+
+The Antipasto Arduino IDE is a fork from the original Arduino IDE at:
+
+* http://www.arduino.cc
+
+This git repository is the source for the IDE.  If you just want to work with
+the Arduino, TouchShield, or Illuminato X Machina, you can download
+this IDE as a binary for Windows, Mac OSX, and Linux at:
+
+* http://www.illuminatolabs.com
+
+Building the IDE
+================
+
+The IDE is best built using the built-in ant scripts.  Running:
+
+    ant dist.all
+
+Will build the IDE for your current OS (Windows, OSX, Linux).  To run the IDE:
+
+    ant run.all
+
