@@ -6,7 +6,7 @@ The Antipasto Arduino IDE is a fork from the original Arduino IDE at:
 * [http://www.arduino.cc/en/Main/Software][0]
 
 This git repository contains the source for the IDE.  If you just want to work
-with the Arduino, TouchShield, or Illuminato X Machina, you can download
+with the [Arduino], [TouchShield], or [Illuminato X Machina], you can download
 this IDE as a binary for Windows, Mac OSX, and Linux at:
 
 * [http://www.illuminatolabs.com/IlluminatoDownloads.htm][1]
@@ -22,5 +22,15 @@ will build the IDE for your current OS (Windows, OSX, Linux).  To run the IDE:
 
     ant run.all
 
+More Information
+================
+
+The IDE is discussed here on github, on the [Antipasto Hardware Blog][6], and sometimes on the [Illuminato X Machina Mailing List][5].
+
 [0]: http://www.arduino.cc/en/Main/Software "Arduino IDE"
 [1]: http://www.illuminatolabs.com/IlluminatoDownloads.htm "Antipasto Arduino IDE"
+[2]: http://www.liquidware.com/shop/show/ARD/Arduino+Duemilanove "Arduino Duemilanove at Liquidware"
+[3]: http://www.liquidware.com/shop/show/TSL/TouchShield+Slide "TouchShield Slide at Liquidware"
+[4]: http://www.liquidware.com/shop/show/IXM/Illuminato+X+Machina "Illuminato X Machina at Liquidware"
+[5]: http://groups.google.com/group/illuminato?hl=en "Illuminato X Machina Mailing List"
+[6]: http://antipastohw.blogspot.com/ "Antipasto Hardware Blog"
