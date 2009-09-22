@@ -18,7 +18,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
   USA
 */
-#include "wiring.h"
 #include "wiring_private.h"
 
 extern "C" void sketchEarlyInits();

@@ -101,24 +101,27 @@
 
     <target name="linker.link">
 
-        <!-- ELF Output for debugging -->
-        <run name="${cross.gpp}"
-              args="&quot;${obj.path}/sketch-wrapper.o&quot;
-                    -L&quot;${lib.path}&quot;
-                    -l
-                    &quot;hw&quot;
-                    -lm
-                    -o
-                    &quot;${obj.path}/sketch.elf&quot;"/>
+        <property name="linker.args" 
+                  value="&quot;${obj.path}/sketch-wrapper.o&quot;
+                         ${cross.ldflags}
+                         -L &quot;${lib.path}&quot;
+                         -lhw
+                         -lcontrib
+                         -lm
+                         -o"/>
 
-        <run name="${cross.gpp}"
-              args="&quot;${obj.path}/sketch-wrapper.o&quot;
-                    -L&quot;${lib.path}&quot;
-                    -l
-                    &quot;hw&quot;
-                    -lm
-                    -o
-                    &quot;${obj.path}/sketch&quot;"/>
+        <!-- ELF Output for debugging -->
+        <run name="${cross.gcc}"
+              args="${linker.args}
+                    &quot;${obj.path}/sketch.elf&quot;
+                    &quot;-Wl,-Map=${bin.path}/sketch.map,--cref&quot;
+                    "/>
+
+        <!-- Binary Output for hex file creation -->
+        <run name="${cross.gcc}"
+              args="${linker.args}
+                    &quot;${obj.path}/sketch&quot;"/> 
+
     </target>
 
     <target name="hex.hexify">

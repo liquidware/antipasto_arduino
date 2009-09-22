@@ -123,17 +123,16 @@
     <property name="cross.ar"       value="${cross.base}/bin/avr-ar"/>
     <property name="cross.size"     value="${cross.base}/bin/avr-size"/>
 
-    <property name="common.cflags"   value="-Wundef -Winline --param max-inline-insns-single=24 -I&quot;${lib.path}/include&quot;"/>
-    <property name="common.cppflags" value="-Wundef -Winline --param max-inline-insns-single=24 -I&quot;${lib.path}/include&quot;"/>
-    <property name="common.ldflags"  value="--fatal-warnings --gc-sections"/>
+    <property name="common.cflags"   value="-g -w -I&quot;${lib.path}/include&quot;"/>
+    <property name="common.cppflags" value="-g -w -I&quot;${lib.path}/include&quot;"/>
+    <property name="common.ldflags"  value="-Wl,--gc-sections"/>
 
     <property name="cross.gcc.defines" value="-DF_CPU=16000000"/>
-    <property name="cross.cflags"    value="${common.cppflags} -mmcu=${board.cpu} -ffunction-sections -fdata-sections ${cross.gcc.defines} -g"/>
-    <property name="cross.cppflags"  value="${common.cppflags} -mmcu=${board.cpu} -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fno-use-cxa-atexit -fno-use-cxa-get-exception-ptr ${cross.gcc.defines} -g"/>
-    <property name="cross.ldflags"   value="-L &quot;${cross.base}/lib/gcc/avr/4.3.2&quot;"/>
+    <property name="cross.cflags"    value="${common.cflags} -mmcu=${board.cpu} -ffunction-sections -fdata-sections ${cross.gcc.defines}"/>
+    <property name="cross.cppflags"  value="${common.cppflags} -mmcu=${board.cpu} -ffunction-sections -fdata-sections ${cross.gcc.defines}"/>
+    <property name="cross.ldflags"   value="${common.ldflags} -mmcu=${board.cpu} -L &quot;${cross.base}/lib/gcc/avr/4.3.2&quot;"/>
 
-
-    <property name="cross.opts"      value="-O2 -Os"/>
+    <property name="cross.opts"      value="-Os"/>
     <property name="cross.Arch.Code" value="2"/>
 
 </project>

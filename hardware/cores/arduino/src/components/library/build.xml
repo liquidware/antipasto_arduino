@@ -158,8 +158,8 @@
 
     <target name="archiver.body.archive">
         <!-- Archive Body -->
-        <ar name="${cross.ar}" to="${body.lib.path}/libreflex.a"
-            dir="${body.obj.path}" includes="*.o" />
+        <ar name="${cross.ar}" to="${body.lib.path}/libcontrib.a"
+            dir="${body.obj.path}" includes="**/*.o" />
     </target>
 
 </project>

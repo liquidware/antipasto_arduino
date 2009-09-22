@@ -43,23 +43,23 @@ unsigned long millis()
 {
 	unsigned long m;
 	uint8_t oldSREG = SREG;
-	
+
 	// disable interrupts while we read timer0_millis or we might get an
 	// inconsistent value (e.g. in the middle of the timer0_millis++)
 	cli();
 	m = timer0_millis;
 	SREG = oldSREG;
-	
+
 	return m;
 }
 
 unsigned long micros() {
 	unsigned long m, t;
 	uint8_t oldSREG = SREG;
-	
-	cli();	
+
+	cli();
 	t = TCNT0;
-  
+
 #ifdef TIFR0
 	if ((TIFR0 & _BV(TOV0)) && (t == 0))
 		t = 256;
@@ -70,19 +70,19 @@ unsigned long micros() {
 
 	m = timer0_overflow_count;
 	SREG = oldSREG;
-	
+
 	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
 }
 
 void delay(unsigned long ms)
 {
 	unsigned long start = millis();
-	
+
 	while (millis() - start <= ms)
 		;
 }
 
-/* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. 
+/* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock.
  * Disables interrupts, which will disrupt the millis() function if used
  * too frequently. */
 void delayMicroseconds(unsigned int us)
@@ -123,7 +123,7 @@ void delayMicroseconds(unsigned int us)
 	// per iteration, so execute it twice for each microsecond of
 	// delay requested.
 	us <<= 1;
-    
+
 	// partially compensate for the time taken by the preceeding commands.
 	// we can't subtract any more than this or we'd overflow w/ small delays.
 	us--;
@@ -149,14 +149,14 @@ void init()
 	// this needs to be called before setup() or some functions won't
 	// work there
 	sei();
-	
+
 	// on the ATmega168, timer 0 is also used for fast hardware pwm
 	// (using phase-correct PWM would mean that timer 0 overflowed half as often
 	// resulting in different millis() behavior on the ATmega8 and ATmega168)
 #if !defined(__AVR_ATmega8__)
 	sbi(TCCR0A, WGM01);
 	sbi(TCCR0A, WGM00);
-#endif  
+#endif
 	// set timer 0 prescale factor to 64
 #if defined(__AVR_ATmega8__)
 	sbi(TCCR0, CS01);
