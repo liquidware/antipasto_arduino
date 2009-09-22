@@ -96,7 +96,7 @@ void InputShield::setSampleAverages(uint8_t sampleAverages) {
     /* Zero Check */
     if (sampleAverages > 0) {
         _averages = sampleAverages;
-    } else
+    } else {
         _averages = 1;
     }
     

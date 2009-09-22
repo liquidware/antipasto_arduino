@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!--
+   ANT Buildfile - Builds the SFB for Arduino
+   Copyright (C) 2009 Christopher Ladden, Omar Ayub  All rights reserved.
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+   USA
+-->
+<project default="build.all">
+
+    <!--
+        ===================================================================
+         Set the properties related to the target we're compiling
+        ===================================================================
+    -->
+    <basename property="base.name"     file="${basedir}" />
+    <property name="source.path"       value="."/>
+    <property name="base.dir"          value="../../.."/>
+    <property name="include.base.path" value="${base.dir}/src/include"/>
+    <property name="include.sub.path"  value="${base.dir}/src/include/lpc"/>
+    <property name="linker.directive"  value="sfbloader3.ld"/>
+
+    <!--
+        ===================================================================
+         Set the properties related to the Build area
+        ===================================================================
+    -->
+    <property name="obj.base"     value="${build.dest}/targets/${target.name}/build" />
+    <property name="bin.path"     value="${build.dest}/targets/${target.name}/bin"/>
+    <property name="lib.path"     value="${build.dest}/targets/${target.name}/lib"/>
+    <property name="obj.path"     value="${obj.base}/${base.name}"/>
+
+    <!--
+        ===================================================================
+         Compile the source
+        ===================================================================
+    -->
+    <target name="compile.all" depends="clean, prepare, assembler.assemble, compile.c, compile.cpp, copy.libraries, archiver.archive"/>
+    <target name="linker.all" depends="linker.link"/>
+    <target name="build.all" depends="compile.all, linker.all"/>
+
+    <target name="prepare">
+        <mkdir dir="${obj.path}"/>
+        <mkdir dir="${bin.path}"/>
+        <mkdir dir="${lib.path}"/>
+        <mkdir dir="${tmp.path}"/>
+    </target>
+
+    <target name="clean">
+        <!-- Do nothing -->
+    </target>
+
+    <target name="assembler.assemble">
+        <cc name="${cross.gcc}" dest="*.o" destdir="${obj.path}" src="*.S" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c" />
+    </target>
+
+    <target name="compile.c">
+        <cc name="${cross.gcc}" dest="*.o" destdir="${obj.path}" src="*.c" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c" />
+    </target>
+
+    <target name="compile.cpp">
+        <cc name="${cross.gpp}" dest="*.o" destdir="${obj.path}" src="*.cpp" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -I${include.sub.path} -c" />
+    </target>
+
+    <target name="archiver.archive">
+        <ar name="${cross.ar}" to="${lib.path}/libhw.a" dir="${obj.path}" includes="*.o" />
+    </target>
+
+    <target name="copy.libraries">
+        <copy todir="${lib.path}">
+            <!-- Copy the Libraries to the lib folder -->
+            <fileset dir="${obj.path}">
+                <include name="main.o"/>
+            </fileset>
+
+            <!-- Copy the Linker directives to the lib folder -->
+            <!-- Slated for deletion 
+            <fileset dir="${source.path}">
+                <include name="sfbloader.ld"/>
+                <include name="sfbloader3.ld"/>
+            </fileset> -->
+        </copy>
+    </target>
+
+    <target name="linker.link">
+        <!-- Do nothing -->
+    </target>
+
+</project>

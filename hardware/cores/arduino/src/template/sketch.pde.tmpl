@@ -1,0 +1,28 @@
+/*                                             -*- mode:C++ -*-
+ *
+ * Sketch description: [What this sketch does]
+ *
+ * Sketch author: [Who made it]
+ *
+ */
+#include "InputShield.h"
+
+// [Helper functions, if needed, go here]
+
+//  InputShield input = InputShield(0);
+
+void setup() {
+  // [One time setup instructions go here]
+  pinMode(13, OUTPUT);
+  //Serial.print(input.getJoyLat());
+}
+
+volatile long x = 500;
+void loop() {
+  // [Repeating main loop instructions go here]
+  digitalWrite(13, HIGH);
+  delay(x);
+  digitalWrite(13, LOW);
+  delay(x);
+
+}
