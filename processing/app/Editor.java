@@ -2742,6 +2742,44 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         }
     }
 
+
+    /**
+     * Clean the project using ANT
+     * Runs the selected board's clean.all target
+     */
+    private boolean ANTcleanTarget() {
+        AntRunner ant = new AntRunner();
+        String antTarget = "clean.all";
+        String uploadPort = (Base.isWindows() ? "\\\\.\\" : "") +
+                            Preferences.get("serial.port");
+
+        try {
+
+            Target target = new Target(System.getProperty("user.dir") + File.separator + "hardware" +
+                                       File.separator + "cores",
+                                       Preferences.get("boards." + Preferences.get("board") + ".build.core"));
+
+            if (Preferences.getBoolean("build.verbose")) {
+                ant.setOutputVerbose();
+            } else {
+                ant.setOutputQuiet();
+            }
+
+            // Run
+            ant.run(Compiler.getBuildFile(target).toString(),antTarget, new String[] {
+                        "build.dest",  Base.getBuildFolder().getAbsolutePath(),
+                        "sketch.name", sketch.name,
+                        "upload.port", uploadPort,
+                    });
+
+            // Wait to finish
+            ant.waitForCompletion();
+        } catch (Exception e) {
+        }
+
+        return ant.getLastRunStatus();
+    }
+
     /**
      *
      *  Uploads the the bootloader using the ANT buildfile targets
@@ -2761,21 +2799,26 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         String uploadPort = (Base.isWindows() ? "\\\\.\\" : "") +
                             Preferences.get("serial.port");
 
-        if (Preferences.getBoolean("upload.verbose")) {
-            ant.setOutputVerbose();
-        } else {
-            ant.setOutputQuiet();
-        }
 
-        // Run
-        ant.run(Compiler.getBuildFile(target).toString(),antTarget, new String[] {
-                    "build.dest",  Base.getBuildFolder().getAbsolutePath(),
-                    "sketch.name", sketch.name,
-                    "upload.port", uploadPort,
-                });
 
-        // Wait to finish
-        ant.waitForCompletion();
+
+
+            if (Preferences.getBoolean("upload.verbose")) {
+                ant.setOutputVerbose();
+            } else {
+                ant.setOutputQuiet();
+            }
+
+            // Run
+            ant.run(Compiler.getBuildFile(target).toString(),antTarget, new String[] {
+                        "build.dest",  Base.getBuildFolder().getAbsolutePath(),
+                        "sketch.name", sketch.name,
+                        "upload.port", uploadPort,
+                    });
+
+            // Wait to finish
+            ant.waitForCompletion();
+
 
         return ant.getLastRunStatus();
     }
@@ -3269,6 +3312,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         System.out.println("Switching board to: " + evObj.getName());
 
         /* Pre-event firing */
+        //ANTcleanTarget(); disabled for now until this works properly
         sketchbook.rebuildMenus();
         evObj.getBoardMenuItem().setSelected(true);                 //select the menu item
 
