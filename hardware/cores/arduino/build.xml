@@ -63,7 +63,8 @@
     <target name="clean.all">
         <!-- Just delete the entire build directory. -->
         <echoproperties/>
-        <delete dir="${build.dest}"/>
+        <delete dir="${build.dest}/targets"/>
+        <delete dir="${build.dest}/tmp"/>
     </target>
 
     <target name="set.body">
