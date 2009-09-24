@@ -3265,9 +3265,11 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     }
 
     private void onActiveBoardChange(ActiveBoardObject evObj) {
+
         System.out.println("Switching board to: " + evObj.getName());
 
         /* Pre-event firing */
+        sketchbook.rebuildMenus();
         evObj.getBoardMenuItem().setSelected(true);                 //select the menu item
 
         /* Fire the event! */

@@ -86,10 +86,6 @@ public class Sketchbook {
     examplesFolder = new File(System.getProperty("user.dir"), "examples");
     examplesPath = examplesFolder.getAbsolutePath();
 
-    librariesFolder = new File(System.getProperty("user.dir"),
-      "hardware" + File.separator + "libraries");
-    librariesPath = librariesFolder.getAbsolutePath();
-
     String sketchbookPath = Preferences.get("sketchbook.path");
 
     // if a value is at least set, first check to see if the
@@ -368,26 +364,26 @@ public class Sketchbook {
    * the menu will disappear from its original location.
    */
   public void rebuildMenus() {
-    //EditorConsole.systemOut.println("rebuilding menus");
     try {
       // rebuild file/open and the toolbar popup menus
       buildMenu(openMenu);
       builtOnce = true;  // disable error messages while loading
       buildMenu(popupMenu);
 
+      librariesFolder = new File(System.getProperty("user.dir"),
+                                 "hardware/cores/" +
+                                 Preferences.get("boards." + Preferences.get("board") + ".build.core") +
+                                 "/src/components/library");
+      librariesPath = librariesFolder.getAbsolutePath();
+
       // rebuild the "import library" menu
       librariesClassPath = "";
       importMenu.removeAll();
-      /*
-      if (addLibraries(importMenu, new File(getSketchbookPath()))) {
-        importMenu.addSeparator();
-      }
-      */
+
       if (addLibraries(importMenu, examplesFolder)) {
         importMenu.addSeparator();
       }
       addLibraries(importMenu, librariesFolder);
-      //System.out.println("libraries cp is now " + librariesClassPath);
 
     } catch (IOException e) {
       Base.showWarning("Problem while building sketchbook menu",
@@ -432,10 +428,10 @@ public class Sketchbook {
 
   /**
    * Populate an Examples Menu from the disk
-   * 
+   *
    * @author christopher.ladden (9/4/2009)
-   * 
-   * @return JMenu 
+   *
+   * @return JMenu
    */
   public JMenu getExamplesMenu() {
     JMenu examplesMenu = new JMenu("Examples");
@@ -571,7 +567,7 @@ public class Sketchbook {
           return (file.getName()).endsWith(".h");
         }
       };
-      
+
       // if the folder has header files
       if (subfolder.listFiles(onlyHFiles).length > 0) {
       // if a .jar file of the same prefix as the folder exists
