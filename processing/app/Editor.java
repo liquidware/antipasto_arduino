@@ -2745,7 +2745,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     /**
      * Clean the project using ANT
-     * Runs the selected board's clean.all target
+     * Runs the clean.all on the current board's target
      */
     private boolean ANTcleanTarget() {
         AntRunner ant = new AntRunner();
@@ -3312,7 +3312,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         System.out.println("Switching board to: " + evObj.getName());
 
         /* Pre-event firing */
-        //ANTcleanTarget(); disabled for now until this works properly
+        ANTcleanTarget();
         sketchbook.rebuildMenus();
         evObj.getBoardMenuItem().setSelected(true);                 //select the menu item
 
