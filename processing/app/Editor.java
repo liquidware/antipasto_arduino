@@ -190,13 +190,13 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     public JFrame _frame;
     public GadgetPanel gadgetPanel ;
     public Wing referencePanel;
+    ButtonGroup boardGroup = new ButtonGroup();
 
     private EventListenerList activeBoardChangedEventList = new EventListenerList();
 
 
     public PluginPanel pluginPanel = new PluginPanel(Base.pluginloader);
     AntRunner ant = new AntRunner();
-
     //static Properties keywords; // keyword -> reference html lookup
 
 
@@ -1087,7 +1087,13 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         menu.addSeparator();
 
         boardsMenu = new JMenu("Board");
-        ButtonGroup boardGroup = new ButtonGroup();
+        JMenu arduinoBoardsMenu = new JMenu("Arduino");
+        JMenu illuminatoBoardsMenu = new JMenu("Illuminato");
+
+        boardsMenu.add(arduinoBoardsMenu);
+        boardsMenu.add(illuminatoBoardsMenu);
+
+
         for (Iterator i = Preferences.getSubKeys("boards"); i.hasNext(); ) {
             String board = (String) i.next();
             item = new JRadioButtonMenuItem();
@@ -1099,7 +1105,14 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                 action.actionPerformed(null);
             }
             boardGroup.add(item);
-            boardsMenu.add(item);
+
+            /* Bucket the boards into groups */
+            if (Preferences.get("boards." + board + ".group").equals("Illuminato")) {
+                illuminatoBoardsMenu.add(item);
+            } else {
+                arduinoBoardsMenu.add(item);
+            }
+
         }
         menu.add(boardsMenu);
 
@@ -1170,6 +1183,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             this.menuItem = menuItem;
         }
         public void actionPerformed(ActionEvent actionevent) {
+            this.menuItem.setSelected(true);
             changeActiveBoard(board);
         }
     }
@@ -1182,21 +1196,13 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     * @param board
     * This is value is usually checked against the list of
     * supported boards in the boards.txt file.
-    */
-   public void changeActiveBoard(String board) {
-
+    * **/
+    public void changeActiveBoard(String board) {
 
        /* Change to this board */
        Preferences.set("board", board);        //set the board in the preferences
 
-       /* Find board menu item */
-       JMenuItem menuItem = new JMenuItem("");
-       for (int x=0; x < boardsMenu.getItemCount(); x++) {
-           menuItem = boardsMenu.getItem(x);
-           if (menuItem.getText().equals(Preferences.get("boards." + board + ".name"))) {
-               break;
-           }
-       }
+       JMenu menuItem = null;
 
         /* Fire the board change event */
         onActiveBoardChange(new ActiveBoardObject(this,
@@ -3314,7 +3320,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         /* Pre-event firing */
         ANTcleanTarget();
         sketchbook.rebuildMenus();
-        evObj.getBoardMenuItem().setSelected(true);                 //select the menu item
 
         /* Fire the event! */
         Object[] listeners = activeBoardChangedEventList.getListenerList();
