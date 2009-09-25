@@ -583,57 +583,68 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         sketchbook.rebuildMenus();
     }
 
-    // ...................................................................
 
     /**
-     * Post-constructor setup for the editor area. Loads the last
-     * sketch that was used (if any), and restores other Editor settings.
-     * The complement to "storePreferences", this is called when the
-     * application is first launched.
+     * Restores the editor window size and location
+     * 
+     * @author christopher.ladden (9/25/2009)
      */
-    public void restorePreferences() {
-        // figure out window placement
-
+    public void restoreWindow() {
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        boolean windowPositionValid = true;
+        boolean windowPositionIsValid = true;
 
-        if (Preferences.get("last.screen.height") != null) {
+        //Check each parameter used in window restoration
+        if ( (Preferences.get("last.screen.height") != null) || 
+             (Preferences.get("last.screen.width") != null) ||
+             (Preferences.get("last.window.x") != null) ||
+             (Preferences.get("last.window.y") != null) ||
+             (Preferences.get("last.divider.location") != null)) {
             // if screen size has changed, the window coordinates no longer
             // make sense, so don't use them unless they're identical
             int screenW = Preferences.getInteger("last.screen.width");
             int screenH = Preferences.getInteger("last.screen.height");
 
             if ((screen.width != screenW) || (screen.height != screenH)) {
-                windowPositionValid = false;
+                windowPositionIsValid = false;
             }
             int windowX = Preferences.getInteger("last.window.x");
             int windowY = Preferences.getInteger("last.window.y");
             if ((windowX < 0) || (windowY < 0) ||
                 (windowX > screenW) || (windowY > screenH)) {
-                windowPositionValid = false;
+                windowPositionIsValid = false;
             }
 
         } else {
-            windowPositionValid = false;
+            windowPositionIsValid = false;
         }
 
-        if (!windowPositionValid) {
-            //System.out.println("using default size");
+        if (!windowPositionIsValid) {
+            //Restore, using defaults
             int windowH = Preferences.getInteger("default.window.height");
             int windowW = Preferences.getInteger("default.window.width");
             setBounds((screen.width - windowW) / 2,
                       (screen.height - windowH) / 2,
                       windowW, windowH);
-            // this will be invalid as well, so grab the new value
-            Preferences.setInteger("last.divider.location",
-                                   splitPane.getDividerLocation());
+            // this will be invalid as well, so use a default value
+            splitPane.setDividerLocation((windowH/2)+100);
         } else {
+            //Restore, using preferences
             setBounds(Preferences.getInteger("last.window.x"),
                       Preferences.getInteger("last.window.y"),
                       Preferences.getInteger("last.window.width"),
                       Preferences.getInteger("last.window.height"));
+
+            splitPane.setDividerLocation(Preferences.getInteger("last.divider.location"));
         }
 
+    }
+
+    /**
+     * Restores the last board from the preferences file.
+     * 
+     * @author christopher.ladden (9/25/2009)
+     */
+    public void restoreBoard() {
         //Determine if the last board is still valid
         String supportedBoard = "";
         String lastBoard = Preferences.get("board");
@@ -644,7 +655,14 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             }
         }
         Preferences.set("board", supportedBoard);
+    }
 
+    /**
+     * Restores the last sketch from the preferences file.
+     * 
+     * @author christopher.ladden (9/25/2009)
+     */
+    public void restoreSketch() {
         // last sketch that was in use, or used to launch the app
         if (Base.openedAtStartup != null) {
             handleOpen2(Base.openedAtStartup);
@@ -662,12 +680,23 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                 handleNew2(true);
             }
         }
+    }
 
+    // ...................................................................
 
-        // location for the console/editor area divider
+    /**
+     * Post-constructor setup for the editor area. Loads the last
+     * sketch that was used (if any), and restores other Editor settings.
+     * The complement to "storePreferences", this is called when the
+     * application is first launched.
+     */
+    public void restorePreferences() {
 
-        int location = Preferences.getInteger("last.divider.location");
-        splitPane.setDividerLocation(location);
+        restoreWindow();
+
+        restoreBoard();
+
+        restoreSketch();
 
         applyPreferences();
 
