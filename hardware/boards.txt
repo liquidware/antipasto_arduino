@@ -1,6 +1,8 @@
 ##############################################################
+#Board Description
 
 template.name=Template (not active)
+template.group=Arduino
 template.build.core=template
 template.reference=hardware/cores/arduino/reference/index.html
 
@@ -10,8 +12,10 @@ template.targets.sketch.upload=upload.sketch
 template.targets.bootloader.upload=upload.bootloader
 
 ##############################################################
+#Board Description
 
 ixm.name=Illuminato X Machina
+ixm.group=Illuminato
 ixm.build.core=ixm
 ixm.reference=hardware/cores/ixm/reference/index.html
 
@@ -21,3 +25,25 @@ ixm.targets.sketch.upload=upload.sketch
 ixm.targets.bootloader.upload=upload.bootloader
 
 ##############################################################
+#Board Description
+
+diecimila.name=Arduino Diecimila, Duemilanove, or Nano w/ ATmega168
+diecimila.group=Arduino
+diecimila.build.core=arduino
+diecimila.reference=hardware/cores/arduino/reference/index.html
+
+diecimila.upload.protocol=stk500
+diecimila.upload.maximum_size=14336
+diecimila.upload.speed=19200
+
+diecimila.bootloader.low_fuses=0xff
+diecimila.bootloader.high_fuses=0xdd
+diecimila.bootloader.extended_fuses=0x00
+diecimila.bootloader.path=atmega
+diecimila.bootloader.file=ATmegaBOOT_168_diecimila.hex
+diecimila.bootloader.unlock_bits=0x3F
+diecimila.bootloader.lock_bits=0x0F
+
+diecimila.build.mcu=atmega168
+diecimila.build.f_cpu=16000000L
+diecimila.build.core=arduino
