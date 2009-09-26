@@ -250,6 +250,7 @@
             <copy file="build/linux/dist/tools/sfbprog"           todir="${build.dir}/hardware/uploaders/bin"/>
             <copy file="build/linux/dist/tools/sfbmon"           todir="${build.dir}/hardware/uploaders/bin"/>
             <copy file="build/linux/dist/Arduino" todir="${build.dir}" />
+            <chmod dir="build/linux" includes="**/Arduino" perm="ugo+rx"/>
         </sequential>
     </macrodef>
 
