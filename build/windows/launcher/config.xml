@@ -1,0 +1,94 @@
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>lib</jar>
+  <outfile>.\..\work\arduino.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.sun.com/javase/downloads/</downloadUrl>
+  <supportUrl></supportUrl>
+  <customProcName>true</customProcName>
+  <stayAlive>true</stayAlive>
+  <manifest></manifest>
+  <icon>application.ico</icon>
+  <classPath>
+    <mainClass>processing.app.Base</mainClass>
+    <cp>lib</cp>
+    <cp>lib/build</cp>
+    <cp>lib/pde.jar</cp>
+    <cp>lib/mrj.jar</cp>
+    <cp>lib/RXTXcomm.jar</cp>
+    <cp>lib/oro.jar</cp>
+    <cp>lib/junit.jar</cp>
+    <cp>lib/sax2.jar</cp>
+    <cp>lib/filterbuilder.jar</cp>
+    <cp>lib/htmllexer.jar</cp>
+    <cp>lib/htmlparser.jar</cp>
+    <cp>lib/thumbelina.jar</cp>
+    <cp>lib/registry.jar</cp>
+    <cp>lib/antlr.jar</cp>
+    <cp>lib/ant.jar</cp>
+    <cp>lib/ant-antlr.jar</cp>
+    <cp>lib/ant-apache-bcel.jar</cp>
+    <cp>lib/ant-apache-bsf.jar</cp>
+    <cp>lib/ant-apache-log4j.jar</cp>
+    <cp>lib/ant-apache-oro.jar</cp>
+    <cp>lib/ant-apache-regexp.jar</cp>
+    <cp>lib/ant-apache-resolver.jar</cp>
+    <cp>lib/ant-commons-logging.jar</cp>
+    <cp>lib/ant-commons-net.jar</cp>
+    <cp>lib/ant-jai.jar</cp>
+    <cp>lib/ant-javamail.jar</cp>
+    <cp>lib/ant-jdepend</cp>
+    <cp>lib/ant-jmf.jar</cp>
+    <cp>lib/ant-jsch.jar</cp>
+    <cp>lib/ant-junit.jar</cp>
+    <cp>lib/ant-launcher.jar</cp>
+    <cp>lib/ant-netrexx.jar</cp>
+    <cp>lib/ant-nodeps.jar</cp>
+    <cp>lib/ant-starteam.jar</cp>
+    <cp>lib/ant-stylebook.jar</cp>
+    <cp>lib/ant-swing.jar</cp>
+    <cp>lib/ant-testutil.jar</cp>
+    <cp>lib/ant-trax.jar</cp>
+    <cp>lib/ant-weblogic.jar</cp>
+    <cp>lib/xercesImpl.jar</cp>
+    <cp>lib/xml-apis.jar</cp>
+    <cp>lib/bcel-5.1.jar</cp>
+    <cp>lib/commons-httpclient-3.0.1.jar</cp>
+    <cp>lib/commons-logging-1.0.4.jar</cp>
+    <cp>lib/ivy-1.3.1.jar</cp>
+    <cp>lib/ant-contrib-1.0b3.jar</cp>
+    <cp>lib/log4j.jar</cp>
+    <cp>lib/jpf.jar</cp>
+    <cp>lib/jpf-boot.jar</cp>
+    <cp>lib/jpf-tools.jar</cp>
+    <cp>lib/jxp.jar</cp>
+    <cp>lib/pivot-core-incubating.jar</cp>
+    <cp>lib/pivot-wtk-incubating.jar</cp>
+    <cp>lib/AntRunner.jar</cp>
+    <cp>jar/Antipasto_Arduino.jar</cp>
+  </classPath>
+  <jre>
+    <path>java</path>
+    <minVersion>1.5.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>jdkOnly</jdkPreference>
+    <opt>-Xms128m -Xmx128m -Djava.library.path=lib</opt>
+  </jre>
+  <splash>
+    <file>.\..\..\shared\lib\about.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+  <messages>
+    <startupErr>An error occurred while starting the application.</startupErr>
+    <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
+    <jreVersionErr>This application requires at least Java Development Kit</jreVersionErr>
+    <launcherErr>The registry refers to a nonexistent Java Development Kit  installation or the runtime is corrupted.</launcherErr>
+    <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>
