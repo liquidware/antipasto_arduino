@@ -47,3 +47,10 @@ diecimila.bootloader.lock_bits=0x0F
 diecimila.build.mcu=atmega168
 diecimila.build.f_cpu=16000000L
 diecimila.build.core=arduino
+
+#ANT core targets
+diecimila.targets.sketch.verify=build.all
+diecimila.targets.sketch.upload=upload.sketch
+diecimila.targets.bootloader.upload=upload.bootloader
+
+
