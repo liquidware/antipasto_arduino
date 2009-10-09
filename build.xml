@@ -323,7 +323,6 @@
 
     </target>
 
-
     <target name="dist.OS">
 
         <!-- Distribute OS Specific files -->
@@ -332,9 +331,10 @@
             <then>
                 <!--- Windows -->
 
-                <!--Compile the windows launcher -->
-                <exec dir="build/windows/launcher" executable="make" />
-                <copy file="build/windows/launcher/arduino.exe" todir="${build.dir}"/>
+                 <!--Compile the windows launcher -->
+                <exec executable="./build/windows/launcher/launch4j/launch4j">
+                    <arg line="../config.xml"/>
+                </exec>
             </then>
 
         <elseif>

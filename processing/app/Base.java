@@ -50,8 +50,7 @@ import com.apple.mrj.*;
 import com.ice.jni.registry.*;
 
 import processing.core.*;
-
-
+import processing.app.ExceptionHandler;
 
 /**
  * The base class for the main Arduino application.
@@ -75,12 +74,22 @@ public class Base {
   static public Editor editor;
   static public PluginLoader pluginloader;
 
+
+
   static public void main(String args[]) {
+    
+    /* Create a catch for tricky errors */
+    Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+    
+    // Uncomment for testing
+    //if (1==1) {
+    //   throw new RuntimeException("Exception thrown on a thread");
+    //}
+
 
     pluginloader = new PluginLoader();
 
     // make sure that this is running on java 1.4
-
     if (PApplet.javaVersion < 1.4f) {
       //System.err.println("no way man");
       Base.showError("Need to install Java 1.4",
