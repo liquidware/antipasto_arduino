@@ -62,7 +62,7 @@ import processing.app.ExceptionHandler;
 public class Base {
   static final String DIST_NAME = "Antipasto Arduino";
   static final int VERSION = 0;
-  static final String VERSION_NAME = "0.8.28";
+  static final String VERSION_NAME = "0.8.29";
 
   /**
    * Path of filename opened on the command line,
@@ -77,10 +77,10 @@ public class Base {
 
 
   static public void main(String args[]) {
-    
+
     /* Create a catch for tricky errors */
     Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
-    
+
     // Uncomment for testing
     //if (1==1) {
     //   throw new RuntimeException("Exception thrown on a thread");
