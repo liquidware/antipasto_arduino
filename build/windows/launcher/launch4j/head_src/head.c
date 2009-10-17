@@ -300,9 +300,9 @@ BOOL findJavaHome(char* path, const int jdkPreference) {
 				do {
 					path[i] = buffer[i];
 				} while (path[i++] != 0);
-                // (foundJava & FOUND_SDK) {  // removed by fry
-                //    appendPath(path, "jre");
-                //
+				if (foundJava & FOUND_SDK) {
+					appendPath(path, "jre");
+				}
 				RegCloseKey(hKey);
 				return TRUE;
 			}
@@ -623,10 +623,6 @@ int prepare(const char *lpCmdLine) {
 			&& strstr(lpCmdLine, "--l4j-default-proc") == NULL;
 	const BOOL wrapper = loadBool(WRAPPER);
 
-    char jdk_path[_MAX_PATH] = {0};  // fry
-    strcpy(jdk_path, cmd);
-    //msgBox(jdk_path);
-
 	appendLauncher(setProcName, exePath, pathLen, cmd);
 
 	// Heap sizes
@@ -691,11 +687,6 @@ int prepare(const char *lpCmdLine) {
 		} else if (*jar) {
 			appendAppClasspath(args, jar, exp);
 		}
-
-	// add tools.jar for JDK  [fry]
-	char tools[_MAX_PATH] = { 0 };
-	sprintf(tools, "%s\\lib\\tools.jar", jdk_path);
-	appendAppClasspath(args, tools, exp);
 
 		// Deal with wildcards or >> strcat(args, exp); <<
 		char* cp = strtok(exp, ";");
@@ -789,8 +780,6 @@ BOOL appendToPathVar(const char* path) {
 	return SetEnvironmentVariable("Path", chBuf);
 }
 
-// may need to ignore STILL_ACTIVE (error code 259) here
-// http://msdn.microsoft.com/en-us/library/ms683189(VS.85).aspx
 DWORD execute(const BOOL wait) {
 	STARTUPINFO si;
     memset(&pi, 0, sizeof(pi));
