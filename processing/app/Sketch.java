@@ -1595,10 +1595,19 @@ public class Sketch {
             // Configure
             String buildFile = target.path + File.separator + "build.xml";
             String uploadPort = (Base.isWindows() ? "\\\\.\\" : "")+
-                                Preferences.get("serial.port");
-            String antTarget = Preferences.get("boards." +
-                                               Preferences.get("board") +
-                                               ".targets.sketch.upload");
+                                 Preferences.get("serial.port");
+            String antTarget  =  Preferences.get("boards." +
+                                                 Preferences.get("board") +
+                                                 ".targets.sketch.upload");
+	    String baudRate   =  Preferences.get("boards." +
+                                                 Preferences.get("board") +
+                                                 ".upload.speed");
+	    String protocol   =  Preferences.get("boards." +
+                                                 Preferences.get("board") +
+                                                 ".upload.protocol");
+	    String uploadCPU  =  Preferences.get("boards." +
+                                                 Preferences.get("board") +
+                                                 ".upload.mcu");
 
             if (Preferences.getBoolean("upload.verbose")) {
                 ant.setOutputVerbose();
@@ -1610,7 +1619,10 @@ public class Sketch {
             ant.run(buildFile, antTarget, new String[] {
                         "build.dest", buildPath,
                         "sketch.name", sketchName,
-                        "upload.port", uploadPort});
+                        "upload.port", uploadPort,
+			"upload.avrdude.baud", baudRate,
+			"upload.avrdude.protocol", protocol,
+			"upload.avrdude.cpu",uploadCPU});
 
             // Wait to finish
             ant.waitForCompletion();

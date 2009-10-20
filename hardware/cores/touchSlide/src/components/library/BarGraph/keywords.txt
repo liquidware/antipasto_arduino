@@ -1,0 +1,24 @@
+#######################################
+# Syntax Coloring Map For Ultrasound
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+BarGraph	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+setBackground	KEYWORD2
+setRange	KEYWORD2
+setValue	KEYWORD2
+repaint	KEYWORD2
+getValue	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

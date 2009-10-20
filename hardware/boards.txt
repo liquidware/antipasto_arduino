@@ -29,12 +29,17 @@ ixm.targets.bootloader.upload=upload.bootloader
 
 diecimila.name=Arduino Diecimila, Duemilanove, or Nano w/ ATmega168
 diecimila.group=Arduino
+
 diecimila.build.core=arduino
+diecimila.build.mcu=atmega168
+diecimila.build.f_cpu=16000000L
+
 diecimila.reference=hardware/cores/arduino/reference/index.html
 
 diecimila.upload.protocol=stk500
 diecimila.upload.maximum_size=14336
 diecimila.upload.speed=19200
+diecimila.upload.mcu=m168
 
 diecimila.bootloader.low_fuses=0xff
 diecimila.bootloader.high_fuses=0xdd
@@ -44,13 +49,27 @@ diecimila.bootloader.file=ATmegaBOOT_168_diecimila.hex
 diecimila.bootloader.unlock_bits=0x3F
 diecimila.bootloader.lock_bits=0x0F
 
-diecimila.build.mcu=atmega168
-diecimila.build.f_cpu=16000000L
-diecimila.build.core=arduino
-
 #ANT core targets
 diecimila.targets.sketch.verify=build.all
 diecimila.targets.sketch.upload=upload.sketch
 diecimila.targets.bootloader.upload=upload.bootloader
 
+##############################################################
+#Board Description
 
+touchSlide.name=TouchShield
+touchSlide.group=Arduino
+touchSlide.build.core=touchSlide
+touchSlide.build.mcu=atmega2560
+touchSlide.build.f_cpu=16000000L
+touchSlide.reference=hardware/cores/arduino/reference/index.html
+
+touchSlide.upload.protocol=butterfly
+touchSlide.upload.maximum_size=250000
+touchSlide.upload.speed=57600
+touchSlide.upload.mcu=m2560
+
+#ANT core targets
+touchSlide.targets.sketch.verify=build.all
+touchSlide.targets.sketch.upload=upload.sketch
+touchSlide.targets.bootloader.upload=upload.bootloader

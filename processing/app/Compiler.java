@@ -108,6 +108,12 @@ public class Compiler implements MessageConsumer {
                 String antTarget = Preferences.get("boards." +
                                                    Preferences.get("board") +
                                                    ".targets.sketch.verify");
+                String boardMCU  = Preferences.get("boards." +
+                                                   Preferences.get("board") +
+                                                   ".build.mcu");
+                String maxSize   = Preferences.get("boards." +
+                                                   Preferences.get("board") +
+                                                   ".upload.maximum_size");
 
                 // Configure
                 if (Preferences.getBoolean("build.verbose")) {
@@ -119,7 +125,9 @@ public class Compiler implements MessageConsumer {
                 // Run
                 ant.run(buildFile.toString(),antTarget, new String[] {
                             "build.dest",  buildPath,
-                            "sketch.name", sketch.name});
+                            "sketch.name", sketch.name,
+                            "board.cpu", boardMCU,
+                            "sketch.maxsize", maxSize});
 
                 // Wait to finish
                 ant.waitForCompletion();
