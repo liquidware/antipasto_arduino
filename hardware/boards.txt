@@ -57,11 +57,73 @@ diecimila.targets.bootloader.upload=upload.bootloader
 ##############################################################
 #Board Description
 
+atmega328.name=Arduino Duemilanove or Nano w/ ATmega328
+atmega328.group=Arduino
+
+atmega328.build.mcu=atmega328p
+atmega328.build.f_cpu=16000000L
+atmega328.build.core=arduino
+
+atmega328.reference=hardware/cores/arduino/reference/index.html
+
+atmega328.upload.protocol=stk500
+atmega328.upload.maximum_size=30720
+atmega328.upload.speed=57600
+diecimila.upload.mcu=m328p
+
+atmega328.bootloader.low_fuses=0xFF
+atmega328.bootloader.high_fuses=0xDA
+atmega328.bootloader.extended_fuses=0x05
+atmega328.bootloader.path=atmega
+atmega328.bootloader.file=ATmegaBOOT_168_atmega328.hex
+atmega328.bootloader.unlock_bits=0x3F
+atmega328.bootloader.lock_bits=0x0F
+
+#ANT core targets
+atmega328.targets.sketch.verify=build.all
+atmega328.targets.sketch.upload=upload.sketch
+atmega328.targets.bootloader.upload=upload.bootloader
+
+##############################################################
+#Board Description
+
+mega.name=Arduino Mega
+mega.group=Arduino
+
+mega.build.mcu=atmega1280
+mega.build.f_cpu=16000000L
+mega.build.core=arduino
+
+mega.reference=hardware/cores/arduino/reference/index.html
+
+mega.upload.protocol=stk500
+mega.upload.maximum_size=126976
+mega.upload.speed=57600
+mega.upload.mcu=m1280
+
+mega.bootloader.low_fuses=0xFF
+mega.bootloader.high_fuses=0xDA
+mega.bootloader.extended_fuses=0xF5
+mega.bootloader.path=atmega
+mega.bootloader.file=ATmegaBOOT_168_atmega1280.hex
+mega.bootloader.unlock_bits=0x3F
+mega.bootloader.lock_bits=0x0F
+
+#ANT core targets
+mega.targets.sketch.verify=build.all
+mega.targets.sketch.upload=upload.sketch
+mega.targets.bootloader.upload=upload.bootloader
+
+##############################################################
+#Board Description
+
 touchSlide.name=TouchShield
 touchSlide.group=Arduino
+
 touchSlide.build.core=touchSlide
 touchSlide.build.mcu=atmega2560
 touchSlide.build.f_cpu=16000000L
+
 touchSlide.reference=hardware/cores/arduino/reference/index.html
 
 touchSlide.upload.protocol=butterfly
