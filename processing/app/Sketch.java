@@ -1608,6 +1608,9 @@ public class Sketch {
 	    String uploadCPU  =  Preferences.get("boards." +
                                                  Preferences.get("board") +
                                                  ".upload.mcu");
+            String boardName  =  Preferences.get("boards." +
+                                                 Preferences.get("board") +
+                                                 ".name");
 
             if (Preferences.getBoolean("upload.verbose")) {
                 ant.setOutputVerbose();
@@ -1622,7 +1625,8 @@ public class Sketch {
                         "upload.port", uploadPort,
 			"upload.avrdude.baud", baudRate,
 			"upload.avrdude.protocol", protocol,
-			"upload.avrdude.cpu",uploadCPU});
+			"upload.avrdude.cpu", uploadCPU,
+			"board.name", boardName});
 
             // Wait to finish
             ant.waitForCompletion();

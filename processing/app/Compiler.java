@@ -114,6 +114,9 @@ public class Compiler implements MessageConsumer {
                 String maxSize   = Preferences.get("boards." +
                                                    Preferences.get("board") +
                                                    ".upload.maximum_size");
+                String boardName = Preferences.get("boards." +
+                                                   Preferences.get("board") +
+                                                   ".name");
 
                 // Configure
                 if (Preferences.getBoolean("build.verbose")) {
@@ -127,7 +130,8 @@ public class Compiler implements MessageConsumer {
                             "build.dest",  buildPath,
                             "sketch.name", sketch.name,
                             "board.cpu", boardMCU,
-                            "sketch.maxsize", maxSize});
+                            "sketch.maxsize", maxSize,
+                            "board.name", boardName});
 
                 // Wait to finish
                 ant.waitForCompletion();
