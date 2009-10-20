@@ -1525,7 +1525,7 @@ void	lcd_rectangle(int x1, int y1, int x2, int y2, COLOR outline_color, COLOR fi
 	bcolor	=	fill_color;
 	fcolor	=	outline_color;
 	fillEnb	=	true;
-	drawrect(x1, y1, (x2 - x1), (y2, y1));
+	drawrect(x1, y1, (x2 - x1), (y2 - y1));
 }
 
 //*******************************************************************************
