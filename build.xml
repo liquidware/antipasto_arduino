@@ -133,7 +133,7 @@
 
             <mkdir dir="${classes.dir}"/>
             <javac srcdir="${src.java.antipasto};
-                           ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath" />
+                           ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath"/>
 
 
         <!-- Jar -->
@@ -350,6 +350,14 @@
                         <include name="**/*" />
                     </fileset>
                 </copy>
+                
+                <!-- Overwrite using architecture specific distribution libraries -->
+                <copy todir="${build.dir}/Arduino.app/Contents/Resources" overwrite="true">
+                    <fileset dir="build/macosx/dist/Arduino.app/Contents/Resources/Java" >
+                        <include name="librxtxSerial.jnilib" />
+                    </fileset>
+                </copy>
+                
                 <move todir="${build.dir}/Arduino.app/Contents/Resources/Java">
                     <fileset dir="${build.dir}/Arduino.app/Contents/Resources">
                         <include name="*.jnilib"/>
