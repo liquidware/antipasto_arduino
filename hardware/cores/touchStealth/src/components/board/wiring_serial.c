@@ -38,19 +38,19 @@ int rx_buffer_tail = 0;
 /*
 SIGNAL(SIG_USART1_RECV)
 {
-    unsigned char c = UDR1;
+	unsigned char c = UDR1;
 
-    int i = (rx_buffer_head + 1) % RX_BUFFER_SIZE;
+	int i = (rx_buffer_head + 1) % RX_BUFFER_SIZE;
 
-    // if we should be storing the received character into the location
-    // just before the tail (meaning that the head would advance to the
-    // current location of the tail), we're about to overflow the buffer
-    // and so we don't write the character or advance the head.
+	// if we should be storing the received character into the location
+	// just before the tail (meaning that the head would advance to the
+	// current location of the tail), we're about to overflow the buffer
+	// and so we don't write the character or advance the head.
     if (i != rx_buffer_tail)
     {
-        rx_buffer[rx_buffer_head] = c;
-        rx_buffer_head = i;
-    }
+		rx_buffer[rx_buffer_head] = c;
+		rx_buffer_head = i;
+	}
 }
 */
 
@@ -74,7 +74,7 @@ void serialWrite(unsigned char c)
 
 volatile unsigned int x;
 volatile unsigned char bits=0;
-
+	
 cli();
 
 CLRBIT(RXTX_PORT, TX_PIN); 
@@ -90,7 +90,7 @@ for (bits = 0; bits<8; bits++)
 		SETBIT(RXTX_PORT,TX_PIN); //bit is a '1'
 		}
 	else
-		{
+{
 		CLRBIT(RXTX_PORT,TX_PIN); //bit is a '0'
 		}
 
@@ -153,80 +153,80 @@ return rx_msg;
 
 void serialFlush()
 {
-    // don't reverse this or there may be problems if the RX interrupt
-    // occurs after reading the value of rx_buffer_head but before writing
-    // the value to rx_buffer_tail; the previous value of rx_buffer_head
-    // may be written to rx_buffer_tail, making it appear as if the buffer
-    // were full, not empty.
-    rx_buffer_head = rx_buffer_tail;
+	// don't reverse this or there may be problems if the RX interrupt
+	// occurs after reading the value of rx_buffer_head but before writing
+	// the value to rx_buffer_tail; the previous value of rx_buffer_head
+	// may be written to rx_buffer_tail, making it appear as if the buffer
+	// were full, not empty.
+	rx_buffer_head = rx_buffer_tail;
 }
 
 void printMode(int mode)
 {
-    // do nothing, we only support serial printing, not lcd.
+	// do nothing, we only support serial printing, not lcd.
 }
 
 void printByte(unsigned char c)
 {
-    serialWrite(c);
+	serialWrite(c);
 }
 
 void printNewline()
 {
-    printByte('\n');
+	printByte('\n');
 }
 
 void printString(const char *s)
 {
-    while (*s)
-        printByte(*s++);
+	while (*s)
+		printByte(*s++);
 }
 
 void printIntegerInBase(unsigned long n, unsigned long base)
 { 
-    unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
-    unsigned long i = 0;
+	unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
+	unsigned long i = 0;
 
     if (n == 0)
     {
-        printByte('0');
-        return;
-    }
+		printByte('0');
+		return;
+	} 
 
     while (n > 0)
     {
-        buf[i++] = n % base;
-        n /= base;
-    }
+		buf[i++] = n % base;
+		n /= base;
+	}
 
-    for (; i > 0; i--)
-        printByte(buf[i - 1] < 10 ?
-                  '0' + buf[i - 1] :
-                  'A' + buf[i - 1] - 10);
+	for (; i > 0; i--)
+		printByte(buf[i - 1] < 10 ?
+			'0' + buf[i - 1] :
+			'A' + buf[i - 1] - 10);
 }
 
 void printInteger(long n)
 {
     if (n < 0)
     {
-        printByte('-');
-        n = -n;
-    }
+		printByte('-');
+		n = -n;
+	}
 
-    printIntegerInBase(n, 10);
+	printIntegerInBase(n, 10);
 }
 
 void printHex(unsigned long n)
 {
-    printIntegerInBase(n, 16);
+	printIntegerInBase(n, 16);
 }
 
 void printOctal(unsigned long n)
 {
-    printIntegerInBase(n, 8);
+	printIntegerInBase(n, 8);
 }
 
 void printBinary(unsigned long n)
 {
-    printIntegerInBase(n, 2);
+	printIntegerInBase(n, 2);
 }

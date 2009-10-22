@@ -11,25 +11,25 @@
 //*******************************************************************************
 
 
-#include <avr/io.h>
-#include <inttypes.h>
-#include <stdlib.h>
-#include <inttypes.h>
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h>
-#include <avr/eeprom.h>
+#include	<avr/io.h>
+#include	<inttypes.h>
+#include	<stdlib.h>
+#include	<inttypes.h>
+#include	<avr/interrupt.h>
+#include	<avr/pgmspace.h>
+#include	<avr/eeprom.h>
 
 #include	"HardwareDef.h"
 
 
-#include "touchscreen.h"
+#include	"touchscreen.h"
 #ifdef _TOUCH_STEALTH_
 	#include "oled_stealth.h"
 #endif
-#include "bitops.h"
-#include "calibrate.h"
-#include "usart.h"
-#include "font.h"
+#include	"bitops.h"
+#include	"calibrate.h"
+#include	"usart.h"
+#include	"font.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -58,38 +58,38 @@ void touchscreen_process_x(unsigned int adc_value)
 
 			if (x_loc>15)   //The natural idle value of the touch screens is about 2 for the x and 2 for the y 
 				//when there as been a press greater than 15 it is on the region of the screen (assuming the y also has a press greater than 15)
-				{
+{
 				sample_count++; //this keeps track of how many samples the processor took durring a press
 				if (x_loc>x_loc_max) //here we look for the max x value durring a press (based on the max of all the sample counts)
 					{ //save the new maximums
 						x_loc_max = x_loc; //save the new maximum x
 						y_loc_max = y_loc; //save the previous y
 					}
-					if (sample_count > 10000)//40,000 samples
-					{
-					eeprom_write_byte((unsigned char*)ee_isCalibrated, 23);
-					//eeprom_write_byte(50, 23);
+	if (sample_count > 10000)//40,000 samples
+	{
+		eeprom_write_byte((unsigned char*)ee_isCalibrated, 23);
+		//eeprom_write_byte(50, 23);
 
-					//lcd_clear();
-					COLOR c = {255,0,0};
-					COLOR blk =  {0,0,0};
-					lcd_clearScreen(blk);
-					char msg[40];
-					strncpy_P(msg,PSTR("Touchscreen Reset."),40);
+		//lcd_clear();
+		COLOR c		=	{255,0,0};
+		COLOR blk	=	{0,0,0};
+		lcd_clearScreen(blk);
+		char msg[40];
+		strncpy_P(msg,PSTR("Touchscreen Reset."),40);
 					dispPutS(msg,0,50,c,blk);
 
-					strncpy_P(msg,PSTR("Please powercycle"),40);
+		strncpy_P(msg,PSTR("Please powercycle"),40);
 					dispPutS(msg,0,60,c,blk);
-					while (1)
-					{
-					;
-					}
+		while (1)
+		{
+			;
+		}					
 					
-					}
+	}
 
 				}
 			else// there wasn't a press because the screen was still in an idle state
-				{
+{
 				//idle
 				if (x_loc_max<=15)//not just pressed because x_loc_max would have a value of16 or greater from above
 					{
@@ -105,11 +105,11 @@ void touchscreen_process_x(unsigned int adc_value)
 							sample_count = 0;  //reinitialize the program to be ready to sample again
 							press = yes;  //flag the pressed status from   no -> yes
 
-							
+
 
 						}
 					}						
-				}
+}
 
 } //end
 
@@ -121,17 +121,17 @@ void touchscreen_process_x(unsigned int adc_value)
 
 void touchscreen_process_y(unsigned int adc_value)
 {
-
+ 
 			y_loc = ADCH;	//save the ADC result
 
 
 
 } //end ADC Interrupt
+ 
 
 
 
-
-
+ 
 
 
 
@@ -147,7 +147,7 @@ void touch_init()  // initialize the touch algorithm
 	sample_count = 0;
 
 
-
+	
 	ADCSRA = (1<<ADEN) | (1<<ADIE) | 
 			(1<<ADPS2) | (1<<ADPS1) |(1<<ADPS0); //clock freq fosc/128
 
@@ -171,7 +171,7 @@ void touch_init()  // initialize the touch algorithm
 	}
 
 
-
+	
 }//end touch_init
 
 
@@ -179,7 +179,7 @@ void touch_init()  // initialize the touch algorithm
 
 //initial sampling direction
 void touchscreen_setup_x() //set up a sample in the x direction
-{
+	{
 
 		
 
@@ -207,11 +207,11 @@ unsigned char x;
 
 
 		for (x=0;x<50;x++)//delay before internal avr caoaciters can discharge
-			{
+		{
 				asm("nop");
-			}
+		}
 
-		
+
 		//Y+ input
 		CLRBIT(DDRF,YPLUS_PIN);
 		//Y- floating
@@ -230,18 +230,18 @@ unsigned char x;
 			}
 
 	 	for (x=0;x<200;x++)//delay before internal avr caoaciters can discharge
-			{
+	{
 				asm("nop");
-			}
+	}
 
 	 	for (x=0;x<200;x++)//delay before internal avr caoaciters can discharge
-			{
+	{
 				asm("nop");
-			}
+	}
 	 	for (x=0;x<200;x++)//delay before internal avr caoaciters can discharge
 			{
 				asm("nop");
-			}
+}
 
 
 
@@ -263,7 +263,7 @@ unsigned char x;
 	                - set +5V to the y minus pin
 					- ground the x plus pin
 					- and read the voltage at the x minus pin     
-	
+
 	*/
 	
 
@@ -279,21 +279,21 @@ unsigned char x;
 		SETBIT(DDRF,XPLUS_PIN); //set to output	
 		
 		for (x=0;x<50;x++)//delay before internal avr caoaciters can discharge
-			{
+{
 				asm("nop");
 			}
-		
+
 		//X+ input
 		CLRBIT(DDRF,XPLUS_PIN);
 		//X- floating
 		CLRBIT(DDRF,XMINUS_PIN);
-	ADMUX = XPLUS;	
- 
+	ADMUX	=	XPLUS;	
+
 
  		for (x=0;x<200;x++)//delay before internal avr caoaciters can discharge
 			{
 				asm("nop");
-			}
+}
 
 
 	SETBIT(ADCSRA,ADSC);
@@ -327,17 +327,17 @@ for (w=0; w<x ; w++)
 
 
 /****************************************************/
-/*                                                  */
-/* Touch Calibrate                                  */
-/*                                                  */
+/*													*/
+/* Touch Calibrate									*/
+/*													*/
 /****************************************************/
 
 /* calibrating the touch screen compensates for 4 major issues 
-     relating a touch location to a pixel location.
-		1)  An offset in the x-aligenment
-		2)  An offset in the y-aligenment
-		3)  A rotational offset between the rows of pixels and the touch screen
-		4)  Compensates the offset of each press location on the touch screen to a pixel location on the LCD screen
+		relating a touch location to a pixel location.
+		1)	An offset in the x-aligenment
+		2)	An offset in the y-aligenment
+		3)	A rotational offset between the rows of pixels and the touch screen
+		4)	Compensates the offset of each press location on the touch screen to a pixel location on the LCD screen
 */
 
 
@@ -348,46 +348,46 @@ char touch_calibrate(void)
 
 
 
-//array of input points
-POINT32	screenSample[3];
+	//array of input points
+	POINT32	screenSample[3];
 
 
 
 
 
-//array of expected correct answers
-POINT32	displaySample[3] =  {
+	//array of expected correct answers
+	POINT32	displaySample[3] =	{
 							{20,60},
 							{60,20},
 							{90,115}
-								};
+									};
 
 
-		/* An array of perfect input screen points used to obtain a first pass   */
-        /*  calibration matrix good enough to collect calibration samples.       */
+	/* An array of perfect input screen points used to obtain a first pass	*/
+	/*	calibration matrix good enough to collect calibration samples.		*/
 
-POINT32 perfectScreenSample[3] =	{
-                                            { 100, 100 },
-												{ 900, 500 },
-                                            { 500, 900 }
-                                } ;
-
-
-
-		/* An array of perfect display points used to obtain a first pass        */
-        /*  calibration matrix good enough to collect calibration samples.       */
-
-POINT32 perfectDisplaySample[3] = {
-                                            { 100, 100 },
-												{ 900, 500 },
-                                            { 500, 900 }
-	                            } ;
+	POINT32 perfectScreenSample[3] =	{
+											{ 100, 100 },
+											{ 900, 500 },
+											{ 500, 900 }
+										} ;
 
 
-//initial pass
-setCalibrationMatrix( &perfectDisplaySample[0], 
-						  &perfectScreenSample[0], 
-						  &matrix ) ;
+
+	/* An array of perfect display points used to obtain a first pass		*/
+	/*	calibration matrix good enough to collect calibration samples.		*/
+
+	POINT32 perfectDisplaySample[3]	=	{
+											{ 100, 100 },
+											{ 900, 500 },
+											{ 500, 900 }
+										} ;
+
+
+	//initial pass
+	setCalibrationMatrix( &perfectDisplaySample[0], 
+								&perfectScreenSample[0], 
+								&matrix ) ;
 
 
 
@@ -400,7 +400,7 @@ COLOR c2 = { 0x00 , 0x00, 0x00}; //fill
 
 dispPutS("Touch to calibrate",18,5,c1,c2);
 
-dispColor(c1);
+	dispColor(c1);
 dispRectangle(20,60,6,6); //draw
 press = no;
 while(!press)
@@ -415,13 +415,13 @@ screenSample[0].y = yy_loc;
 
 dispColor(c2);
 dispRectangle(20,60,6,6); //draw
-delay_ms(250);
+	delay_ms(250);
 
 
 
 
 
-dispColor(c1);
+	dispColor(c1);
 dispRectangle(60,20,6,6); //draw
 press = no;
 while(!press)
@@ -436,7 +436,7 @@ screenSample[1].y = yy_loc;
 
 dispColor(c2);
 dispRectangle(60,20,6,6); //draw
-delay_ms(250);
+	delay_ms(250);
 
 
 
@@ -463,31 +463,31 @@ lcd_clearScreen(blk);
 dispPutS("Calibrating the",15,15,c,blk);
 dispPutS("Touch Screen",20,25,c,blk);
 
-//now, the real calibration pass
-setCalibrationMatrix( &displaySample[0], &screenSample[0], &matrix ) ;
+	//now, the real calibration pass
+	setCalibrationMatrix( &displaySample[0], &screenSample[0], &matrix ) ;
 
-eeprom_write_byte((unsigned char*)ee_isCalibrated, TOUCHSCR_IS_CALIBRATED);
-eeprom_write_block(&matrix, (unsigned char*)ee_matrix, sizeof(MATRIX)); //MATRIX = 28 bytes
-					
-					delay_ms(250);
-					delay_ms(250);
-					delay_ms(250);
+	eeprom_write_byte((unsigned char*)ee_isCalibrated, TOUCHSCR_IS_CALIBRATED);
+	eeprom_write_block(&matrix, (unsigned char*)ee_matrix, sizeof(MATRIX)); //MATRIX	=	28 bytes
+						
+						delay_ms(250);
+						delay_ms(250);
+						delay_ms(250);
 POINT clear_value;
 touch_get_cursor(&clear_value);
 press = no;
 
-return 0;
+	return 0;
 }
 
- 
 
 
 
+	
 
 /****************************************************/
-/*                                                  */
+/*													*/
 /* Touch Get Cursor                                 */
-/*                                                  */
+/*													*/
 /****************************************************/
 
 //unsigned char x,y;
@@ -498,7 +498,7 @@ return 0;
 
 char touch_get_cursor(POINT* p)
 {
-
+	
 	if (press)
 	{
 
@@ -510,13 +510,13 @@ char touch_get_cursor(POINT* p)
 
 		(p->x) = (unsigned char)calibrated_point.x;
 		(p->y) = (unsigned char)calibrated_point.y;
-				
+			
 		press = no;
 		return 1;
 	}
 	else
 	{
-		return 0;
+	return 0;
 	}
 }//end touch_get_cursor
 
@@ -529,14 +529,14 @@ unsigned char	dispPointReturnValue;
 
 	isTouching	=	0;
 	if (x_loc>15)
-	{
+		{
 		POINT32 my_point, calibrated_point;
 		my_point.x = (long)x_loc;
 		my_point.y = (long)y_loc;
 	
 		dispPointReturnValue	=	getDisplayPoint( &calibrated_point, &my_point, &matrix ) ;
 		if (dispPointReturnValue == OK)
-		{
+			{
 			isTouching	=	1;
 		}
 		(p->x) = (unsigned char)calibrated_point.x;

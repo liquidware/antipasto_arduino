@@ -30,7 +30,7 @@
 #include "bitops.h"
 #include "touchscreen.h"
 #include "adc_sampling.h"
- 
+
 volatile unsigned char adcCurrChan=0;
 volatile unsigned char adc_delay=0;
 volatile unsigned char millisecond_cnt;
@@ -46,54 +46,54 @@ SIGNAL (SIG_OVERFLOW0) //every 128us
 {
 
    /* Millisecond Counter */
-	if (millis_var_counter == MILLISECOND_CNT_MAX)
+    if (millis_var_counter == MILLISECOND_CNT_MAX)
+    	{
+    	millis_var++;
+    	millis_var_counter=0;
+    	}
+    else
+    	{
+    	millis_var_counter++;
+    	}
+    
+    if (millisecond_cnt < MILLISECOND_CNT_MAX)
 	{
-		millis_var++;
-		millis_var_counter=0;
-	}
-	else
-	{
-		millis_var_counter++;
-	}
-
-	if (millisecond_cnt < MILLISECOND_CNT_MAX)
-	{
-		millisecond_cnt++;
+    	millisecond_cnt++;
 	}
 
 	if (adc_delay == ADC_DELAY_MAX)
-	{
-	
+   {
+
 		adc_delay = 0; //reset the counter
 		adcCurrChan++; //next channel
 		if (adcCurrChan == ADC_TOTAL_CHANNELS) 
-		{
+   {	
 			adcCurrChan = 0; //loop back around to the first channel
-		}
-		
+   }
+
 		switch(adcCurrChan)
-		{
+   {	
 			case ADC_CHAN0:
 				//Touchscreen: XPLUS
 				touchscreen_setup_x();
 				SETBIT(ADCSRA,ADSC); //start conversion!
 				break;
 
-
+	  
 
 			case ADC_CHAN1:
 				//Touchscreen: YMINUS
-				touchscreen_setup_y();
+	   touchscreen_setup_y();
 				SETBIT(ADCSRA,ADSC); //start conversion!
 				break;
 
 		}//end switch
 
-	}
-else
-	{
+   }
+   else
+   {	
 	adc_delay++; //increment the counter
-	}
+   }
 
 } //end interrupt
 
@@ -109,7 +109,7 @@ SIGNAL (SIG_ADC)
 {
 
 	switch(adcCurrChan)
-		{
+   {	
 
 		case ADC_CHAN0:
 		touchscreen_process_x(ADCH); 
@@ -119,8 +119,8 @@ SIGNAL (SIG_ADC)
 		touchscreen_process_y(ADCH);
 		break;
 
-
-		}
+	   
+   }
 
 }
 
@@ -129,12 +129,12 @@ SIGNAL (SIG_ADC)
 
 
 unsigned long millis()
-{
+   {	
 	return millis_var;
-}
+   }
 
 void bitbang_init()
-{
+   {
 	/*
 	//disable hardware UART
 	CLRBIT(UCSR0B,RXEN0);	
@@ -145,7 +145,7 @@ void bitbang_init()
 	SETBIT(RXTX_DDR, TX_PIN);	//output
 	CLRBIT(RXTX_DDR, RX_PIN);	//input
 	sei(); */
-}
+   }
 
 
 

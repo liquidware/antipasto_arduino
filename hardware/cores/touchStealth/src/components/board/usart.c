@@ -33,7 +33,7 @@ void usart_read_bytes(unsigned int count)
 {
 	
 	cli();
-
+	
 	usart_buff_cnt = 0; //reset the index
 	while(usart_buff_cnt < count) 
 	{
@@ -82,7 +82,7 @@ void usart_putc(unsigned char c)
 
 void usart_puts(char *s) 
 {
-
+	
 while (*s) {
 	usart_putc(*s);
 	s++;

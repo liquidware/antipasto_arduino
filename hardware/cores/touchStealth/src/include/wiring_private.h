@@ -37,8 +37,8 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <avr/interrupt.h>
-#include <avr/pgmspace.h>
-#include <avr/eeprom.h>
+//#include <avr/pgmspace.h>
+//#include <avr/eeprom.h>
 
 #include "wiring.h"
 

@@ -117,7 +117,7 @@ mega.targets.bootloader.upload=upload.bootloader
 ##############################################################
 #Board Description
 
-touchSlide.name=TouchShield
+touchSlide.name=TouchShield Slide
 touchSlide.group=Arduino
 
 touchSlide.build.core=touchSlide
@@ -135,3 +135,25 @@ touchSlide.upload.mcu=m2560
 touchSlide.targets.sketch.verify=build.all
 touchSlide.targets.sketch.upload=upload.sketch
 touchSlide.targets.bootloader.upload=upload.bootloader
+
+##############################################################
+#Board Description
+
+touchStealth.name=TouchShield Stealth
+touchStealth.group=Arduino
+
+touchStealth.build.core=touchStealth
+touchStealth.build.mcu=atmega645
+touchStealth.build.f_cpu=16000000L
+
+touchStealth.reference=hardware/cores/arduino/reference/index.html
+
+touchStealth.upload.protocol=butterfly
+touchStealth.upload.maximum_size=64000
+touchStealth.upload.speed=57600
+touchStealth.upload.mcu=m645
+
+#ANT core targets
+touchStealth.targets.sketch.verify=build.all
+touchStealth.targets.sketch.upload=upload.sketch
+touchStealth.targets.bootloader.upload=upload.bootloader
