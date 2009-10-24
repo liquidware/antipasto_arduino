@@ -62,7 +62,7 @@ import processing.app.ExceptionHandler;
 public class Base {
   static final String DIST_NAME = "Antipasto Arduino";
   static final int VERSION = 0;
-  static final String VERSION_NAME = "0.8.32";
+  static final String VERSION_NAME = "0.8.33";
 
   /**
    * Path of filename opened on the command line,
