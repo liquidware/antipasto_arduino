@@ -651,7 +651,41 @@ distribution.version=${build.version}</echo>
                 <arg value="-d" />
                 <arg value="${package.dir}/Resources/Description.plist"/>
             </exec>
+            
 
+            <!-- Remove instances of the IFPkgFlagRelocatable   -->
+            <replace file="${package.dir}/Arduino_macosx.pkg/Contents/Info.plist" 
+                     token="IFPkgFlagRelocatable" 
+                     value="IFPkgFlagOverwritePermissions"/>
+            
+              <!-- Strip off the package mapping tags, this sucks. -->
+              <!-- Get the head -->
+              <exec executable="head" searchpath="true" append="true">
+                <arg line="-42
+                            ${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
+                            
+                <redirector outputproperty="redirector.out"
+                            errorproperty="redirector.err">
+                    <outputmapper type="merge" to="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt"/>
+                </redirector>
+              </exec>
+              <!-- Get the tail -->
+              <exec executable="tail" searchpath="true" append="true">
+                <arg line="-2
+                           ${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
+                           
+                <redirector outputproperty="redirector.out"
+                            errorproperty="redirector.err">
+                    <outputmapper type="merge" to="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt"/>
+                </redirector>
+              </exec>
+              
+              <!-- Overwrite the Info.plist file -->
+              <move file="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt" 
+                    tofile="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
+
+
+            <!-- Build the .dmg image -->
             <exec executable="mv" searchpath="true">
                 <arg value="${package.dir}/Package_Root/Applications/Arduino" />
                 <arg value="${build.dir}" />
@@ -669,7 +703,7 @@ distribution.file=${package.macosx.name}
 distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
-
+    
 
     <!--
         ===================================================================

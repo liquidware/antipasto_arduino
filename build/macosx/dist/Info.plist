@@ -15,8 +15,6 @@
 		<string>AdminAuthorization</string>
 		<key>IFPkgFlagOverwritePermissions</key>
 		<false/>
-		<key>IFPkgFlagRelocatable</key>
-		<false/>
 		<key>IFPkgFlagDefaultLocation</key>
 		<string>/</string>
 		<key>IFPkgFlagFollowLinks</key>
