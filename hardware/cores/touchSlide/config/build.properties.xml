@@ -130,7 +130,7 @@
     <property name="cross.gcc.defines" value="-DF_CPU=16000000"/>
     <property name="cross.cflags"    value="${common.cflags} -mmcu=${board.cpu} -ffunction-sections -fdata-sections ${cross.gcc.defines}"/>
     <property name="cross.cppflags"  value="${common.cppflags} -mmcu=${board.cpu} -ffunction-sections -fdata-sections ${cross.gcc.defines}"/>
-    <property name="cross.ldflags"   value="${common.ldflags} -mmcu=${board.cpu} -L &quot;${cross.base}/lib/gcc/avr/4.3.2&quot;"/>
+    <property name="cross.ldflags"   value="${common.ldflags} -mmcu=${board.cpu}"/>
 
     <property name="cross.opts"      value="-Os"/>
     <property name="cross.Arch.Code" value="2"/>
