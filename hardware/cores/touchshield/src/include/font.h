@@ -35,7 +35,7 @@
 	#define	_ENABLE_XLARGE_NUMBERS_					//*	6974 bytes
 #endif
 
-	#define	_ENABLE_HERSHEY_FONTS_					//*	base fonts and code = 3984 bytes
+#define	_ENABLE_HERSHEY_FONTS_					//*	base fonts and code = 3984 bytes
 
 
 #ifndef _AVR_IO_H_

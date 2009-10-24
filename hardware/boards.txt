@@ -120,7 +120,7 @@ mega.targets.bootloader.upload=upload.bootloader
 touchSlide.name=TouchShield Slide
 touchSlide.group=Arduino
 
-touchSlide.build.core=touchSlide
+touchSlide.build.core=touchshield
 touchSlide.build.mcu=atmega2560
 touchSlide.build.f_cpu=16000000L
 
@@ -142,7 +142,7 @@ touchSlide.targets.bootloader.upload=upload.bootloader
 touchStealth.name=TouchShield Stealth
 touchStealth.group=Arduino
 
-touchStealth.build.core=touchStealth
+touchStealth.build.core=touchshield
 touchStealth.build.mcu=atmega645
 touchStealth.build.f_cpu=16000000L
 
