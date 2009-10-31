@@ -1,23 +1,23 @@
 //*******************************************************************************
-//*	
-//*	                             Sub-Processing 
+//*
+//*	                             Sub-Processing
 //*                        for TouchShield library
 //*	         by inthebitz @ antipastohw.blogspot.com & liquidware.com
-//*	
+//*
 //*******************************************************************************
 //*	 History:
-//*	
+//*
 //*	 Version 0.2 | Dec 4, 2008  | Chris @ antipastohw.blogspot.com & liquidware.com
 //*	 Merged into the TouchShield core
-//*	
+//*
 //*	 Version 0.1 | Nov 30, 2008 | inthebitz @ antipastohw.blogspot.com & liquidware.com
 //*	 This is the beginnings of the "Sub-Processing" for TouchShield library
-//*	 
-//*	
+//*
+//*
 //*	 DESCRIPTION:
-//*	 Sub-Processing provides a rich graphics and interaction library 
+//*	 Sub-Processing provides a rich graphics and interaction library
 //*	 for the TouchShield.
-//*	 
+//*
 //*******************************************************************************
 //*	Detailed Edit history
 //*	<MLS>	=	Mark Sproul, msproul@jove.rutgers.edu
@@ -40,7 +40,7 @@
 //*	Jan  3,	2009	<MLS> Changed my_point to gMostRecentTouchPt
 //*******************************************************************************
 //*	<MLS> Programming style
-//*			never use 1 letter variable names, use LONG names, 
+//*			never use 1 letter variable names, use LONG names,
 //*			{ and } always go on their own line
 //*			never put 2 lines of code on the same line
 //*			use TAB instead of multiple spaces
@@ -103,10 +103,10 @@ COLOR	bcolor		=	{ 0, 0, 0 };
 //COLOR	white		=	{255,255,255};
 //COLOR	mycolor		=	{255, 255, 255};
 
-int		brightness	=	BRIGHT_MAX;
+static int brightness	=	BRIGHT_MAX;
 POINT	gMostRecentTouchPt;
 int		trix1, triy1, trix2, triy2, trix3, triy3;
-	
+
 int		mouseX			=	screen.width / 2;
 int		mouseY			=	screen.height / 2;
 int		width			=	kSCREEN_X_size;		//screen.width;
@@ -125,7 +125,7 @@ char	command[16];
 //*******************************************************************************
 void	dispFillEllipse(int xCenter, int yCenter, int xRadius, int yRadius);
 void	dispOutlineEllipse(unsigned int xc,unsigned int yc,unsigned int a,unsigned int b);
-void	dispWuLine( int X0, int Y0, int X1, int Y1); 
+void	dispWuLine( int X0, int Y0, int X1, int Y1);
 void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3);
 int		point_triangle_intersection(int px, int py, int x1, int y1, int x2, int y2, int x3, int y3);
 int		orientation (long x1, long y1, long x2, long y2, long px, long py);
@@ -206,13 +206,13 @@ long			d2yt	=	2 * a2;
 	while (yy >= 0 &&  xx <= xRadius)
 	{
 		if (t + b2 * xx <= crit1 ||	 /* e(x+1,y-1/2) <= 0 */
-			t + a2 * yy <= crit3) 
+			t + a2 * yy <= crit3)
 		{
 			/* e(x+1/2,y) <= 0 */
 			incx();
 			width	+=	2;
 		}
-		else if (t - a2 * yy > crit2) 
+		else if (t - a2 * yy > crit2)
 		{
 			/* e(x+1/2,y-1) > 0 */
 			//dispRectangle(xCenter - x, yCenter - y, width, 1);
@@ -243,8 +243,8 @@ long			d2yt	=	2 * a2;
 		//dispRectangle(xCenter - xRadius, yCenter, 2 * xRadius + 1, 1);
 		dispRectangle(xCenter - xRadius, yCenter, 2 * xRadius + 1, 1);
 	}
-} 
- 
+}
+
 //*******************************************************************************
 //There's definitely an easier way to do this, but for now I'll use some help from:
 //http://www.codeproject.com/KB/GDI/antialias.aspx#dwuln
@@ -398,12 +398,12 @@ unsigned short	IntensityBits	=	2;
 //	http://www.swissdelphicenter.ch/en/showcode.php?id=2400
 //	http://tog.acm.org/GraphicsGems/gemsiii/triangleCube.c
 //	I'm sure there's a more elegant and cleaner way, but with help from the links above I was able to cludge
-//	this together, so that it at least works! 
+//	this together, so that it at least works!
 //*******************************************************************************
-void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3) 
+void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3)
 {
 
-	if (strokeEnb) 
+	if (strokeEnb)
 	{
 		dispColor(fcolor);
 		dispWuLine ( x1, y1, x2, y2);
@@ -411,7 +411,7 @@ void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3)
 		dispWuLine ( x3, y3, x1, y1);
 	}
 
-	if (fillEnb) 
+	if (fillEnb)
 	{
 	int		xx;
 	int		yy;
@@ -419,7 +419,7 @@ void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3)
 	int		endX;
 	int		startY;
 	int		endY;
-	
+
 		//*	figure out the left most and right most points
 		startX	=	MIN3(x1, x2, x3);
 		endX	=	MAX3(x1, x2, x3);
@@ -427,11 +427,11 @@ void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3)
 		startY	=	MIN3(y1,y2,y3);
 		endY	=	MAX3(y1,y2,y3);
 		dispColor(bcolor);
-		for (xx = startX; xx < endX; xx++) 
+		for (xx = startX; xx < endX; xx++)
 		{
-			for (yy = startY; yy < endY; yy++) 
+			for (yy = startY; yy < endY; yy++)
 			{
-				if (point_triangle_intersection(xx, yy, x1, y1, x2, y2, x3, y3) ) 
+				if (point_triangle_intersection(xx, yy, x1, y1, x2, y2, x3, y3) )
 				{
 					dispPixel(xx , yy);
 				}
@@ -444,11 +444,11 @@ void	dispTriangle( int x1, int y1, int x2, int y2, int x3, int y3)
 int point_triangle_intersection(int px, int py, int x1, int y1, int x2, int y2, int x3, int y3)
 {
 int or1, or2, or3;
- 
+
 	or1	=	orientation(x1, y1, x2, y2, px, py);
 	or2	=	orientation(x2, y2, x3, y3, px, py);
 	or3	=	orientation(x3, y3, x1, y1, px, py);
- 
+
 	if ((or1 == or2) && (or2 == or3) )
 	{
 		return 1;
@@ -491,7 +491,7 @@ long	orin;
 	{
 		return 0;
 	}
-} 
+}
 
 //*******************************************************************************
 //*	GLOBAL FUNCTIONS
@@ -556,12 +556,12 @@ void	ellipse( int xLoc, int yLoc, int radx, int rady)
 {
 
 	//fill
-	if (fillEnb) 
+	if (fillEnb)
 	{
 		dispColor(bcolor);
 		dispFillEllipse(xLoc, yLoc, radx-1, rady-1);
 	}
-	
+
 	//stroke
 	if (strokeEnb)
 	{
@@ -579,7 +579,7 @@ void	fadein( int time)
 {
 uint8_t ii;
 
-	for (ii = 0; ii<(brightness+1); ii++) 
+	for (ii = 0; ii<(brightness+1); ii++)
 	{
 	#if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
 		dispBrightness((uint8_t)ii);
@@ -595,7 +595,7 @@ void	fadeout( int time)
 {
 uint8_t ii;
 
-	for (ii = brightness; ii>0; ii--) 
+	for (ii = brightness; ii>0; ii--)
 	{
 	#if defined(_TOUCH_STEALTH_) || !defined(_VERSION_0012LW_)
 		dispBrightness((uint8_t)ii);
@@ -694,7 +694,7 @@ void	quad( int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 	/* Save the stroke state */
 	uint8_t prevStroke	=	strokeEnb;
 
-	if (fillEnb) 
+	if (fillEnb)
 	{
 		/* Disable stroke */
 		noStroke();
@@ -709,7 +709,7 @@ void	quad( int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 		}
 	}
 
-	if (strokeEnb) 
+	if (strokeEnb)
 	{
 		line(x1,y1,x2,y2);
 		line(x2,y2,x3,y3);
@@ -750,7 +750,7 @@ void	framerect(int xLeft, int yTop, int width, int height)
 		{
 			line(xLeft,			yTop,			xLeft + width,	yTop);				//*	top line
 			line(xLeft,			yTop + height,	xLeft + width,	yTop + height);		//*	bottom line
-			
+
 			line(xLeft,			yTop,			xLeft,			yTop + height);		//*	left line
 			line(xLeft + width,	yTop,			xLeft + width,	yTop + height);		//*	right line
 		}
@@ -768,7 +768,7 @@ void	rect(int xLeft, int yTop, int width, int height)
 		if (fillEnb)
 		{
 			dispColor(bcolor);
-			dispRectangle(xLeft, yTop, width, height); 
+			dispRectangle(xLeft, yTop, width, height);
 		}
 
 		if (strokeEnb)
@@ -812,7 +812,7 @@ void	size(int w, int h)
 #ifdef _SUPPORT_CLIPPING_
 	dispClip(w,h); //set the clipping region
 #endif
-	width	=	w; 
+	width	=	w;
 	height	=	h;
 	mouseX	=	w / 2; //reset the mouse
 	mouseY	=	h / 2; //reset the mouse
@@ -885,20 +885,20 @@ void	text(double data, int xLoc, int yLoc)
 //*******************************************************************************
 void	text(char *textString, int xLoc, int yLoc, int height)
 {
-    HersheyDrawCString(0, xLoc, yLoc, textString, height, 0, 1); 
+    HersheyDrawCString(0, xLoc, yLoc, textString, height, 0, 1);
 }
 
 //*******************************************************************************
 void	text(char *textString, int xLoc, int yLoc, int width, int height)
 {
-    HersheyDrawCString(0, xLoc, yLoc, textString, height, 0, 1); 
+    HersheyDrawCString(0, xLoc, yLoc, textString, height, 0, 1);
 }
- 
+
 //*******************************************************************************
-void	triangle( int x1, int y1, int x2, int y2, int x3, int y3) 
-{ 
+void	triangle( int x1, int y1, int x2, int y2, int x3, int y3)
+{
 	dispTriangle(x1, y1, x2, y2, x3, y3);
-} 
+}
 
 //*******************************************************************************
 void	beginCanvas(void)
@@ -921,21 +921,21 @@ void	beginCanvas(void)
 	cptr=1;
 
 	/* Is it a valid command? */
-	if (buf[0] == '|') 
+	if (buf[0] == '|')
 	{
 		/* Determine the command */
-		switch(buf[cptr]) 
+		switch(buf[cptr])
 		{
 		case kSubP_SETFCOLOR:
 			setfcolor( buf[cptr+1], buf[cptr+2], buf[cptr+3]);
 			break;
 
 		case kSubP_SETBCOLOR:
-			setbcolor( buf[cptr+1], buf[cptr+2], buf[cptr+3]); 
+			setbcolor( buf[cptr+1], buf[cptr+2], buf[cptr+3]);
 			break;
 
 		case kSubP_FILLBACK:
-			fillback();		
+			fillback();
 			break;
 
 		case kSubP_SET_BRIGHTNESS:
@@ -958,22 +958,22 @@ void	beginCanvas(void)
 		case kSubP_CIRCLE:
 			int r;
 			r	=	(buf[cptr+6] << 8) + buf[cptr+5];
-			ellipse((buf[cptr+2] << 8) + buf[cptr+1], 
+			ellipse((buf[cptr+2] << 8) + buf[cptr+1],
 					(buf[cptr+4] << 8) + buf[cptr+3],
 					r,
 					r);
 			break;
 
 		case kSubP_RECT:
-			rect((buf[cptr+2] << 8) + buf[cptr+1], 
-				(buf[cptr+4] << 8) + buf[cptr+3], 
-				(buf[cptr+6] << 8) + buf[cptr+5], 
+			rect((buf[cptr+2] << 8) + buf[cptr+1],
+				(buf[cptr+4] << 8) + buf[cptr+3],
+				(buf[cptr+6] << 8) + buf[cptr+5],
 				(buf[cptr+8] << 8) + buf[cptr+7]);
 			break;
 
 		case kSubP_LINE:
-			line((buf[cptr+2] << 8) + buf[cptr+1], 
-				(buf[cptr+4] << 8) + buf[cptr+3], 
+			line((buf[cptr+2] << 8) + buf[cptr+1],
+				(buf[cptr+4] << 8) + buf[cptr+3],
 				(buf[cptr+6] << 8) + buf[cptr+5],
 				(buf[cptr+8] << 8) + buf[cptr+7]);
 			break;
@@ -986,7 +986,7 @@ void	beginCanvas(void)
 			break;
 
 		case kSubP_STRING:
-			drawstring((buf[cptr+2] << 8) + buf[cptr+1], 
+			drawstring((buf[cptr+2] << 8) + buf[cptr+1],
 					 (buf[cptr+4] << 8) + buf[cptr+3],
 					 (char*)&buf[cptr+8]);
 			break;
@@ -1030,9 +1030,9 @@ void	beginCanvas(void)
 
 			sendStringL(command,11);
 			break;
-			
+
 		case kSubP_ELLIPSE:
-			ellipse((buf[cptr+2] << 8) + buf[cptr+1], 
+			ellipse((buf[cptr+2] << 8) + buf[cptr+1],
 					(buf[cptr+4] << 8) + buf[cptr+3],
 					(buf[cptr+6] << 8) + buf[cptr+5],
 					(buf[cptr+8] << 8) + buf[cptr+7]);
@@ -1050,9 +1050,9 @@ void	beginCanvas(void)
 			triy3	=	(buf[cptr+4] << 8) + buf[cptr+3];
 			triangle(trix1, triy1, trix2, triy2, trix3, triy3);
 			break;
-			
+
 		default:
-			break; 
+			break;
 		}
 	}
 }
@@ -1061,7 +1061,7 @@ void	beginCanvas(void)
 void	getstring(uint8_t *buf, int bufsize)
 {
 int	ii;
-	
+
 	//*	Send the termination command, we're ready
 	serialWrite(0);
 
@@ -1073,16 +1073,16 @@ int	ii;
 			;	//*	do nothing
 		}
 		buf[ii]	=	serialRead();
-		
+
 		if (buf[ii] == 0)	// is it the terminator byte?
 		{
 			if (ii > 9) break;
 		}
 	}
-	
+
 	buf[ii]	=	0; // 0 string terminator just in case
 }
- 
+
 //*******************************************************************************
 void	sendStringL( char *buf, int size)
 {
@@ -1093,7 +1093,7 @@ int	ii;
 		delay(2);
 		serialWrite(buf[ii]);
 	}
-} 
+}
 
 #pragma mark -
 //*******************************************************************************
@@ -1128,9 +1128,9 @@ int	myWidth, myHeight;
 
 	myWidth		=	theRect->right - theRect->left;
 	myHeight	=	theRect->bottom - theRect->top;
-	
+
 	dispColor(bcolor);
-	dispRectangle(theRect->left, theRect->top, myWidth, myHeight); 
+	dispRectangle(theRect->left, theRect->top, myWidth, myHeight);
 #else
 	rect(theRect->left, theRect->top, (theRect->right - theRect->left), (theRect->bottom - theRect->top));
 #endif
@@ -1178,8 +1178,8 @@ void	InsetRect(RECT *theRect, short insetX, short insetY)
 	theRect->right		-=	insetX;
 	theRect->top		+=	insetX;
 	theRect->bottom		-=	insetX;
-	
-	
+
+
 }
 
 //*******************************************************************************
@@ -1189,8 +1189,8 @@ void	OffsetRect(RECT *theRect, short deltaX, short deltaY)
 	theRect->right		+=	deltaX;
 	theRect->top		+=	deltaY;
 	theRect->bottom		+=	deltaY;
-	
-	
+
+
 }
 
 
@@ -1210,7 +1210,7 @@ void	SetRect(RECT *theRect, short left, short top, short right, short bottom)
 //*******************************************************************************
 //*	1st 2 bytes are size, x,y
 //*	follwed by that number of bytes (i.e. 16 x 16 = 256
-//*	bytes consist of 4 2 bit fields, 
+//*	bytes consist of 4 2 bit fields,
 //*		b7,b6	=	future use
 //*		b5,b4	=	red
 //*		b3,b2	=	green
@@ -1267,7 +1267,7 @@ COLOR	myColor;
 
 					dispPixel(xLoc + (xx * 2),		yLoc + (yy * 2) + 1);
 					dispPixel(xLoc + (xx * 2) + 1,	yLoc + (yy * 2) + 1);
-				
+
 				#else
 					dispPixel(xLoc + xx, yLoc + yy);
 				#endif
@@ -1294,7 +1294,7 @@ COLOR	myColor;
 
 			dispPixel(xLoc + (xx * 2),		yLoc + (yy * 2) + 1);
 			dispPixel(xLoc + (xx * 2) + 1,	yLoc + (yy * 2) + 1);
-		
+
 		#else
 			dispPixel(xLoc + xx, yLoc + yy);
 		#endif
@@ -1359,9 +1359,9 @@ void	Display7SegmentDigit(int xLeft, int yTop, char decimalDigit, char segmentLe
 //*	Dec 31,	2008	<MLS> Changed the bit defnition from 8 bit to 16 bit to allow more chars
 //*	this is the definition of a 7 segment display, we use 8 bits to define each char
 //*	the most significant bit will be used for a decimal point
-//		---------	bit 6			
+//		---------	bit 6
 //		|		|
-//		|		|	bit 5   bit 4	
+//		|		|	bit 5   bit 4
 //		|		|
 //		---------	bit 3
 //		|		|
@@ -1389,7 +1389,7 @@ RECT	digitRect;
 	}
 
 	myBinaryValue	=	g7SegmentDisplay[decimalDigit & 0x01f];
-	
+
 	if (myBinaryValue & B01000000)
 	{
 		//*	draw segment 6 horizontal
@@ -1460,7 +1460,7 @@ void	Display7SegmentChar(int xLeft, int yTop, char theChar, char segmentLength)
 	{
 		Display7SegmentDigit(xLeft, yTop, kLEDsegExtra_Minus, segmentLength);
 	}
-	else 
+	else
 	{
 		drawchar(xLeft, yTop, theChar);
 	}
@@ -1501,7 +1501,7 @@ short	segmentSize;
 	buttonWidth	=	(theButton->buttonRect.right - theButton->buttonRect.left);
 	segmentSize	=	buttonWidth /3;
 	segmentSize	-=	1;
-	
+
 	Display7SegmentChar(	theButton->buttonRect.left + (buttonWidth >> 2) + (buttonWidth >> 3),
 							theButton->buttonRect.top + (buttonWidth / 6),
 							theButton->buttonChar,
@@ -1538,3 +1538,45 @@ void	lcd_pixel(int x, int y, COLOR pixel_color)
 
 
 #endif	//	_SUPPORT_OLD_LCD_ROUTINE_NAMES_
+
+//*******************************************************************************
+void	lcd_line(int x1, int y1, int x2, int y2, COLOR pixel_color)
+{
+	stroke(pixel_color.red,
+		   pixel_color.green,
+		   pixel_color.blue);
+	line(x1,y1,x2,y2);
+}
+
+//*******************************************************************************
+void	lcd_circle(int x1, int y1, int radius, COLOR outline_color, COLOR fill_color)
+{
+	bcolor	=	fill_color;
+	fcolor	=	outline_color;
+	fillEnb	=	true;
+	ellipse(x1,y1,radius,radius);
+}
+
+//*******************************************************************************
+void	lcd_puts(char * string, int x, int y, COLOR outline_color, COLOR fill_color)
+{
+	bcolor	=	fill_color;
+	fcolor	=	outline_color;
+	fillEnb	=	true;
+	text(string,x,y);
+}
+
+#if defined(_TOUCH_SLIDE_)
+//*******************************************************************************
+void	lcd_clearScreen(COLOR fill_color)
+{
+	background(fill_color.red,
+			   fill_color.green,
+			   fill_color.blue);
+}
+
+//*******************************************************************************
+void lcd_setBrightness(uint8_t bright) {
+	setbrightness(bright);
+}
+#endif
