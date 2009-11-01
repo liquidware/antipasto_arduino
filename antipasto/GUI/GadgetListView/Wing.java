@@ -57,7 +57,8 @@ import processing.app.*;
 public class Wing extends JDialog implements ComponentListener,
                                              IActiveGadgetChangedEventListener,
                                              FocusListener, ISelectedItemListener,
-                                             IActiveBoardChangedEventListener {
+                                             IActiveBoardChangedEventListener,
+                                             IActiveLibraryAddedEventListener   {
 
     // The standard width and height for the dialog
     private int cachedHeight = 425;
@@ -282,7 +283,6 @@ public class Wing extends JDialog implements ComponentListener,
         repaint();
     }
 
-
     /**
      * This function loads the reference URL specified in the
      * boards.txt file.
@@ -329,6 +329,21 @@ public class Wing extends JDialog implements ComponentListener,
     public void onActiveBoardChanged(ActiveBoardObject obj) {
         if (obj != null) {
             loadBoardReference(obj.getReferenceURL());
+        }
+    }
+
+    /**
+     * The event fires when a library has been added to the sketch.
+     *
+     * @author christopher.ladden (9/8/2009)
+     *
+     * @param obj
+     */
+    public void onActiveLibraryAdded(ActiveLibraryObject obj) {
+        if (obj != null) {
+            if (obj.getReferenceURL() != null) {
+                loadBoardReference(obj.getReferenceURL());
+            }
         }
     }
 

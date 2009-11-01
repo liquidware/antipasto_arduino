@@ -194,7 +194,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     private EventListenerList activeBoardChangedEventList = new EventListenerList();
 
-
     public PluginPanel pluginPanel = new PluginPanel(Base.pluginloader);
     AntRunner ant = new AntRunner();
     //static Properties keywords; // keyword -> reference html lookup
@@ -496,6 +495,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
         referencePanel = new Wing(this);
         addActiveBoardChangedEventListener(referencePanel);
+        sketchbook.addActiveLibraryAddedEventListener(referencePanel);
 
         rightWing = new JPanel();
         rightWing.setBackground(new Color(0x54, 0x91, 0x9e));
@@ -586,7 +586,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     /**
      * Restores the editor window size and location
-     * 
+     *
      * @author christopher.ladden (9/25/2009)
      */
     public void restoreWindow() {
@@ -594,7 +594,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         boolean windowPositionIsValid = true;
 
         //Check each parameter used in window restoration
-        if ( (Preferences.get("last.screen.height") != null) || 
+        if ( (Preferences.get("last.screen.height") != null) ||
              (Preferences.get("last.screen.width") != null) ||
              (Preferences.get("last.window.x") != null) ||
              (Preferences.get("last.window.y") != null) ||
@@ -641,7 +641,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     /**
      * Restores the last board from the preferences file.
-     * 
+     *
      * @author christopher.ladden (9/25/2009)
      */
     public void restoreBoard() {
@@ -659,7 +659,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     /**
      * Restores the last sketch from the preferences file.
-     * 
+     *
      * @author christopher.ladden (9/25/2009)
      */
     public void restoreSketch() {

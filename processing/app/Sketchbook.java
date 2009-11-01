@@ -37,6 +37,7 @@ import javax.swing.text.*;
 import javax.swing.undo.*;
 
 import com.apple.mrj.*;
+import antipasto.GUI.GadgetListView.GadgetPanelEvents.*;
 
 
 /**
@@ -77,6 +78,7 @@ public class Sketchbook {
   // found in the sketchbook)
   static String librariesClassPath;
 
+  private EventListenerList activeLibraryAddedEventList = new EventListenerList();
 
   public Sketchbook(Editor editor) {
     this.editor = editor;
@@ -548,6 +550,25 @@ public class Sketchbook {
     ActionListener listener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           editor.sketch.importLibrary(e.getActionCommand());
+
+          /* Fire the library added event */
+          String libraryName = new String(new File(e.getActionCommand()).getName());
+          String coreName = Preferences.get("boards." + Preferences.get("board") + ".build.core");
+          String referenceURL = null;
+
+          File index = new File(e.getActionCommand() + "/Reference/index.html");
+          if (index.exists()) {
+              referenceURL = "hardware/cores/" + coreName +
+                             "/src/components/library/" + libraryName +
+                             "/Reference/index.html";
+          }
+
+          onActiveLibraryAdded(new ActiveLibraryObject(this,
+                               /* ShortName */    libraryName,
+                               /* LongName */     libraryName,
+                               /* referenceURL */ referenceURL,
+                               /* boardMenuItem */ null));
+
         }
       };
 
@@ -557,7 +578,7 @@ public class Sketchbook {
       if ((list[i].charAt(0) == '.') ||
           list[i].equals("CVS")) continue;
 
-      File subfolder = new File(folder, list[i]);
+      final File subfolder = new File(folder, list[i]);
       if (!subfolder.isDirectory()) continue;
 
       //File exported = new File(subfolder, "library");
@@ -570,37 +591,7 @@ public class Sketchbook {
 
       // if the folder has header files
       if (subfolder.listFiles(onlyHFiles).length > 0) {
-      // if a .jar file of the same prefix as the folder exists
-      // inside the 'library' subfolder of the sketch
-      //if (entry.exists()) {
-        /*
-        String sanityCheck = sanitizedName(list[i]);
-        if (!sanityCheck.equals(list[i])) {
-          String mess =
-            "The library \"" + list[i] + "\" cannot be used.\n" +
-            "Library names must contain only basic letters and numbers.\n" +
-            "(ascii only and no spaces, and it cannot start with a number)";
-          Base.showMessage("Ignoring bad sketch name", mess);
-          continue;
-        }
-        */
-/*
-        // get the path for all .jar files in this code folder
-        String libraryClassPath =
-          Compiler.contentsToClassPath(exported);
-        // grab all jars and classes from this folder,
-        // and append them to the library classpath
-        librariesClassPath +=
-          File.pathSeparatorChar + libraryClassPath;
-        // need to associate each import with a library folder
-        String packages[] =
-          Compiler.packageListFromClassPath(libraryClassPath);
-        for (int k = 0; k < packages.length; k++) {
-          //System.out.println(packages[k] + " -> " + exported);
-          //String already = (String) importToLibraryTable.get(packages[k]);
-          importToLibraryTable.put(packages[k], exported);
-        }
-*/
+        final String library = list[i];
         JMenuItem item = new JMenuItem(list[i]);
         item.addActionListener(listener);
         item.setActionCommand(subfolder.getAbsolutePath());
@@ -673,4 +664,32 @@ public class Sketchbook {
       }
     }
   }
+
+  public void addActiveLibraryAddedEventListener(IActiveLibraryAddedEventListener listener) {
+      this.activeLibraryAddedEventList.add(IActiveLibraryAddedEventListener.class, listener);
+  }
+
+  public void removeActiveLibraryAddedEventListener(IActiveLibraryAddedEventListener listener) {
+      this.activeLibraryAddedEventList.remove(IActiveLibraryAddedEventListener.class, listener);
+  }
+
+  private void onActiveLibraryAdded(ActiveLibraryObject evObj) {
+
+        /* Pre-event firing */
+        /* none */
+
+        /* Fire the event! */
+        Object[] listeners = activeLibraryAddedEventList.getListenerList();
+        // Each listener occupies two elements - the first is the listener class
+        // and the second is the listener instance
+        for (int i=0; i<listeners.length; i+=2) {
+            if (listeners[i]== IActiveLibraryAddedEventListener.class) {
+                ((IActiveLibraryAddedEventListener)listeners[i+1]).onActiveLibraryAdded(evObj);
+            }
+        }
+
+        /* Post-event firing */
+        /* None */
+    }
+
 }
