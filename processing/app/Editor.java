@@ -155,8 +155,9 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     JMenuItem burnBootloader168NGItem = null;
     JMenuItem burnBootloader168NGParallelItem = null;
 
+    JMenu fileMenu;
     JMenu boardsMenu;
-
+    JMenu examplesMenu = new JMenu("Examples");
     JMenu serialMenu;
     JMenu serialRateMenu;
     JMenu mcuMenu;
@@ -235,7 +236,8 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         sketchbook = new Sketchbook(this);
 
         JMenuBar menubar = new JMenuBar();
-        menubar.add(buildFileMenu());
+        fileMenu = buildFileMenu();
+        menubar.add(fileMenu);
         menubar.add(buildEditMenu());
         menubar.add(buildSketchMenu());
         menubar.add(buildToolsMenu());
@@ -910,7 +912,8 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
 
         menu.add(sketchbook.getOpenMenu());
-        menu.add(sketchbook.getExamplesMenu());
+
+        /* Build the examples menu via sketchbook.rebuildMenus */
 
         saveMenuItem = newJMenuItem("Save", 'S');
         saveMenuItem.addActionListener(new ActionListener() {

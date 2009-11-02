@@ -37,7 +37,7 @@ public class LibraryManager {
   private File libDir;
   private List libraries = new ArrayList();
   private Target target;
-  
+
   /*
    * Create a LibraryManager.
    */
@@ -47,19 +47,18 @@ public class LibraryManager {
       //System.out.println("outputting library: " + Preferences.get("boards." + Preferences.get("board") + ".build.core"));
     String userDir = System.getProperty("user.dir") + File.separator;
     libDir = new File(
-      ((!Base.isMacOS()) ? "" : userDir) + "hardware" + File.separator +
-      "libraries");
+      ((!Base.isMacOS()) ? "" : userDir) + "hardware/cores/arduino/src/components/library");
 
       refreshLibraries();
   }
-  
+
   public Target getTarget()
   {
     return target;
   }
 
   /*
-   * Scans for libraries and refreshes internal list 
+   * Scans for libraries and refreshes internal list
    */
   private void refreshLibraries()
   {
@@ -68,13 +67,16 @@ public class LibraryManager {
         return file.isDirectory();
       }
     };
-    //The following is disabled until we do this ant style
-    // 
-    //libraries.clear();
-    //File[] libs = libDir.listFiles(onlyDirs);
-    //for(int i = 0; i < libs.length; ++i){
-    //  libraries.add(new Library(this, libs[i]));
-    //}
+
+    libDir = new File(System.getProperty("user.dir"),
+                      "hardware/cores/" +
+                      Preferences.get("boards." + Preferences.get("board") + ".build.core") +
+                      "/src/components/library");
+    libraries.clear();
+    File[] libs = libDir.listFiles(onlyDirs);
+    for(int i = 0; i < libs.length; ++i){
+      libraries.add(new Library(this, libs[i]));
+    }
   }
 
   /*
@@ -121,7 +123,7 @@ public class LibraryManager {
     }
     return Collections.unmodifiableList(buildableLibraries);
   }
-  
+
  /*
    * Rebuilds built libraries
    * @return Number of libraries built as int, -1 & exception on error
@@ -167,7 +169,7 @@ public class LibraryManager {
       }
     }
     String[] filesArray = new String[filesArrayList.size()];
-    filesArrayList.toArray(filesArray); 
+    filesArrayList.toArray(filesArray);
     return filesArray;
   }
 
@@ -189,7 +191,7 @@ public class LibraryManager {
       }
     }
     String[] filesArray = new String[filesArrayList.size()];
-    filesArrayList.toArray(filesArray); 
+    filesArrayList.toArray(filesArray);
     return filesArray;
   }
 
@@ -239,7 +241,7 @@ public class LibraryManager {
     }
     return countBuilt;
   }
-  
+
   /*
    * Populates examples menu with library folders
    */

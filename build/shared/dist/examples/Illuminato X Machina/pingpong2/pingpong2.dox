@@ -1,8 +1,0 @@
-/**
-  \example pingpong2.cpp 
-
-  Here's a variation on pingpong.cpp.  It's nearly the same sketch,
-  except for two changes: When we send \c pong, we also light an LED,
-  and, when our button is pushed, we \c ping all our neighbors.
-
- */

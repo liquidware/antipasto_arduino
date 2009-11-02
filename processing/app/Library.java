@@ -54,7 +54,7 @@ public class Library implements MessageConsumer{
     libFolder = folder;
     libManager = manager;
     utilityFolder = getUtilityFolder();
-    
+
     // for debug output
     /*
     System.out.println("library: " + getName());
@@ -96,7 +96,8 @@ public class Library implements MessageConsumer{
     if(getObjectFiles().length >= (getCSourceFiles().length + getCPPSourceFiles().length)){
       return true;
     }
-    return false;
+    return true;
+    //return false;
   }
 
   /*
@@ -149,7 +150,7 @@ public class Library implements MessageConsumer{
   }
 
   /*
-   * Finds examples folder 
+   * Finds examples folder
    * @return "examples" folder as file object or null
    */
   private File getExamplesFolder()
@@ -198,7 +199,7 @@ public class Library implements MessageConsumer{
       }
     }
   }
-  
+
   /*
    * Builds and returns an examples menu
    * @return JMenu object with example files, or null if none
@@ -209,7 +210,7 @@ public class Library implements MessageConsumer{
     if(null != examplesFolder){
       submenu = new JMenu("Library-" + getName());
       populateWithExamples(examplesFolder, submenu, listener);
-      return submenu; 
+      return submenu;
     }
     return null;
   }
@@ -316,17 +317,17 @@ public class Library implements MessageConsumer{
     if(!isBuildable()){
       return false;
     }
-    
+
     String userdir = System.getProperty("user.dir") + File.separator;
     String avrBasePath;
     if(Base.isMacOS()) {
-    	avrBasePath = new String("hardware/tools/avr/bin/"); 
+    	avrBasePath = new String("hardware/tools/avr/bin/");
     }
     else if(Base.isLinux()) {
-    	avrBasePath = new String("hardware/tools/avr/bin/");     	
+    	avrBasePath = new String("hardware/tools/avr/bin/");
     }
     else {
-    	avrBasePath = new String(userdir + "hardware/tools/avr/bin/"); 
+    	avrBasePath = new String(userdir + "hardware/tools/avr/bin/");
     }
 
     String[] baseCompileCommandC = new String[] {
@@ -374,8 +375,8 @@ public class Library implements MessageConsumer{
       compileCommandC[baseCompileCommandC.length + i] = "-I" + libDirs[i];
       compileCommandCPP[baseCompileCommandCPP.length + i] = "-I" + libDirs[i];
     }
-    
-    // add this library's "utility" folder to inclusion paths 
+
+    // add this library's "utility" folder to inclusion paths
     if(null != utilityFolder){
       compileCommandC[compileCommandC.length - 3] = "-I" + utilityFolder.getPath();
       compileCommandCPP[compileCommandCPP.length - 3] = "-I" + utilityFolder.getPath();
@@ -392,15 +393,15 @@ public class Library implements MessageConsumer{
       String pathSansExtension;
       Process process;
       boolean compiling = true;
-    
+
       // compile c sources
       for(int i = 0; i < sourcesC.length; ++i) {
         pathSansExtension = sourcesC[i].getPath();
         pathSansExtension = pathSansExtension.substring(0, pathSansExtension.length() - 2); // -2 because ".c"
-        
+
         compileCommandC[compileCommandC.length - 2] = sourcesC[i].getPath();
         compileCommandC[compileCommandC.length - 1] = "-o" + pathSansExtension + ".o";
-        
+
         process = Runtime.getRuntime().exec(compileCommandC);
         new MessageSiphon(process.getInputStream(), this);
         new MessageSiphon(process.getErrorStream(), this);
@@ -424,15 +425,15 @@ public class Library implements MessageConsumer{
           return false;
         }
       }
-      
+
       // compile c++ sources
       for(int i = 0; i < sourcesCPP.length; ++i) {
         pathSansExtension = sourcesCPP[i].getPath();
         pathSansExtension = pathSansExtension.substring(0, pathSansExtension.length() - 4); // -4 because ".cpp"
-        
+
         compileCommandCPP[compileCommandCPP.length - 2] = sourcesCPP[i].getPath();
         compileCommandCPP[compileCommandCPP.length - 1] = "-o" + pathSansExtension + ".o";
-        
+
         process = Runtime.getRuntime().exec(compileCommandCPP);
         new MessageSiphon(process.getInputStream(), this);
         new MessageSiphon(process.getErrorStream(), this);
@@ -487,7 +488,7 @@ public class Library implements MessageConsumer{
       Base.openURL(BUGS_URL);
       throw new RunnerException(SUPER_BADNESS);
     }
-    
+
     // success would mean that 'result' is set to zero
     return (result == 0); // ? true : false;
   }
@@ -518,13 +519,13 @@ public class Library implements MessageConsumer{
     outString = result.toString();
 
     System.err.print(outString);
-    
+
     // prepare error for throwing
     if (inString.indexOf("error") != -1){
       exception = new RunnerException("Error building library \"" + getName() + "\"");
     }
   }
-  
+
   /**
    * Handles loading of keywords file.
    * It is recommended that a # sign be used for comments
@@ -532,7 +533,7 @@ public class Library implements MessageConsumer{
    */
   public void addSyntaxColors(PdeKeywords keywords) {
     File keywordsFile = new File(libFolder.getPath() + File.separator + "keywords.txt");
-    
+
     // do not bother if no keywords file to read
     // should reprimand negligent library writers?!
     if(!keywordsFile.exists() || !keywordsFile.canRead()){
@@ -544,42 +545,42 @@ public class Library implements MessageConsumer{
       InputStream input = new FileInputStream(keywordsFile);
       InputStreamReader isr = new InputStreamReader(input);
       BufferedReader reader = new BufferedReader(isr);
-    
+
       String line = null;
       while ((line = reader.readLine()) != null) {
-  
+
         // skip empty and whitespace lines
         if (line.trim().length() == 0){
           continue;
         }
-  
+
         // skip lines without tabs
         if (line.indexOf('\t') == -1){
           continue;
         }
-  
+
         String pieces[] = PApplet.split(line, '\t');
-  
+
         if (pieces.length >= 2) {
           String keyword = pieces[0].trim();
           String coloring = pieces[1].trim();
-  
+
           if (coloring.length() > 0) {
             // text will be KEYWORD or LITERAL
             boolean isKey = (coloring.charAt(0) == 'K');
-            
+
             // KEYWORD1 -> 0, KEYWORD2 -> 1, etc
             int num = coloring.charAt(coloring.length() - 1) - '1';
-  
+
             byte id = (byte)((isKey ? Token.KEYWORD1 : Token.LITERAL1) + num);
-  
+
             //System.out.println("got " + (isKey ? "keyword" : "literal") + (num+1) + " for " + keyword);
-  
+
             PdeKeywords.getKeywordColoring().add(keyword, id);
-          }  
+          }
         }
       }
-  
+
       // close file stream
       reader.close();
     } catch (Exception e) {

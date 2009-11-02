@@ -48,20 +48,11 @@ public class Sketchbook {
 
   JMenu openMenu;
   JMenu popupMenu;
-  //JMenu examples;
   JMenu importMenu;
 
   // set to true after the first time it's built.
   // so that the errors while building don't show up again.
   boolean builtOnce;
-
-  //File sketchbookFolder;
-  //String sketchbookPath;  // canonical path
-
-  // last file/directory used for file opening
-  //String handleOpenDirectory;
-  // opted against this.. in imovie, apple always goes
-  // to the "Movies" folder, even if that wasn't the last used
 
   // these are static because they're used by Sketch
   static File examplesFolder;
@@ -105,30 +96,7 @@ public class Sketchbook {
     }
 
     if (sketchbookPath == null) {
-      // by default, set default sketchbook path to the user's
-      // home folder with 'sketchbook' as a subdirectory of that
-
-      /*
-      File home = new File(System.getProperty("user.home"));
-
-      if (Base.platform == Base.MACOSX) {
-        // on macosx put the sketchbook in the "Documents" folder
-        home = new File(home, "Documents");
-
-      } else if (Base.platform == Base.WINDOWS) {
-        // on windows put the sketchbook in the "My Documents" folder
-        home = new File(home, "My Documents");
-      }
-      */
-
-      // use a subfolder called 'sketchbook'
-      //File home = Preferences.getProcessingHome();
-      //String folderName = Preferences.get("sketchbook.name.default");
-      //File sketchbookFolder = new File(home, folderName);
-
-      //System.out.println("resetting sketchbook path");
       File sketchbookFolder = Base.getDefaultSketchbookFolder();
-      //System.out.println("default is " + sketchbookFolder);
       Preferences.set("sketchbook.path",
                       sketchbookFolder.getAbsolutePath());
 
@@ -345,14 +313,6 @@ public class Sketchbook {
    * to prevent the interface from locking up until the menus are done.
    */
   public void rebuildMenusAsync() {
-    // disabling the async option for actual release, this hasn't been tested
-    /*
-    SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          rebuildMenus();
-        }
-      });
-    */
     rebuildMenus();
   }
 
@@ -372,11 +332,15 @@ public class Sketchbook {
       builtOnce = true;  // disable error messages while loading
       buildMenu(popupMenu);
 
+      editor.fileMenu.remove(editor.examplesMenu);
+      editor.examplesMenu.removeAll();
+      editor.examplesMenu = getExamplesMenu(editor.examplesMenu);
+      editor.fileMenu.add(editor.examplesMenu,4);
+
       librariesFolder = new File(System.getProperty("user.dir"),
                                  "hardware/cores/" +
                                  Preferences.get("boards." + Preferences.get("board") + ".build.core") +
                                  "/src/components/library");
-      librariesPath = librariesFolder.getAbsolutePath();
 
       // rebuild the "import library" menu
       librariesClassPath = "";
@@ -393,7 +357,6 @@ public class Sketchbook {
                           "sketchbook menu. Things might get a little\n" +
                           "kooky around here.", e);
     }
-    //EditorConsole.systemOut.println("done rebuilding menus");
   }
 
 
@@ -403,7 +366,6 @@ public class Sketchbook {
     // rebuild the popup menu
     menu.removeAll();
 
-    //item = new JMenuItem("Open...");
     item = Editor.newJMenuItem("Open...", 'O', false);
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -435,8 +397,7 @@ public class Sketchbook {
    *
    * @return JMenu
    */
-  public JMenu getExamplesMenu() {
-    JMenu examplesMenu = new JMenu("Examples");
+  public JMenu getExamplesMenu(JMenu examplesMenu) {
 
     ActionListener listener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -445,9 +406,12 @@ public class Sketchbook {
       };
 
     try {
+      String coreName = Preferences.get("boards." + Preferences.get("board") + ".build.core");
+
       LibraryManager libManager = new LibraryManager();
       addSketches(examplesMenu, examplesFolder);
       libManager.populateExamplesMenu(examplesMenu, listener);
+
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -560,7 +524,7 @@ public class Sketchbook {
           if (index.exists()) {
               referenceURL = "hardware/cores/" + coreName +
                              "/src/components/library/" + libraryName +
-                             "/Reference/index.html";
+                             "/reference/index.html";
           }
 
           onActiveLibraryAdded(new ActiveLibraryObject(this,
