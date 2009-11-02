@@ -1,0 +1,56 @@
+1.6.0:
+======
+antlib.xml created as part of the URI . 
+
+Now - doxygen tasks could be created by 
+
+* Copying ant-doxygen.jar to $ANT_HOME/lib directory.
+
+* Specify the URI in the projects as :
+
+<project name="ant_doxygen"  xmlns:doxygen="antlib:org.doxygen.tools" ..  >
+
+* Specify new task as 
+  
+  <doxygen:doxygen ...  >
+  
+  </doxygen:doxygen>
+  
+This should make way for a much better integration.  
+
+
+1.5.1
+===
+Code refactored to work with JDK 5.
+
+1.5
+===
+888801 DoxygenTask.java: Straighten out [non-]nested properties.
+------ DoxygenTest.java: Improved unit test coverage to 90%.
+
+1.3.1
+=====
+  
+ Features
+ =========
+
+ 887510	DoxygenTask.java: Attribute 'versionCompatible' added 	
+ 885849	DoxygenTask.java: Integrate/Remove of task-element support.	
+ 883163	DoxygenTask.java: Ant/Java flavor defaults for Doxygen	 
+ 702402	DoxygenTask.java: Support for multiple INPUTs.	
+ 883174	DoxygenTask.java: Support nested attribute specifications.
+ 883150	DoxygenTask.java: configFile attribute added 	 
+ 881633	DoxygenTask.java: doxygenPath attribute	added 
+
+Bugs Fixed:
+==========
+793056	FILE_PATTERNS 
+739884	Support for Doxygen 1.3	
+772527	Doxygen 1.3.2 Ant task support	
+875319	plugin do not support the current doxygen version	
+
+CHANGES HISTORY: 
+* RELEASE 1.4 
+  * Moving code-level documentation to Doxygen tags; ignoring JavaDoc tag deficiencies.
+
+$Header: /cvsroot/ant-doxygen/ant_task/Attic/CHANGES,v 1.1.2.4 2004/02/05 01:14:48 jfrotz Exp $

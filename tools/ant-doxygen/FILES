@@ -1,0 +1,23 @@
+BINARY DISTRIBUTION:
+--------------------
+[] AUTHORS
+[] FILES
+[] LICENSE - Released under Apache Software License 1.1
+[] README
+[] doc/doxygen_usage.html - Usage document for Ant task for Doxygen.
+[] lib/doxygen_ant.jar - The jar file containing the doxygen file definition.
+
+SOURCE DISTRIBUTION (includes binary distribution):
+---------------------------------------------------
+[] build.xml - For building the source files.
+[] conf/doxygen.cfg - Base Doxygen configuration file for this project.
+[] src/org/doxygen/tools/DoxygenTask.java - Contains the Ant-Doxygen Task.
+[] src/org/doxygen/tools/DoxygenVersion.java - Helper class
+[] test/src/test/org/doxygen/tools/DoxygenTest.java - jUnit test cases.
+[] xml/checkstyle-text.xsl - Checkstyle report XSL transformations.
+[] xml/sun_checks.xml - Sun Style Guide Checkstyle specification.
+
+
+
+
+$Header: $

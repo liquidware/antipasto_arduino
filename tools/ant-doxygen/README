@@ -1,0 +1,105 @@
+ANT TASK FOR DOXYGEN
+====================
+
+This project allows the invocation of Doxygen
+(http://www.doxygen.org/) from within Ant (http://ant.apache.org/).
+
+Doxygen is a different source-level documentation system, similar to,
+but somewhat more detailed than JavaDoc.  Key examples are the use of
+the following documentation tags:
+
+JavaDoc			Doxygen
+-------			-------
+@author			@author
+@version		@version
+@since			@since
+@param			@param
+@return			@return
+@throws			@throws
+			@note
+			@bug
+			@todo
+			@pre(condition)
+			@post(condition)
+			@invariant
+			@par(agraph)
+
+In addition to a richer documentation tag support, Doxygen can produce
+many output deliverables: HTML (like JavaDoc), Compressed HTML, LaTex,
+PDF, RTF, man, Postscript.
+
+ Lastly, Doxygen leverages AT&T Research's GraphViz
+(http://www.research.att.com/sw/tools/graphviz/) to generate various
+graphs that become important when trying to understand the complexity
+of a large set of sources.
+
+
+LICENSING
+=========
+
+This software is licensed under the Apache Software License 1.1 terms
+which can be found in the file named "LICENSE" in this directory.
+
+
+FEATURES
+========
+
+* This Ant Task provides development teams with the ability to track
+  environmental changes.  A minimum Doxygen version can be set with a
+  hard or soft enforcement.
+
+* The invocation of Doxygen is tuned to common Java build structures:
+  * src/.../*.java
+  * classes/.../*.class
+  * doc/.../*.html
+  The minimalist task tag is: <doxygen/>
+
+* This Ant Task can optionally use a base Doxygen configuration file
+  so that development teams working on multiple, similar projects can
+  have a consistent documentation set generated.  Given a base
+  configuration file, each build.xml file can augment the Doxygen
+  configuration with just a few changes.
+
+* This Ant Task now supports nested properties so that arbitrary
+  Doxygen configuration properties can be embedded in your build.xml
+  file if needed.
+
+
+MINIMALIST USAGE
+================
+
+build.xml contains an example that is used by this project.
+Additionally, there are other examples in examples/.
+
+   <target name="documentation">
+    <taskdef name="doxygen"
+             classname="org.doxygen.tools.DoxygenTask"
+             classpath="lib/doxygen_ant.jar" />
+    <doxygen/>
+   </target>
+
+
+LATEST RELEASES
+===============
+
+Standard SourceForge support is available from this project.  Namely:
+
+* The low-bandwidth release notification mailing list:
+
+  ant-doxygen-release@lists.sourceforge.net
+
+  To subscribe, go to:
+
+  http://lists.sourceforge.net/lists/listinfo/ant-doxygen-release
+
+* The homepage is:
+
+  http://ant-doxygen.sourceforge.net/
+
+* If you need to request a feature, request help, report a bug, the
+  project page on SourceForge is
+
+  http://sourceforge.net/projects/ant-doxygen.
+
+
+$Header: $

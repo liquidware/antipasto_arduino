@@ -1,0 +1,72 @@
+<!--============================================================================-->
+<!-- VERSION_CHECK.XML:								-->
+<!--	Ant-Doxygen example build.xml file.					-->
+<!--	 									-->
+<!-- TARGETS:									-->
+<!--		ant documentation	- Invoke Doxygen via Ant.		-->
+<!--	 									-->
+<!-- URL:									-->
+<!--	http://ant-doxygen.sourceforge.net		- Project Home		-->
+<!--	http://sourceforge.net/projects/ant-doxygen	- SourceForge Project	-->
+<!--	 									-->
+<!--============================================================================-->
+<!-- $Header: /cvsroot/ant-doxygen/ant_task/build.xml,v 1.10.4.1 2004/01/26 01:23:52 jfrotz Exp $ -->
+
+<project name="ant_doxygen" default="documentation" basedir=".." >
+
+
+
+
+
+ <!--===========================================================================-->
+ <!-- PROPERTY INITIALIZATION:							-->
+ <!--	 The following properties are used in this file.			-->
+ <!--	 	build.compiler	- We prefer "jikes".  You might use "javac" 	-->
+ <!--	 									-->
+ <!-- NOTE: 									-->
+ <!--	You may wish to use your ${user.home}/ant.properties file to preset	-->
+ <!--	build.compiler and possibly the checkstyle and/or junit jar files	-->
+ <!--	 									-->
+ <target name="properties">
+  <property file="${user.home}/ant.properties"  />
+  <property name="version"        value="1.3"   />
+  <property name="build.compiler" value="jikes" />
+  <property name="build.compiler" value="javac" />
+ </target>
+
+
+
+
+
+ <!--===========================================================================-->
+ <!-- CLASSPATH REFERENCES:							-->
+ <!--	 project.class.path	- Used to compile this project.			-->
+ <!--	 									-->
+ <path id="project.class.path">
+  <pathelement path="src"/>
+  <pathelement path="classes"/>
+  <pathelement path="lib/ant_doxygen.jar"/>
+ </path>
+
+
+
+
+
+ <!--===========================================================================-->
+ <!-- DOCUMENTATION:								-->
+ <!--	Demonstrate the Ant-Doxygen version agnostic form.  By default, the 	-->
+ <!--   detected Doxygen installation must be later than 1.2.17.		-->
+ <!--	 									-->
+ <target name="documentation"
+         depends="properties"
+	 description="Example target showing version agnostic form.">
+  <taskdef name="doxygen"
+           classname="org.doxygen.tools.DoxygenTask"
+	   classpathref="project.class.path" />
+   <!--==============================================-->
+   <!-- ignoreVersion controls whether Ant-Doxygen is-->
+   <!-- finicky about the Doxygen version invoked.   -->
+   <!--                                              -->
+  <doxygen ignoreVersion="true"/>
+ </target>
+</project>

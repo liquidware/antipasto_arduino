@@ -18,7 +18,9 @@
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
    USA
 -->
-<project name="Antipasto_Arduino" basedir="." default="main">
+<project name="Antipasto_Arduino"
+         basedir="."
+         default="main">
 
     <!--
         ===================================================================
@@ -31,6 +33,10 @@
         </classpath>
     </typedef>
 
+    <taskdef name="doxygen" 
+             classname="org.doxygen.tools.DoxygenTask"
+             classpath="tools/ant-doxygen/lib/ant_doxygen.jar" />
+
     <!--
         ===================================================================
          Load the project's properties
@@ -38,8 +44,8 @@
     -->
     <import file="build.properties.xml" />
 
-    <target name="clean.all" depends="clean.cores, clean.external, clean.plugins, clean.OS"/>
-    <target name="get.all"   depends="get.cores, get.libraries, get.plugins, get.external, get.OS"/>
+    <target name="clean.all" depends="clean.libraries, clean.cores, clean.external, clean.plugins, clean.OS"/>
+    <target name="get.all"   depends="get.cores, get.libraries, build.reference, get.plugins, get.external, get.OS"/>
     <target name="build.all" depends="build.plugins, build.external, build.java"/>
     <target name="dist.all"  depends="clean.all, get.all, build.all, dist.OS"/>
     <target name="run.all"      depends="run.OS"/>
@@ -72,6 +78,10 @@
     <target name="clean.cores">
         <!-- Clean Illuminato X Machina -->
         <delete dir="hardware/cores/ixm"/>
+    </target>
+
+    <target name="clean.libraries">
+        <!--Delete the reference directories -->
     </target>
 
 
@@ -779,6 +789,106 @@ distribution.version=${build.version}</echo>
              remotedir="public_html/illuminatolabs/ide/">
             <fileset refid="upload.files"/>
         </ftp>
+    </target>
+    
+    <macrodef name="doc-arduino">
+        <attribute name="name"/>
+        <attribute name="path"/>
+        <attribute name="project-name" default="@{name}"/>
+        <sequential>
+            <doxygen>
+                <property name="PROJECT_NAME" value="@{project-name}"/>
+                <property name="INPUT" value="@{path}" />
+                <property name="OUTPUT_DIRECTORY" value="@{path}\reference"/>
+                <property name="FILE_PATTERNS" value="*.h"/>
+                
+                <property name="CASE_SENSE_NAMES" value="YES"/>
+                <property name="OPTIMIZE_OUTPUT_JAVA" value="NO"/>
+                <property name="OPTIMIZE_OUTPUT_FOR_C" value="YES"/>
+    
+                <property name="HIDE_UNDOC_CLASSES" value="NO"/>
+                <property name="HIDE_UNDOC_MEMBERS" value="NO"/>
+                <property name="HIDE_UNDOC_RELATIONS" value="NO"/>
+                <property name="EXTRACT_ALL" value="YES"/>
+                <property name="DISABLE_INDEX" value="YES"/>
+                 
+                <property name="HTML_HEADER" value="docs/header.html"/>
+                <property name="HTML_FOOTER" value="docs/footer.html"/>
+                <property name="HTML_STYLESHEET" value="docs/main.css"/>
+    
+                <property name="SEARCHENGINE" value="NO"/>
+                <property name="SOURCE_BROWSER" value="NO"/>
+                <property name="SHOW_NAMESPACES" value="NO"/>
+                <property name="SHOW_USED_FILES" value="NO"/>
+                <property name="SHOW_FILES" value="NO"/>
+                <property name="INLINE_SOURCES" value="NO"/>
+                <property name="INLINE_INFO" value="NO"/>
+                <property name="INCLUDE_GRAPH" value="NO"/>
+                
+                <property name="GENERATE_TESTLIST" value="NO"/>
+                <property name="GENERATE_TODOLIST" value="NO"/>
+                <property name="GENERATE_TREEVIEW" value="NO"/>
+                <property name="GENERATE_LEGEND" value="NO"/>
+                <property name="GENERATE_DEPRECATEDLIST" value="NO"/>
+                <property name="GENERATE_BUGLIST" value="NO"/> 
+                <property name="FULL_PATH_NAMES" value="NO"/>
+                <property name="DETAILS_AT_TOP" value="NO"/>
+                <property name="DIRECTORY_GRAPH" value="NO"/>
+                <property name="CLASS_GRAPH" value="NO"/>
+                <property name="CLASS_DIAGRAMS" value="NO"/>
+            </doxygen> 
+            <move todir="@{path}/reference">
+                <fileset dir="@{path}/reference/html" includes="*.*"/>
+            </move>
+            <delete dir="@{path}/reference/html"/>
+            <move tofile="@{path}/reference/index.html">
+                <fileset dir="@{path}/reference">
+                    <!-- class names that appearently do not follow
+                         the standard Arduino library naming conventions --> 
+                    <include name="class@{name}.html"/>
+                    <include name="class@{name}Class.html"/>
+                    <include name="classTwoWire.html"/>
+                </fileset>
+            </move>
+        </sequential>
+    </macrodef> 
+
+    <!--
+        ===================================================================
+         Build Arduino code reference
+            Requires Doxygen to be on the path
+        ===================================================================
+    -->
+    <target name="build.reference">
+        <for param="file">
+            <path id="test">
+                <dirset dir="hardware\cores\arduino\src\components\library" includes="*"/>
+            </path>
+            <sequential>
+                
+                <!-- Get the basename of the directory -->
+                <propertyregex override="yes"
+                               property="name"
+                               input="@{file}"
+                               regexp="[^\\]*$"
+                               select="\0"/>
+
+                <!-- Create a project name -->
+                <propertyregex override="yes"
+                               property="project-name"
+                               input="@{file}"
+                               regexp="[^\\]*$"
+                               select="Library-\0"/>
+
+                <echo message=" " />
+                <echo message="Building reference for '${name}'"/>
+
+                <!-- Generate the docs -->
+                <doc-arduino name="${name}"
+                             path="@{file}"
+                             project-name="${project-name}"/>
+            </sequential>
+        </for>
     </target>
 
 </project>

@@ -1,0 +1,59 @@
+<!--============================================================================-->
+<!-- MINIMALIST.XML:								-->
+<!--	Ant-Doxygen example build.xml file.					-->
+<!--	 									-->
+<!-- TARGETS:									-->
+<!--		ant documentation	- Invoke Doxygen via Ant.		-->
+<!--	 									-->
+<!-- URL:									-->
+<!--	http://ant-doxygen.sourceforge.net		- Project Home		-->
+<!--	http://sourceforge.net/projects/ant-doxygen	- SourceForge Project	-->
+<!--	 									-->
+<!--============================================================================-->
+<!-- $Header: /cvsroot/ant-doxygen/ant_task/build.xml,v 1.10.4.1 2004/01/26 01:23:52 jfrotz Exp $ -->
+
+<project name="ant_doxygen"  xmlns:doxygen="antlib:org.doxygen.tools" default="documentation" basedir=".." >
+
+
+
+
+
+ <target name="properties">
+  <property file="${user.home}/ant.properties"  />
+  <property name="version"        value="1.3"   />
+  <property name="build.compiler" value="jikes" />
+  <property name="build.compiler" value="javac" />
+ </target>
+
+
+
+
+
+
+
+ <!--===========================================================================-->
+ <!-- DOCUMENTATION:								-->
+ <!--	Demonstrate the Ant-Doxygen minimalist form.  The following Doxygen 	-->
+ <!--   parameters are implied above and beyond Doxygen	defaults.		-->
+ <!--		DETAILS_AT_TOP=YES						-->
+ <!--		EXPAND_TOC=YES							-->
+ <!--		GENERATE_LATEX=NO						-->
+ <!--		HAVE_DOT=YES							-->
+ <!--		HIDE_UNDOC_MEMBERS=YES						-->
+ <!--		INLINE_SOURCE=YES						-->
+ <!--		QUIET=YES							-->
+ <!--		RECURSIVE=YES							-->
+ <!--		SOURCE_BROWSER=YES						-->
+ <!--	 	FILE_PATTERNS=*.java						-->
+ <!--	 	INPUT=src							-->
+ <!--	 	OPTIMIZE_OUTPUT_JAVA=YES					-->
+ <!--	 	OUTPUT_DIRECTORY=doc						-->
+ <!--	 									-->
+ <!--	This is equivalent to 14 different property tags with these values.	-->
+ <!--	 									-->
+ <target name="documentation"
+         depends="properties"
+	 description="Example target showing minimalist form.">
+  <doxygen:doxygen/>
+ </target>
+</project>
