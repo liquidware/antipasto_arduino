@@ -81,7 +81,15 @@
     </target>
 
     <target name="clean.libraries">
-        <!--Delete the reference directories -->
+        <!--Delete the library reference -->
+        <delete>
+            <fileset dir=".">
+                <include name="hardware/cores/**/src/components/library/**/reference/*"/>
+            </fileset>
+            <dirset dir=".">
+                <include name="hardware/cores/**/src/components/library/**/reference" />
+            </dirset>
+        </delete>
     </target>
 
 
