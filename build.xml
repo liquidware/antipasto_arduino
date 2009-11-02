@@ -39,7 +39,7 @@
     <import file="build.properties.xml" />
 
     <target name="clean.all" depends="clean.cores, clean.external, clean.plugins, clean.OS"/>
-    <target name="get.all"   depends="get.cores, get.plugins, get.external, get.OS"/>
+    <target name="get.all"   depends="get.cores, get.libraries, get.plugins, get.external, get.OS"/>
     <target name="build.all" depends="build.plugins, build.external, build.java"/>
     <target name="dist.all"  depends="clean.all, get.all, build.all, dist.OS"/>
     <target name="run.all"      depends="run.OS"/>
@@ -105,6 +105,33 @@
         <delete file="hardware/cores/ixm/sfb-latest-html-docs.zip"/>
     </target>
 
+
+    <!-- A helper macro to get libraries from remote http urls -->
+    <macrodef name="get-library-http">
+        <attribute name="file"/>
+        <attribute name="url"/>
+        <attribute name="core"/>
+        <sequential>
+            <echo message="Getting @{file} library from '@{url}'"/>
+            <get src="@{url}"
+                 dest="hardware/cores/@{core}/src/components/library/@{file}"/>
+            <unzip src="hardware/cores/@{core}/src/components/library/@{file}"
+                   dest="hardware/cores/@{core}/src/components/library"/>
+            <delete file="hardware/cores/@{core}/src/components/library/@{file}"/>
+            <!-- TODO: Build Reference if it doesn't exist -->
+        </sequential>
+    </macrodef>
+
+    <!-- Get the user contributed hardware libraries -->
+    <target name="get.libraries">
+        <!-- JeeNode -->
+        <get-library-http file="Ports.zip"
+                          url="http://jeefiles.equi4.com/Ports.zip"
+                          core="arduino"/>
+        <get-library-http file="RF12.zip"
+                          url="http://jeefiles.equi4.com/RF12.zip"
+                          core="arduino"/>
+    </target>
 
     <!--
         ===================================================================
@@ -350,14 +377,14 @@
                         <include name="**/*" />
                     </fileset>
                 </copy>
-                
+
                 <!-- Overwrite using architecture specific distribution libraries -->
                 <copy todir="${build.dir}/Arduino.app/Contents/Resources" overwrite="true">
                     <fileset dir="build/macosx/dist/Arduino.app/Contents/Resources/Java" >
                         <include name="librxtxSerial.jnilib" />
                     </fileset>
                 </copy>
-                
+
                 <move todir="${build.dir}/Arduino.app/Contents/Resources/Java">
                     <fileset dir="${build.dir}/Arduino.app/Contents/Resources">
                         <include name="*.jnilib"/>
@@ -651,19 +678,19 @@ distribution.version=${build.version}</echo>
                 <arg value="-d" />
                 <arg value="${package.dir}/Resources/Description.plist"/>
             </exec>
-            
+
 
             <!-- Remove instances of the IFPkgFlagRelocatable   -->
-            <replace file="${package.dir}/Arduino_macosx.pkg/Contents/Info.plist" 
-                     token="IFPkgFlagRelocatable" 
+            <replace file="${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"
+                     token="IFPkgFlagRelocatable"
                      value="IFPkgFlagOverwritePermissions"/>
-            
+
               <!-- Strip off the package mapping tags, this sucks. -->
               <!-- Get the head -->
               <exec executable="head" searchpath="true" append="true">
                 <arg line="-42
                             ${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
-                            
+
                 <redirector outputproperty="redirector.out"
                             errorproperty="redirector.err">
                     <outputmapper type="merge" to="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt"/>
@@ -673,15 +700,15 @@ distribution.version=${build.version}</echo>
               <exec executable="tail" searchpath="true" append="true">
                 <arg line="-2
                            ${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
-                           
+
                 <redirector outputproperty="redirector.out"
                             errorproperty="redirector.err">
                     <outputmapper type="merge" to="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt"/>
                 </redirector>
               </exec>
-              
+
               <!-- Overwrite the Info.plist file -->
-              <move file="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt" 
+              <move file="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt"
                     tofile="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
 
 
@@ -703,7 +730,7 @@ distribution.file=${package.macosx.name}
 distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
-    
+
 
     <!--
         ===================================================================
