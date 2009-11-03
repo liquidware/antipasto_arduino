@@ -10,7 +10,7 @@ body, table, div, p, dl {
 
 h1 {
 	text-align: center;
-	font-size: 250%;
+	font-size: 140%;
 }
 
 h2 {
@@ -189,7 +189,7 @@ p.formulaDsp {
 }
 
 img.formulaDsp {
-	
+
 }
 
 img.formulaInl {
@@ -242,20 +242,20 @@ span.charliteral {
 	color: #008080
 }
 
-span.vhdldigit { 
-	color: #ff00ff 
+span.vhdldigit {
+	color: #ff00ff
 }
 
-span.vhdlchar { 
-	color: #000000 
+span.vhdlchar {
+	color: #000000
 }
 
-span.vhdlkeyword { 
-	color: #700070 
+span.vhdlkeyword {
+	color: #700070
 }
 
-span.vhdllogic { 
-	color: #ff0000 
+span.vhdllogic {
+	color: #ff0000
 }
 
 /* @end */
@@ -360,7 +360,7 @@ hr {
 }
 
 .memproto, .memdoc {
-	border: 1px solid #84b0c7;	
+	border: 1px solid #84b0c7;
 }
 
 .memproto {
