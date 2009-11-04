@@ -33,7 +33,7 @@
         </classpath>
     </typedef>
 
-    <taskdef name="doxygen" 
+    <taskdef name="doxygen"
              classname="org.doxygen.tools.DoxygenTask"
              classpath="tools/ant-doxygen/lib/ant_doxygen.jar" />
 
@@ -798,7 +798,7 @@ distribution.version=${build.version}</echo>
             <fileset refid="upload.files"/>
         </ftp>
     </target>
-    
+
     <macrodef name="doc-arduino">
         <attribute name="name"/>
         <attribute name="path"/>
@@ -809,21 +809,21 @@ distribution.version=${build.version}</echo>
                 <property name="INPUT" value="@{path}" />
                 <property name="OUTPUT_DIRECTORY" value="@{path}\reference"/>
                 <property name="FILE_PATTERNS" value="*.h"/>
-                
+
                 <property name="CASE_SENSE_NAMES" value="YES"/>
                 <property name="OPTIMIZE_OUTPUT_JAVA" value="NO"/>
                 <property name="OPTIMIZE_OUTPUT_FOR_C" value="YES"/>
-    
+
                 <property name="HIDE_UNDOC_CLASSES" value="NO"/>
                 <property name="HIDE_UNDOC_MEMBERS" value="NO"/>
                 <property name="HIDE_UNDOC_RELATIONS" value="NO"/>
                 <property name="EXTRACT_ALL" value="YES"/>
                 <property name="DISABLE_INDEX" value="YES"/>
-                 
+
                 <property name="HTML_HEADER" value="docs/header.html"/>
                 <property name="HTML_FOOTER" value="docs/footer.html"/>
                 <property name="HTML_STYLESHEET" value="docs/main.css"/>
-    
+
                 <property name="SEARCHENGINE" value="NO"/>
                 <property name="SOURCE_BROWSER" value="NO"/>
                 <property name="SHOW_NAMESPACES" value="NO"/>
@@ -832,19 +832,19 @@ distribution.version=${build.version}</echo>
                 <property name="INLINE_SOURCES" value="NO"/>
                 <property name="INLINE_INFO" value="NO"/>
                 <property name="INCLUDE_GRAPH" value="NO"/>
-                
+
                 <property name="GENERATE_TESTLIST" value="NO"/>
                 <property name="GENERATE_TODOLIST" value="NO"/>
                 <property name="GENERATE_TREEVIEW" value="NO"/>
                 <property name="GENERATE_LEGEND" value="NO"/>
                 <property name="GENERATE_DEPRECATEDLIST" value="NO"/>
-                <property name="GENERATE_BUGLIST" value="NO"/> 
+                <property name="GENERATE_BUGLIST" value="NO"/>
                 <property name="FULL_PATH_NAMES" value="NO"/>
                 <property name="DETAILS_AT_TOP" value="NO"/>
                 <property name="DIRECTORY_GRAPH" value="NO"/>
                 <property name="CLASS_GRAPH" value="NO"/>
                 <property name="CLASS_DIAGRAMS" value="NO"/>
-            </doxygen> 
+            </doxygen>
             <move todir="@{path}/reference">
                 <fileset dir="@{path}/reference/html" includes="*.*"/>
             </move>
@@ -852,14 +852,15 @@ distribution.version=${build.version}</echo>
             <move tofile="@{path}/reference/index.html">
                 <fileset dir="@{path}/reference">
                     <!-- class names that appearently do not follow
-                         the standard Arduino library naming conventions --> 
+                         the standard Arduino library naming conventions -->
                     <include name="class@{name}.html"/>
                     <include name="class@{name}Class.html"/>
                     <include name="classTwoWire.html"/>
+                    <include name="classPort.html"/>
                 </fileset>
             </move>
         </sequential>
-    </macrodef> 
+    </macrodef>
 
     <!--
         ===================================================================
@@ -873,7 +874,7 @@ distribution.version=${build.version}</echo>
                 <dirset dir="hardware\cores\arduino\src\components\library" includes="*"/>
             </path>
             <sequential>
-                
+
                 <!-- Get the basename of the directory -->
                 <propertyregex override="yes"
                                property="name"
