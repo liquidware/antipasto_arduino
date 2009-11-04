@@ -807,7 +807,7 @@ distribution.version=${build.version}</echo>
             <doxygen>
                 <property name="PROJECT_NAME" value="@{project-name}"/>
                 <property name="INPUT" value="@{path}" />
-                <property name="OUTPUT_DIRECTORY" value="@{path}\reference"/>
+                <property name="OUTPUT_DIRECTORY" value="@{path}/reference"/>
                 <property name="FILE_PATTERNS" value="*.h"/>
 
                 <property name="CASE_SENSE_NAMES" value="YES"/>
@@ -845,20 +845,18 @@ distribution.version=${build.version}</echo>
                 <property name="CLASS_GRAPH" value="NO"/>
                 <property name="CLASS_DIAGRAMS" value="NO"/>
             </doxygen>
+            
             <move todir="@{path}/reference">
                 <fileset dir="@{path}/reference/html" includes="*.*"/>
             </move>
             <delete dir="@{path}/reference/html"/>
-            <move tofile="@{path}/reference/index.html">
-                <fileset dir="@{path}/reference">
-                    <!-- class names that appearently do not follow
-                         the standard Arduino library naming conventions -->
-                    <include name="class@{name}.html"/>
-                    <include name="class@{name}Class.html"/>
-                    <include name="classTwoWire.html"/>
-                    <include name="classPort.html"/>
-                </fileset>
-            </move>
+
+            <move tofile="@{path}/reference/index.html" file="@{path}/reference/class@{name}.html" failonerror="false"/>
+            <!-- class names that appearently do not follow
+                 the standard Arduino library naming conventions. -->
+            <move tofile="@{path}/reference/index.html" file="@{path}/reference/class@{name}Class.html" failonerror="false"/>
+            <move tofile="@{path}/reference/index.html" file="@{path}/reference/classTwoWire.html" failonerror="false"/>
+            <move tofile="@{path}/reference/index.html" file="@{path}/reference/classPort.html" failonerror="false"/>
         </sequential>
     </macrodef>
 
@@ -870,30 +868,30 @@ distribution.version=${build.version}</echo>
     -->
     <target name="build.reference">
         <for param="file">
-            <path id="test">
-                <dirset dir="hardware\cores\arduino\src\components\library" includes="*"/>
+            <path>
+                <dirset dir="hardware/cores/arduino/src/components/library" includes="*"/>
             </path>
             <sequential>
 
                 <!-- Get the basename of the directory -->
                 <propertyregex override="yes"
-                               property="name"
+                               property="basename"
                                input="@{file}"
-                               regexp="[^\\]*$"
+                               regexp="[^\\/]*$"
                                select="\0"/>
 
                 <!-- Create a project name -->
                 <propertyregex override="yes"
                                property="project-name"
                                input="@{file}"
-                               regexp="[^\\]*$"
+                               regexp="[^\\/]*$"
                                select="Library-\0"/>
 
                 <echo message=" " />
-                <echo message="Building reference for '${name}'"/>
+                <echo message="Building reference for '${basename}'"/>
 
                 <!-- Generate the docs -->
-                <doc-arduino name="${name}"
+                <doc-arduino name="${basename}"
                              path="@{file}"
                              project-name="${project-name}"/>
             </sequential>
