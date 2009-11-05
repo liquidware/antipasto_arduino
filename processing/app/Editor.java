@@ -6,7 +6,9 @@
 
   Copyright (c) 2004-05 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
-
+ 
+  Cleanup and adaptation to events by: Christopher Ladden @ www.liquidware.org
+ 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
@@ -64,7 +66,6 @@ import antipasto.Plugins.Events.EditorEvent;
 
 import com.apple.mrj.*;
 import com.oroinc.text.regex.*;
-//import de.hunsicker.jalopy.*;
 
 import com.apple.mrj.*;
 import gnu.io.*;
@@ -73,7 +74,7 @@ import org.arduino.tools.AntRunner;
 
 public class Editor extends JFrame
 implements MRJAboutHandler, MRJQuitHandler, MRJPrefsHandler,
-MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicationHandler
+MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
     // yeah
     static final String WINDOW_TITLE = "Antipasto Arduino";
 
@@ -135,11 +136,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     // runtime information and window placement
     Point appletLocation;
-    //Point presentLocation;
-    //Window presentationWindow;
     RunButtonWatcher watcher;
-    //Runner runtime;
-
 
     JMenuItem exportAppItem;
     JMenuItem saveMenuItem;
@@ -184,9 +181,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     File originalBoardsFile;
     File newBoardsFile;
 
-    //SketchHistory history;  // TODO re-enable history
     Sketchbook sketchbook;
-    //Preferences preferences;
     FindReplace find;
     public JFrame _frame;
     public GadgetPanel gadgetPanel ;
@@ -197,7 +192,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
     public PluginPanel pluginPanel = new PluginPanel(Base.pluginloader);
     AntRunner ant = new AntRunner();
-    //static Properties keywords; // keyword -> reference html lookup
 
 
     public Editor() {
@@ -241,20 +235,11 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         menubar.add(buildEditMenu());
         menubar.add(buildSketchMenu());
         menubar.add(buildToolsMenu());
-        // what platform has their help menu way on the right? motif?
-        //menubar.add(Box.createHorizontalGlue());
         menubar.add(buildHelpMenu());
 
         _frame.setJMenuBar(menubar);
 
         buildGadgetPanel();
-        // doesn't matter when this is created, just make it happen at some point
-        //find = new FindReplace(Editor.this);
-
-        //Container pain = getContentPane();
-        //pain.setLayout(new BorderLayout());
-        // for rev 0120, placing things inside a JPanel because
-        //Container contentPain = getContentPane();
         this.getContentPane().setLayout(new BorderLayout());
         JPanel pain = new JPanel();
         pain.setLayout(new BorderLayout());
@@ -272,13 +257,11 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
 
         header = new EditorHeader(this);
-        //header.setBorder(null);
         upper.add(header);
 
 
         textarea = new JEditTextArea(new PdeTextAreaDefaults());
         textarea.setRightClickPopup(new TextAreaPopup());
-        //textarea.setTokenMarker(new PdeKeywords());
         textarea.setHorizontalOffset(6);
 
         // assemble console panel, consisting of status area and the console itself
@@ -370,7 +353,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         leftWing.setVisible(true);
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                    upper, consolePanel);
-        //textarea, consolePanel);
 
         splitPane.setOneTouchExpandable(true);
         // repaint child panes while resizing
@@ -405,43 +387,10 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                     public boolean importData(JComponent src, Transferable transferable) {
                                         DataFlavor[] flavors = transferable.getTransferDataFlavors();
 
-                                        //gadgetPanel.setVisible(false);
-
-                                        /*
-                                        DropTarget dt = new DropTarget(this, new DropTargetListener() {
-
-                                            public void dragEnter(DropTargetDragEvent event) {
-                                              // debug messages for diagnostics
-                                              //System.out.println("dragEnter " + event);
-                                              event.acceptDrag(DnDConstants.ACTION_COPY);
-                                            }
-
-                                            public void dragExit(DropTargetEvent event) {
-                                              //System.out.println("dragExit " + event);
-                                            }
-
-                                            public void dragOver(DropTargetDragEvent event) {
-                                              //System.out.println("dragOver " + event);
-                                              event.acceptDrag(DnDConstants.ACTION_COPY);
-                                            }
-
-                                            public void dropActionChanged(DropTargetDragEvent event) {
-                                              //System.out.println("dropActionChanged " + event);
-                                            }
-
-                                            public void drop(DropTargetDropEvent event) {
-                                              //System.out.println("drop " + event);
-                                              event.acceptDrop(DnDConstants.ACTION_COPY);
-
-                                              Transferable transferable = event.getTransferable();
-                                              DataFlavor flavors[] = transferable.getTransferDataFlavors();
-                                        */
                                         int successful = 0;
 
                                         for (int i = 0; i < flavors.length; i++) {
                                             try {
-                                                //System.out.println(flavors[i]);
-                                                //System.out.println(transferable.getTransferData(flavors[i]));
                                                 Object stuff = transferable.getTransferData(flavors[i]);
                                                 if (!(stuff instanceof java.util.List)) continue;
                                                 java.util.List list = (java.util.List) stuff;
@@ -555,7 +504,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
      * even being called on later versions of OS X or Windows.
      */
     public Dimension getMinimumSize() {
-        //System.out.println("getting minimum size");
         return new Dimension(500, 550);
     }
 
@@ -672,7 +620,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         } else {
             String sketchName = Preferences.get("last.sketch.name");
             String sketchPath = Preferences.get("last.sketch.path");
-            //Sketch sketchTemp = new Sketch(sketchPath);
 
             if ((sketchPath != null) && (new File(sketchPath)).exists()) {
                 // don't check modified because nothing is open yet
@@ -718,8 +665,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
         textarea.setEditable(!external);
         saveMenuItem.setEnabled(!external);
-        //saveAsMenuItem.setEnabled(!external);
-        //beautifyMenuItem.setEnabled(!external);
 
         TextAreaPainter painter = textarea.getPainter();
         if (external) {
@@ -737,18 +682,10 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             textarea.setCaretVisible(true);
         }
 
-        // apply changes to the font size for the editor
-        //TextAreaPainter painter = textarea.getPainter();
         painter.setFont(Preferences.getFont("editor.font"));
-        //Font font = painter.getFont();
-        //textarea.getPainter().setFont(new Font("Courier", Font.PLAIN, 36));
 
         // in case tab expansion stuff has changed
         listener.applyPreferences();
-
-        // in case moved to a new location
-        // For 0125, changing to async version (to be implemented later)
-        //sketchbook.rebuildMenus();
         sketchbook.rebuildMenusAsync();
     }
 
@@ -758,7 +695,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
      * Called when the application is quitting.
      */
     public void storePreferences() {
-        //System.out.println("storing preferences");
 
         // window location information
         Rectangle bounds = getBounds();
@@ -808,17 +744,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
                                                     File dflt = new File(Sketchbook.getSketchbookPath());
 
-                                                    /*File file = Base.selectFile("Enter the new Gadget file name",
-                                                                                dflt,
-                                                                                dialog,
-                                                                                filter);
-
-                                                            /* Error checking and formatting */
-                                                    /*		if (file == null) {
-                                                                return;
-                                                            }
-
-                                                    */
                                                     final String baseDir = Base.getDefaultSketchbookFolder().getPath();
                                                     IOkListener ourListener = new IOkListener() {
                                                         private String msg;
@@ -842,7 +767,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                                                     editor.gadgetPanel.loadGadget(newFile);
                                                                     editor.gadgetPanel.setVisible(true);
                                                                     editor.SetShownPanel(BLANK);
-                                                                    //editor.textarea.setOpaque(false);
                                                                     editor.textarea.repaint();
                                                                     editor.header.tabHeader.setVisible(false);
                                                                     editor.console.message("Just created a new Gadget File ! Located : " + file.getPath(), false, false);
@@ -938,21 +862,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                    }
                                });
         menu.add(item);
-
-
-
-        /*exportAppItem = newJMenuItem("Export Application", 'E', true);
-        exportAppItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              //buttons.activate(EditorButtons.EXPORT);
-              //SwingUtilities.invokeLater(new Runnable() {
-              //public void run() {
-              handleExportApplication();
-              //}});
-            }
-          });
-        menu.add(exportAppItem);
-        */
         menu.addSeparator();
 
         item = newJMenuItem("Page Setup", 'P', true);
@@ -1040,7 +949,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         item = newJMenuItem("Show Sketch Folder", 'K', false);
         item.addActionListener(new ActionListener() {
                                    public void actionPerformed(ActionEvent e) {
-                                       //Base.openFolder(sketchDir);
                                        Base.openFolder(sketch.folder);
                                    }
                                });
@@ -1048,8 +956,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         if (!Base.openFolderAvailable()) {
             item.setEnabled(false);
         }
-
-        //menu.addSeparator();
 
         item = new JMenuItem("Add File...");
         item.addActionListener(new ActionListener() {
@@ -1059,8 +965,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                });
         menu.add(item);
 
-        // TODO re-enable history
-        //history.attachMenu(menu);
         return menu;
     }
 
@@ -1098,24 +1002,10 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         item.addActionListener(new ActionListener() {
                                    public void actionPerformed(ActionEvent e) {
                                        new Archiver(Editor.this).show();
-                                       //Archiver archiver = new Archiver();
-                                       //archiver.setup(Editor.this);
-                                       //archiver.show();
                                    }
                                });
         menu.add(item);
 
-        /*
-        item = new JMenuItem("Export Folder...");
-        item.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              SwingUtilities.invokeLater(new Runnable() {
-                  public void run() {
-              new ExportFolder(Editor.this).show();
-            }
-          });
-        menu.add(item);
-        */
         menu.addSeparator();
 
         boardsMenu = new JMenu("Board");
@@ -1179,7 +1069,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                  public void menuDeselected(MenuEvent e) {
                                  }
                                  public void menuSelected(MenuEvent e) {
-                                     //System.out.println("Tools menu selected.");
                                      populateSerialMenu();
                                  }
                              });
@@ -1243,13 +1132,13 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                              /* referenceURL   */ Preferences.get("boards." + Preferences.get("board") + ".reference"),
                              /* boardMenuItem  */ menuItem,
                              /* corePath       */ (new File(System.getProperty("user.dir") +
-                                                            "hardware/cores/" + board)).getAbsolutePath(),
+                                                            "/hardware/cores/" + board)).getAbsolutePath(),
                              /* librariesPath  */ (new File(System.getProperty("user.dir") +
-                                                            "hardware/cores/" + board +
-                                                            "src/components/libraries")).getAbsolutePath(),
+                                                            "/hardware/cores/" + board +
+                                                            "/src/components/libraries")).getAbsolutePath(),
                              /* examplesPath   */ (new File(System.getProperty("user.dir") +
-                                                            "hardware/cores/" + board +
-                                                            "src/components/examples")).getAbsolutePath()));
+                                                            "/hardware/cores/" + board +
+                                                            "/src/components/examples")).getAbsolutePath()));
    }
 
     /**
@@ -1278,27 +1167,21 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
         JMenuItem rbMenuItem;
 
-        //System.out.println("Clearing serial port menu.");
-
         serialMenu.removeAll();
         boolean empty = true;
 
         try {
             for (Enumeration enumeration = CommPortIdentifier.getPortIdentifiers(); enumeration.hasMoreElements();) {
                 CommPortIdentifier commportidentifier = (CommPortIdentifier)enumeration.nextElement();
-                //System.out.println("Found communication port: " + commportidentifier);
                 if (commportidentifier.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-                    //System.out.println("Adding port to serial port menu: " + commportidentifier);
                     String curr_port = commportidentifier.getName();
                     rbMenuItem = new JCheckBoxMenuItem(curr_port, curr_port.equals(Preferences.get("serial.port")));
                     rbMenuItem.addActionListener(serialMenuListener);
-                    //serialGroup.add(rbMenuItem);
                     serialMenu.add(rbMenuItem);
                     empty = false;
                 }
             }
             if (!empty) {
-                //System.out.println("enabling the serialMenu");
                 serialMenu.setEnabled(true);
             }
 
@@ -1312,9 +1195,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         if (serialMenu.getItemCount() == 0) {
             serialMenu.setEnabled(false);
         }
-
-        //serialMenu.addSeparator();
-        //serialMenu.add(item);
     }
 
     protected JMenu buildHelpMenu() {
@@ -1460,9 +1340,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                        if (find == null) {
                                            find = new FindReplace(Editor.this);
                                        }
-                                       //new FindReplace(Editor.this).show();
                                        find.show();
-                                       //find.setVisible(true);
                                    }
                                });
         menu.add(item);
@@ -1473,8 +1351,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         item.addActionListener(new ActionListener() {
                                    public void actionPerformed(ActionEvent e) {
                                        if (find != null) {
-                                           //find.find(true);
-                                           //FindReplace find = new FindReplace(Editor.this); //.show();
                                            find.find(true);
                                        }
                                    }
@@ -1522,8 +1398,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             try {
                 undo.undo();
             } catch (CannotUndoException ex) {
-                //System.out.println("Unable to undo: " + ex);
-                //ex.printStackTrace();
             }
             updateUndoState();
             redoAction.updateRedoState();
@@ -1561,8 +1435,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             try {
                 undo.redo();
             } catch (CannotRedoException ex) {
-                //System.out.println("Unable to redo: " + ex);
-                //ex.printStackTrace();
             }
             updateRedoState();
             undoAction.updateUndoState();
@@ -1623,18 +1495,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     public void handlePrefs() {
         Preferences preferences = new Preferences();
         preferences.showFrame(this);
-
-        // since this can't actually block, it'll hide
-        // the editor window while the prefs are open
-        //preferences.showFrame(this);
-        // and then call applyPreferences if 'ok' is hit
-        // and then unhide
-
-        // may need to rebuild sketch and other menus
-        //applyPreferences();
-
-        // next have editor do its thing
-        //editor.appyPreferences();
     }
 
 
@@ -1858,7 +1718,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
                                               } else {
 
-                                                  //There is no active gadget; we should do a classic run
                                                   String boardName = Preferences.get("board");
                                                   success = sketch.handleRun(new Target(System.getProperty("user.dir") + File.separator + "hardware" +
                                                                                    File.separator + "cores", Preferences.get("boards." + boardName + ".build.core")));
@@ -1879,7 +1738,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
                                       } catch (RunnerException e) {
                                           error("Error compiling.");
-                                          //error(e);
 
                                       } catch (Exception e) {
                                           error("Error compiling.");
@@ -1955,7 +1813,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
      */
     public void doStop() {
 
-        //if (runtime != null) runtime.stop();
         if (debugging) {
             status.unserial();
             serialPort.dispose();
@@ -2157,8 +2014,9 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
      */
     protected void handleNew2(boolean noPrompt) {
         try {
-            String pdePath =
-            sketchbook.handleNew(noPrompt, handleNewShift, handleNewLibrary);
+            /* Clean the current board target */
+            ANTcleanTarget();
+            String pdePath = sketchbook.handleNew(noPrompt, handleNewShift, handleNewLibrary);
             if (pdePath != null) handleOpen2(pdePath);
 
             this.header.rebuild();
@@ -2219,7 +2077,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
         sketch.setCurrent(codeIndex);
         textarea.select(selStart, selStop);
-        //textarea.updateScrollBars();
         textarea.setScrollPosition(scrollPos);
     }
 
@@ -2270,7 +2127,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             // user selected a .java from the same sketch,
             // but open the .pde instead
             return altFile.getAbsolutePath();
-            //System.out.println("found alt file in same folder");
         } else {
             return path;
         }
@@ -2283,21 +2139,10 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             isGadgetFile = true;
             this.gadgetPanel.loadGadget(new File(path));
             path = this.gadgetPanel.getActiveModule().getSketchFile().getPath();
-            //this.loadGadget(this.gadgetPanel.getActiveGadget());
             this.lastActiveGadgetPath = path;
-
-            try {
-                //this.gadgetIsLoading = true;
-                //sketch = new Sketch(this, path);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            //this.gadgetIsLoading = false;
 
             this.gadgetPanel.setVisible(isGadgetFile);
 
-            //gadgetPanel.show();
             /* The Boards menu doesn't
              * make sense with a gadget .pde file, so disable it */
             _frame.getJMenuBar().getMenu(3).getItem(4).setEnabled(false);
@@ -2309,9 +2154,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
     }
 
     protected void handleSketchFileOpen(String path) {
-
-        // need to put this into the new/open menu
-        //this.gadgetPanel.Unload();    //remove the gadget list and unload active module
 
         /* Use the Boards menu with a std .pde file */
 
@@ -2481,13 +2323,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                 this.gadgetPanel.saveCurrentGadget();
                 System.out.println("Saved Gadget");
             }
-            // rebuild sketch menu in case a save-as was forced
-            // Disabling this for 0125, instead rebuild the menu inside
-            // the Save As method of the Sketch object, since that's the
-            // only one who knows whether something was renamed.
-            //sketchbook.rebuildMenus();
-            //sketchbook.rebuildMenusAsync();
-
         } catch (Exception e) {
             // show the error as a message in the window
             error(e);
@@ -2554,8 +2389,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             doStop();
         buttons.activate(EditorButtons.EXPORT);
         console.clear();
-        //String what = sketch.isLibrary() ? "Applet" : "Library";
-        //message("Exporting " + what + "...");
 
         final GadgetPanel panel = this.gadgetPanel;
         this.isExporting = true;
@@ -2587,7 +2420,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                           }
 
                                       } catch (RunnerException e) {
-                                          //message("Error during upload.", false);
                                           error(e);
                                       } catch (Exception e) {
                                           message("Error during upload.", false);
@@ -2653,7 +2485,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
 
     public void handlePageSetup() {
-        //printerJob = null;
         if (printerJob == null) {
             printerJob = PrinterJob.getPrinterJob();
         }
@@ -2661,18 +2492,15 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             pageFormat = printerJob.defaultPage();
         }
         pageFormat = printerJob.pageDialog(pageFormat);
-        //System.out.println("page format is " + pageFormat);
     }
 
 
     public void handlePrint() {
         message("Printing...");
-        //printerJob = null;
         if (printerJob == null) {
             printerJob = PrinterJob.getPrinterJob();
         }
         if (pageFormat != null) {
-            //System.out.println("setting page format " + pageFormat);
             printerJob.setPrintable(textarea.getPainter(), pageFormat);
         } else {
             printerJob.setPrintable(textarea.getPainter());
@@ -2692,7 +2520,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         } else {
             message("Printing canceled.");
         }
-        //printerJob = null;  // clear this out?
     }
 
 
@@ -2746,7 +2573,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         sketchbook.clean();
         console.handleQuit();
 
-        //System.out.println("exiting here");
         System.exit(0);
     }
 
@@ -2760,7 +2586,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
         } else {
             String referenceFile = PdeKeywords.getReference(text);
-            //System.out.println("reference file is " + referenceFile);
             if (referenceFile == null) {
                 message("No reference available for \"" + text + "\"");
             } else {
@@ -2923,7 +2748,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             textarea.select(0, 0);
             return;
         }
-        //System.out.println(lnum);
         String s = textarea.getText();
         int len = s.length();
         int st = -1;
@@ -2937,7 +2761,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             boolean newline = false;
             if (s.charAt(i) == '\r') {
                 if ((i != len-1) && (s.charAt(i+1) == '\n')) {
-                    i++; //ii--;
+                    i++;
                 }
                 lc++;
                 newline = true;
@@ -2949,7 +2773,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                 if (lc == lnum)
                     st = ii;
                 else if (lc == lnum+1) {
-                    //end = ii;
                     // to avoid selecting entire, because doing so puts the
                     // cursor on the next line [0090]
                     end = ii - 1;
@@ -3004,18 +2827,13 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
 
     public void error(RunnerException e) {
-        //System.out.println("file and line is " + e.file + " " + e.line);
         if (e.file >= 0) sketch.setCurrent(e.file);
         if (e.line >= 0) highlightLine(e.line);
 
-        // remove the RuntimeException: message since it's not
-        // really all that useful to the user
-        //status.error(e.getMessage());
         String mess = e.getMessage();
         String rxString = "RuntimeException: ";
         if (mess.indexOf(rxString) == 0) {
             mess = mess.substring(rxString.length());
-            //System.out.println("MESS3: " + mess);
         }
         String javaLang = "java.lang.";
         if (mess.indexOf(javaLang) == 0) {
@@ -3044,7 +2862,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
      * Returns the edit popup menu.
      */
     class TextAreaPopup extends JPopupMenu {
-        //String currentDir = System.getProperty("user.dir");
         String referenceFile = null;
 
         JMenuItem cutItem, copyItem;
@@ -3093,8 +2910,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             referenceItem = new JMenuItem("Find in Reference");
             referenceItem.addActionListener(new ActionListener() {
                                                 public void actionPerformed(ActionEvent e) {
-                                                    //Base.showReference(referenceFile + ".html");
-                                                    handleReference(); //textarea.getSelectedText());
+                                                    handleReference();
                                                 }
                                             });
             this.add(referenceItem);
@@ -3129,7 +2945,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             cl.show(centerPanel, CODEEDITOR);
             File sketchFile = obj.getSketch();
             File boardFile = obj.getBoards();
-            //this.handleOpen(sketchFile.getPath());
             String board = gadgetPanel.getActiveModule().getTarget();
             try {
                 this.sketch = new Sketch(this, sketchFile.getPath());
@@ -3148,82 +2963,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         }
         this.header.paint(getGraphics());
     }
-
-    /*
-    * Creates a back up of the current boards.txt file and returns the renamed file
-    * */
-    /*
-    private File backUpBoardsFile() {
-        String boardFile = System.getProperty("user.dir") + File.separator + "hardware" +
-                           File.separator + "boards.txt";
-        System.out.println(boardFile);
-        this.originalBoardsFile = new File(boardFile);
-        this.newBoardsFile = new File(originalBoardsFile.getPath() + ".bak");
-        originalBoardsFile.renameTo(newBoardsFile);
-        return newBoardsFile;
-    }
-
-    private void RestoreBoardsFile() {
-        if (newBoardsFile != null) {
-            File boardsFileToRestore = new File(newBoardsFile.getPath() + ".bak");
-            boardsFileToRestore.renameTo(boardsFileToRestore);
-        }
-    }
-*/
-    /*
-    private File writeBoardsToStandardLocation(File boardsFile) {
-        File originalBoards = new File(System.getProperty("user.dir") + File.separator + "hardware" +
-                                       File.separator + "boards.txt");
-        String path = originalBoards.getPath();
-        originalBoards.delete();
-        File copyFile = new File(path);
-        try {
-            copyFile.createNewFile();
-
-            FileReader in = new FileReader(boardsFile);
-            FileWriter out = new FileWriter(copyFile);
-            int c;
-
-            while ((c = in.read()) != -1)
-                out.write(c);
-
-            in.close();
-            out.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        Preferences.init();
-        this.buildToolsMenu();
-        return copyFile;
-    }
-*/
-    /*
-    private void importBoardsFile(File boardsFile, String target) {
-        String boardExists = Preferences.get("boards." + target + ".build.core");
-        String originalBoardsFile = System.getProperty("user.dir") + File.separator + "hardware" +
-                                    File.separator + "boards.txt";
-
-        if (boardExists != null && boardExists.length() > 0) {
-            //don't do anything?
-        } else {
-            String originalBoards = getContents(new File(originalBoardsFile));
-            String importedBoards = getContents(boardsFile);
-            originalBoards = originalBoards.concat("##############################################################");
-            originalBoards = originalBoards.concat("\r\n");
-            originalBoards = originalBoards.concat(importedBoards);
-
-            try {
-                this.setContents(new File(originalBoardsFile), originalBoards);
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-    */
 
     public String getContents(File aFile) {
         //...checks on aFile are elided
@@ -3273,36 +3012,14 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         //use buffering
         Writer output = new BufferedWriter(new FileWriter(aFile));
         try {
-            //		System.out.print( aContents);
             output.write( aContents );
         } finally {
             output.close();
         }
     }
 
-    /*
-    private void loadGadget(IGadget gadget) {
-        for (int i = 0; i < gadget.getModules().length; i++) {
-            this.importModule(gadget.getModules()[i]);
-        }
-        //imageListPanel.setGadgetPanel(this.gadgetPanel);
-    }
-
-    private void importModule(IModule module) {
-        String target = module.getTarget();
-        String boardExists = Preferences.get("boards." + target + ".build.core");
-        System.out.println(System.getProperty("user.dir"));
-        if (boardExists == null || boardExists.length() == 0) {
-            this.importBoardsFile(module.getBoardsFile(), target);
-            String cpyDir = System.getProperty("user.dir") + File.separator + "hardware" +
-                            File.separator + "cores" + File.separator + target;
-            module.copyCoreToDirectory(cpyDir);
-        }
-    } */
-
     public void setImageListVisable(IModule module) {
         this.imageListPanel.setModule(module);
-        //this.textarea.setVisible(true);
         CardLayout cl = ((CardLayout)this.centerPanel.getLayout());
         cl.show(centerPanel, FILELIST);
     }

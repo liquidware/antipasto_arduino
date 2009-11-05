@@ -19,8 +19,8 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     private void showException(Thread t, Throwable e) {
-        String msg = String.format("Oops, there was a hardcore threading problem on thread (name '%s': message '%s').\n"+
-                                   "Please restart me.",
+        String msg = String.format("Oops, there was a hardcore error on thread (name '%s': message '%s'). " +
+                                   "Arduino must now quit.",
                                    t.getName(), e.getMessage());
 
         logException(t, e);
@@ -29,7 +29,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
                                            JOptionPane.QUESTION_MESSAGE);
 
         JDialog dialog = pane.createDialog(Base.editor,
-                                           "Oops, there's a problem");
+                                           "Arduino must now quit");
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setVisible(true);
     }

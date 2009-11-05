@@ -5,7 +5,9 @@
 
   Copyright (c) 2004-05 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
-
+ 
+  Cleanup and adaptation to events by: Christopher Ladden @ www.liquidware.org
+ 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
@@ -194,9 +196,6 @@ public class Sketchbook {
     // make a note of a newly added sketch in the sketchbook menu
     rebuildMenusAsync();
 
-    // now open it up
-    //handleOpen(newbieName, newbieFile, newbieDir);
-    //return newSketch;
     return newbieFile.getAbsolutePath();
   }
 
@@ -278,14 +277,11 @@ public class Sketchbook {
     FileDialog fd = new FileDialog(editor._frame, //new Frame(),
                                    "Open a Processing sketch...",
                                    FileDialog.LOAD);
-    //fd.setDirectory(Preferences.get("sketchbook.path"));
-    //fd.setDirectory(getSketchbookPath());
 
     // only show .pde files as eligible bachelors
     // TODO this doesn't seem to ever be used. AWESOME.
     fd.setFilenameFilter(new FilenameFilter() {
         public boolean accept(File dir, String name) {
-          //System.out.println("check filter on " + dir + " " + name);
           return name.toLowerCase().endsWith(".pde");
         }
       });
@@ -299,9 +295,6 @@ public class Sketchbook {
 
     // user cancelled selection
     if (filename == null) return null;
-
-    // this may come in handy sometime
-    //handleOpenDirectory = directory;
 
     File selection = new File(directory, filename);
     return selection.getAbsolutePath();
@@ -461,8 +454,6 @@ public class Sketchbook {
       File entry = new File(subfolder, list[i] + ".pde");
       // if a .pde file of the same prefix as the folder exists..
       if (entry.exists()) {
-        //String sanityCheck = sanitizedName(list[i]);
-        //if (!sanityCheck.equals(list[i])) {
         if (!Sketchbook.isSanitary(list[i])) {
           if (!builtOnce) {
             String complaining =
@@ -488,7 +479,7 @@ public class Sketchbook {
         JMenu submenu = new JMenu(list[i]);
         // needs to be separate var
         // otherwise would set ifound to false
-        boolean found = addSketches(submenu, subfolder); //, false);
+        boolean found = addSketches(submenu, subfolder);
         if (found) {
           menu.add(submenu);
           ifound = true;
@@ -546,8 +537,6 @@ public class Sketchbook {
       final File subfolder = new File(folder, list[i]);
       if (!subfolder.isDirectory()) continue;
 
-      //File exported = new File(subfolder, "library");
-      //File entry = new File(exported, list[i] + ".o");
       FileFilter onlyHFiles = new FileFilter() {
         public boolean accept(File file) {
           return (file.getName()).endsWith(".h");
@@ -574,26 +563,22 @@ public class Sketchbook {
       }
     }
     return ifound;
-  /*return false;*/  }
+ }
 
 
   /**
    * Clear out projects that are empty.
    */
   public void clean() {
-    //if (!Preferences.getBoolean("sketchbook.auto_clean")) return;
 
     File sketchbookFolder = new File(getSketchbookPath());
     if (!sketchbookFolder.exists()) return;
 
-    //String entries[] = new File(userPath).list();
     String entries[] = sketchbookFolder.list();
     if (entries != null) {
       for (int j = 0; j < entries.length; j++) {
-        //System.out.println(entries[j] + " " + entries.length);
         if (entries[j].charAt(0) == '.') continue;
 
-        //File prey = new File(userPath, entries[j]);
         File prey = new File(sketchbookFolder, entries[j]);
         File pde = new File(prey, entries[j] + ".pde");
 
@@ -602,7 +587,6 @@ public class Sketchbook {
 
         if (pde.exists() &&
             (Base.calcFolderSize(prey) == 0)) {
-          //System.out.println("i want to remove " + prey);
 
           if (Preferences.getBoolean("sketchbook.auto_clean")) {
             Base.removeDir(prey);
