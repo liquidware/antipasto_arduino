@@ -105,8 +105,8 @@
                   value="&quot;${obj.path}/sketch-wrapper.o&quot;
                          ${cross.ldflags}
                          -L &quot;${lib.path}&quot;
-                         -lhw
                          -lcontrib
+                         -lhw
                          -lm
                          -o"/>
 
