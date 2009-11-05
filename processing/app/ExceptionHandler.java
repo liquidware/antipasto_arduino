@@ -19,16 +19,17 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     private void showException(Thread t, Throwable e) {
-        String msg = String.format("Unexpected problem on thread %s: %s",
-                t.getName(), e.getMessage());
+        String msg = String.format("Oops, there was a hardcore threading problem on thread (name '%s': message '%s').\n"+
+                                   "Please restart me.",
+                                   t.getName(), e.getMessage());
 
         logException(t, e);
 
-        JOptionPane pane = new JOptionPane(msg, 
+        JOptionPane pane = new JOptionPane(msg,
                                            JOptionPane.QUESTION_MESSAGE);
 
-        JDialog dialog = pane.createDialog(Base.editor, 
-                                           "Unexpected Problem");
+        JDialog dialog = pane.createDialog(Base.editor,
+                                           "Oops, there's a problem");
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setVisible(true);
     }

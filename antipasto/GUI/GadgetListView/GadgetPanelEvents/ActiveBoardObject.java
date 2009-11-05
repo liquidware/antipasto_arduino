@@ -11,18 +11,27 @@ public class ActiveBoardObject extends EventObject {
     private String boardLongName;
     private String boardShortName;
     private JMenuItem boardMenuItem;
+    private String corePath;
+    private String librariesPath;
+    private String examplesPath;
 
-    public ActiveBoardObject(Object source, 
-                             String boardShortName, 
-                             String boardLongName, 
+    public ActiveBoardObject(Object source,
+                             String boardShortName,
+                             String boardLongName,
                              String referenceURL,
-                             JMenuItem boardMenuItem) {
+                             JMenuItem boardMenuItem,
+                             String corePath,
+                             String librariesPath,
+                             String examplesPath) {
         super(source);
-        
+
         this.boardShortName = boardShortName;
         this.boardLongName = boardLongName;
         this.referenceURL = referenceURL;
         this.boardMenuItem = boardMenuItem;
+        this.corePath = corePath;
+        this.librariesPath = librariesPath;
+        this.examplesPath = examplesPath;
     }
 
     public String getReferenceURL() {
@@ -44,4 +53,13 @@ public class ActiveBoardObject extends EventObject {
     public JMenuItem getBoardMenuItem() {
         return boardMenuItem;
     }
+
+    public String getLibrariesFolder() {
+        return librariesPath;
+    }
+
+    public String getExamplesFolder() {
+        return examplesPath;
+    }
+
 }

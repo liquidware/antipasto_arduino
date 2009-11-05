@@ -1239,9 +1239,17 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         /* Fire the board change event */
         onActiveBoardChange(new ActiveBoardObject(this,
                              /* boardShortName */ board,
-                             /*  boardLongName */ Preferences.get("boards." + board + ".name"),
-                             /*   referenceURL */ Preferences.get("boards." + Preferences.get("board") + ".reference"),
-                             /*  boardMenuItem */ menuItem));
+                             /* boardLongName  */ Preferences.get("boards." + board + ".name"),
+                             /* referenceURL   */ Preferences.get("boards." + Preferences.get("board") + ".reference"),
+                             /* boardMenuItem  */ menuItem,
+                             /* corePath       */ (new File(System.getProperty("user.dir") +
+                                                            "hardware/cores/" + board)).getAbsolutePath(),
+                             /* librariesPath  */ (new File(System.getProperty("user.dir") +
+                                                            "hardware/cores/" + board +
+                                                            "src/components/libraries")).getAbsolutePath(),
+                             /* examplesPath   */ (new File(System.getProperty("user.dir") +
+                                                            "hardware/cores/" + board +
+                                                            "src/components/examples")).getAbsolutePath()));
    }
 
     /**
@@ -1826,6 +1834,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         Thread t = new Thread(new Runnable() {
                                   public void run() {
                                       try {
+
                                           boolean success = false;
 
                                           if (gadgetPanel != null) {
@@ -1876,7 +1885,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                           error("Error compiling.");
                                       }
                                   }
-                              });
+                              }, "Compiler Thread");
         t.start();
 
     }
@@ -1892,28 +1901,11 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
         public void run() {
             while (Thread.currentThread() == thread) {
-                /*if (runtime == null) {
-                  stop();
 
-                } else {
-                  if (runtime.applet != null) {
-                    if (runtime.applet.finished) {
-                      stop();
-                    }
-                    //buttons.running(!runtime.applet.finished);
-
-                  } else if (runtime.process != null) {
-                    //buttons.running(true);  // ??
-
-                  } else {
-                    stop();
-                  }
-                }*/
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
                 }
-                //System.out.println("still inside runner thread");
             }
         }
 
@@ -1992,8 +1984,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             sketch.cleanup();
         }
 
-        // [toxi 030903]
-        // focus the PDE again after quitting presentation mode
         _frame.toFront();
 
         gadgetPanel.cleanup();
@@ -2190,7 +2180,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
      * and the Windows XP open document will be routed through this too.
      */
     public void handleOpenFile(File file) {
-        //System.out.println("handling open file: " + file);
         handleOpen(file.getAbsolutePath());
     }
 
@@ -2246,7 +2235,6 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
             if (!oldPath.equals(newPath)) {
                 if (Base.calcFolderSize(sketch.folder) == 0) {
                     Base.removeDir(sketch.folder);
-                    //sketchbook.rebuildMenus();
                     sketchbook.rebuildMenusAsync();
                 }
             }
@@ -2578,6 +2566,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
         Thread t = new Thread(new Runnable() {
                                   public void run() {
                                       try {
+
                                           message("Uploading to I/O Board...", true);
                                           String board = Preferences.get("board");
 
@@ -2606,7 +2595,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
                                       }
                                       buttons.clear();
                                   }
-                              });
+                              }, "Uploader Thread");
 
         t.start();
     }
@@ -2925,7 +2914,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
                                       buttons.clear();
                                   }
-                              });
+                              }, "Uploader Thread");
         t.start();
     }
 
@@ -3351,6 +3340,8 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener { //, MRJOpenApplicati
 
         /* Pre-event firing */
         ANTcleanTarget();
+        sketchbook.setExamplesPath(evObj.getExamplesFolder());
+        sketchbook.setLibrariesPath(evObj.getLibrariesFolder());
         sketchbook.rebuildMenus();
 
         /* Fire the event! */

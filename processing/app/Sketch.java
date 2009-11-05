@@ -1906,23 +1906,18 @@ public class Sketch {
 	 */
 	public boolean isReadOnly() {
 		String apath = folder.getAbsolutePath();
-		if (apath.startsWith(Sketchbook.examplesPath)
-				|| apath.startsWith(Sketchbook.librariesPath)) {
+		if (apath.startsWith(editor.sketchbook.getExamplesPath())
+				|| apath.startsWith(editor.sketchbook.getLibrariesPath())) {
 			return true;
 
-			// canWrite() doesn't work on directories
-			// } else if (!folder.canWrite()) {
 		} else {
 			// check to see if each modified code file can be written to
 			for (int i = 0; i < codeCount; i++) {
 				if (code[i].modified && !code[i].file.canWrite()
 						&& code[i].file.exists()) {
-					// System.err.println("found a read-only file " +
-					// code[i].file);
 					return true;
 				}
 			}
-			// return true;
 		}
 		return false;
 	}

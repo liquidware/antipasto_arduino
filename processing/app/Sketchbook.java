@@ -56,10 +56,10 @@ public class Sketchbook {
 
   // these are static because they're used by Sketch
   static File examplesFolder;
-  static String examplesPath;  // canonical path (for comparison)
+  String examplesPath = " ";  // canonical path (for comparison)
 
   static File librariesFolder;
-  static String librariesPath;
+  static String librariesPath = " ";
 
   // maps imported packages to their library folder
   static Hashtable importToLibraryTable = new Hashtable();
@@ -526,7 +526,8 @@ public class Sketchbook {
                              "/src/components/library/" + libraryName +
                              "/reference/index.html";
           }
-
+          
+          /* Fire a library changed event */
           onActiveLibraryAdded(new ActiveLibraryObject(this,
                                /* ShortName */    libraryName,
                                /* LongName */     libraryName,
@@ -640,7 +641,7 @@ public class Sketchbook {
   private void onActiveLibraryAdded(ActiveLibraryObject evObj) {
 
         /* Pre-event firing */
-        /* none */
+        /* None */
 
         /* Fire the event! */
         Object[] listeners = activeLibraryAddedEventList.getListenerList();
@@ -655,5 +656,21 @@ public class Sketchbook {
         /* Post-event firing */
         /* None */
     }
+
+  public String getExamplesPath() {
+    return examplesPath;
+  }
+
+  public void setExamplesPath(String path) {
+    examplesPath = path;
+  }
+
+  public String getLibrariesPath() {
+    return librariesPath;
+  }
+
+  public void setLibrariesPath(String path) {
+    librariesPath = path;
+  }
 
 }
