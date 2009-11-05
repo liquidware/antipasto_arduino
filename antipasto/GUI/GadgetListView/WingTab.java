@@ -45,7 +45,7 @@ public class WingTab extends JComponent implements MouseListener {
 	private Color textColor;
 	
 	private double width; 
-	private double height = 20;
+	private double height = 32;
 	private boolean isFocused = false;
 	private boolean isSelected = false;
 	
@@ -68,31 +68,22 @@ public class WingTab extends JComponent implements MouseListener {
 		this.width = (this.txt.length() * 7) + 10;
 		
 		this.setPreferredSize(new Dimension((int)this.width, (int)this.height));
-		//this.setSize(new Dimension((int) this.width, (int)height));
 		
 	}
 	
 	 public void paint(Graphics g) {
 	        Graphics2D graphics2 = (Graphics2D) g;
 	        
-	        //FontMetrics metrics = g.getFontMetrics(font);
-	        //this.width =  ((metrics.getStringBounds(txt, g).getWidth() / 2) * 1.4) +5;
-	        //this.width = (int)this.txt.length() * 8;
-	        //this.width = font.getStringBounds(this.txt,graphics2.getFontRenderContext()).getWidth()-10;
-	        
-	        //this.setSize(new Dimension((int) this.width, (int)height));
-			//this.setPreferredSize(new Dimension((int) this.width, (int)height));
-	        
-			String printTxt = this.txt;
-			
-			roundRect = new RoundRectangle2D.Double(0, 5, width, 25 , 10, 10);
-			rect = new Rectangle2D.Double(0,10,width, 15);
-			
-			graphics2.setColor(this.bgColor);
-			graphics2.fill(roundRect);
-			graphics2.fill(rect);
-			graphics2.draw(roundRect);
-			graphics2.draw(rect);
+		String printTxt = this.txt;
+		
+		roundRect = new RoundRectangle2D.Double(0, 13, width, 35, 10, 10);
+		rect = new Rectangle2D.Double(0,18,width, 35);
+		
+		graphics2.setColor(this.bgColor);
+		graphics2.fill(roundRect);
+		graphics2.fill(rect);
+		graphics2.draw(roundRect);
+		graphics2.draw(rect);
 			
 	        graphics2.setColor(this.textColor);
 	        graphics2.drawString(printTxt, 5,(int)height - 2 );

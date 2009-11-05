@@ -253,10 +253,15 @@ public class Wing extends JDialog implements ComponentListener,
 
     private void setLocation() {
         if (this.isVisible() && ((Editor) component).centerPanel.isVisible()) {
+            Component centerPanel = ((Editor) component).centerPanel;
+            Component lineStatus =((Editor) component).lineStatus;
             int xLocation = component.getX() + component.getWidth();
-            int yLocation = ((Editor) component).centerPanel
-                            .getLocationOnScreen().y;
+            int yLocation = (int)centerPanel.getLocationOnScreen().getY() - 32;
+            int width = (int)this.getSize().getWidth();
+            int height = ((int)lineStatus.getLocationOnScreen().getY()) - yLocation;
+
             this.setLocation(xLocation, yLocation);
+            this.setSize(width, height);
         }
     }
 
