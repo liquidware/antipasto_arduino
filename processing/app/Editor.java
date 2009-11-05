@@ -115,7 +115,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
     EditorConsole console;
     Serial serialPort;
     JSplitPane splitPane;
-    JPanel consolePanel;
+    public JPanel consolePanel;
 
     JLabel lineNumberComponent;
 
@@ -128,7 +128,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
 
     public String lastActiveGadgetPath;
 
-    EditorLineStatus lineStatus;
+    public EditorLineStatus lineStatus;
     String curBoard;
 
     public JEditTextArea textarea;
