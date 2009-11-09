@@ -68,7 +68,6 @@ public class WingPanelReference extends JPanel {
 	private JLabel     headerLabel;
 	private JScrollPane scrollPane;
 	private WingFooter  wingFooter;
-	//final JEditorPane textArea = new JEditorPane();
 	final JTextPane textArea = new JTextPane();
 	final List <URL> htmlHistory = new ArrayList <URL>();
 

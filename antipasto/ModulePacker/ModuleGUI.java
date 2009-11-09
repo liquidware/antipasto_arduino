@@ -75,7 +75,6 @@ public class ModuleGUI extends JPanel {
 			super();
 			this.setBackground(Color.black);
 			dropTarget = new DropTarget(this, this);
-			//this.setSize(dimension);
 			System.out.println("Constructing Files List");
 		}
 		

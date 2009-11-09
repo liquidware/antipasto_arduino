@@ -24,7 +24,6 @@ public class LibraryGadgetCellRenderer extends DefaultListCellRenderer  {
 	
 	label.setIcon(icon);
 	label.setText("");
-	//label.setText(gadget.getName());
 	} else {
 	// Clear old icon; needed in 1st release of JDK 1.2
 	label.setIcon(null);

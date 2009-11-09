@@ -111,7 +111,6 @@ class ArduinoMessageSiphon extends Thread
 			while ((theLine = br.readLine()) != null) {
 				if (logAllOutput) {
 					theMsg += theLine + "\r\n";
-					//System.out.println(theMsg);
 				}
 				if ((theLine.indexOf("warning:") != -1) && (theLine.indexOf("prog.c:") != -1) && (debugWarning)) {
 					theMsg += theLine + "\r\n";

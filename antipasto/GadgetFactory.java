@@ -71,7 +71,6 @@ public class GadgetFactory {
             try {
                 Gadget gadget = (Gadget)this.generate(getFirstElementOfModuleFile(configFile), unpackedFiles, outputDirectory);
                 gadget.setPackedFile(gadgetFile);
-                //IModule[] modules = gadget.getGadgets();
                 return gadget;
             } catch (Exception e) {
                 e.printStackTrace();

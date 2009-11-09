@@ -111,7 +111,6 @@ public class GadgetList extends JList implements IGadgetWindowTransferFileEventL
 
     public void saveCurrentGadget(){
         GadgetFactory factory = new GadgetFactory();
-        //factory.writeSketchBookToFile(_book, sketchBookDirectory);
 		String originalDirectory = ((IPackedFile)gadget).getPackedFile().getPath();
 		String bookFileName = ((IPackedFile)gadget).getPackedFile().getName();
 		

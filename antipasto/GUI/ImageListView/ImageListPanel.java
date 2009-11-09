@@ -162,7 +162,6 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 			
 		}
 		this.transferButton.setVisible(true);
-		//this.setSizesOfComponents();
 		
 		_module = module;
 	}
@@ -172,7 +171,6 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	}
 	
 	public void paint(java.awt.Graphics g){
-		//this.setSizesOfComponents();
 		
 		totalFileCount = list.getModel().getSize();
 		progressLabel.setText(" Files: " + totalFileCount);
@@ -185,14 +183,11 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 		Dimension btnSize = this.transferButton.getSize();
 		double height = this.getParent().getSize().getHeight() - this.transferButton.getSize().getHeight();
 		int heightI = (int)height;
-		//Dimension listViewSize = new Dimension(this.getParent().getWidth(), heightI);
-		//list.setSize(listViewSize);
 		this.repaint();
 	}
 	
 	private JButton createRemoveButton(){
 		this.removeButton = new JButton("Remove File");
-		//this.removeButton.setBackground(new Color(0x04, 0x4F, 0x6F));
 		this.removeButton.addMouseListener(
 			new MouseListener(){
 										   
@@ -221,7 +216,6 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 	
 	private void createTransferButton(){
 		this.transferButton = new JButton("Transfer");
-		//this.transferButton.setBackground(new Color(0x04, 0x4F, 0x6F));
 		this.transferButton.addMouseListener(new MouseListener(){
 			
 			public void mouseClicked(MouseEvent arg0) {
@@ -305,7 +299,6 @@ public class ImageListPanel extends JPanel implements IActiveGadgetChangedEventL
 							   ilist.resetUI();
 						   } catch (SerialException err) {
 							   err.printStackTrace();
-							   //editor.error(err);
 							   try { Thread.sleep(500); } catch (Exception e) { ilist.resetUI(); }
 							   isTransfering = false;
 							   

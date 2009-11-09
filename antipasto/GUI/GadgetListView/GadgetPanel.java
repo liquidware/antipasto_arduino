@@ -159,8 +159,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
         messagePanel.add(messageLabel, BorderLayout.WEST);          
         
         JButton button;
-        
-        //GadgetWindowTransferHandler transferHandler = new GadgetWindowTransferHandler();
        
     	box = Box.createVerticalBox();
         
@@ -327,7 +325,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
                     Editor editor = (Editor) parentFrame;
                     editor.textarea.setVisible(true);
                     editor.textarea.setEnabled(true);
-                    //gadgetDescLabel.setText(gadgetPath.getName() + " - " + activeModule.getName());
     }
 
     public void addSketchBookChangedEventListener(IActiveSketchChangingListener listener){
@@ -445,13 +442,6 @@ public class GadgetPanel extends JDialog implements ListSelectionListener, IActi
 	}
 
 	public void windowActivated(WindowEvent arg0) {
-		//boolean isVis = this.isVisible();
-		/*if(this._gadget != null){
-			if(this.isVisible()){
-				this.setAlwaysOnTop(true);
-				this.setAlwaysOnTop(false);
-			}
-		}*/
 	}
 
 	public void windowClosed(WindowEvent arg0) {

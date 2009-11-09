@@ -20,8 +20,6 @@ import antipasto.Plugins.Events.EventSender;
 import antipasto.Plugins.Interfaces.EditorListener;
 
 import processing.app.Base;
-//private EventSender sender = new EventSender();
-//getEventSender().broadcast(new EditorEvent());
 
 public class PluginLoader {
 

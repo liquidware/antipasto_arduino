@@ -94,13 +94,11 @@ public class GadgetCellRenderer extends DefaultListCellRenderer {
 				public void mouseClicked(MouseEvent e) {					
 				}
 
-				public void mouseEntered(MouseEvent e) {	
-					//System.out.println("Doing hover");
+				public void mouseEntered(MouseEvent e) {
 					doHover = true;
 				}
 
-				public void mouseExited(MouseEvent e) {	
-					//System.out.println("Stopping hover..");
+				public void mouseExited(MouseEvent e) {
 					doHover = false;
 				}
 

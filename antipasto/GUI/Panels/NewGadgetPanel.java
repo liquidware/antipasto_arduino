@@ -15,7 +15,6 @@ public class NewGadgetPanel extends JFrame {
 	public NewGadgetPanel()
 	{
 		this.setSize(new Dimension(250, 250));
-		//this.setBackground(Color.green);
 		gl = new NewGadgetList();
 		gl.setSize(this.getSize());
 		this.add(gl);

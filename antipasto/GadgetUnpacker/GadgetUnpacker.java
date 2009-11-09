@@ -24,8 +24,6 @@ public class GadgetUnpacker {
 
             GadgetFactory sbFactory = new GadgetFactory();
 
-            //ISketchBook book = sbFactory.loadSketchBook(skFile, System.getProperty("java.io.tmpdir"));
-
             sbFactory.loadGadget(skFile, outputDirectory);
         }
     }

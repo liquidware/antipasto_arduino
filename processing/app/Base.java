@@ -91,7 +91,6 @@ public class Base {
 
     // make sure that this is running on java 1.4
     if (PApplet.javaVersion < 1.4f) {
-      //System.err.println("no way man");
       Base.showError("Need to install Java 1.4",
                      "This version of Processing requires    \n" +
                      "Java 1.4 or later to run properly.\n" +
@@ -139,12 +138,6 @@ public class Base {
         UIManager.put("Component.visualMargin", new Insets(1, 1, 1, 1));
 
       } else if (Base.isLinux()) {
-        // Linux is by default even uglier than metal (Motif?).
-        // Actually, i'm using native menus, so they're even uglier
-        // and Motif-looking (Lesstif?). Ick. Need to fix this.
-        //String lfname = UIManager.getCrossPlatformLookAndFeelClassName();
-        //UIManager.setLookAndFeel(lfname);
-
         // For 0120, trying out the gtk+ look and feel as the default.
         // This is available in Java 1.4.2 and later, and it can't possibly
         // be any worse than Metal. (Ocean might also work, but that's for
@@ -154,10 +147,6 @@ public class Base {
       } else {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       }
-    //} catch (ClassNotFoundException cnfe) {
-      // just default to the native look and feel for this platform
-      // i.e. appears that some linux systems don't have the gtk l&f
-      //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -277,10 +266,6 @@ public class Base {
         dataFolder = new File(libraryFolder, "Arduino");
 
       } catch (Exception e) {
-        // this could be FileNotFound or NoSuchMethod
-        //} catch (FileNotFoundException e) {
-        //e.printStackTrace();
-        //System.exit(1);
         showError("Problem getting data folder",
                   "Error getting the Arduino data folder.", e);
       }
@@ -297,7 +282,6 @@ public class Base {
       // Value Data: path
 
       try {
-        //RegistryKey topKey = Registry.getTopLevelKey("HKCU");
         RegistryKey topKey = Registry.HKEY_CURRENT_USER;
 
         String localKeyPath =
@@ -305,10 +289,6 @@ public class Base {
           "\\Explorer\\Shell Folders";
         RegistryKey localKey = topKey.openSubKey(localKeyPath);
         String appDataPath = cleanKey(localKey.getStringValue("AppData"));
-        //System.out.println("app data path is " + appDataPath);
-        //System.exit(0);
-        //topKey.closeKey();  // necessary?
-        //localKey.closeKey();
 
         dataFolder = new File(appDataPath, "Arduino");
 
@@ -316,7 +296,6 @@ public class Base {
         showError("Problem getting data folder",
                   "Error getting the Arduino data folder.", e);
       }
-      //return null;
 
     } else {
       // otherwise make a .arduino directory int the user's home dir
@@ -364,8 +343,6 @@ public class Base {
         buildFolder = new File(buildPath);
 
       } else {
-        //File folder = new File(getTempFolder(), "build");
-        //if (!folder.exists()) folder.mkdirs();
         buildFolder = createTempFolder("build");
         buildFolder.deleteOnExit();
       }
@@ -384,8 +361,6 @@ public class Base {
   static public File createTempFolder(String name) {
     try {
       File folder = File.createTempFile(name, null);
-      //String tempPath = ignored.getParent();
-      //return new File(tempPath);
       folder.delete();
       folder.mkdirs();
       return folder;
@@ -395,21 +370,6 @@ public class Base {
     }
     return null;  // TODO could we *really* ever reach this?
   }
-
-
-  /*
-  static public void addBuildFolderToClassPath() {
-    String path = getBuildFolder().getAbsolutePath();
-    String jcp = System.getProperty("java.class.path");
-    if (jcp.indexOf(path) == -1) {
-      System.setProperty("java.class.path", path + File.pathSeparator + jcp);
-      //return new File(getProcessingDataFolder(), "build");
-      System.out.println("jcp is now " +
-                         System.getProperty("java.class.path"));
-    }
-  }
-  */
-
 
   static public File getDefaultSketchbookFolder() {
     File sketchbookFolder = null;
@@ -423,15 +383,9 @@ public class Base {
       // additional information found int the local file:
       // /System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/CarbonCore.framework/Headers/
 
-      // this is the 1.4 version.. but using 1.3 since i have the stubs
-      // import com.apple.eio.*
-      //println(FileManager.findFolder(kUserDomain,
-      //        kDomainLibraryFolderType));
-
       // not clear if i can write to this folder tho..
       try {
         MRJOSType domainDocuments = new MRJOSType("docs");
-        //File libraryFolder = MRJFileUtils.findFolder(domainDocuments);
 
         // for 77, try switching this to the user domain, just to be sure
         Method findFolderMethod =
@@ -444,8 +398,6 @@ public class Base {
         sketchbookFolder = new File(documentsFolder, "Arduino");
 
       } catch (Exception e) {
-        //showError("Could not find folder",
-        //          "Could not locate the Documents folder.", e);
         sketchbookFolder = promptSketchbookLocation();
       }
 
@@ -470,37 +422,14 @@ public class Base {
           "\\Explorer\\Shell Folders";
         RegistryKey localKey = topKey.openSubKey(localKeyPath);
         String personalPath = cleanKey(localKey.getStringValue("Personal"));
-        //topKey.closeKey();  // necessary?
-        //localKey.closeKey();
         sketchbookFolder = new File(personalPath, "Arduino");
 
       } catch (Exception e) {
-        //showError("Problem getting folder",
-        //          "Could not locate the Documents folder.", e);
         sketchbookFolder = promptSketchbookLocation();
       }
 
     } else {
       sketchbookFolder = promptSketchbookLocation();
-
-      /*
-      // on linux (or elsewhere?) prompt the user for the location
-      JFileChooser fc = new JFileChooser();
-      fc.setDialogTitle("Select the folder where " +
-                        "Arduino programs should be stored...");
-      //fc.setSelectedFile(new File(sketchbookLocationField.getText()));
-      fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-      int returned = fc.showOpenDialog(new JDialog());
-      if (returned == JFileChooser.APPROVE_OPTION) {
-        //File file = fc.getSelectedFile();
-        //sketchbookLocationField.setText(file.getAbsolutePath());
-        sketchbookFolder = fc.getSelectedFile();
-
-      } else {
-        System.exit(0);
-      }
-      */
     }
 
     // create the folder if it doesn't exist already
@@ -563,7 +492,6 @@ public class Base {
       FileDialog fd = new FileDialog(frame, prompt, FileDialog.LOAD);
       if (folder != null) {
         fd.setDirectory(folder.getParent());
-        //fd.setFile(folder.getName());
       }
       System.setProperty("apple.awt.fileDialogForDirectories", "false");
       fd.show();
@@ -607,7 +535,6 @@ public class Base {
       FileDialog fd = new FileDialog(frame, prompt, FileDialog.LOAD);
       if (folder != null) {
         fd.setDirectory(folder.getParent());
-        //fd.setFile(folder.getName());
       }
       System.setProperty("apple.awt.fileDialogForDirectories", "true");
       fd.show();
@@ -648,42 +575,9 @@ public class Base {
     int tooHigh = 65536 - 128;
     for (int i = 0; i < c.length; i++) {
       if (c[i] >= tooHigh) c[i] &= 0xff;
-
-      /*
-      if ((c[i] >= 32) && (c[i] < 128)) {
-        System.out.print(c[i]);
-      } else {
-        System.out.print("[" + PApplet.hex(c[i]) + "]");
-      }
-      */
     }
-    //System.out.println();
     return new String(c);
   }
-
-
-  // .................................................................
-
-
-  // someone needs to be slapped
-  //static KeyStroke closeWindowKeyStroke;
-
-  /**
-   * Return true if the key event was a Ctrl-W or an ESC,
-   * both indicators to close the window.
-   * Use as part of a keyPressed() event handler for frames.
-   */
-  /*
-  static public boolean isCloseWindowEvent(KeyEvent e) {
-    if (closeWindowKeyStroke == null) {
-      int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-      closeWindowKeyStroke = KeyStroke.getKeyStroke('W', modifiers);
-    }
-    return ((e.getKeyCode() == KeyEvent.VK_ESCAPE) ||
-            KeyStroke.getKeyStrokeForEvent(e).equals(closeWindowKeyStroke));
-  }
-  */
-
 
   /**
    * Registers key events for a Ctrl-W and ESC with an ActionListener
@@ -691,14 +585,6 @@ public class Base {
    */
   static public void registerWindowCloseKeys(JRootPane root, //Window window,
                                              ActionListener disposer) {
-    /*
-    JRootPane root = null;
-    if (window instanceof JFrame) {
-      root = ((JFrame)window).getRootPane();
-    } else if (window instanceof JDialog) {
-      root = ((JDialog)window).getRootPane();
-    }
-    */
 
     KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
     root.registerKeyboardAction(disposer, stroke,
@@ -812,10 +698,6 @@ public class Base {
         com.apple.mrj.MRJFileUtils.openURL(url);
 
       } else if (Base.isLinux()) {
-        // how's mozilla sound to ya, laddie?
-        //Runtime.getRuntime().exec(new String[] { "mozilla", url });
-        //String browser = Preferences.get("browser");
-        //Runtime.getRuntime().exec(new String[] { browser, url });
         String launcher = Preferences.get("launcher.linux");
         if (launcher != null) {
           Runtime.getRuntime().exec(new String[] { launcher, url });
@@ -875,14 +757,9 @@ public class Base {
       String folder = file.getAbsolutePath();
 
       if (Base.isWindows()) {
-        // doesn't work
-        //Runtime.getRuntime().exec("cmd /c \"" + folder + "\"");
 
         // works fine on winxp, prolly win2k as well
         Runtime.getRuntime().exec("explorer \"" + folder + "\"");
-
-        // not tested
-        //Runtime.getRuntime().exec("start explorer \"" + folder + "\"");
 
       } else if (Base.isMacOS()) {
         openURL(folder);  // handles char replacement, etc
@@ -919,7 +796,6 @@ public class Base {
     JOptionPane.showMessageDialog(new Frame(), message, title,
                                   JOptionPane.WARNING_MESSAGE);
 
-    //System.err.println(e.toString());
     if (e != null) e.printStackTrace();
   }
 
@@ -1015,9 +891,6 @@ public class Base {
     to = null;
 
     bfile.setLastModified(afile.lastModified());  // jdk13+ required
-  //} catch (IOException e) {
-  //  e.printStackTrace();
-  //}
   }
 
 
@@ -1073,7 +946,6 @@ public class Base {
       File source = new File(sourceDir, files[i]);
       File target = new File(targetDir, files[i]);
       if (source.isDirectory()) {
-        //target.mkdirs();
         copyDir(source, target);
         target.setLastModified(source.lastModified());
       } else {
@@ -1118,7 +990,6 @@ public class Base {
         }
       } else {
         removeDir(dead);
-        //dead.delete();
       }
     }
   }

@@ -359,16 +359,11 @@ public class Wing extends JDialog implements ComponentListener,
                 || this.activeModule.getReferenceText()
                 .equalsIgnoreCase("")) {
                 wingPanelReference.setPage("http://www.google.com");
-                // Disabled until reference text is written..
-                // wingPanelReference.setText(this.activeModule.getReferenceText());
-                //wingPanelReference.setText(this.activeModule.getName() + " reference text here.");
             } else {
                 System.out.println("No reference text found, defaulting ");
-                //wingPanelReference.setText(this.activeModule.getName() + " reference text here.");
             }
         } else {
             wingPanelReference.setPage("http://www.google.com");
-            //wingPanelReference.setText("Reference text area.");
         }
     }
 

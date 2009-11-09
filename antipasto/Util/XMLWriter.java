@@ -30,8 +30,6 @@ public class XMLWriter {
             StreamResult result = new StreamResult(f);
             DOMSource source = new DOMSource(elements);
             transformer.transform(source, result);
-
-            //Logger.getLogger(Util.Writer.class.getName()).log(Level.INFO, null, xmlString);
             return f;
         } catch (TransformerException ex) {
           Logger.getLogger(XMLWriter.class.getName()).log(Level.SEVERE, null, ex);

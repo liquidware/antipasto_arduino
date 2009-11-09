@@ -89,17 +89,10 @@ public class CoreFactory {
                         {
                             throw new FileNotFoundException("Couldn't find the file specified");
                         }
-                        //System.out.println(fileName);
                     }
                 }else if(nodes.item(i).getNodeName().equalsIgnoreCase("Compilers"))
                 {
-                    //Future
-                    /*NodeList compilerNodes = nodes.item(i).getChildNodes();
-                    for(int x = 0; x < compilerNodes.getLength(); x++)
-                    {
-                        ICompiler compiler = compilerFact.CreateCompiler((Element)compilerNodes.item(x));
-                        compilers.add(compiler);
-                    } */
+
                 }else if(nodes.item(i).getNodeName().equalsIgnoreCase("Version"))
                 {
                     IVersionable version = XMLVersionReader.Load((Element) nodes.item(i));
@@ -162,10 +155,6 @@ public class CoreFactory {
             Element nameNode = (Element) root.appendChild(doc.createElement("Name"));
             nameNode.setAttribute("value", core.getName());
             Element compilerOutput = (Element) root.appendChild(doc.createElement("Compilers"));
-            /*for(int i=0; i < core.getCompilers().size(); i++)
-            {
-                compilerOutput.appendChild(fact.CreateCompilerXMLElement(core.getCompilers().get(i)));
-            } */
             Element fileOutput = doc.createElement("Files");
             for(int i=0; i < core.getFiles().length; i++)
             {
@@ -290,7 +279,6 @@ public class CoreFactory {
     	for(int i=0; i < files.length; i++)
     	{
             File f = files[i];
-            //System.out.println(name.toLowerCase());
     		if(f.getName().toLowerCase().endsWith(name.toLowerCase()))
     		{
     			return f;

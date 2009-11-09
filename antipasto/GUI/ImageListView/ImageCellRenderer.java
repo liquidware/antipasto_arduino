@@ -118,9 +118,6 @@ public class ImageCellRenderer extends DefaultListCellRenderer{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			} else {
-			// Clear old icon; needed in 1st release of JDK 1.2
-			//imgLabel.setIcon(null);
 			}
 			return(fileEntry);
 			}
