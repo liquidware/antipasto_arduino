@@ -845,7 +845,7 @@ distribution.version=${build.version}</echo>
                 <property name="CLASS_GRAPH" value="NO"/>
                 <property name="CLASS_DIAGRAMS" value="NO"/>
             </doxygen>
-            
+
             <move todir="@{path}/reference">
                 <fileset dir="@{path}/reference/html" includes="*.*"/>
             </move>
@@ -870,6 +870,7 @@ distribution.version=${build.version}</echo>
         <for param="file">
             <path>
                 <dirset dir="hardware/cores/arduino/src/components/library" includes="*"/>
+                <dirset dir="hardware/cores/touchshield/src/components/library" includes="*"/>
             </path>
             <sequential>
 
