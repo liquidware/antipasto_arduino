@@ -1,6 +1,9 @@
 /*
-  BarGraph.h - A TouchShield Library
-  Copyright (c) 2009 Chris Ladden.  All right reserved.
+  BarGraph - A Library for the Liquidware TouchShield
+
+  http://www.liquidware.com/shop/show/TSL/TouchShield+Slide
+
+  Copyright (c) 2009 Christopher Ladden.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -20,6 +23,7 @@
 /******************************************************************************
  * Includes
  ******************************************************************************/
+#include "WProgram.h"
 #include "BarGraph.h"
 
 /******************************************************************************
@@ -38,12 +42,69 @@
  * Constructors
  ******************************************************************************/
 
-BarGraph::BarGraph(int xPos, 
-                   int yPos, 
-                   int width, 
-                   int height, 
-                   float min, 
-                   float max) {
+BarGraph::BarGraph(char * text,
+                   int x,
+                   int y) {
+    xLocation = x;
+    yLocation = y;
+    graphWidth = 100;
+    graphHeight = 40;
+    prevValue = 1.0;
+    currValue = 25.0;
+    valueClamped = 25.0;
+
+    fgColorR = 0;
+    fgColorG = 0;
+    fgColorB = 255;
+
+    bgColorR = 0;
+    bgColorG = 0;
+    bgColorB = 0;
+
+    minValue = 0.0;
+    maxValue = 50.0;
+
+    sprintf(graphLabel, text);
+    paint();
+}
+
+/**
+ * Paint the BarGraph
+ */
+void BarGraph::paint(void) {
+    char outStr[25];
+    char outValueStr[6];
+
+    //draw bargraph Background and outine
+    stroke(fgColorR,
+           fgColorG,
+           fgColorB);
+
+    fill(bgColorR,
+         bgColorG,
+         bgColorB);
+
+    rect(xLocation,
+         yLocation,
+         graphWidth,
+         graphHeight);
+
+    //draw the bargraph label and value
+    dtostrf(currValue, 5, 1, outValueStr);
+    sprintf(outStr,"%s %s", graphLabel, outValueStr);
+    text(outStr,
+         xLocation,
+         yLocation-10);
+
+    //draw the bar
+    noStroke();
+    fill(fgColorR,
+         fgColorG,
+         fgColorB);
+    rect(xLocation,
+         yLocation,
+         valueClamped * ((float)graphWidth / (maxValue - minValue)),
+         graphHeight);
 
 
 }
@@ -54,31 +115,110 @@ BarGraph::BarGraph(int xPos,
 
 
 /**
+ * Set the current value of the bar
+ * graph and repaint the graph
  *
- * @param red   index for the red color 
- * @param green index for the green color
- * @param blue  index for the blue color
+ * @param value The value to display in the graph
+ */
+void BarGraph::setValue(float value) {
+    currValue = value;
+
+    //Range Clamp
+    if (value > maxValue) {
+        value = maxValue;
+    }
+    if (value < minValue) {
+        value = minValue;
+    }
+
+    valueClamped = value;
+
+    paint();
+}
+
+
+/**
+ * Set the Bar Graph min and max range values.
+ *
+ * The min and max values determine the
+ * scaling of the graph
+ *
+ *
+ * @param min The minimum value that setValue() will see
+ * @param max The maximum value that setValue() will see
+ */
+void BarGraph::setRange(float min,
+                        float max) {
+    minValue = min;
+    maxValue = max;
+}
+
+/**
+ * Set the background color of the graph.
+ *
+ *
+ * @param red
+ * @param green
+ * @param blue
  */
 void BarGraph::setBackground(uint8_t red,
+                 uint8_t green,
+                 uint8_t blue) {
+    bgColorR = red;
+    bgColorG = green;
+    bgColorB = blue;
+}
+
+/**
+ * Set the foreground color of the graph. This is the outline
+ * and text color.
+ *
+ *
+ * @param red
+ * @param green
+ * @param blue
+ */
+void BarGraph::setForeground(uint8_t red,
                              uint8_t green,
                              uint8_t blue) {
+    fgColorR = red;
+    fgColorG = green;
+    fgColorB = blue;
+}
 
+/**
+ * Set the size of the Graph
+ *
+ * @param width
+ * @param height
+ */
+void BarGraph::setSize(int width,
+                       int height) {
+
+    graphWidth = width;
+    graphHeight = height;
 
 }
 
-void BarGraph::setRange(float min, float max) {
-
+/**
+ * Set the location of the Graph on the screen.
+ *
+ * @param x
+ * @param y
+ */
+void BarGraph::setLocation(int x,
+                           int y) {
+    xLocation = x;
+    yLocation = y;
 }
 
-void BarGraph::setValue(float value) {
-
+/**
+ * Set the graph's label
+ *
+ *
+ * @param text The text label to display
+ */
+void BarGraph::setText(char * text) {
+    sprintf(graphLabel,"%s",text);
 }
 
-void BarGraph::repaint() {
-   
-}
-
-float BarGraph::getValue() {
-
-   return 0.0;
-}

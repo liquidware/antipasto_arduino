@@ -1,6 +1,9 @@
 /*
-  BarGraph.h - A TouchShield Library
-  Copyright (c) 2009 Chris Ladden.  All right reserved.
+  BarGraph - A Library for the Liquidware TouchShield
+
+  http://www.liquidware.com/shop/show/TSL/TouchShield+Slide
+
+  Copyright (c) 2009 Christopher Ladden.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -25,29 +28,45 @@
 class BarGraph
 {
    private:
-      float currentValue; 
-      int   width;
-      int   height;
-      float min;
-      float max;
+      float prevValue;
+      float currValue;
+      float valueClamped;
+      int   xLocation;
+      int   yLocation;
+      int   graphWidth;
+      int   graphHeight;
+      float minValue;
+      float maxValue;
+      char  graphLabel[25];
+      uint8_t fgColorR, fgColorG, fgColorB;
+      uint8_t bgColorR, bgColorG, bgColorB;
+
+      void paint(void);
 
    public:
-      BarGraph(int xPos, 
-               int yPos, 
-               int width, 
-               int height, 
-               float min, 
-               float max);
+      BarGraph(char * text,
+               int x,
+               int y);
+
+      void setLocation(int x,
+                       int y);
+
+      void setSize(int width,
+                   int height);
+
+      void setRange(float min,
+                    float max);
 
       void setBackground(uint8_t red,
                          uint8_t green,
                          uint8_t blue);
 
-      void setRange(float min, float max);   
-      void setValue(float value);
+      void setForeground(uint8_t red,
+                         uint8_t green,
+                         uint8_t blue);
 
-      void repaint();
-      float getValue();
+      void setText(char * text);
+      void setValue(float value);
 };
 
 #endif

@@ -1,24 +1,20 @@
 #######################################
-# Syntax Coloring Map For Ultrasound
+# Syntax Coloring Map For WindSensor
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-BarGraph	KEYWORD1
+WindSensor	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-setLocation KEYWORD2
-setSize	KEYWORD2
-setRange	KEYWORD2
-setBackground KEYWORD2
-setForeground KEYWORD2
-setText	KEYWORD2
-setValue	KEYWORD2
+getAirFlow	KEYWORD2
+callibrate	KEYWORD2
+
 
 
 #######################################
