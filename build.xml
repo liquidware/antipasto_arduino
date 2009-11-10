@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-   ANT Buildfile - Builds the Aardvark IDE
+   ANT Buildfile - Builds the Antipasto Arduino IDE
    Copyright (C) 2009 Christopher Ladden All rights reserved.
 
    This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
    USA
 -->
-<project name="Aardvark"
+<project name="Antipasto_Arduino"
          basedir="."
          default="main">
 
@@ -47,9 +47,9 @@
     <target name="clean.all" depends="clean.libraries, clean.cores, clean.external, clean.plugins, clean.OS"/>
     <target name="get.all"   depends="get.cores, get.libraries, build.reference, get.plugins, get.external, get.OS"/>
     <target name="build.all" depends="build.plugins, build.external, build.java"/>
-    <target name="test.all"  depends="test.boards"/>
     <target name="dist.all"  depends="clean.all, get.all, build.all, dist.OS"/>
     <target name="run.all"      depends="run.OS"/>
+    <target name="test.all"  depends="test.boards"/>
     <target name="package.all"  depends="test.all, package.OS"/>
     <target name="upload.all"   depends="upload.OS"/>
 
@@ -910,7 +910,7 @@ distribution.version=${build.version}</echo>
     <macrodef name="test-libraries">
         <attribute name="core"/>
         <attribute name="board.cpu"/>
-        <attribute name="tmpBaseDir" default="${user.home}/Aardvark/test-library/@{core}-@{board.cpu}"/>
+        <attribute name="tmpBaseDir" default="${user.home}/${ant.project.name}/test-library/@{core}-@{board.cpu}"/>
         <sequential>
 
             <delete dir="${tmpBaseDir}"/>   <!-- Clean tests -->
@@ -923,73 +923,73 @@ distribution.version=${build.version}</echo>
                 </path>
                 <sequential>
                     <echo message="in '@{libraryPath}'"/>
-    
+
                     <!-- Get the basename of the directory -->
                     <propertyregex override="yes"
                                    property="library"
                                    input="@{libraryPath}"
                                    regexp="[^\\/]*$"
                                    select="\0"/>
-    
-    
+
+
                     <!-- Build each example in library -->
                     <for param="examplePath">
                         <path>
                             <dirset dir="@{libraryPath}/examples" includes="*"/>
                         </path>
                         <sequential>
-    
+
                             <!-- Get the basename of the directory -->
                             <propertyregex override="yes"
                                            property="example"
                                            input="@{examplePath}"
                                            regexp="[^\\/]*$"
                                            select="\0"/>
-    
+
                             <mkdir dir="@{tmpBaseDir}/${library}/examples/${example}"/>
-            
+
                             <!-- Create the cross compiler build -->
                             <ant antfile="build/windows/work/hardware/cores/@{core}/build.xml"
                                  inheritAll = "false"
                                  output = "@{tmpBaseDir}/test.libraries.txt">
-    
-                                <!-- The sizer parsing seems to fail due to stdout differences 
-                                     from ant sub calls. So, lets run only the following targets --> 
+
+                                <!-- The sizer parsing seems to fail due to stdout differences
+                                     from ant sub calls. So, lets run only the following targets -->
                                 <target name="set.body"/>
                                 <target name="build.libraries"/>
                                 <target name="build.board.src"/>
                                 <target name="build.sketch"/>
-    
+
                                 <!-- Set the relevant build properties -->
                                 <property name="build.dest"  value="@{tmpBaseDir}/${library}/examples/${example}"/>
                                 <property name="sketch.name" value="${example}"/>
                                 <property name="board.cpu"   value="@{board.cpu}"/>
                                 <property name="board.name"  value="@{core}"/>
-    
+
                             </ant>
                         </sequential>
                     </for>
                 </sequential>
-            </for>            
+            </for>
         </sequential>
     </macrodef>
 
     <!--
         ===================================================================
-         Test the boards 
+         Test the boards
             This task tries to compile test sketches for hardware boards
         ===================================================================
     -->
     <target name="test.boards">
 
         <echo message="Board tests starting..."/>
-        
+
         <echo message="Testing libraries..."/>
-        <test-libraries core="arduino" 
+        <test-libraries core="arduino"
                         board.cpu="atmega168"/>
-        <test-libraries core="touchshield" 
+        <test-libraries core="touchshield"
                         board.cpu="atmega2560"/>
-        <test-libraries core="touchshield" 
+        <test-libraries core="touchshield"
                         board.cpu="atmega645"/>
 
         <echo message="Board tests COMPLETE and PASSED."/>
