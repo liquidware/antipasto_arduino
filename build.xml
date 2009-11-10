@@ -919,7 +919,7 @@ distribution.version=${build.version}</echo>
             <!-- For each library in board -->
             <for param="libraryPath">
                 <path>
-                    <dirset dir="build/windows/work/hardware/cores/@{core}/src/components/library" includes="*" />
+                    <dirset dir="${build.dir}/hardware/cores/@{core}/src/components/library" includes="*" />
                 </path>
                 <sequential>
                     <echo message="in '@{libraryPath}'"/>
@@ -949,7 +949,7 @@ distribution.version=${build.version}</echo>
                             <mkdir dir="@{tmpBaseDir}/${library}/examples/${example}"/>
 
                             <!-- Create the cross compiler build -->
-                            <ant antfile="build/windows/work/hardware/cores/@{core}/build.xml"
+                            <ant antfile="${build.dir}/hardware/cores/@{core}/build.xml"
                                  inheritAll = "false"
                                  output = "@{tmpBaseDir}/test.libraries.txt">
 
