@@ -62,20 +62,24 @@ public class LibraryManager {
    */
   private void refreshLibraries()
   {
-    FileFilter onlyDirs = new FileFilter() {
-      public boolean accept(File file) {
-        return file.isDirectory();
-      }
-    };
+    try {
+      FileFilter onlyDirs = new FileFilter() {
+        public boolean accept(File file) {
+          return file.isDirectory();
+        }
+      };
 
-    libDir = new File(System.getProperty("user.dir"),
-                      "hardware/cores/" +
-                      Preferences.get("boards." + Preferences.get("board") + ".build.core") +
-                      "/src/components/library");
-    libraries.clear();
-    File[] libs = libDir.listFiles(onlyDirs);
-    for(int i = 0; i < libs.length; ++i){
-      libraries.add(new Library(this, libs[i]));
+      libDir = new File(System.getProperty("user.dir"),
+                        "hardware/cores/" +
+                        Preferences.get("boards." + Preferences.get("board") + ".build.core") +
+                        "/src/components/library");
+      libraries.clear();
+      File[] libs = libDir.listFiles(onlyDirs);
+      for(int i = 0; i < libs.length; ++i){
+        libraries.add(new Library(this, libs[i]));
+      }
+    } catch(Exception ex) {
+      libraries.add(new Library(this, new File("/"))); //add a dummy file
     }
   }
 
