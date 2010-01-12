@@ -38,6 +38,7 @@
 //*	Jan  2,	2009	<MLS> Changed args in orientation() to LONG, fixed bug in filled triangles
 //*	Jan  3,	2009	<MLS> Added OffsetRect
 //*	Jan  3,	2009	<MLS> Changed my_point to gMostRecentTouchPt
+//*	Jan 12, 2010	<MLS> Working on merge
 //*******************************************************************************
 //*	<MLS> Programming style
 //*			never use 1 letter variable names, use LONG names,
