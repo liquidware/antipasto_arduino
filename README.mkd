@@ -14,6 +14,8 @@ this IDE as a binary for Windows, Mac OSX, and Linux at:
 Building the IDE
 ================
 
+Required packages: apache-ant, java-1.6, doxygen, git
+
 The IDE is best built using the built-in ant scripts.  Running:
 
     ant dist.all
