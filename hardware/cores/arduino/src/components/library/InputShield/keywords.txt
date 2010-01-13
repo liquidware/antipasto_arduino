@@ -12,13 +12,13 @@ InputShield	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-setMode	KEYWORD2
+SetMode	KEYWORD2
 GetButtonA  KEYWORD2
 GetButtonB	KEYWORD2
 GetButtonJoy	KEYWORD2
 GetJoyLat	KEYWORD2
 GetJoyVert	KEYWORD2
-setSampleAverages	KEYWORD2
+SetSampleAverages	KEYWORD2
 Vibrate	KEYWORD2
 
 #######################################
