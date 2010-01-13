@@ -13,13 +13,13 @@ InputShield	KEYWORD1
 #######################################
 
 setMode	KEYWORD2
-getButtonA  KEYWORD2
-getButtonB	KEYWORD2
-getButtonJoy	KEYWORD2
-getJoyLat	KEYWORD2
-getJoyVert	KEYWORD2
+GetButtonA  KEYWORD2
+GetButtonB	KEYWORD2
+GetButtonJoy	KEYWORD2
+GetJoyLat	KEYWORD2
+GetJoyVert	KEYWORD2
 setSampleAverages	KEYWORD2
-
+Vibrate	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
