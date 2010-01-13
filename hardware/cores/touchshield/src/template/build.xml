@@ -57,7 +57,7 @@
         <!-- Find all source files in the base directory
              and move them into the tmp directory -->
         <move todir="${tmp.path}/${sketch.name}">
-            <fileset dir="${build.dest}">
+            <fileset dir="${tmp.path}">
                 <include name="*.S" />
                 <include name="*.c" />
                 <include name="*.cpp" />
@@ -79,7 +79,10 @@
             force="true"
             dest="*.o" destdir="${obj.path}"
             src="*.S" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c" />
+            args="${cross.opts} ${cross.cflags}
+                  -I${include.base.path} -I${include.sub.path}
+                  -I${tmp.path}/${sketch.name}
+                  -c" />
     </target>
 
     <target name="compile.c">
@@ -87,7 +90,10 @@
             force="true"
             dest="*.o" destdir="${obj.path}"
             src="*.c" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c" />
+            args="${cross.opts} ${cross.cflags}
+                  -I${include.base.path} -I${include.sub.path}
+                  -I${tmp.path}/${sketch.name} -I${tmp.path}/${sketch.name}
+                  -c" />
     </target>
 
     <target name="compile.cpp">
@@ -95,13 +101,16 @@
             force="true"
             dest="sketch-wrapper.o" destdir="${obj.path}"
             src="sketch-wrapper.cpp" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -I${include.sub.path}
-                    -DSKETCH_BUILD_DATE=0x${sketch.build.date} -DSKETCH_BUILD_TIME=0x${sketch.build.time} -c" />
+            args="${cross.opts} ${cross.cppflags}
+                  -I${include.base.path} -I${include.sub.path}
+                  -I${tmp.path}/${sketch.name}
+                  -DSKETCH_BUILD_DATE=0x${sketch.build.date} -DSKETCH_BUILD_TIME=0x${sketch.build.time}
+                  -c" />
     </target>
 
     <target name="linker.link">
 
-        <property name="linker.args" 
+        <property name="linker.args"
                   value="&quot;${obj.path}/sketch-wrapper.o&quot;
                          ${cross.ldflags}
                          -L &quot;${lib.path}&quot;
@@ -120,7 +129,7 @@
         <!-- Binary Output for hex file creation -->
         <run name="${cross.gcc}"
               args="${linker.args}
-                    &quot;${obj.path}/sketch&quot;"/> 
+                    &quot;${obj.path}/sketch&quot;"/>
 
     </target>
 
