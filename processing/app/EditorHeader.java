@@ -120,10 +120,10 @@ public class EditorHeader extends JPanel {
 
     // Ditch the old one, make a new one
     tabHeader = new JPanel(new FlowLayout());
+    tabHeader.setPreferredSize(new Dimension(800, 40));
     tabHeader.setBackground(backgroundColor);
 		tabHeader.setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
 		tabHeader.setOpaque(true);
-
     this.add(tabHeader);
   }
 
