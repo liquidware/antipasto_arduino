@@ -132,10 +132,12 @@ public class Sketch {
          * "the application to complete the repair.", null); }
          */
         tempBuildFolder = Base.getBuildFolder();
+        File tmpFolder = new File(tempBuildFolder.getAbsolutePath() + File.separator + "/tmp");
+        tmpFolder.mkdirs();
 
         folder = new File(new File(path).getParent());
 
-        Base.copyDir(folder, tempBuildFolder);
+        Base.copyDir(folder, tmpFolder);
 
         load();
     }
