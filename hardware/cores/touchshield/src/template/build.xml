@@ -37,7 +37,7 @@
         ===================================================================
     -->
     <property name="lib.path"     value="${build.dest}/targets/${target.name}/lib"/>
-    <property name="obj.path"     value="${build.dest}/tmp/${sketch.name}"/>
+    <property name="obj.path"     value="${build.dest}/targets/${target.name}/build/sketch"/>
     <property name="bin.path"     value="${build.dest}/tmp/${sketch.name}"/>
 
     <!--
@@ -45,7 +45,7 @@
          Compile the source
         ===================================================================
     -->
-    <target name="compile.all" depends="prepare, assembler.assemble, compile.c, compile.cpp"/>
+    <target name="compile.all" depends="prepare, assembler.assemble, compile.c, compile.cpp, archiver.archive"/>
     <target name="linker.all" depends="linker.link"/>
     <target name="build.all" depends="compile.all, linker.all, hex.hexify"/>
 
@@ -72,6 +72,9 @@
              so the sketch-wrapper can include it -->
         <move file="${build.dest}/${sketch.name}.pde" tofile="${tmp.path}/${sketch.name}/sketch.pde"/>
 
+        <!-- Create the folder for the sketch .o files -->
+        <mkdir dir="${obj.path}" />
+		
     </target>
 
     <target name="assembler.assemble">
@@ -99,14 +102,26 @@
     <target name="compile.cpp">
         <cc name="${cross.gpp}"
             force="true"
-            dest="sketch-wrapper.o" destdir="${obj.path}"
-            src="sketch-wrapper.cpp" srcdir="${source.path}"
+            dest="*.o" destdir="${obj.path}"
+            src="*.cpp" srcdir="${source.path}"
             args="${cross.opts} ${cross.cppflags}
                   -I${include.base.path} -I${include.sub.path}
                   -I${tmp.path}/${sketch.name}
                   -DSKETCH_BUILD_DATE=0x${sketch.build.date} -DSKETCH_BUILD_TIME=0x${sketch.build.time}
                   -c" />
     </target>
+
+    <!--
+        ===================================================================
+        build the the sketch archive
+        ===================================================================
+    -->
+
+    <target name="archiver.archive">
+        <ar name="${cross.ar}" to="${lib.path}/libsketch.a" dir="${obj.path}" includes="*.o" />
+    </target>
+
+
 
     <target name="linker.link">
 
@@ -115,6 +130,7 @@
                          ${cross.ldflags}
                          -L &quot;${lib.path}&quot;
                          -lcontrib
+                         -lsketch 
                          -lhw
                          -lm
                          -o"/>
