@@ -2,12 +2,12 @@
 
 /*
  Part of the Processing project - http://processing.org
- 
+
  Copyright (c) 2004-05 Ben Fry and Casey Reas
  Copyright (c) 2001-04 Massachusetts Institute of Technology
- 
+
  Cleanup and adaptation to events by: Christopher Ladden @ www.liquidware.org
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -134,6 +134,8 @@ public class Sketch {
         tempBuildFolder = Base.getBuildFolder();
 
         folder = new File(new File(path).getParent());
+
+        Base.copyDir(folder, tempBuildFolder);
 
         load();
     }
@@ -1728,8 +1730,8 @@ public class Sketch {
 
 
     /**
-     * 
-     * 
+     *
+     *
      * @author christopher.ladden (11/5/2009)
      * @return true if the files are readonly
      */
@@ -1755,8 +1757,8 @@ public class Sketch {
         String examplesPath =  editor.sketchbook.getExamplesPath();
         String librariesPath = editor.sketchbook.getLibrariesPath();
 
-        boolean result = (apath.startsWith(examplesPath) || 
-                          apath.startsWith(librariesPath) || 
+        boolean result = (apath.startsWith(examplesPath) ||
+                          apath.startsWith(librariesPath) ||
                           modifiedCodeIsReadOnly());
 
         return result;
