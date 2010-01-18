@@ -58,7 +58,9 @@ public class Archiver {
     // first save the sketch so that things don't archive strangely
     boolean success = false;
     try {
-      success = editor.sketch.save();
+    	if (!Preferences.getBoolean("editor.external")) {
+      		success = editor.sketch.save();
+    	}
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -122,6 +122,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
     JPanel leftWing;
     JPanel rightWing;
     JLabel leftExpandLabel;
+	int runCount = 0;
 
     // currently opened program
     public Sketch sketch;
@@ -1609,22 +1610,23 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
 
     // ...................................................................
 
-
+	
     public void handleRun(final boolean present) throws IOException {
         //Is ant is running another request?
         if (ant.isRunning()) {
-            message("Please wait...");
+            message("Compile running, please wait.", true);
             return;
         }
-
-        System.out.println("handling the run");
+		
+		runCount = runCount + 1;
+        System.out.println("Handling the compile " + runCount);
         doClose();
         running = true;
         this.isExporting = false;
         buttons.activate(EditorButtons.RUN);
         message("Compiling...", true);
         // do this for the terminal window / dos prompt / etc
-        for (int i = 0; i < 10; i++) System.out.println();
+        //for (int i = 0; i < 10; i++) System.out.println();
 
         // clear the console on each run, unless the user doesn't want to
         //if (Base.getBoolean("console.auto_clear", true)) {
@@ -1648,9 +1650,15 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
             }
         }
 
-        this.saveSketches();
-
+		System.out.println("Saving sketches...");
+		if (!Preferences.getBoolean("editor.external")) {
+			this.saveSketches();
+		}
+		System.out.println("Sketches saved.");
+		
+		System.out.println("Checking active gadget...");
         if (gadgetPanel.getActiveGadget() != null) {
+			System.out.println("yes, active gadget...");
             if (gadgetPanel.getActiveModule().getRules() != null) {
                 IMessage message = null;
                 if (gadgetPanel.getActiveModule().getRules().getMessages() != null) {
@@ -1682,6 +1690,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
                 this.compile();
             }
         } else {
+			System.out.println("Not a gadget, compiling...");
             this.compile();
         }
 
@@ -1717,7 +1726,7 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
                                                                                           File.separator + "cores", Preferences.get("boards." + target + ".build.core")));
 
                                               } else {
-
+												   System.out.println("compile(), new thread run about to sketch.handleRun()");
                                                   String boardName = Preferences.get("board");
                                                   success = sketch.handleRun(new Target(System.getProperty("user.dir") + File.separator + "hardware" +
                                                                                    File.separator + "cores", Preferences.get("boards." + boardName + ".build.core")));
@@ -2312,8 +2321,14 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
     public void handleSave2() {
         message("Saving...");
         try {
-            sketch.save();
-            if (saveSketches()) {
+           	boolean saveResult = true;
+           	
+            if (!Preferences.getBoolean("editor.external")) {
+            	sketch.save();
+            	saveResult = saveSketches();
+            }
+            
+            if (saveResult) {
                 message("Done Saving.");
             } else {
                 message(EMPTY);
@@ -2393,7 +2408,9 @@ MRJOpenDocumentHandler, IActiveGadgetChangedEventListener {
         final GadgetPanel panel = this.gadgetPanel;
         this.isExporting = true;
 
-        this.saveSketches();
+ 		if (!Preferences.getBoolean("editor.external")) {
+        	this.saveSketches();
+ 		}
 
 
         Thread t = new Thread(new Runnable() {
