@@ -29,7 +29,7 @@
     <property name="source.path"       value="${build.dest}/tmp/${sketch.name}"/>
     <property name="base.dir"          value="../../"/>
     <property name="include.base.path" value="${base.dir}/src/include"/>
-    <property name="include.sub.path"  value="${base.dir}/src/include/lpc"/>
+    <property name="include.sub.path"  value="${base.dir}/src/components/board"/>
 
     <!--
         ===================================================================
