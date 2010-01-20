@@ -14,11 +14,12 @@
 
 #include	<avr/pgmspace.h>
 
-#include	"font.h"
+
+
+#include	"HersheyFonts.h"
 
 #ifdef _ENABLE_HERSHEY_FONTS_
 
-#include	"HersheyFonts.h"
 
 
 //*******************************************************************************

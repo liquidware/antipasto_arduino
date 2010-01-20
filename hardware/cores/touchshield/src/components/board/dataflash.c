@@ -49,15 +49,23 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include	"HardwareDef.h"
 
 #include "dataflash.h"
 #include "bitops.h"
 #include "usart.h"
-#include "touchscreen.h"
+#ifdef _TOUCH_SLIDE_
+	#include "touchscreen.h"
+#endif
+#ifdef _TOUCH_STEALTH_
+	#include "touchscreen_stealth.h"
+#endif
 
 unsigned int dataflash_buff_size = 0;	//!< The size of the on-chip buffer
 
 
+
+//*******************************************************************************
 void dataflash_init()
 {
 
@@ -82,7 +90,6 @@ void dataflash_init()
 	SPCR = 0x5C; //SPI mode 3
 	SPSR = (1<<SPI2X);
 //	SPCR |= (1<< SPR0);
-
 }
 
 
@@ -94,6 +101,7 @@ void dataflash_init()
 
 
 
+//*******************************************************************************
 void dataflash_write_buff(unsigned char * out_data)
 {
 unsigned int i;
@@ -107,9 +115,9 @@ unsigned int i;
 	dataflash_out(0);
 
 
-for (i=0; i<DATAFLASH_PAGESIZE; i++)
+	for (i=0; i<DATAFLASH_PAGESIZE; i++)
 	{
-	dataflash_out(out_data[i]);
+		dataflash_out(out_data[i]);
 	}
 
 	SETBIT(DATAFLASH_PORT,DATAFLASH_CS); //Deselect flash chip
@@ -123,6 +131,7 @@ for (i=0; i<DATAFLASH_PAGESIZE; i++)
 
 
 
+//*******************************************************************************
 void dataflash_read_buff(unsigned char * in_data)
 {
 unsigned int i;
@@ -150,6 +159,7 @@ for (i=0; i<DATAFLASH_PAGESIZE; i++)
 
 
 
+//*******************************************************************************
 void dataflash_clear_buff()
 {
 unsigned int i;
@@ -179,6 +189,7 @@ for (i=0; i<DATAFLASH_PAGESIZE; i++)
 
 
 
+//*******************************************************************************
 void dataflash_program_page(unsigned char * page_buff, unsigned int page_num)
 {
 unsigned char p=0;
@@ -212,6 +223,7 @@ dataflash_write_buff(&page_buff[0]);
 
 
 
+//*******************************************************************************
 void dataflash_erase()
 {
 //unsigned int block_counter=0;
@@ -239,21 +251,24 @@ while(block_counter < DATAFLASH_BLOCK_COUNT)
 }
 
 
+//*******************************************************************************
 void dataflash_out(unsigned char cData)
 {
 
 	/* Start transmission */
 	SPDR = cData;
 	/* Wait for transmission complete */
-
+#ifndef __MWERKS__
 	while(!CHECKBIT(SPSR,SPIF)) 
 		{
 		;
 		}
+#endif
 
 }
 
 
+//*******************************************************************************
 unsigned char dataflash_checkStatus()
 {
 	
@@ -279,6 +294,7 @@ unsigned char dataflash_checkStatus()
 
 
 
+//*******************************************************************************
 void dataflash_read_block(unsigned char * storage_buff, unsigned long offset, unsigned int size)
 {
 unsigned long page_num = offset/DATAFLASH_PAGESIZE;
@@ -329,6 +345,7 @@ dataflash_clear_buff();
 
 
 
+//*******************************************************************************
 void dataflash_cont_read(unsigned char * storage_buff, unsigned int page_num, unsigned int size)
 {
 //unsigned int page_num = addr/DATAFLASH_PAGESIZE;

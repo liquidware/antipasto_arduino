@@ -24,15 +24,33 @@
 //*******************************************************************************
 
 
-#ifdef _ENABLE_HERSHEY_ROWMAND_
-	#include	"HersheyRowmand.h"
+#ifdef _ENABLE_HERSHEY_ROWMAN_SIMPLEX_
+	#include	"HersheyRowmanSimplex.h"
 	//*******************************************************************************
-	void	GetFontDef_Rowmand(short tableIndex, char *fontDefString)
+	void	GetFontDef_RowmanSimplex(short tableIndex, char *fontDefString)
 	{
-		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyRowmandFontTable[tableIndex])));
+		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyRowmanSimplexFontTable[tableIndex])));
 	}
 #endif
 
+
+#ifdef _ENABLE_HERSHEY_ROWMAN_DUPLEX_
+	#include	"HersheyRowmanDuplex.h"
+	//*******************************************************************************
+	void	GetFontDef_RowmanDuplex(short tableIndex, char *fontDefString)
+	{
+		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyRowmanDuplexFontTable[tableIndex])));
+	}
+#endif
+
+#ifdef _ENABLE_HERSHEY_ROWMAN_TRIPLEX_
+	#include	"HersheyRowmanTriplex.h"
+	//*******************************************************************************
+	void	GetFontDef_RowmanTriplex(short tableIndex, char *fontDefString)
+	{
+		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyRowmanTriplexFontTable[tableIndex])));
+	}
+#endif
 
 
 #endif		//*	_ENABLE_HERSHEY_FONTS_

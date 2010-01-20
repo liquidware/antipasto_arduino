@@ -13,15 +13,16 @@
 //*	Jan 14,	2009	<MLS> Added status messages via debug rect
 //*	Jan 15,	2009	<MLS> Discussed File System with Matt, decided to do entirely new system
 //*	Jan 16,	2009	<MLS> Got my own C program on MacOSX to talk to the USB port and to this code
-//*	Jan 17,	2009	<MLS> Strated seperate file for new file system
+//*	Jan 17,	2009	<MLS> Started seperate file for new file system
 //*******************************************************************************
 
-#include <avr/io.h>
-#include <inttypes.h>
-#include <string.h>
-#include <inttypes.h>
-#include <avr/interrupt.h>
-#include <stdlib.h>
+#include	<avr/io.h>
+#include	<inttypes.h>
+#include	<string.h>
+#include	<inttypes.h>
+#include	<avr/interrupt.h>
+#include	<stdlib.h>
+#include	<stdio.h>
 
 #include	"HardwareDef.h"
 
@@ -41,6 +42,7 @@
 
 #define	_USE_DBBUG_RECT_STATUS_
 
+#warning this needs to be removed for memory convervation
 COLOR black = { 0,0,0};
 COLOR textColor = {255,255,255};
 COLOR white = {255,255,255};
@@ -50,7 +52,8 @@ uint16_t gPageIndex = 0;
 //************************************************************************
 //* A debug tool.
 //* AutoIncrements the line.
-void DebugRectPrintText(char * msg) {
+static void DebugRectPrintTextLocal(char * msg)
+{
 	static int line;
 	
 	dispColor(black);
@@ -62,7 +65,8 @@ void DebugRectPrintText(char * msg) {
 	textColor.blue += 50;
 
 	line+=10;
-	if (line > 220) {
+	if (line > 220)
+	{
 		line = 0;
 	}
 
@@ -83,7 +87,7 @@ static void	FlashFileFormat(void)
 long	DelayBigTime(void)
 {
 long	answer;
-long	ii;
+//long	ii;
 
 	answer	=	0;
 //	for (ii=0; ii<10000000; ii++)
@@ -99,7 +103,7 @@ long	ii;
 //*******************************************************************************
 static void	SendAck(void)
 {
-	DebugRectPrintText("sending ACK +++");
+	DebugRectPrintTextLocal("sending ACK +++");
 	usart_putc(kAscii_ACK);
 	usart_puts("ACK");
 	
@@ -108,7 +112,7 @@ static void	SendAck(void)
 //*******************************************************************************
 static void	SendNAK(void)
 {
-	DebugRectPrintText("sending NAK ---");
+	DebugRectPrintTextLocal("sending NAK ---");
 
 	usart_putc(kAscii_NAK);
 	usart_puts("NAK");
@@ -119,7 +123,8 @@ static void	SendNAK(void)
 static void	FlashFileDownload(void)
 {
 unsigned int	xx;
-unsigned int	ii,wait,wait2;
+unsigned int	ii;
+//unsigned int	wait,wait2;
 unsigned char	dataBuff[DATAFLASH_PAGESIZE];
 char			msgBuff[48];
 unsigned char	*buff;
@@ -132,7 +137,7 @@ long			longByte3;
 long			longByte4;
 
 #ifdef _USE_DBBUG_RECT_STATUS_
-	DebugRectPrintText("STORE");
+	DebugRectPrintTextLocal("STORE");
 #endif
 
 	buff	=	usart_getBuff_ptr();
@@ -174,7 +179,7 @@ long			longByte4;
 		newFileName[12]	=	0;
 		
 		sprintf(msgBuff, "File=%s, size=%ld pages=%d", newFileName, newFileSize, page_count);
-		DebugRectPrintText(msgBuff);
+		DebugRectPrintTextLocal(msgBuff);
 		
 		bmp_store((char*)dataBuff,(char*)newFileName,(uint32_t)gPageIndex*DATAFLASH_PAGESIZE); //save the file name and offset
 				
@@ -198,12 +203,12 @@ long			longByte4;
 
 			inChecksum = (inChecksum ^ 0xFF) + 1;		// two's compliment
 			dataflash_program_page(&dataBuff[0], ii); 	//program the page
-	    
+	
 			/* Clear the buffer */
 			for(xx=0; xx<DATAFLASH_PAGESIZE; xx++)
 			{
 				dataBuff[xx]	=	0x00;
-	     	}
+			}
 
 			dataflash_cont_read(&dataBuff[0], ii, DATAFLASH_PAGESIZE);	//read the page
 
@@ -215,14 +220,17 @@ long			longByte4;
 			outChecksum = (outChecksum ^ 0xFF) + 1;						// two's compliment
 
 			/* Make sure the checksum matches */
-			if (inChecksum == outChecksum) {
+			if (inChecksum == outChecksum)
+			{
 
 				sprintf(msgBuff, "File=%s %d / %d",newFileName, (ii-gPageIndex)+1, page_count);
-				DebugRectPrintText(msgBuff);
+				DebugRectPrintTextLocal(msgBuff);
 				usart_putc(IMAGE_INTERFACE_PAGE_DONE); 			//respond
 
-			} else {
-				DebugRectPrintText("checksum fail");
+			}
+			else
+			{
+				DebugRectPrintTextLocal("checksum fail");
 				usart_putc(0); 									//error
 			}
 			
@@ -237,25 +245,25 @@ long			longByte4;
 	}
 	
 #ifdef _USE_DBBUG_RECT_STATUS_
-	DebugRectPrintText("--DONE");
+	DebugRectPrintTextLocal("--DONE");
 #endif
 }
 
 //*******************************************************************************
 static void	FlashFileInfo(void)
 {
-short	ii;
-char	validImage;
-short	bmpWidth;
-short	bmpHeight;
-char	displayLine[64];
+//short	ii;
+//char	validImage;
+//short	bmpWidth;
+//short	bmpHeight;
+//char	displayLine[64];
 
 
 //	usart_puts("\nTouchShield/Slide Flash File System Ver 0.1\n");
 	usart_puts("Flasher v0.2");
 	usart_putc(0);
 	
-	#if 0
+#if 0
 	ii			=	0;
 	validImage	=	TRUE;
 
@@ -267,7 +275,7 @@ char	displayLine[64];
 		usart_puts("\n");
 		ii++;
 	}
-	#endif
+#endif
 }
 
 
@@ -281,7 +289,7 @@ unsigned char	*buff;
 
 
 #ifdef _USE_DBBUG_RECT_STATUS_
-	DebugRectPrintText("IMAGE_INTERFACE_READ");
+	DebugRectPrintTextLocal("IMAGE_INTERFACE_READ");
 #endif
 
 	buff		=	usart_getBuff_ptr();
@@ -315,7 +323,7 @@ boolean			keepGoing;
 char			commandString[8];
 
 
-	DebugRectPrintText("FlashFileSystemComm()");
+	DebugRectPrintTextLocal("FlashFileSystemComm()");
 
 
 	arduinoReset();
@@ -343,7 +351,7 @@ char			commandString[8];
 		strcpy(commandString, "cmd=");
 		commandString[4]	=	commandFromHost;
 		commandString[5]	=	0;
-		DebugRectPrintText(commandString);
+		DebugRectPrintTextLocal(commandString);
 
 		switch(commandFromHost)
 		{
@@ -360,14 +368,14 @@ char			commandString[8];
 				break;
 
 			case IMAGE_INTERFACE_INFO:
-			//	DebugRectPrintText("IMAGE_INTERFACE_INFO");
+			//	DebugRectPrintTextLocal("IMAGE_INTERFACE_INFO");
 				FlashFileInfo();
 				break;
 
 
 			case IMAGE_INTERFACE_EXIT:
 
-				DebugRectPrintText("File Send complete.");
+				DebugRectPrintTextLocal("File Send complete.");
 
 				sei(); //enable interrupts
 				bmp_init();
@@ -378,7 +386,7 @@ char			commandString[8];
 				break;
 				
 			default:
-				DebugRectPrintText("Unknown Command");
+				DebugRectPrintTextLocal("Unknown Command");
 				break;
 
 		}
@@ -388,15 +396,18 @@ char			commandString[8];
 
 //*************************************
 // Launches an executable program
-void open(ProgramEx p) {
+void FlashFile_open(ProgramEx p)
+{
 	/* Determine the program */
-    switch (p) {
-    case FlashTransfer:
-        FlashFileSystemComm();
-        break;
-    default:
-        break;
-    }
+	switch (p) 
+	{
+		case FlashTransfer:
+			FlashFileSystemComm();
+			break;
+		
+		default:
+			break;
+	}
 }
 
 

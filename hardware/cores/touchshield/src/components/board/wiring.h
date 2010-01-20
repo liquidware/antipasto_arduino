@@ -26,6 +26,7 @@
 #define Wiring_h
 
 #include	<avr/io.h>
+#include	<stdio.h>
 
 //Standard TouchShield headers
 #include	"HardwareDef.h"
@@ -34,10 +35,17 @@
 #include	"touchscreen.h"
 #include	"dataflash.h"
 #include	"image_interface.h"
-#include	"graphics.h"
+//#include	"graphics.h"
 #include	"bmp.h"
 #include    "FlashFileSystem.h"
-#include    "HersheyFonts.h"
+#ifndef _HESHEYFONT_H_
+	//*	you cant include HersheyFonts.h because it needs wiring.h
+	//	#include    "HersheyFonts.h"
+#endif
+
+#include	"pindefs.h"
+#include	"binary.h"
+//#include	"font.h"
 
 #ifdef _TOUCH_SLIDE_
 	#include	"oled_slide.h"
@@ -45,9 +53,6 @@
 #ifdef _TOUCH_STEALTH_
 	#include	"oled_stealth.h"
 #endif
-#include	"binary.h"
-#include	"pindefs.h"
-#include	"font.h"
 
 
 #ifdef __cplusplus

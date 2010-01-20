@@ -8,6 +8,11 @@
 //#include	"HersheyCursive.h"
 
 
+
+//*	the 1st 2 bytes are decimal # of pairs
+//*	the rest are offset coordinate pairs, each letter gets 'R' subtracted from it to come up with a number
+//*	the firt pair is left position and right position
+
 prog_char	gFutural_00[]	PROGMEM	=	"Futural";
 
 prog_char	gFutural_20[]	PROGMEM	=	" 1JZ";

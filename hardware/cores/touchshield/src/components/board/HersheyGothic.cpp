@@ -63,5 +63,13 @@
 	}
 #endif
 
+#ifdef _ENABLE_HERSHEY_GOTHITT_
+	#include	"HersheyGothitt.h"
+	//*******************************************************************************
+	void	GetFontDef_Gothitt(short tableIndex, char *fontDefString)
+	{
+		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyGothittFontTable[tableIndex])));
+	}
+#endif
 
 #endif		//*	_ENABLE_HERSHEY_FONTS_

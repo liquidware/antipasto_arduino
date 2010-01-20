@@ -4,13 +4,16 @@
 //*	Sub-Processing 
 //*	for TouchShield library
 //*	by msproul@jove.rutgers.edu
-//*	This implementation of Hershey fonts is (C) 2009 by Mark Sproul
+//*	This implementation of Hershey fonts is (C) 2009-2010 by Mark Sproul
 //*	The Hershey Font data is covered under its own rules
 //*
 //*	This library is free software; you can redistribute it and/or
 //*	modify it under the terms of the GNU Lesser General Public
 //*	License as published by the Free Software Foundation; either
 //*	version 2.1 of the License, or (at your option) any later version.
+//*
+//*		I got the font data from
+//*		http://emergent.unpythonic.net/software/hershey
 //*******************************************************************************
 //*	Jan 21,	2009	<MLS> Started working on large fonts
 //*	Jan 21,	2009	<MLS> Formated Hershey Gothic English for Arduino
@@ -23,29 +26,60 @@
 //*	Feb 18,	2009	<MLS> Formated Hershey Greek Simplex for Arduino
 //*	Feb 20,	2009	<MLS> Formated Hershey Script Complex for Arduino
 //*	Feb 22,	2009	<MLS> Formated Hershey Script Simplex for Arduino
+//*	Mar  2,	2009	<MLS> Added GetHersheyFontNumerFromName
+//*	Dec 31,	2009	<MLS> Added HersheyDisplayFontList
+//*	Jan  1,	2010	<MLS> Added HersheyDisplayFontSamples
+//*	Jan 10,	2010	<MLS> Added HersheyGetCharWidth and HersheyGetStringWidth
+//*	Jan 10,	2010	<MLS> Added pensize support to HersheyDrawLetter (size 1,2,3)
+//*	JAN 10,	2010	<MLS> Formated Hershey Roman Triplex for Arduion
 //*******************************************************************************
 
 
-#include	<avr/io.h>
-#include	<avr/pgmspace.h>
+#ifdef __MWERKS__
+	void sprintf(...);
+	short	random(int a, int b);
+//	#include	"wiring.h"
+#else
+	#include	<stdio.h>
+#endif
+
 #include	<string.h>
 #include	<math.h>
+#include	<avr/io.h>
+#include	<avr/pgmspace.h>
+#include	<ctype.h>
 
+#include	"WProgram.h"
 #include	"wiring.h"
 
-#include	"HardwareDef.h"
-#include	"graphics.h"
-#include	"font.h"
-#include	"binary.h"
-#ifndef SUBPGRAPHICS_H
-	#include	"SubPGraphics.h"
-#endif
-#include	"QuickDraw.h"
 
+#include	"HardwareDef.h"
+
+#if defined(_TOUCH_STEALTH_) || defined(_TOUCH_SLIDE_)
+	#include	"graphics.h"
+	#include	"font.h"
+	#include	"binary.h"
+
+	#ifndef SUBPGRAPHICS_H
+		#include	"SubPGraphics.h"
+	#endif
+	#ifndef _QUICKDRAW_H_
+		#include	"QuickDraw.h"
+	#endif
+#endif
+
+#if defined(_ARDUINO_MEGA_)
+	#ifndef _PICASO_H_
+		#include	"PicasoVGA.h"
+	#endif
+#endif
+
+#include	"HersheyFonts.h"
 
 #ifdef _ENABLE_HERSHEY_FONTS_
 
-#include	"HersheyFonts.h"
+#define	kMaxVectorStringLength	300
+
 
 //********************************************************************************
 //	http://www.ks.uiuc.edu/Research/vmd/doxygen/Hershey_8C-source.html
@@ -184,114 +218,116 @@
 //prog_char	string_1D[]	PROGMEM	=	"JZ";
 //prog_char	string_1E[]	PROGMEM	=	"JZ";
 //prog_char	string_1F[]	PROGMEM	=	"JZ";
-		
+
+//*	Jan 10,	2010	<MLS>
+//*	this data did not have the pair count, I need it consistant, so I am adding it
 prog_char	gHersheyDefault_00[]	PROGMEM	=	"Hershey default";				//*	0X20
-prog_char	gHersheyDefault_20[]	PROGMEM	=	"JZ";				//*	0X20
-prog_char	gHersheyDefault_21[]	PROGMEM	=	"MWRFRT RRYQZR[SZRY";
-prog_char	gHersheyDefault_22[]	PROGMEM	=	"JZNFNM RVFVM";
-prog_char	gHersheyDefault_23[]	PROGMEM	=	"H]SBLb RYBRb RLOZO RKUYU";
-prog_char	gHersheyDefault_24[]	PROGMEM	=	"H\\PBP_ RTBT_ RYIWGTFPFMGKIKKLMMNOOUQWRXSYUYXWZT[P[MZKX";
-prog_char	gHersheyDefault_25[]	PROGMEM	=	"F^[FI[ RNFPHPJOLMMKMIKIIJGLFNFPGSHVHYG[F RWTUUTWTYV[X[ZZ[X[VYTWT";
-prog_char	gHersheyDefault_26[]	PROGMEM	=	"E_\\O\\N[MZMYNXPVUTXRZP[L[JZIYHWHUISJRQNRMSKSIRGPFNGMIMKNNPQUXWZY[";
-prog_char	gHersheyDefault_27[]	PROGMEM	=	"MWRHQGRFSGSIRKQL";
-prog_char	gHersheyDefault_28[]	PROGMEM	=	"KYVBTDRGPKOPOTPYR]T`Vb";
-prog_char	gHersheyDefault_29[]	PROGMEM	=	"KYNBPDRGTKUPUTTYR]P`Nb";
-prog_char	gHersheyDefault_2A[]	PROGMEM	=	"JZRLRX RMOWU RWOMU";
-prog_char	gHersheyDefault_2B[]	PROGMEM	=	"E_RIR[ RIR[R";
-prog_char	gHersheyDefault_2C[]	PROGMEM	=	"NVSWRXQWRVSWSYQ[";
-prog_char	gHersheyDefault_2D[]	PROGMEM	=	"E_IR[R";
-prog_char	gHersheyDefault_2E[]	PROGMEM	=	"NVRVQWRXSWRV";
-prog_char	gHersheyDefault_2F[]	PROGMEM	=	"G][BIb";
+prog_char	gHersheyDefault_20[]	PROGMEM	=	" 1JZ";				//*	0X20
+prog_char	gHersheyDefault_21[]	PROGMEM	=	"  MWRFRT RRYQZR[SZRY";
+prog_char	gHersheyDefault_22[]	PROGMEM	=	"  JZNFNM RVFVM";
+prog_char	gHersheyDefault_23[]	PROGMEM	=	"  H]SBLb RYBRb RLOZO RKUYU";
+prog_char	gHersheyDefault_24[]	PROGMEM	=	"  H\\PBP_ RTBT_ RYIWGTFPFMGKIKKLMMNOOUQWRXSYUYXWZT[P[MZKX";
+prog_char	gHersheyDefault_25[]	PROGMEM	=	"  F^[FI[ RNFPHPJOLMMKMIKIIJGLFNFPGSHVHYG[F RWTUUTWTYV[X[ZZ[X[VYTWT";
+prog_char	gHersheyDefault_26[]	PROGMEM	=	"  E_\\O\\N[MZMYNXPVUTXRZP[L[JZIYHWHUISJRQNRMSKSIRGPFNGMIMKNNPQUXWZY[";
+prog_char	gHersheyDefault_27[]	PROGMEM	=	"  MWRHQGRFSGSIRKQL";
+prog_char	gHersheyDefault_28[]	PROGMEM	=	"  KYVBTDRGPKOPOTPYR]T`Vb";
+prog_char	gHersheyDefault_29[]	PROGMEM	=	"  KYNBPDRGTKUPUTTYR]P`Nb";
+prog_char	gHersheyDefault_2A[]	PROGMEM	=	"  JZRLRX RMOWU RWOMU";
+prog_char	gHersheyDefault_2B[]	PROGMEM	=	"  E_RIR[ RIR[R";
+prog_char	gHersheyDefault_2C[]	PROGMEM	=	"  NVSWRXQWRVSWSYQ[";
+prog_char	gHersheyDefault_2D[]	PROGMEM	=	"  E_IR[R";
+prog_char	gHersheyDefault_2E[]	PROGMEM	=	"  NVRVQWRXSWRV";
+prog_char	gHersheyDefault_2F[]	PROGMEM	=	"  G][BIb";
 		
-prog_char	gHersheyDefault_30[]	PROGMEM	=	"H\\QFNGLJKOKRLWNZQ[S[VZXWYRYOXJVGSFQF";	/*	0x30	*/	
-prog_char	gHersheyDefault_31[]	PROGMEM	=	"H\\NJPISFS[";
-prog_char	gHersheyDefault_32[]	PROGMEM	=	"H\\LKLJMHNGPFTFVGWHXJXLWNUQK[Y[";
-prog_char	gHersheyDefault_33[]	PROGMEM	=	"H\\MFXFRNUNWOXPYSYUXXVZS[P[MZLYKW";
-prog_char	gHersheyDefault_34[]	PROGMEM	=	"H\\UFKTZT RUFU[";
-prog_char	gHersheyDefault_35[]	PROGMEM	=	"H\\WFMFLOMNPMSMVNXPYSYUXXVZS[P[MZLYKW";
-prog_char	gHersheyDefault_36[]	PROGMEM	=	"H\\XIWGTFRFOGMJLOLTMXOZR[S[VZXXYUYTXQVOSNRNOOMQLT";
-prog_char	gHersheyDefault_37[]	PROGMEM	=	"H\\YFO[ RKFYF";
-prog_char	gHersheyDefault_38[]	PROGMEM	=	"H\\PFMGLILKMMONSOVPXRYTYWXYWZT[P[MZLYKWKTLRNPQOUNWMXKXIWGTFPF";
-prog_char	gHersheyDefault_39[]	PROGMEM	=	"H\\XMWPURRSQSNRLPKMKLLINGQFRFUGWIXMXRWWUZR[P[MZLX";
-prog_char	gHersheyDefault_3A[]	PROGMEM	=	"NVROQPRQSPRO RRVQWRXSWRV";
-prog_char	gHersheyDefault_3B[]	PROGMEM	=	"NVROQPRQSPRO RSWRXQWRVSWSYQ[";
-prog_char	gHersheyDefault_3C[]	PROGMEM	=	"F^ZIJRZ[";
-prog_char	gHersheyDefault_3D[]	PROGMEM	=	"E_IO[O RIU[U";
-prog_char	gHersheyDefault_3E[]	PROGMEM	=	"F^JIZRJ[";
-prog_char	gHersheyDefault_3F[]	PROGMEM	=	"I[LKLJMHNGPFTFVGWHXJXLWNVORQRT RRYQZR[SZRY";
+prog_char	gHersheyDefault_30[]	PROGMEM	=	"  H\\QFNGLJKOKRLWNZQ[S[VZXWYRYOXJVGSFQF";	/*	0x30	*/	
+prog_char	gHersheyDefault_31[]	PROGMEM	=	"  H\\NJPISFS[";
+prog_char	gHersheyDefault_32[]	PROGMEM	=	"  H\\LKLJMHNGPFTFVGWHXJXLWNUQK[Y[";
+prog_char	gHersheyDefault_33[]	PROGMEM	=	"  H\\MFXFRNUNWOXPYSYUXXVZS[P[MZLYKW";
+prog_char	gHersheyDefault_34[]	PROGMEM	=	"  H\\UFKTZT RUFU[";
+prog_char	gHersheyDefault_35[]	PROGMEM	=	"  H\\WFMFLOMNPMSMVNXPYSYUXXVZS[P[MZLYKW";
+prog_char	gHersheyDefault_36[]	PROGMEM	=	"  H\\XIWGTFRFOGMJLOLTMXOZR[S[VZXXYUYTXQVOSNRNOOMQLT";
+prog_char	gHersheyDefault_37[]	PROGMEM	=	"  H\\YFO[ RKFYF";
+prog_char	gHersheyDefault_38[]	PROGMEM	=	"  H\\PFMGLILKMMONSOVPXRYTYWXYWZT[P[MZLYKWKTLRNPQOUNWMXKXIWGTFPF";
+prog_char	gHersheyDefault_39[]	PROGMEM	=	"  H\\XMWPURRSQSNRLPKMKLLINGQFRFUGWIXMXRWWUZR[P[MZLX";
+prog_char	gHersheyDefault_3A[]	PROGMEM	=	"  NVROQPRQSPRO RRVQWRXSWRV";
+prog_char	gHersheyDefault_3B[]	PROGMEM	=	"  NVROQPRQSPRO RSWRXQWRVSWSYQ[";
+prog_char	gHersheyDefault_3C[]	PROGMEM	=	"  F^ZIJRZ[";
+prog_char	gHersheyDefault_3D[]	PROGMEM	=	"  E_IO[O RIU[U";
+prog_char	gHersheyDefault_3E[]	PROGMEM	=	"  F^JIZRJ[";
+prog_char	gHersheyDefault_3F[]	PROGMEM	=	"  I[LKLJMHNGPFTFVGWHXJXLWNVORQRT RRYQZR[SZRY";
 		
 		
-prog_char	gHersheyDefault_40[]	PROGMEM	=	"E`WNVLTKQKOLNMMPMSNUPVSVUUVS RQKOMNPNSOUPV RWKVSVUXVZV\\T]Q]O\\L[J";	//*	@
-prog_char	gHersheyDefault_41[]	PROGMEM	=	"I[RFJ[ RRFZ[ RMTWT";													//*	A
-prog_char	gHersheyDefault_42[]	PROGMEM	=	"G\\KFK[ RKFTFWGXHYJYLXNWOTP RKPTPWQXRYTYWXYWZT[K[";					//*	B
-prog_char	gHersheyDefault_43[]	PROGMEM	=	"H]ZKYIWGUFQFOGMILKKNKSLVMXOZQ[U[WZYXZV";								//*	C
-prog_char	gHersheyDefault_44[]	PROGMEM	=	"G\\KFK[ RKFRFUGWIXKYNYSXVWXUZR[K[";									//*	D
-prog_char	gHersheyDefault_45[]	PROGMEM	=	"H[LFL[ RLFYF RLPTP RL[Y[";												//*	E
-prog_char	gHersheyDefault_46[]	PROGMEM	=	"HZLFL[ RLFYF RLPTP";													//*	F
-prog_char	gHersheyDefault_47[]	PROGMEM	=	"H]ZKYIWGUFQFOGMILKKNKSLVMXOZQ[U[WZYXZVZS RUSZS";						//*	G
-prog_char	gHersheyDefault_48[]	PROGMEM	=	"G]KFK[ RYFY[ RKPYP";													//*	H
-prog_char	gHersheyDefault_49[]	PROGMEM	=	"NVRFR[";																//*	I
-prog_char	gHersheyDefault_4A[]	PROGMEM	=	"JZVFVVUYTZR[P[NZMYLVLT";												//*	J
-prog_char	gHersheyDefault_4B[]	PROGMEM	=	"G\\KFK[ RYFKT RPOY[";													//*	K
+prog_char	gHersheyDefault_40[]	PROGMEM	=	"  E`WNVLTKQKOLNMMPMSNUPVSVUUVS RQKOMNPNSOUPV RWKVSVUXVZV\\T]Q]O\\L[J";	//*	@
+prog_char	gHersheyDefault_41[]	PROGMEM	=	"  I[RFJ[ RRFZ[ RMTWT";													//*	A
+prog_char	gHersheyDefault_42[]	PROGMEM	=	"  G\\KFK[ RKFTFWGXHYJYLXNWOTP RKPTPWQXRYTYWXYWZT[K[";					//*	B
+prog_char	gHersheyDefault_43[]	PROGMEM	=	"  H]ZKYIWGUFQFOGMILKKNKSLVMXOZQ[U[WZYXZV";								//*	C
+prog_char	gHersheyDefault_44[]	PROGMEM	=	"  G\\KFK[ RKFRFUGWIXKYNYSXVWXUZR[K[";									//*	D
+prog_char	gHersheyDefault_45[]	PROGMEM	=	"  H[LFL[ RLFYF RLPTP RL[Y[";												//*	E
+prog_char	gHersheyDefault_46[]	PROGMEM	=	"  HZLFL[ RLFYF RLPTP";													//*	F
+prog_char	gHersheyDefault_47[]	PROGMEM	=	"  H]ZKYIWGUFQFOGMILKKNKSLVMXOZQ[U[WZYXZVZS RUSZS";						//*	G
+prog_char	gHersheyDefault_48[]	PROGMEM	=	"  G]KFK[ RYFY[ RKPYP";													//*	H
+prog_char	gHersheyDefault_49[]	PROGMEM	=	"  NVRFR[";																//*	I
+prog_char	gHersheyDefault_4A[]	PROGMEM	=	"  JZVFVVUYTZR[P[NZMYLVLT";												//*	J
+prog_char	gHersheyDefault_4B[]	PROGMEM	=	"  G\\KFK[ RYFKT RPOY[";													//*	K
 	//	(char *)	"HYLFL[ RL[X[";															//*	L
-prog_char	gHersheyDefault_4C[]	PROGMEM	=	"HYLFL[L[X[";															//*	L
-prog_char	gHersheyDefault_4D[]	PROGMEM	=	"F^JFJ[ RJFR[ RZFR[ RZFZ[";												//*	M
-prog_char	gHersheyDefault_4E[]	PROGMEM	=	"G]KFK[ RKFY[ RYFY[";													//*	N
-prog_char	gHersheyDefault_4F[]	PROGMEM	=	"G]PFNGLIKKJNJSKVLXNZP[T[VZXXYVZSZNYKXIVGTFPF";							//*	O
-prog_char	gHersheyDefault_50[]	PROGMEM	=	"G\\KFK[ RKFTFWGXHYJYMXOWPTQKQ";										//*	P
-prog_char	gHersheyDefault_51[]	PROGMEM	=	"G]PFNGLIKKJNJSKVLXNZP[T[VZXXYVZSZNYKXIVGTFPF RSWY]";					//*	Q
-prog_char	gHersheyDefault_52[]	PROGMEM	=	"G\\KFK[ RKFTFWGXHYJYLXNWOTPKP RRPY[";									//*	R
-prog_char	gHersheyDefault_53[]	PROGMEM	=	"H\\YIWGTFPFMGKIKKLMMNOOUQWRXSYUYXWZT[P[MZKX";							//*	S
-prog_char	gHersheyDefault_54[]	PROGMEM	=	"JZRFR[ RKFYF";															//*	T
-prog_char	gHersheyDefault_55[]	PROGMEM	=	"G]KFKULXNZQ[S[VZXXYUYF";												//*	U
-prog_char	gHersheyDefault_56[]	PROGMEM	=	"I[JFR[ RZFR[";															//*	V
-prog_char	gHersheyDefault_57[]	PROGMEM	=	"F^HFM[ RRFM[ RRFW[ R\\FW[";											//*	W
-prog_char	gHersheyDefault_58[]	PROGMEM	=	"H\\KFY[ RYFK[";														//*	X
-prog_char	gHersheyDefault_59[]	PROGMEM	=	"I[JFRPR[ RZFRP";														//*	Y
-prog_char	gHersheyDefault_5A[]	PROGMEM	=	"H\\YFK[ RKFYF RK[Y[";													//*	Z
+prog_char	gHersheyDefault_4C[]	PROGMEM	=	"  HYLFL[L[X[";															//*	L
+prog_char	gHersheyDefault_4D[]	PROGMEM	=	"  F^JFJ[ RJFR[ RZFR[ RZFZ[";												//*	M
+prog_char	gHersheyDefault_4E[]	PROGMEM	=	"  G]KFK[ RKFY[ RYFY[";													//*	N
+prog_char	gHersheyDefault_4F[]	PROGMEM	=	"  G]PFNGLIKKJNJSKVLXNZP[T[VZXXYVZSZNYKXIVGTFPF";							//*	O
+prog_char	gHersheyDefault_50[]	PROGMEM	=	"  G\\KFK[ RKFTFWGXHYJYMXOWPTQKQ";										//*	P
+prog_char	gHersheyDefault_51[]	PROGMEM	=	"  G]PFNGLIKKJNJSKVLXNZP[T[VZXXYVZSZNYKXIVGTFPF RSWY]";					//*	Q
+prog_char	gHersheyDefault_52[]	PROGMEM	=	"  G\\KFK[ RKFTFWGXHYJYLXNWOTPKP RRPY[";									//*	R
+prog_char	gHersheyDefault_53[]	PROGMEM	=	"  H\\YIWGTFPFMGKIKKLMMNOOUQWRXSYUYXWZT[P[MZKX";							//*	S
+prog_char	gHersheyDefault_54[]	PROGMEM	=	"  JZRFR[ RKFYF";															//*	T
+prog_char	gHersheyDefault_55[]	PROGMEM	=	"  G]KFKULXNZQ[S[VZXXYUYF";												//*	U
+prog_char	gHersheyDefault_56[]	PROGMEM	=	"  I[JFR[ RZFR[";															//*	V
+prog_char	gHersheyDefault_57[]	PROGMEM	=	"  F^HFM[ RRFM[ RRFW[ R\\FW[";											//*	W
+prog_char	gHersheyDefault_58[]	PROGMEM	=	"  H\\KFY[ RYFK[";														//*	X
+prog_char	gHersheyDefault_59[]	PROGMEM	=	"  I[JFRPR[ RZFRP";														//*	Y
+prog_char	gHersheyDefault_5A[]	PROGMEM	=	"  H\\YFK[ RKFYF RK[Y[";													//*	Z
 		
 		
 		
-prog_char	gHersheyDefault_5B[]	PROGMEM	=	"KYOBOb RPBPb ROBVB RObVb";
-prog_char	gHersheyDefault_5C[]	PROGMEM	=	"KYKFY^";
-prog_char	gHersheyDefault_5D[]	PROGMEM	=	"KYTBTb RUBUb RNBUB RNbUb";
-prog_char	gHersheyDefault_5E[]	PROGMEM	=	"JZRDJR RRDZR";
-prog_char	gHersheyDefault_5F[]	PROGMEM	=	"I[Ib[b";
+prog_char	gHersheyDefault_5B[]	PROGMEM	=	"  KYOBOb RPBPb ROBVB RObVb";
+prog_char	gHersheyDefault_5C[]	PROGMEM	=	"  KYKFY^";
+prog_char	gHersheyDefault_5D[]	PROGMEM	=	"  KYTBTb RUBUb RNBUB RNbUb";
+prog_char	gHersheyDefault_5E[]	PROGMEM	=	"  JZRDJR RRDZR";
+prog_char	gHersheyDefault_5F[]	PROGMEM	=	"  I[Ib[b";
 
-prog_char	gHersheyDefault_60[]	PROGMEM	=	"NVSKQMQORPSORNQO";
-prog_char	gHersheyDefault_61[]	PROGMEM	=	"I\\XMX[ RXPVNTMQMONMPLSLUMXOZQ[T[VZXX";								//*	a
-prog_char	gHersheyDefault_62[]	PROGMEM	=	"H[LFL[ RLPNNPMSMUNWPXSXUWXUZS[P[NZLX";									//*	b
-prog_char	gHersheyDefault_63[]	PROGMEM	=	"I[XPVNTMQMONMPLSLUMXOZQ[T[VZXX";										//*	c
-prog_char	gHersheyDefault_64[]	PROGMEM	=	"I\\XFX[ RXPVNTMQMONMPLSLUMXOZQ[T[VZXX";								//*	d
-prog_char	gHersheyDefault_65[]	PROGMEM	=	"I[LSXSXQWOVNTMQMONMPLSLUMXOZQ[T[VZXX";									//*	e
-prog_char	gHersheyDefault_66[]	PROGMEM	=	"MYWFUFSGRJR[ ROMVM";													//*	f
-prog_char	gHersheyDefault_67[]	PROGMEM	=	"I\\XMX]W`VaTbQbOa RXPVNTMQMONMPLSLUMXOZQ[T[VZXX";						//*	g
-prog_char	gHersheyDefault_68[]	PROGMEM	=	"I\\MFM[ RMQPNRMUMWNXQX[";												//*	h
-prog_char	gHersheyDefault_69[]	PROGMEM	=	"NVQFRGSFREQF RRMR[";													//*	i
-prog_char	gHersheyDefault_6A[]	PROGMEM	=	"MWRFSGTFSERF RSMS^RaPbNb";												//*	j
-prog_char	gHersheyDefault_6B[]	PROGMEM	=	"IZMFM[ RWMMW RQSX[";													//*	k
-prog_char	gHersheyDefault_6C[]	PROGMEM	=	"NVRFR[";																//*	l
-prog_char	gHersheyDefault_6D[]	PROGMEM	=	"CaGMG[ RGQJNLMOMQNRQR[ RRQUNWMZM\\N]Q][";								//*	m
-prog_char	gHersheyDefault_6E[]	PROGMEM	=	"I\\MMM[ RMQPNRMUMWNXQX[";												//*	n
-prog_char	gHersheyDefault_6F[]	PROGMEM	=	"I\\QMONMPLSLUMXOZQ[T[VZXXYUYSXPVNTMQM";								//*	o
+prog_char	gHersheyDefault_60[]	PROGMEM	=	"  NVSKQMQORPSORNQO";
+prog_char	gHersheyDefault_61[]	PROGMEM	=	"  I\\XMX[ RXPVNTMQMONMPLSLUMXOZQ[T[VZXX";								//*	a
+prog_char	gHersheyDefault_62[]	PROGMEM	=	"  H[LFL[ RLPNNPMSMUNWPXSXUWXUZS[P[NZLX";									//*	b
+prog_char	gHersheyDefault_63[]	PROGMEM	=	"  I[XPVNTMQMONMPLSLUMXOZQ[T[VZXX";										//*	c
+prog_char	gHersheyDefault_64[]	PROGMEM	=	"  I\\XFX[ RXPVNTMQMONMPLSLUMXOZQ[T[VZXX";								//*	d
+prog_char	gHersheyDefault_65[]	PROGMEM	=	"  I[LSXSXQWOVNTMQMONMPLSLUMXOZQ[T[VZXX";									//*	e
+prog_char	gHersheyDefault_66[]	PROGMEM	=	"  MYWFUFSGRJR[ ROMVM";													//*	f
+prog_char	gHersheyDefault_67[]	PROGMEM	=	"  I\\XMX]W`VaTbQbOa RXPVNTMQMONMPLSLUMXOZQ[T[VZXX";						//*	g
+prog_char	gHersheyDefault_68[]	PROGMEM	=	"  I\\MFM[ RMQPNRMUMWNXQX[";												//*	h
+prog_char	gHersheyDefault_69[]	PROGMEM	=	"  NVQFRGSFREQF RRMR[";													//*	i
+prog_char	gHersheyDefault_6A[]	PROGMEM	=	"  MWRFSGTFSERF RSMS^RaPbNb";												//*	j
+prog_char	gHersheyDefault_6B[]	PROGMEM	=	"  IZMFM[ RWMMW RQSX[";													//*	k
+prog_char	gHersheyDefault_6C[]	PROGMEM	=	"  NVRFR[";																//*	l
+prog_char	gHersheyDefault_6D[]	PROGMEM	=	"  CaGMG[ RGQJNLMOMQNRQR[ RRQUNWMZM\\N]Q][";								//*	m
+prog_char	gHersheyDefault_6E[]	PROGMEM	=	"  I\\MMM[ RMQPNRMUMWNXQX[";												//*	n
+prog_char	gHersheyDefault_6F[]	PROGMEM	=	"  I\\QMONMPLSLUMXOZQ[T[VZXXYUYSXPVNTMQM";								//*	o
 
-prog_char	gHersheyDefault_70[]	PROGMEM	=	"H[LMLb RLPNNPMSMUNWPXSXUWXUZS[P[NZLX";									//*	p
-prog_char	gHersheyDefault_71[]	PROGMEM	=	"I\\XMXb RXPVNTMQMONMPLSLUMXOZQ[T[VZXX";								//*	q
-prog_char	gHersheyDefault_72[]	PROGMEM	=	"KXOMO[ ROSPPRNTMWM";													//*	r
-prog_char	gHersheyDefault_73[]	PROGMEM	=	"J[XPWNTMQMNNMPNRPSUTWUXWXXWZT[Q[NZMX";									//*	s
-prog_char	gHersheyDefault_74[]	PROGMEM	=	"MYRFRWSZU[W[ ROMVM";													//*	t
-prog_char	gHersheyDefault_75[]	PROGMEM	=	"I\\MMMWNZP[S[UZXW RXMX[";												//*	u
-prog_char	gHersheyDefault_76[]	PROGMEM	=	"JZLMR[ RXMR[";															//*	v
-prog_char	gHersheyDefault_77[]	PROGMEM	=	"G]JMN[ RRMN[ RRMV[ RZMV[";												//*	w
-prog_char	gHersheyDefault_78[]	PROGMEM	=	"J[MMX[ RXMM[";															//*	x
-prog_char	gHersheyDefault_79[]	PROGMEM	=	"JZLMR[ RXMR[P_NaLbKb";													//*	y
-prog_char	gHersheyDefault_7A[]	PROGMEM	=	"J[XMM[ RMMXM RM[X[";													//*	z
-prog_char	gHersheyDefault_7B[]	PROGMEM	=	"KYTBRCQDPFPHQJRKSMSOQQ RRCQEQGRISJTLTNSPORSTTVTXSZR[Q]Q_Ra RQSSU";		//*	
-prog_char	gHersheyDefault_7C[]	PROGMEM	=	"NVRBRb";																//*	
-prog_char	gHersheyDefault_7D[]	PROGMEM	=	"KYPBRCSDTFTHSJRKQMQOSQ RRCSESGRIQJPLPNQPURQTPVPXQZR[S]S_Ra RSSQU";		//*	
-prog_char	gHersheyDefault_7E[]	PROGMEM	=	"F^IUISJPLONOPPTSVTXTZS[Q RISJQLPNPPQTTVUXUZT[Q[O";						//*	
-prog_char	gHersheyDefault_7F[]	PROGMEM	=	"JZJFJ[K[KFLFL[M[MFNFN[O[OFPFP[Q[QFRFR[S[SFTFT[U[UFVFV[W[WFXFX[Y[YFZFZ[";//*	
-prog_char	gHersheyDefault_80[]	PROGMEM	=	"";
+prog_char	gHersheyDefault_70[]	PROGMEM	=	"  H[LMLb RLPNNPMSMUNWPXSXUWXUZS[P[NZLX";									//*	p
+prog_char	gHersheyDefault_71[]	PROGMEM	=	"  I\\XMXb RXPVNTMQMONMPLSLUMXOZQ[T[VZXX";								//*	q
+prog_char	gHersheyDefault_72[]	PROGMEM	=	"  KXOMO[ ROSPPRNTMWM";													//*	r
+prog_char	gHersheyDefault_73[]	PROGMEM	=	"  J[XPWNTMQMNNMPNRPSUTWUXWXXWZT[Q[NZMX";									//*	s
+prog_char	gHersheyDefault_74[]	PROGMEM	=	"  MYRFRWSZU[W[ ROMVM";													//*	t
+prog_char	gHersheyDefault_75[]	PROGMEM	=	"  I\\MMMWNZP[S[UZXW RXMX[";												//*	u
+prog_char	gHersheyDefault_76[]	PROGMEM	=	"  JZLMR[ RXMR[";															//*	v
+prog_char	gHersheyDefault_77[]	PROGMEM	=	"  G]JMN[ RRMN[ RRMV[ RZMV[";												//*	w
+prog_char	gHersheyDefault_78[]	PROGMEM	=	"  J[MMX[ RXMM[";															//*	x
+prog_char	gHersheyDefault_79[]	PROGMEM	=	"  JZLMR[ RXMR[P_NaLbKb";													//*	y
+prog_char	gHersheyDefault_7A[]	PROGMEM	=	"  J[XMM[ RMMXM RM[X[";													//*	z
+prog_char	gHersheyDefault_7B[]	PROGMEM	=	"  KYTBRCQDPFPHQJRKSMSOQQ RRCQEQGRISJTLTNSPORSTTVTXSZR[Q]Q_Ra RQSSU";		//*	{
+prog_char	gHersheyDefault_7C[]	PROGMEM	=	"  NVRBRb";																//*	|
+prog_char	gHersheyDefault_7D[]	PROGMEM	=	"  KYPBRCSDTFTHSJRKQMQOSQ RRCSESGRIQJPLPNQPURQTPVPXQZR[S]S_Ra RSSQU";		//*	}
+prog_char	gHersheyDefault_7E[]	PROGMEM	=	"  F^IUISJPLONOPPTSVTXTZS[Q RISJQLPNPPQTTVUXUZT[Q[O";						//*	~
+prog_char	gHersheyDefault_7F[]	PROGMEM	=	"  JZJFJ[K[KFLFL[M[MFNFN[O[OFPFP[Q[QFRFR[S[SFTFT[U[UFVFV[W[WFXFX[Y[YFZFZ[";//*	
+prog_char	gHersheyDefault_80[]	PROGMEM	=	"  ";
 
 //};
 
@@ -438,8 +474,11 @@ PGM_P gHershyFontTable[]	PROGMEM =	   // change "gHersheyDefault_table" name to 
 
 };
 
+#pragma mark -
+#pragma mark LOCAL functions
+
 //*******************************************************************************
-void	GetFontDef_Default(short tableIndex, char *fontDefString)
+static void	GetFontDef_Default(short tableIndex, char *fontDefString)
 {
 	strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyFontTable[tableIndex])));
 }
@@ -454,7 +493,7 @@ void	GetFontDef_Default(short tableIndex, char *fontDefString)
 #ifdef _ENABLE_HERSHEY_CURSIVE_
 	#include	"HersheyCursive.h"
 	//*******************************************************************************
-	void	GetFontDef_Cursive(short tableIndex, char *fontDefString)
+	static void	GetFontDef_Cursive(short tableIndex, char *fontDefString)
 	{
 		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyCursiveFontTable[tableIndex])));
 	}
@@ -463,9 +502,18 @@ void	GetFontDef_Default(short tableIndex, char *fontDefString)
 #ifdef _ENABLE_HERSHEY_FUTURAL_
 	#include	"HersheyFutural.h"
 	//*******************************************************************************
-	void	GetFontDef_Futural(short tableIndex, char *fontDefString)
+	static void	GetFontDef_Futural(short tableIndex, char *fontDefString)
 	{
 		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyFuturalFontTable[tableIndex])));
+	}
+#endif
+
+#ifdef _ENABLE_HERSHEY_FUTURAM_
+	#include	"HersheyFuturam.h"
+	//*******************************************************************************
+	static void	GetFontDef_Futuram(short tableIndex, char *fontDefString)
+	{
+		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyFuturamFontTable[tableIndex])));
 	}
 #endif
 
@@ -473,7 +521,7 @@ void	GetFontDef_Default(short tableIndex, char *fontDefString)
 #ifdef _ENABLE_HERSHEY_JAPANESE_
 	#include	"HersheyJapanese.h"
 	//*******************************************************************************
-	void	GetFontDef_Japanese(short tableIndex, char *fontDefString)
+	static void	GetFontDef_Japanese(short tableIndex, char *fontDefString)
 	{
 		strcpy_P(fontDefString, (char*)pgm_read_word(&(gHershyJapaneseFontTable[tableIndex])));
 	}
@@ -508,46 +556,48 @@ short	newValue;
 
 
 
-#pragma mark -
 
 
 
 
 //********************************************************************************
-//*	returns offset value, either 2 or 4
-char	GetHersheyFontStringFromIndex(char fontNumber, char theCharIndex, char *fontVectorString)
+static void	GetHersheyFontStringFromIndex(char fontNumber, char theCharIndex, char *fontVectorString)
 {
-char	startOffset;
 
-	startOffset	=	4;	//*	default value
 	switch(fontNumber)
 	{
 	#ifdef _ENABLE_HERSHEY_CURSIVE_
-		case kHerheyFont_Cursive:
+		case kHersheyFont_Cursive:
 			GetFontDef_Cursive(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_FUTURAL_
-		case kHerheyFont_Futural:
+		case kHersheyFont_Futural:
 			GetFontDef_Futural(theCharIndex, fontVectorString);
 			break;
 	#endif
 
+	#ifdef _ENABLE_HERSHEY_FUTURAM_
+		case kHersheyFont_Futuram:
+			GetFontDef_Futuram(theCharIndex, fontVectorString);
+			break;
+	#endif
+
 	#ifdef _ENABLE_HERSHEY_GREEK_
-		case kHerheyFont_Greek:
+		case kHersheyFont_Greek:
 			GetFontDef_Greek(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_GREEK_SIMPLEX_
-		case kHerheyFont_GreekSimplex:
+		case kHersheyFont_GreekSimplex:
 			GetFontDef_GreekSimplex(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_GREEK_COMPLEX_
-		case kHerheyFont_GreekComplex:
+		case kHersheyFont_GreekComplex:
 			GetFontDef_GreekComplex(theCharIndex, fontVectorString);
 			break;
 
@@ -556,51 +606,67 @@ char	startOffset;
 	//********************************************************************************
 	//*	times fonts
 	#ifdef _ENABLE_HERSHEY_TIMES_GREEK_
-		case kHerheyFont_TimesGreek:
+		case kHersheyFont_TimesGreek:
 			GetFontDef_TimesGreek(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_TIMES_ITALIC_
-		case kHerheyFont_TimesItalic:
+		case kHersheyFont_TimesItalic:
 			GetFontDef_TimesItalic(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_TIMES_ITALIC_BOLD_
-		case kHerheyFont_TimesItalicBold:
+		case kHersheyFont_TimesItalicBold:
 			GetFontDef_TimesItalicBold(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_TIMES_ROMAN_
-		case kHerheyFont_TimesRoman:
+		case kHersheyFont_TimesRoman:
 			GetFontDef_TimesRoman(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_TIMES_ROMAN_BOLD_
-		case kHerheyFont_TimesRomanBold:
+		case kHersheyFont_TimesRomanBold:
 			GetFontDef_TimesRomanBold(theCharIndex, fontVectorString);
 			break;
 	#endif
 
-	#ifdef _ENABLE_HERSHEY_ROWMAND_
-		case kHerheyFont_Rowmand:
-			GetFontDef_Rowmand(theCharIndex, fontVectorString);
+	//********************************************************************************
+	//*	Roman fonts
+	#ifdef _ENABLE_HERSHEY_ROWMAN_SIMPLEX_
+		case kHersheyFont_RowmanSimplex:
+			GetFontDef_RowmanSimplex(theCharIndex, fontVectorString);
 			break;
 	#endif
+
+	#ifdef _ENABLE_HERSHEY_ROWMAN_DUPLEX_
+		case kHersheyFont_RowmanDuplex:
+			GetFontDef_RowmanDuplex(theCharIndex, fontVectorString);
+			break;
+	#endif
+
+	#ifdef _ENABLE_HERSHEY_ROWMAN_TRIPLEX_
+		case kHersheyFont_RowmanTriplex:
+			GetFontDef_RowmanTriplex(theCharIndex, fontVectorString);
+			break;
+	#endif
+
+
 
 	//********************************************************************************
 	//*	script fonts
 	#ifdef _ENABLE_HERSHEY_SCRIPT_SIMPLEX_
-		case kHerheyFont_ScriptSimplex:
+		case kHersheyFont_ScriptSimplex:
 			GetFontDef_ScriptSimplex(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_SCRIPT_COMPLEX_
-		case kHerheyFont_ScriptComplex:
+		case kHersheyFont_ScriptComplex:
 			GetFontDef_ScriptComplex(theCharIndex, fontVectorString);
 			break;
 	#endif
@@ -610,42 +676,42 @@ char	startOffset;
 	//*	symbol fonts
 
 	#ifdef _ENABLE_HERSHEY_ASTROLOGY_
-		case kHerheyFont_Astrology:
+		case kHersheyFont_Astrology:
 			GetFontDef_Astrology(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_MARKERS_
-		case kHerheyFont_Markers:
+		case kHersheyFont_Markers:
 			GetFontDef_Markers(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_MATH_
-		case kHerheyFont_Mathlow:
+		case kHersheyFont_Mathlow:
 			GetFontDef_Mathlow(theCharIndex, fontVectorString);
 			break;
 
-		case kHerheyFont_Mathupp:
+		case kHersheyFont_Mathupp:
 			GetFontDef_Mathupp(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_METEOROLOGY_
-		case kHerheyFont_Meteorology:
+		case kHersheyFont_Meteorology:
 			GetFontDef_Meteorology(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_MUSIC_
-		case kHerheyFont_Music:
+		case kHersheyFont_Music:
 			GetFontDef_Music(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 
 	#ifdef _ENABLE_HERSHEY_SYMBOLIC_
-		case kHerheyFont_Symbolic:
+		case kHersheyFont_Symbolic:
 			GetFontDef_Symbolic(theCharIndex, fontVectorString);
 			break;
 	#endif
@@ -653,27 +719,33 @@ char	startOffset;
 	//********************************************************************************
 	//*	Gothic fonts
 	#ifdef _ENABLE_HERSHEY_GOTHIC_ENGLISH_
-		case kHerheyFont_GothicEnglish:
+		case kHersheyFont_GothicEnglish:
 			GetFontDef_GothicEnglish(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_GOTHIC_GERMAN_
-		case kHerheyFont_GothicGerman:
+		case kHersheyFont_GothicGerman:
 			GetFontDef_GothicGerman(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_GOTHIC_ITALIAN_
-		case kHerheyFont_GothicItalian:
+		case kHersheyFont_GothicItalian:
 			GetFontDef_GothicItalian(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 
 	#ifdef _ENABLE_HERSHEY_GOTHIC_GBT_
-		case kHerheyFont_Gothic_GBT:
+		case kHersheyFont_Gothic_GBT:
 			GetFontDef_GothicGBT(theCharIndex, fontVectorString);
+			break;
+	#endif
+
+	#ifdef _ENABLE_HERSHEY_GOTHITT_
+		case kHersheyFont_Gothitt:
+			GetFontDef_Gothitt(theCharIndex, fontVectorString);
 			break;
 	#endif
 
@@ -681,29 +753,27 @@ char	startOffset;
 
 	//********************************************************************************
 	#ifdef _ENABLE_HERSHEY_CYRILLIC_
-		case kHerheyFont_Cyrillic:
+		case kHersheyFont_Cyrillic:
 			GetFontDef_Cyrillic(theCharIndex, fontVectorString);
 			break;
 
 
-		case kHerheyFont_Cyrilic1:
+		case kHersheyFont_Cyrilic1:
 			GetFontDef_Cyrilic1(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 	#ifdef _ENABLE_HERSHEY_JAPANESE_
-		case kHerheyFont_Japanese:
+		case kHersheyFont_Japanese:
 			GetFontDef_Japanese(theCharIndex, fontVectorString);
 			break;
 	#endif
 
 
 		default:
-			startOffset	=	2;
 			GetFontDef_Default(theCharIndex, fontVectorString);
 			break;
 	}
-	return(startOffset);
 }
 
 //********************************************************************************
@@ -715,11 +785,53 @@ void	GetHersheyFontName(char fontNumber, char *fontName)
 }
 
 //********************************************************************************
+static void	toupperStr(char *string)
+{
+short	ii;
+
+	ii	=	0;
+	while (string[ii] != 0)
+	{
+		string[ii]	=	toupper(string[ii]);
+		ii++;
+	}
+}
+
+#pragma mark -
+#pragma mark GLOBAL functions
+//********************************************************************************
+char	GetHersheyFontNumerFromName(char *fontName)
+{
+char	lookUpFontName[32];
+char	currentFontName[32];
+byte	ii, fontIndex;
+
+	fontIndex	=	0;
+	strcpy(lookUpFontName, fontName);
+	toupperStr(lookUpFontName);
+	
+	for (ii=kHershey_FirstFontNumber; ii<kHersheyFont_last; ii++)
+	{
+		//*	ii is font index
+		//*	0 is char index, 0 means the FONT NAME
+		GetHersheyFontStringFromIndex(ii, 0, currentFontName);
+		toupperStr(currentFontName);
+		if (strcmp(lookUpFontName, currentFontName) == 0)
+		{
+			fontIndex	=	ii;
+			break;
+		}
+	}
+	return(fontIndex);
+}
+
+
+//********************************************************************************
 long	GetHersheyFontTableSize(char fontNumber)
 {
 short	ii;
 long	byteCount;
-char	fontVectorString[300];
+char	fontVectorString[kMaxVectorStringLength];
 
 	byteCount	=	0;
 	for (ii = 31; ii <= 127; ii++)
@@ -733,6 +845,37 @@ char	fontVectorString[300];
 	return(byteCount);
 }
 
+//********************************************************************************
+//*	the 2nd pair of letters is the left and right side of the char in pixels. They have to be scaled 
+short	HersheyGetCharWidth(char fontNumber, char theChar, short fontSize)
+{
+char	fontVectorString[kMaxVectorStringLength];
+short	leftSide, rightSide;
+
+	GetHersheyFontStringFromIndex(fontNumber, (theChar - 31), fontVectorString);
+
+	leftSide	=	ScaleFontData(fontVectorString[2], fontSize);
+	rightSide	=	ScaleFontData(fontVectorString[3], fontSize);
+	return(rightSide - leftSide);
+}
+
+//********************************************************************************
+short	HersheyGetStringWidth(char fontNumber, char *theString, short fontSize)
+{
+short	totalWidth;
+short	ii;
+
+	totalWidth	=	0;
+	ii			=	0;
+	while (theString[ii] != 0)
+	{
+		totalWidth	+=	HersheyGetCharWidth(fontNumber, theString[ii], fontSize);
+		ii++;
+	}
+	return(totalWidth);
+}
+
+
 
 //********************************************************************************
 //  HersheyDrawLetter() interprets the instructions from the array
@@ -741,22 +884,27 @@ char	fontVectorString[300];
 //*	this version does the scaling of the data EACH time, very inefficient for speed
 //*	but much more efficient for memory
 //********************************************************************************
-void	HersheyDrawLetter(short startX, short startY, char fontSize, short fontAngle,  char startOffset, char *theVectorString)
+//*	returns the width of the char
+static short	HersheyDrawLetter(	short	startX,
+									short	startY,
+									char	fontSize,
+									char	penSize,
+									short	fontAngle,
+									char	startOffset,
+									char	*theVectorString)
 {
-//float	lm	=	h2float(cp[0]);
-//float	rm	=	h2float(cp[1]);
-//char	*p;
 boolean	moveFlag;
 short	ii;
 short	newX, newY;
 short	currentX, currentY;
-//short	leftMargin, rightMargin;
+short	leftMargin, rightMargin;
+short	charWidth;
 //short	moveCount;
 	moveFlag	=	true;
 
-//	for (p=cp+2; *p ; p+=2)
-//	leftMargin	=	ScaleFontData(theVectorString[0], fontSize);
-//	rightMargin	=	ScaleFontData(theVectorString[1], fontSize);
+	leftMargin	=	ScaleFontData(theVectorString[2], fontSize);
+	rightMargin	=	ScaleFontData(theVectorString[3], fontSize);
+	charWidth	=	rightMargin - leftMargin;
 
 	currentX	=	0;
 	currentY	=	0;
@@ -825,16 +973,42 @@ short	currentX, currentY;
 			}
 			else
 			{
-				line(startX + currentX, startY + currentY, startX + newX, startY + newY);
+				MoveTo(startX + currentX, startY + currentY);
+				LineTo(startX + newX, startY + newY);
+				if (penSize > 1)
+				{
+				short	offsetX, offsetY;
+					
+					if (newX > newY)
+					{
+						offsetX	=	0;
+						offsetY	=	1;
+					}
+					else
+					{
+						offsetX	=	1;
+						offsetY	=	0;
+					}
+					MoveTo(startX + currentX + offsetX, startY + currentY + offsetY);
+					LineTo(startX + newX + offsetX, startY + newY + offsetY);
+					if (penSize > 1)
+					{
+						MoveTo(startX + currentX - offsetX, startY + currentY - offsetY);
+						LineTo(startX + newX - offsetX, startY + newY - offsetY);
+					}
+				}
 			}
 			currentX	=	newX;
 			currentY	=	newY;
 		}
 		ii	+=	2;
 	}
+	return(charWidth);
 }
 
 
+#pragma mark -
+#pragma mark Global functions
 //********************************************************************************
 //*	arguments
 //*		char fontNumber,		this is an 8 bit integer (not a char)
@@ -854,8 +1028,8 @@ short	ii;
 short	myCharIndex;
 short	myDeltaX, myDeltaY;
 short	myXloc, myYloc;
-char	myVectorString[300];
-char	startOffset;
+char	myVectorString[kMaxVectorStringLength];
+short	charWidth;
 
 	myXloc		=	xloc;
 	myYloc		=	yloc;
@@ -890,17 +1064,162 @@ char	startOffset;
 			myCharIndex	=	0;
 		}
 
-		startOffset	=	GetHersheyFontStringFromIndex(fontNumber, myCharIndex, myVectorString);
+		GetHersheyFontStringFromIndex(fontNumber, myCharIndex, myVectorString);
 
-    	HersheyDrawLetter(myXloc, myYloc, fontSize, fontAngle, startOffset, myVectorString);
-	
-		myXloc	+=	myDeltaX;
-		myYloc	+=	myDeltaY;
+		//*	we want to start with the 4th char, 1st 2 are # of pairs, 2nd 2 are leftMargin, rightMargin
+    	charWidth	=	HersheyDrawLetter(myXloc, myYloc, fontSize, penSize, fontAngle, 4, myVectorString);
+	#ifdef _HERSHEY_PROP_SPACING_
+		if (fontAngle == 0)
+		{
+			myXloc	+=	charWidth;
+			myXloc	+=	(fontSize / 6);
+		}
+		else
+	#endif
+		{
+			myXloc	+=	myDeltaX;
+			myYloc	+=	myDeltaY;
+		}
 	
 		ii++;
 	}
 }
 
+//********************************************************************************
+void	HersheyDisplayFontList(RECT *displayRect, boolean showSize)
+{
+int		xLoc, yLoc;
+int		ii;
+char	theFontName[32];
+long	fontDataLen;
+short	myDisplayWidth;
 
+#ifdef _USE_WHITE_BACKGROUND_
+	fill(255);
+#else
+	fill(0);
+#endif
+	myDisplayWidth	=	displayRect->right - displayRect->left;
+	
+	EraseRect(displayRect);
+
+#ifdef _USE_WHITE_BACKGROUND_
+	stroke(0, 0, 0);
+#else
+	stroke(random(100, 255), random(100, 255), random(100, 255));
+#endif
+
+	FrameRect(displayRect);
+	yLoc	=	10;
+	DrawCString(5, yLoc, "Installed Hershey Fonts");
+	xLoc	=	20;
+	yLoc	=	30;
+	for (ii = kHershey_FirstFontNumber; ii <kHersheyFont_last; ii++)
+	{
+		GetHersheyFontName(ii, theFontName);
+		DrawCString(25, yLoc, theFontName);
+		if (showSize)
+		{
+			fontDataLen	=	GetHersheyFontTableSize(ii);
+	
+			sprintf(theFontName, "%ld bytes", fontDataLen);
+			DrawCString((displayRect->left + (myDisplayWidth / 2)), yLoc, theFontName);
+			yLoc	+=	15;
+		}
+		else
+		{
+			//*	print some sample text
+			HersheyDrawCString(ii, (myDisplayWidth / 2), yLoc + 7, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",   15, 0, 1);
+			yLoc	+=	20;
+			
+		}
+
+		if (yLoc > displayRect->bottom)
+		{
+			delay(500);
+			EraseRect(displayRect);
+			FrameRect(displayRect);
+			yLoc	=	10;
+			DrawCString(5, yLoc, "Installed Hershey Fonts");
+			xLoc	=	20;
+			yLoc	=	30;
+
+		}
+	}
+	
+	fill(0);
+
+}
+
+//*******************************************************************************
+void	HersheyDisplayFontSamples(RECT *displayRect)
+{
+int		xLoc, yLoc;
+int		xLoc2;
+int		fontSize;
+char	fontName[32];
+short	fontNum;
+
+	for (fontNum = kHershey_FirstFontNumber; fontNum <kHersheyFont_last; fontNum++)
+	{
+		stroke(random(100, 255),random(100, 255),random(100, 255));
+		EraseScreen();
+		
+		FrameRect(displayRect);
+
+		GetHersheyFontName(fontNum, fontName);
+
+		xLoc	=	30;
+		yLoc	=	10;
+		xLoc2	=	(displayRect->right - displayRect->left) / 2;
+		
+		DrawCString(xLoc, yLoc, "Hershey fonts");
+		yLoc		+=	12;
+
+		//*******************************************************************************
+		DrawCString(xLoc, yLoc, fontName);
+		DrawCString(xLoc2, yLoc, "Size 6");
+		yLoc		+=	20;
+		fontSize	=	6;
+		
+		HersheyDrawCString(fontNum, xLoc, yLoc, "ABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&()[];'><",  fontSize, 0, 1);
+		yLoc	+=	15;
+		HersheyDrawCString(fontNum, xLoc, yLoc, "abcdefghijklmnopqrstuvwzyz 1234567890 ", fontSize,   0, 1);
+		yLoc	+=	15;
+
+
+
+		//*******************************************************************************
+		DrawCString(xLoc, yLoc, fontName);
+		DrawCString(xLoc2, yLoc, "Size 10");
+		fontSize	=	10;
+		yLoc		+=	25;
+		HersheyDrawCString(fontNum, xLoc, yLoc, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",   fontSize, 0, 1);
+		yLoc	+=	25;
+		HersheyDrawCString(fontNum, xLoc, yLoc, "abcdefghijklmnopqrstuvwzyz 1234567890 ", fontSize,   0, 1);
+		yLoc	+=	25;
+
+		//*******************************************************************************
+		DrawCString(xLoc, yLoc, fontName);
+		DrawCString(xLoc2, yLoc, "Size 40");
+		fontSize	=	40;
+		yLoc		+=	40;
+		HersheyDrawCString(fontNum, xLoc, yLoc, "ABCDEFGHIJKL",  fontSize,  0, 1);
+		yLoc	+=	30;
+
+	#ifdef _ARDUINO_MEGA_
+		//*******************************************************************************
+		DrawCString(xLoc, yLoc, fontName);
+		DrawCString(xLoc2, yLoc, "Size 70");
+		fontSize	=	70;
+		yLoc		+=	70;
+		xLoc		+=	15;
+		HersheyDrawCString(fontNum, xLoc, yLoc, "ABCDEFG",  fontSize,  0, 1);
+		yLoc	+=	30;
+	#endif
+	
+		delay(3000);
+	}
+}
 
 #endif		//*	_ENABLE_HERSHEY_FONTS_

@@ -1,11 +1,17 @@
 //*******************************************************************************
 //	Routines to read bmp files from data flash
 //*******************************************************************************
+//*	<CML>		=	Chris Ladden <Chris @ antipastohw.blogspot.com & liquidware.com>
+//*	<MLS>		=	Mark Sproul <msproul@jove.rutgers.edu>
+//*******************************************************************************
 //*	Jan  4,	2009	<MLS> Started cleaning up and documenting this code
 //*	Jan 12,	2009	<MLS> Added bmp_get_entryname
 //*	Jan 13,	2009	<MLS> There is no way the lookup table can be kept in ram, re-writing
 //*	Jan 13,	2009	<MLS> Added bmp_draw_imageN
 //*	Jan 14,	2009	<MLS> bmp_draw modified to return true if succesfull
+//*	Sep 16,	2009	<CML> Added PImage routines
+//*	Jan 12,	2010	<MLS> Merged Chris's updates with mine
+//*	Jan 14,	2010	<MLS> Added _USE_7LETTER_NAMES_ to be able to use the old system
 //*******************************************************************************
 
 #include	"HardwareDef.h"
@@ -13,6 +19,7 @@
 #include	<avr/io.h>
 #include	<inttypes.h>
 #include	<stdlib.h>
+#include	<stdio.h>
 #include	<inttypes.h>
 #include	<string.h>
 #include	<avr/interrupt.h>
@@ -29,16 +36,25 @@
 	#include	"SubPGraphics.h"
 #endif
 
-#define BMP_LOOKUP_TABLE_SIZE 	DATAFLASH_PAGESIZE    	//!< Two dataflash pages
-#define BMP_MAXBMP_COUNT		44						//!< Max BMP count
+#define BMP_LOOKUP_TABLE_SIZE DATAFLASH_PAGESIZE //!< Two dataflash pages
 
-FLASH_FILE_ENTRY bmpLookupTable[kLookupTableMaxEntries+1];
-uint16_t gBmpLookupTableEntries = 0;
+FLASH_FILE_ENTRY	gBMPlookupTable[kLookupTableMaxEntries+1];
+uint16_t			gBmpLookupTableEntries	=	0;
+
+
+//*	for some VERY strange reason, it gets into a reset loop if this isnt here
+//unsigned char	bmp_lookup_table[BMP_LOOKUP_TABLE_SIZE];
+//unsigned char	bmp_lookup_table_status	=	FALSE;
+
+
 
 //*******************************************************************************
 void	bmp_init()
 {
-;
+	//*	read the look up table from the data flash
+//	dataflash_cont_read(&bmp_lookup_table[0],0,BMP_LOOKUP_TABLE_SIZE);
+//	bmp_lookup_table_status	=	TRUE;
+
 }
 
 //*******************************************************************************
@@ -48,18 +64,6 @@ unsigned char	bmp_lookup_table_checkStatus()
 	return TRUE;
 }
 
-//*******************************************************************************
-static char	itoh(char theNyble)
-{
-char	theChar;
-
-	theChar	=	(theNyble & 0x0f) + 0x30;
-	if (theChar > 0x39)
-	{
-		theChar	+=	7;
-	}
-	return(theChar);
-}
 
 //*******************************************************************************
 void	GetFlashFileEntry(short fileIndex, FLASH_FILE_ENTRY *fileEntry)
@@ -71,13 +75,16 @@ long		myByteIndex;
 	dataflash_read_block((unsigned char *)fileEntry, myByteIndex, kSizeOfFlashFileEntry);
 }
 
-#if 0
+#if 1
 //*******************************************************************************
 char	bmp_get_entryname(unsigned char entryNumber, char *entryName, short *imgWidth, short *imgHeight)
 {
-long				myIndex;
+//long				myIndex;
 char				cc;
-long				longByte1, longByte2, longByte3, longByte4;
+long				longByte1, longByte2;
+#ifdef _USE_7LETTER_NAMES_
+	long			longByte3, longByte4;
+#endif
 long				bmp_loc;
 unsigned char		bmp_buff[16];
 int					bmpWidth;
@@ -100,12 +107,13 @@ char				validImage;
 		entryName[cc++]	=	0x20;
 		entryName[cc++]	=	0;
 
-
-		sprintf(bmp_buff, "%02X%02X %02X%02X",	(myFileEntry.flashOffsetByte1 & 0x0ff),
-												(myFileEntry.flashOffsetByte2 & 0x0ff),
-												(myFileEntry.flashOffsetByte3 & 0x0ff),
-												(myFileEntry.flashOffsetByte4 & 0x0ff));
-		strcat((char*)entryName, (char *)bmp_buff);
+#ifdef _USE_7LETTER_NAMES_
+		sprintf((char *)bmp_buff, "%02X%02X %02X%02X",
+									(myFileEntry.flashOffsetByte1 & 0x0ff),
+									(myFileEntry.flashOffsetByte2 & 0x0ff),
+									(myFileEntry.flashOffsetByte3 & 0x0ff),
+									(myFileEntry.flashOffsetByte4 & 0x0ff));
+		strcat(entryName, (char *)bmp_buff);
 
 		longByte1		=	(myFileEntry.flashOffsetByte1 & 0x0ff);
 		longByte2		=	(myFileEntry.flashOffsetByte2 & 0x0ff);
@@ -116,6 +124,11 @@ char				validImage;
 		bmp_loc		|=	longByte2 << 16;
 		bmp_loc		|=	longByte3 << 8;
 		bmp_loc		|=	longByte4;
+#else
+		bmp_loc	=	myFileEntry.flashOffset;
+		sprintf((char *)bmp_buff, "%04X", bmp_loc);
+		strcat(entryName, (char *)bmp_buff);
+#endif
 
 		//* Get the width and height
 		dataflash_read_block(bmp_buff, bmp_loc, 2);
@@ -130,7 +143,7 @@ char				validImage;
 		bmpWidth	=	longByte1 & 0x0ff;
 		bmpHeight	=	longByte2 & 0x0ff;
 
-		sprintf(bmp_buff, " %3d x %3d", bmpWidth, bmpHeight);
+		sprintf((char *)bmp_buff, " %3d x %3d", bmpWidth, bmpHeight);
 		strcat(entryName, (char *)bmp_buff);
 		
 		*imgWidth	=	bmpWidth;
@@ -144,7 +157,8 @@ char				validImage;
 	}
 	return(validImage);
 }
-#endif 
+#endif
+
 
 //*******************************************************************************
 //*	returns true if found
@@ -203,16 +217,19 @@ char				imageOK;
 	{
 		//*	OK, it looks like a valid file
 		imageOK		=	TRUE;
-//		longByte1	=	(myFileEntry.flashOffsetByte1 & 0x0ff);
-//		longByte2	=	(myFileEntry.flashOffsetByte2 & 0x0ff);
-//		longByte3	=	(myFileEntry.flashOffsetByte3 & 0x0ff);
-//		longByte4	=	(myFileEntry.flashOffsetByte4 & 0x0ff);
 
+	#ifdef _USE_7LETTER_NAMES_
+		longByte1	=	(myFileEntry.flashOffsetByte1 & 0x0ff);
+		longByte2	=	(myFileEntry.flashOffsetByte2 & 0x0ff);
+		longByte3	=	(myFileEntry.flashOffsetByte3 & 0x0ff);
+		longByte4	=	(myFileEntry.flashOffsetByte4 & 0x0ff);
 		bmp_loc		=	longByte1 << 24;
 		bmp_loc		|=	longByte2 << 16;
 		bmp_loc		|=	longByte3 << 8;
 		bmp_loc		|=	longByte4;
-		
+	#else
+		bmp_loc		=	myFileEntry.flashOffset;
+	#endif
 		/* Get the width and height */
 		dataflash_read_block(bmp_buff, bmp_loc, 2);
 		
@@ -234,8 +251,8 @@ char				imageOK;
 		if ((xLoc == -1) && (yLoc == -1))
 		{
 			//*	if xLoc and yLoc are -1, then CENTER the image
-			xLoc	=	(kSCREEN_X_size - bmpWidth) / 2;
-			yLoc	=	(kSCREEN_Y_size - bmpHeight) / 2;
+			xLoc	=	(gWidth - bmpWidth) / 2;
+			yLoc	=	(gHeight - bmpHeight) / 2;
 			if (xLoc < 0)
 			{
 				xLoc	=	0;
@@ -247,7 +264,7 @@ char				imageOK;
 			GraphicsColor.red	=	0;
 			GraphicsColor.blue	=	0;
 			GraphicsColor.green	=	0;
-			dispRectangle(0, 0, kSCREEN_X_size-1, kSCREEN_Y_size-1);
+			dispRectangle(0, 0, gWidth-1, gHeight-1);
 		}
 		pixelX	=	0;
 		pixelY	=	0;
@@ -308,65 +325,64 @@ char				imageOK;
 	return(imageOK);
 }
 
+//*********************************************************************************
 void bmp_drawTest(char * bmp_name, unsigned int x, unsigned int y)
 {
-    unsigned int i=0;
-//    unsigned char * lookup_table = &bmp_lookup_table[0];
-    unsigned long bmp_loc=0;
-    unsigned int index;
-    uint8_t nameLength;
-    //uint8_t bmpNameLen = strlen(bmp_name);
-    COLOR black = {0,0,0};
-    COLOR white = {255,255,255};
+unsigned int	i		=	0;
+//unsigned char * lookup_table = &bmp_lookup_table[0];
+unsigned long	bmp_loc	=	0;
+//uint8_t bmpNameLen = strlen(bmp_name);
+COLOR			black	=	{0,0,0};
+COLOR			white	=	{255,255,255};
 
-    cli(); //disable interrupts
+	cli(); //disable interrupts
 
-	bmp_loc = bmp_find(bmp_name);
+	bmp_loc	=	bmp_find(bmp_name);
 
-    /* Bitmap not found
-       error handling here */
+	/* Bitmap not found
+		error handling here */
 #if 0
-    if (bmp_loc == 0)
-    {
-        /* Display the not found placeholder */
-        dispPutS(bmp_name,x,y,white,black);
-        return;
-    }
+	if (bmp_loc == 0)
+	{
+		/* Display the not found placeholder */
+		dispPutS(bmp_name,x,y,white,black);
+		return;
+	}
 #endif
 
-    unsigned char bmp_buff[DATAFLASH_PAGESIZE];
+	unsigned char bmp_buff[DATAFLASH_PAGESIZE];
 
 /* Get the width and height */
-    dataflash_read_block(bmp_buff,bmp_loc,4);
+	dataflash_read_block(bmp_buff,bmp_loc,4);
 
-    uint16_t width = (uint16_t)(bmp_buff[0]<<8) + bmp_buff[1];
-    uint16_t height = (uint16_t)(bmp_buff[2]<<8) + bmp_buff[3];
-    uint32_t length = (uint32_t)width * (uint32_t)height;
-    uint16_t byteCnt=0;
+	uint16_t width	=	(uint16_t)(bmp_buff[0]<<8) + bmp_buff[1];
+	uint16_t height	=	(uint16_t)(bmp_buff[2]<<8) + bmp_buff[3];
+	uint32_t length	=	(uint32_t)width * (uint32_t)height;
+	uint16_t byteCnt=0;
 
-    dispSetWindow(x,y,width-1,height);
+	dispSetWindow(x,y,width-1,height);
 
 /* Incremement the bmp pointer passed the width/height */
-    bmp_loc+=4;
-    dataflash_read_block(bmp_buff, bmp_loc, DATAFLASH_PAGESIZE);
-    while (length--)
-    {
-        GraphicsColor.blue  =   bmp_buff[byteCnt];
-        GraphicsColor.green =   bmp_buff[byteCnt+1];
-        GraphicsColor.red   =   bmp_buff[byteCnt+2];
-        dispPix();
+	bmp_loc+=4;
+	dataflash_read_block(bmp_buff, bmp_loc, DATAFLASH_PAGESIZE);
+	while (length--)
+	{
+		GraphicsColor.blue	=	bmp_buff[byteCnt];
+		GraphicsColor.green =	bmp_buff[byteCnt+1];
+		GraphicsColor.red	=	bmp_buff[byteCnt+2];
+		dispPix();
 
-        byteCnt+=3;
+		byteCnt+=3;
 
-        if (byteCnt>=528)
-        {
-            bmp_loc+=528;
-            dataflash_read_block(bmp_buff, bmp_loc, DATAFLASH_PAGESIZE);
-            byteCnt=0;
-        }
-    }
+		if (byteCnt>=528)
+		{
+			bmp_loc+=528;
+			dataflash_read_block(bmp_buff, bmp_loc, DATAFLASH_PAGESIZE);
+			byteCnt=0;
+		}
+	}
 
-    sei(); //enable interrupts
+	sei(); //enable interrupts
 }
 
 
@@ -377,48 +393,60 @@ void bmp_drawTest(char * bmp_name, unsigned int x, unsigned int y)
 //* tBuff should be 528 bytes or more.
 //*
 //* Be careful with lots of flash writes.
-void bmp_store(char* tBuff, char* fileName, uint32_t location) {
+void bmp_store(char* tBuff, char* fileName, uint32_t location)
+{
 
 	FLASH_FILE_ENTRY *fileEntry;
 	uint16_t x;
 
-	fileEntry = &bmpLookupTable[gBmpLookupTableEntries];
+	fileEntry	=	&gBMPlookupTable[gBmpLookupTableEntries];
 
 	/* Store the file name */
-	for (x=0;x<kFileNameSize; x++) {
-		fileEntry->fileName[x] = fileName[x];
+	for (x=0;x<kFileNameSize; x++)
+	{
+		fileEntry->fileName[x]	=	fileName[x];
 	}
 
 	/* Store the location */
-	fileEntry->flashOffset = location;
+#ifdef _USE_7LETTER_NAMES_
 
-	dataflash_program_page((unsigned char*)bmpLookupTable, kLookupTablePage); 	//program the page
+#else
+	fileEntry->flashOffset	=	location;
+#endif
+
+	dataflash_program_page((unsigned char*)gBMPlookupTable, kLookupTablePage); 	//program the page
 
 	gBmpLookupTableEntries++;
 }
 
 //**********************************************************************************
 // Returns the bitmap location in flash
-// Uses the lookup table stored in the bottom of flash.  
-uint32_t bmp_find(char *fileName) {
+// Uses the lookup table stored in the bottom of flash.
+uint32_t bmp_find(char *fileName)
+{
 	
 	FLASH_FILE_ENTRY fileEntry;
 	uint16_t ii;
 	uint32_t lookupLoc;
 	
-	lookupLoc = (uint32_t)kLookupTablePage * (uint32_t)DATAFLASH_PAGESIZE;
+	lookupLoc	=	(uint32_t)kLookupTablePage * (uint32_t)DATAFLASH_PAGESIZE;
 
-	for (ii=0;ii < kLookupTableMaxEntries; ii++) {
+	for (ii=0;ii < kLookupTableMaxEntries; ii++)
+	{
 		
 		/* Read the file entry out of the flash lookup table */
 		dataflash_read_block((unsigned char*)&fileEntry,
-							 lookupLoc,  
+							 lookupLoc,
 							 sizeof(FLASH_FILE_ENTRY));
 
 		/* Check for a file name match */
-		if (!strncmp(fileName,(char*)&fileEntry.fileName[0],kFileNameSize)) {
+		if (!strncmp(fileName,(char*)&fileEntry.fileName[0],kFileNameSize))
+		{
 			
+		#ifdef _USE_7LETTER_NAMES_
+		#else
 			return fileEntry.flashOffset;
+		#endif
 		}
 		
 		/* Next entry */
@@ -432,7 +460,8 @@ uint32_t bmp_find(char *fileName) {
 //********************************************************
 // A processing style image loading function.
 // Returns image pointer to an external flash location 
-PImage loadImage(char * fileName) {
+PImage loadImage(char * fileName)
+{
 
 	/* Get the image page location */
 	return (PImage)bmp_find(fileName);
@@ -440,46 +469,43 @@ PImage loadImage(char * fileName) {
 
 //********************************************************
 // A processing style image display function.
-void image(PImage image, int xLoc, int yLoc) {
+void image(PImage image, int xLoc, int yLoc)
+{
+unsigned char bmp_buff[DATAFLASH_PAGESIZE];
 
-	unsigned int i=0;
-    unsigned int index;
-    uint8_t nameLength;
-	unsigned char bmp_buff[DATAFLASH_PAGESIZE];
-
-    cli(); //disable interrupts
+	cli(); //disable interrupts
 
 	/* Get the width and height */
-    dataflash_read_block(bmp_buff,image,4);
+	dataflash_read_block(bmp_buff,image,4);
 
-    uint16_t width = (uint16_t)(bmp_buff[0]<<8) + bmp_buff[1];
-    uint16_t height = (uint16_t)(bmp_buff[2]<<8) + bmp_buff[3];
-    uint32_t length = (uint32_t)width * (uint32_t)height;
-    uint16_t byteCnt=0;
+	uint16_t width		=	(uint16_t)(bmp_buff[0]<<8) + bmp_buff[1];
+	uint16_t height		=	(uint16_t)(bmp_buff[2]<<8) + bmp_buff[3];
+	uint32_t length		=	(uint32_t)width * (uint32_t)height;
+	uint16_t byteCnt	=	0;
 
-    dispSetWindow(xLoc,yLoc,width-1,height);
+	dispSetWindow(xLoc,yLoc,width-1,height);
 
 	/* Incremement the bmp pointer passed the width/height */
-    image+=4;
-    dataflash_read_block(bmp_buff, image, DATAFLASH_PAGESIZE);
-    while (length--)
-    {
-        GraphicsColor.blue  =   bmp_buff[byteCnt];
-        GraphicsColor.green =   bmp_buff[byteCnt+1];
-        GraphicsColor.red   =   bmp_buff[byteCnt+2];
-        dispPix();
+	image+=4;
+	dataflash_read_block(bmp_buff, image, DATAFLASH_PAGESIZE);
+	while (length--)
+	{
+		GraphicsColor.blue	=	bmp_buff[byteCnt];
+		GraphicsColor.green =	bmp_buff[byteCnt+1];
+		GraphicsColor.red	=	bmp_buff[byteCnt+2];
+		dispPix();
 
-        byteCnt+=3;
+		byteCnt+=3;
 
-        if (byteCnt>=528)
-        {
-            image+=528;
-            dataflash_read_block(bmp_buff, image, DATAFLASH_PAGESIZE);
-            byteCnt=0;
-        }
-    }
+		if (byteCnt>=528)
+		{
+			image	+=	528;
+			dataflash_read_block(bmp_buff, image, DATAFLASH_PAGESIZE);
+			byteCnt	=	0;
+		}
+	}
 
-    sei(); //enable interrupts
+	sei(); //enable interrupts
 
 }
 

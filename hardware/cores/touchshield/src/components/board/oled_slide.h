@@ -5,12 +5,17 @@
 //*	Dec 27,	2008	<MLS> Changed RECT_T to RECT
 //*	Dec 28,	2008	<MLS> Changed SCREEN_T to SCREEN
 //*	Dec 31,	2008	<MLS> Got 0012LW from Chris, making previous changes to this new version
-//*	Dec 29,	2008	<CHRIS> RECT and SCREEN moved to graphics.h
+//*	Dec 29,	2008	<CML> RECT and SCREEN moved to graphics.h
 //*	Jan  2,	2009	<MLS> Changed name to oled_slide.h
 //*******************************************************************************
 
 #ifndef _OLED_SLIDE_H_
 #define _OLED_SLIDE_H_
+
+
+#ifndef _PINDEFS_H_
+	#include	"pindefs.h"
+#endif
 
 #ifdef __cplusplus
 extern "C"{
@@ -86,6 +91,23 @@ typedef struct
    unsigned int gReg[GREG_MAX];
 } OLED_GAMMA;
 
+
+#define	kOLEDcmd_RGBinterfaceControl	0x02
+#define	kOLEDcmd_EntryMode				0x03
+#define	kOLEDcmd_DisplayControl1		0x05
+#define	kOLEDcmd_StandbyMode			0x10
+#define	kOLEDcmd_GRAMaddressSetX		0x20
+#define	kOLEDcmd_GRAMaddressSetY		0x21
+#define	kOLEDcmd_GRAMread_write			0x22
+#define	kOLEDcmd_IFselect				0x23
+#define	kOLEDcmd_VerticalScrollCtrlHi	0x30
+#define	kOLEDcmd_VerticalScrollCtrlLo	0x31
+#define	kOLEDcmd_VerticalScrollCtrl2	0x32
+
+#define	kOLEDcmd_VerticalRamAddrHi		0x35
+#define	kOLEDcmd_VerticalRamAddrLow		0x36
+#define	kOLEDcmd_HorizontalRamAddr		0x37
+#define	kOLEDcmd_GammaTopBottomControl	0x70
 
 
 void oled_brightness(uint8_t brightnessLevel);

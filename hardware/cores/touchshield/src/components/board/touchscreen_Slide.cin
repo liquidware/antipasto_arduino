@@ -207,7 +207,7 @@ void touch_init()	// initialize the touch algorithm
 {
 
 	ADCSRA	=	(1<<ADEN) | (0<<ADIE) | 
-			(0<<ADPS2) | (1<<ADPS1) |(1<<ADPS0); //clock freq fosc
+				(0<<ADPS2) | (1<<ADPS1) |(1<<ADPS0); //clock freq fosc
 
 	TCCR0B	=	(0<<CS02) |(1<<CS01) | (0<<CS00); //timer 0 setup to overflow every 128us
 	TIMSK0	=	(1<<TOIE0);
@@ -220,7 +220,7 @@ void touch_init()	// initialize the touch algorithm
 	}
 	else
 	{
-		eeprom_read_block (&matrix,(unsigned char*) ee_matrix, sizeof(MATRIX)); // read the previous saved calibration values in from memory
+		eeprom_read_block(&matrix,(unsigned char*) ee_matrix, sizeof(MATRIX)); // read the previous saved calibration values in from memory
 	}
 }
 

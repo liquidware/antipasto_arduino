@@ -1,12 +1,11 @@
-extern void sketchEarlyInits();
+//*******************************************************************************
 
-extern void sketchLateInits();
+#include	"wiring.h"
+#include	"startup.h"
 
-extern void runSketch();
-
-extern void init();
-
-int main() {
+//*******************************************************************************
+int main()
+{
 
   init();
 

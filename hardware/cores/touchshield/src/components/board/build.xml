@@ -29,7 +29,7 @@
     <property name="source.path"       value="."/>
     <property name="base.dir"          value="../../.."/>
     <property name="include.base.path" value="${base.dir}/src/include"/>
-    <property name="include.sub.path"  value="${base.dir}/src/components/board"/>
+    <property name="include.sub.path"  value="${base.dir}/src/include/lpc"/>
     <property name="linker.directive"  value="sfbloader3.ld"/>
 
     <!--
@@ -87,6 +87,13 @@
             <fileset dir="${obj.path}">
                 <include name="main.o"/>
             </fileset>
+
+            <!-- Copy the Linker directives to the lib folder -->
+            <!-- Slated for deletion 
+            <fileset dir="${source.path}">
+                <include name="sfbloader.ld"/>
+                <include name="sfbloader3.ld"/>
+            </fileset> -->
         </copy>
     </target>
 

@@ -33,32 +33,34 @@
 
 class HardwareSerial
 {
-  private:
-    //uint8_t _uart;
-    void printNumber(unsigned long, uint8_t);
-  public:
-    HardwareSerial(uint8_t);
-    void begin(long);
- //   void end(void);
-    int available(void);
-    int read(void);
-    void flush(void);
-    void print(char);
-    void print(const char[]);
-    void print(uint8_t);
-    void print(int);
-    void print(unsigned int);
-    void print(long);
-    void print(unsigned long);
-    void print(long, int);
-    void println(void);
-    void println(char);
-    void println(const char[]);
-    void println(uint8_t);
-    void println(int);
-    void println(long);
-    void println(unsigned long);
-    void println(long, int);
+	private:
+		//uint8_t _uart;
+		void printNumber(unsigned long, uint8_t);
+	public:
+		HardwareSerial(uint8_t);
+		void begin(long);
+		//	void end(void);
+		int available(void);
+		int read(void);
+		void flush(void);
+		void print(char);
+		void print(const char[]);
+		void print(uint8_t);
+		void print(int);
+	#ifndef  __MWERKS__
+		void print(unsigned int);
+	#endif
+		void print(long);
+		void print(unsigned long);
+		void print(long, int);
+		void println(void);
+		void println(char);
+		void println(const char[]);
+		void println(uint8_t);
+		void println(int);
+		void println(long);
+		void println(unsigned long);
+		void println(long, int);
 };
 
 extern HardwareSerial Serial;
