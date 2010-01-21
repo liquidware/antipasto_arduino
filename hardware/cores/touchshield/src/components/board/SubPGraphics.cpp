@@ -1198,7 +1198,8 @@ void	clear(COLOR rgbColor)
 //-	dispSetDisplayMode(0);
 	bcolor			=	rgbColor;
 //	fillRect(-1, -1, kSCREEN_X_size + 1, kSCREEN_Y_size + 1, col);
-	fillRect(0, 0, kSCREEN_X_size, kSCREEN_Y_size, rgbColor);
+//-	fillRect(0, 0, kSCREEN_X_size, kSCREEN_Y_size, rgbColor);
+	fillRect(0, 0, gWidth, gHeight, rgbColor);
 //-	dispSetDisplayMode(saveDisplayMode);
 }
 
@@ -1313,7 +1314,7 @@ void	drawcircle( int xLoc, int yLoc, int radius)
 }
 
 //*******************************************************************************
-void	drawrect( int xLoc, int yLoc, int argWidth, int argHeight)
+void	drawrect(int xLoc, int yLoc, int argWidth, int argHeight)
 {
 	rect(xLoc, yLoc, argWidth, argHeight);
 }
@@ -1501,13 +1502,13 @@ uint8_t		prevStrokeWeight;
 
 
 //*******************************************************************************
-void	drawRect(int x, int y, int width, int height)
+void	drawRect(int xx, int yy, int width, int height)
 {
-	drawRect(x,y,width,height,fcolor);
+	drawRect(xx, yy, width, height, fcolor);
 }
 
 //*******************************************************************************
-void	drawRect(int x, int y, int width, int height, COLOR col)
+void	drawRect(int xx, int yy, int width, int height, COLOR col)
 {
 	if ((width > 0) && (height > 0))
 	{
@@ -1515,10 +1516,10 @@ void	drawRect(int x, int y, int width, int height, COLOR col)
 		if (gStrokeWeightVal > 1)
 		{
 		//stroke
-		int		left	=	x - 1;
-		int		top		=	y - 1;
-		int		right	=	x + width;
-		int		bottom	=	y + height;
+		int		left	=	xx - 1;
+		int		top		=	yy - 1;
+		int		right	=	xx + width;
+		int		bottom	=	yy + height;
 
 			for(int i=0; i<gStrokeWeightVal; i++)
 			{
@@ -1534,10 +1535,10 @@ void	drawRect(int x, int y, int width, int height, COLOR col)
 		}
 		else
 		{
-			dispWuLine(x, y, x + width, y, col);				//*	top line
-			dispWuLine(x, y + height, x + width, y + height, col);		//*	bottom line
-			dispWuLine(x, y, x, y + height, col);		//*	left line
-			dispWuLine(x + width, y, x + width, y + height, col);		//*	right line
+			dispWuLine(xx, yy, xx + width, yy, col);				//*	top line
+			dispWuLine(xx, yy + height, xx + width, yy + height, col);		//*	bottom line
+			dispWuLine(xx, yy, xx, yy + height, col);		//*	left line
+			dispWuLine(xx + width, yy, xx + width, yy + height, col);		//*	right line
 		}
 
 	}
@@ -1589,42 +1590,58 @@ void	triangle( int x1, int y1, int x2, int y2, int x3, int y3)
 
 
 //*******************************************************************************
-void	drawWindow(char* caption, int xx, int yy, int ww, int h, COLOR bkg)
+void	drawWindow(char* caption, int xx, int yy, int ww, int hh, COLOR bkg)
 {
 uint8_t	oldFont;	// Backup Font
+RECT	myOutsideRect;
+RECT	myInsideRect;
+int		outsideWidth;
+int		outsideHeight;
+COLOR	myFrameColor;
 
 	oldFont	=	0;
 #ifdef _ENABLE_TAHOMA_FONTS_
 	oldFont		=	setFont(2);	//*	get the previous font and set to BOLD
 #elif defined(_ENABLE_HERSHEY_FONTS_)
-	textFont(kHersheyFont_RowmanTriplex, 10);
-//	gCurrentFontPenSize	=	2;
+	textFont(kHersheyFont_RowmanTriplex, 9);
 #endif
 
-	// Borders
+	//*	set up the inside window rect
+	myInsideRect.left	=	xx;
+	myInsideRect.right	=	xx + ww;
+	myInsideRect.top	=	yy;
+	myInsideRect.bottom	=	yy + hh;
+
+	//*	set up our outside boarder
+	myOutsideRect		=	myInsideRect;
+	InsetRect(&myOutsideRect, -4, -4);	//*	make the window bigger
+	myOutsideRect.top	-=	14;
+	outsideWidth		=	myOutsideRect.right - myOutsideRect.left;
+	outsideHeight		=	myOutsideRect.bottom - myOutsideRect.top;
+
+	//*	fill the backgrounds
+	//*	this is a bit more code but it looks better on the refresh
+	setForecolor(209, 209, 209);
+	fillRect(myOutsideRect.left,		myOutsideRect.top,			outsideWidth,	18);			//*	titlebar
+	fillRect(myOutsideRect.left,		myOutsideRect.bottom - 4,	outsideWidth,	4);				//*	bottom
+	fillRect(myOutsideRect.left,		myOutsideRect.top,			4,				outsideHeight);	//*	left side
+	fillRect(myOutsideRect.right - 4,	myOutsideRect.top,			4,				outsideHeight);	//*	right side
+
+	fillRect(myInsideRect.left, myInsideRect.top, (myInsideRect.right - myInsideRect.left), (myInsideRect.bottom - myInsideRect.top), bkg);
+	
+	//*	frame the backgrounds
 	setForecolor(0, 0, 0);
-	drawRect(xx, yy, ww, h, fcolor);								// Outer
-	drawRect(xx + 4, yy + 18, ww - 8, h - 22, fcolor);				// Inner-Inner
-	setForecolor(121, 121, 121);
-	line(xx + 3, yy + 17, xx + ww - 3, yy + 17, fcolor);			// Inner-Outer Top
-	line(xx + 3, yy + 18, xx + 3, yy + h - 4, fcolor);				// Inner-Outer Left
-	setForecolor(255, 255, 255);
-	line(xx + ww - 3, yy + 18, xx + ww - 3, yy + h - 3, fcolor);	// Inner-Outer Right
-	line(xx + 4, yy + h - 3, xx + ww - 4, yy + h - 3, fcolor);		// Inner-Outer Bottom
-
-	// Frame Background
-	setBackcolor(209, 209, 209);
-	fillRect(xx + 1, yy + 1, ww - 2, 16, bcolor);					// Titlebar
-	fillRect(xx + 1, yy + 17, 2, h - 19, bcolor);					// Left
-	fillRect(xx + ww - 3, yy + 17, 2, h - 19, bcolor);				// Right
-	fillRect(xx + 1, yy + h - 3, ww - 2, 2, bcolor);				// Bottom
-
+	FrameRect(&myOutsideRect);
+	FrameRect(&myInsideRect);
+	
 	// Draw Text
 	setForecolor(0, 0, 0);
-	centerText(xx + 1, yy + 1, xx + ww - 2, yy + 17, caption);		// Title
+	centerText(	myOutsideRect.left,
+				myOutsideRect.top,
+				myOutsideRect.right,
+				myOutsideRect.top + 18,
+				caption);		// Title
 
-	// Draw Window Background
-	fillRect(xx + 5,  yy + 19, ww - 10, h - 24, bkg);
 
 	setFont(oldFont);		// Restore Font
 	gCurrentFontPenSize	=	1;
@@ -1699,16 +1716,16 @@ void	fillEllipse(int xx, int yy, int xRadius, int yRadius)
 
 
 //*******************************************************************************
-void	fillRect(int x, int y, int width, int height, COLOR col)
+void	fillRect(int xx, int yy, int width, int height, COLOR col)
 {
 	dispColor(col);
-	dispRectangle(x, y, width, height); 
+	dispRectangle(xx, yy, width, height); 
 }
 
 //*******************************************************************************
-void	fillRect(int x, int y, int width, int height)
+void	fillRect(int xx, int yy, int width, int height)
 {
-	fillRect(x, y, width, height, fcolor);
+	fillRect(xx, yy, width, height, fcolor);
 }
 
 //*******************************************************************************

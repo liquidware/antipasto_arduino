@@ -849,14 +849,21 @@ char	fontVectorString[kMaxVectorStringLength];
 //*	the 2nd pair of letters is the left and right side of the char in pixels. They have to be scaled 
 short	HersheyGetCharWidth(char fontNumber, char theChar, short fontSize)
 {
+short	theCharWidth;
+
+#ifdef _HERSHEY_PROP_SPACING_
 char	fontVectorString[kMaxVectorStringLength];
 short	leftSide, rightSide;
 
 	GetHersheyFontStringFromIndex(fontNumber, (theChar - 31), fontVectorString);
 
-	leftSide	=	ScaleFontData(fontVectorString[2], fontSize);
-	rightSide	=	ScaleFontData(fontVectorString[3], fontSize);
-	return(rightSide - leftSide);
+	leftSide		=	ScaleFontData(fontVectorString[2], fontSize);
+	rightSide		=	ScaleFontData(fontVectorString[3], fontSize);
+	theCharWidth	=	rightSide - leftSide;
+#else
+	theCharWidth	=	fontSize + (fontSize / 6);
+#endif
+	return(theCharWidth);
 }
 
 //********************************************************************************
