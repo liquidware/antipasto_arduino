@@ -44,13 +44,24 @@ ButtonPad::ButtonPad() {
     pinList[4] = 68;
     pinList[5] = 69;    
     
-    //Arduino LED pins
-    ledList[0] = 16;
-    ledList[1] = 17;
-    ledList[2] = 18;
-    ledList[3] = 19;
-    ledList[4] = 20;
-    ledList[5] = 21;
+#if 1
+	//Arduino LED pins
+	//*	order changed by MLS Jan 2, 2009
+	ledList[0]	=	21;
+	ledList[1]	=	18;
+	ledList[2]	=	19;
+	ledList[3]	=	20;
+	ledList[4]	=	16;
+	ledList[5]	=	17;
+#else
+	//Arduino LED pins
+	ledList[0]	=	16;
+	ledList[1]	=	17;
+	ledList[2]	=	18;
+	ledList[3]	=	19;
+	ledList[4]	=	20;
+	ledList[5]	=	21;
+#endif
 
     //Initialize Power to the ButtonPad through Arduino MEGA Pins 62 and 63
     pinMode(62,OUTPUT);
