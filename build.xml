@@ -145,6 +145,38 @@
         </sequential>
     </macrodef>
 
+    <!-- A helper macro to get libraries from remote http urls -->
+    <macrodef name="get-library-github">
+        <attribute name="libName"/>
+        <attribute name="url"/>
+        <attribute name="core"/>
+        <sequential>
+            <!-- Clean the dir -->
+            <delete dir = "hardware/cores/@{core}/src/components/library/@{libName}"
+                    failonerror = "false" />
+
+            <echo message="Getting @{libName} library from '@{url}'"/>
+            <git action="clone" args="@{url}" dir="hardware/cores/@{core}/src/components/library" />
+
+            <!-- Clean the git directory -->
+            <delete dir = "hardware/cores/@{core}/src/components/library/@{libName}/.git"
+                    failonerror = "false" />
+        </sequential>
+    </macrodef>
+
+    <!-- A helper macro to get github clones -->
+   <macrodef name="git">
+        <attribute name="action"/>
+        <attribute name="args"/>
+        <attribute name="dir"/>
+        <sequential>
+            <exec executable="git" dir="@{dir}" failonerror="true" searchpath="true">
+                <arg value="@{action}"/>
+                <arg line="@{args}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
     <!-- Get the user contributed hardware libraries -->
     <target name="get.libraries">
         <!-- JeeNode -->
@@ -154,6 +186,15 @@
         <get-library-http file="RF12.zip"
                           url="http://jeefiles.equi4.com/RF12.zip"
                           core="arduino"/>
+
+        <get-library-github libName="LibTemperature"
+                            url="http://github.com/liquidware/LibTemperature.git"
+                            core="arduino"/>
+
+        <get-library-github libName="LibCompass"
+                            url="http://github.com/liquidware/LibCompass.git"
+                            core="arduino"/>
+
     </target>
 
     <!--
