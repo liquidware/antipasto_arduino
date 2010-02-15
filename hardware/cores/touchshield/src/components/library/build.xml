@@ -59,21 +59,7 @@
                                        compile.body.cpp,
                                        archiver.body.archive"/>
 
-    <target name="build.host" depends="clean.host,
-                                       prepare.host,
-                                       assembler.host.assemble,
-                                       compile.host.c,
-                                       compile.host.cpp,
-                                       archiver.host.archive"/>
-
-    <target name="prepare.host">
-        <!-- Host Directories -->
-        <mkdir dir="${host.obj.path}"/>
-        <mkdir dir="${host.bin.path}"/>
-        <mkdir dir="${host.lib.path}"/>
-
-        <mkdir dir="${tmp.path}"/>
-    </target>
+    <target name="build.host" depends=""/>
 
     <target name="prepare.body">
         <!-- Body directories -->
@@ -86,7 +72,7 @@
         <!-- Copy the library directory structures -->
         <copy todir="${body.obj.path}">
             <dirset dir=".">
-                <include name="*"/>
+                <include name="**/*"/>
             </dirset>
         </copy>
 
@@ -99,18 +85,7 @@
     </target>
 
     <target name="clean.body">
-     <!--   <delete dir="${build.dest}/targets/body"/> -->
-    </target>
-
-    <target name="clean.host">
-     <!--   <delete dir="${build.dest}/targets/host"/> -->
-    </target>
-
-    <target name="assembler.host.assemble">
-        <!-- Compile Host -->
-        <cc name="${native.gcc}" dest="*.o" destdir="${host.obj.path}"
-            src="*.S" srcdir="${source.path}"
-            args="${native.opts} ${native.cflags} -I${include.base.path} -I${include.sub.path} -c"/>
+     <!--  Nothing -->
     </target>
 
     <target name="assembler.body.assemble">
@@ -120,25 +95,12 @@
             args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c"/>
     </target>
 
-    <target name="compile.host.c">
-        <!-- Compile Host -->
-        <cc name="${native.gcc}" dest="*.o" destdir="${host.obj.path}"
-            src="*.c" srcdir="${source.path}"
-            args="${native.opts} ${native.cflags} -I${include.base.path} -I${include.sub.path} -c" />
-    </target>
-
     <target name="compile.body.c">
         <!-- Compile Body -->
-        <cc name="${cross.gcc}" dest="**/*.o" destdir="${body.obj.path}"
-            src="**/*.c" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c" />
-    </target>
-
-    <target name="compile.host.cpp">
-        <!-- Compile Host -->
-        <cc name="${native.gpp}" dest="*.o" destdir="${host.obj.path}"
-            src="*.cpp" srcdir="${source.path}"
-            args="${native.opts} ${native.cppflags} -I${include.base.path} -I${include.sub.path} -c" />
+        <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
+            include="**/*.c"
+            src="*.c" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cflags} -I${include.base.path} -c" />
     </target>
 
     <target name="compile.body.cpp">
@@ -146,14 +108,7 @@
         <cc name="${cross.gpp}" dest="*.o" destdir="${body.obj.path}"
             include="**/*.cpp"
             src="*.cpp" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -I${include.sub.path} -c" />
-    </target>
-
-    <target name="archiver.host.archive">
-        <!-- Archive Host -->
-        <ar name="${native.ar}" to="${host.lib.path}/libreflex.a"
-            dir="${host.obj.path}" includes="*.o" />
-        <run name="${native.ranlib}" args="&quot;${host.lib.path}/libreflex.a&quot;"/>
+            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -c" />
     </target>
 
     <target name="archiver.body.archive">
