@@ -100,7 +100,7 @@
         <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
             include="**/*.c"
             src="*.c" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags} -I${include.base.path} -c" />
+            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c" />
     </target>
 
     <target name="compile.body.cpp">
@@ -108,7 +108,7 @@
         <cc name="${cross.gpp}" dest="*.o" destdir="${body.obj.path}"
             include="**/*.cpp"
             src="*.cpp" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -c" />
+            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -I${include.sub.path} -c" />
     </target>
 
     <target name="archiver.body.archive">
