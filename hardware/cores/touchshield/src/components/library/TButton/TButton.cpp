@@ -26,6 +26,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include "wiring.h"
+#include "SubPGraphics.h"
 #include "TButton.h"
 
 /******************************************************************************
