@@ -26,7 +26,8 @@
  ******************************************************************************/
 #include <inttypes.h>
 #include <string.h>
-#include "WProgram.h"
+#include "wiring.h"
+#include "HardwareSerial.h"
 #include "ArduinoReader.h"
 
 /******************************************************************************
