@@ -1,7 +1,7 @@
 //*******************************************************************************
-//*		
-//*	
-//*	
+//*
+//*
+//*
 //*******************************************************************************
 //*	Detailed Edit History
 //*	<inthebitz>	=	Matt <inthebitz @ antipastohw.blogspot.com & liquidware.com>
@@ -92,7 +92,7 @@ do { \
 
 
 COLOR	GraphicsColor;
-SCREEN	screen	=	{ 
+SCREEN	screen	=	{
 					kSCREEN_X_size,			//*	Width
 					kSCREEN_Y_size};		//*	Height
 
@@ -136,7 +136,7 @@ volatile unsigned char c = command;
 //	if (gEnableDebug)
 //	{
 //	char	debugString[48];
-//		
+//
 //		sprintf(debugString, "command=%02X   ", command);
 //		usart_puts3(debugString);
 //	}
@@ -168,24 +168,24 @@ volatile unsigned char hB	=	(unsigned char)(data>>8);
 //	if (gEnableDebug)
 //	{
 //	char	debugString[48];
-//		
+//
 //		sprintf(debugString, "data=%04X   \r\n", data);
 //		usart_puts3(debugString);
 //	}
 #endif
 
-	
+
 	SETBIT(OLED_CTRL_PORT,OLED_DC);
 	CLRBIT(OLED_CTRL_PORT,OLED_CS);
 	// SETBIT(OLED_CTRL_PORT,OLED_RD);
 	CLRBIT(OLED_CTRL_PORT,OLED_WR);
-	
+
 	OLED_DATA_LOW	=	(lB << 3);
 	OLED_DATA_MED	=	(lB >> 3);
 	OLED_DATA_MED	=	OLED_DATA_MED | (hB << 6);
 	OLED_DATA_HIGH	=	hB;
-	
-	
+
+
 	SETBIT(OLED_CTRL_PORT,OLED_WR);
 	SETBIT(OLED_CTRL_PORT,OLED_CS);
 	// SETBIT(OLED_CTRL_PORT,OLED_DC);
@@ -357,7 +357,7 @@ static void	TranslateScreenOrientation(int xx, int yy, int *newXX, int *newYY)
 
 //*******************************************************************************
 //*	returns TRUE if all OK, FALSE if we are aborting
-boolean	dispSetWindow(int xx, int yy, int argWidth, int argHeight)
+unsigned char	dispSetWindow(int xx, int yy, int argWidth, int argHeight)
 {
 uint16_t	yyStart, yyEnd;
 uint16_t	xxStart, xxEnd;
@@ -395,12 +395,12 @@ char		debugString[48];
 		if (xx < gClipX1)
 		{
 		int	rightEdge;
-			
+
 			rightEdge	=	xx + argWidth;
-			
+
 			xx			=	gClipX1;
 			argWidth	=	rightEdge - xx;
-			
+
 		}
 		//*	is the right edge outside to the right
 		if ((xx + argWidth) > gClipX2)
@@ -412,12 +412,12 @@ char		debugString[48];
 		if (yy < gClipY1)
 		{
 		int	bottomEdge;
-			
+
 			bottomEdge	=	yy + argHeight;
-			
+
 			yy			=	gClipY1;
 			argHeight	=	bottomEdge - yy;
-			
+
 		}
 		if ((yy + argHeight) > gClipY2)
 		{
@@ -427,9 +427,9 @@ char		debugString[48];
 		if ((argWidth <= 0) || (argHeight <= 0))
 		{
 			return(FALSE);
-		}		
+		}
 	}
-#endif	
+#endif
 
 
 	//* Bounds checking
@@ -460,7 +460,7 @@ char		debugString[48];
 	{
 		argHeight	=	gHeight - yy;
 	}
-	
+
 	if ((argWidth <= 0) || (argHeight <= 0))
 	{
 		return(FALSE);
@@ -471,7 +471,7 @@ char		debugString[48];
 	if (gEnableDebug)
 	{
 		usart_puts3("--------------\r\n");
-		
+
 		sprintf(debugString, "xx=%3d yy=%3d\r\n", xx, yy);
 		usart_puts3(debugString);
 
@@ -513,7 +513,7 @@ char		debugString[48];
 #ifdef _DEBUG_DISPWINDOW_
 	if (gEnableDebug)
 	{
-	
+
 		sprintf(debugString, "myXX=%3d myYY=%3d myWidth=%3d myHeight=%3d\r\n", myXX, myYY, myWidth, myHeight);
 		usart_puts3(debugString);
 	}
@@ -526,7 +526,7 @@ char		debugString[48];
 	if (gEnableDebug)
 	{
 	char	debugString[48];
-	
+
 		sprintf(debugString, "myXX=%3d myYY=%3d myWidth=%3d myHeight=%3d\r\n", myXX, myYY, myWidth, myHeight);
 		usart_puts3(debugString);
 	}
@@ -555,19 +555,19 @@ char		debugString[48];
 			xxStart	=	myXX - myWidth;
 		   	xxEnd	=	myXX;
 			break;
-		
+
 		case	kScreenOrientation_Landscape180:
 			yyStart	=	myYY - myHeight;
 			yyEnd	=	myYY ;
-			
+
 			xxStart	=	myXX - myWidth;
 		   	xxEnd	=	myXX;
 			break;
-			
+
 		default:
 			yyStart	=	myYY;
 			yyEnd	=	myYY + myHeight;
-			
+
 			xxStart	=	myXX;
 		   	xxEnd	=	myXX + myWidth;
 			break;
@@ -580,7 +580,7 @@ char		debugString[48];
 
 	yyStart	=	myYY;
 	yyEnd	=	myYY + myHeight;
-	
+
 	xxStart	=	myXX;
    	xxEnd	=	myXX + myWidth;
 #endif
@@ -622,7 +622,7 @@ char		debugString[48];
 	//*	Specify the Vertical end positions
 	dispCommand(kOLEDcmd_VerticalRamAddrLow);
 	dispData(xxEnd);
-	
+
 #ifdef _DEBUG_DISPWINDOW_
 	if (gEnableDebug)
 	{
@@ -632,8 +632,8 @@ char		debugString[48];
 #endif
 	dispCommand(kOLEDcmd_HorizontalRamAddr);
 	dispData((yyStart << 8) | yyEnd);
-	
-	//*	Specify the x address in RAM			
+
+	//*	Specify the x address in RAM
 	dispCommand(kOLEDcmd_GRAMaddressSetX);
 	dispData(yyStart);
 
@@ -693,8 +693,8 @@ int	myXX, myYY;
 			return;
 		}
 	}
-#endif	
-	
+#endif
+
 	//* check to make sure its on the screen
 	if ( (myXX >= kSCREEN_X_size) || (myYY >= kSCREEN_Y_size))
 	{
@@ -705,7 +705,7 @@ int	myXX, myYY;
 		return;
 	}
 
-	//* Set XY location 
+	//* Set XY location
 	dispCommand(kOLEDcmd_GRAMaddressSetX);	//Specify the x address in RAM
 	dispData(0x00FF & myYY);
 
@@ -713,7 +713,7 @@ int	myXX, myYY;
 	dispData(0x01FF & myXX);
 
 
-	dispCommand(kOLEDcmd_GRAMread_write);	//RAM write	
+	dispCommand(kOLEDcmd_GRAMread_write);	//RAM write
 
 	//* Draw pixel
 	CLRBIT(OLED_CTRL_PORT,OLED_CS);
@@ -759,7 +759,7 @@ void	dispPixel2(int xx, int yy)
 	dispCommand(0x21); //Specify the y address in RAM
 	dispData(0x01FF & xx);
 
-	dispCommand(0x22); //RAM write	
+	dispCommand(0x22); //RAM write
 
 	/* Draw pixel */
 	CLRBIT(OLED_CTRL_PORT,OLED_CS);
@@ -835,7 +835,7 @@ int	myXX, myYY;
 	buffer->blue	=	OLED_DATA_LOW_PIN;
 	buffer->green	=	OLED_DATA_MED_PIN;
 	buffer->red		=	OLED_DATA_HIGH_PIN;
-	
+
 	SETBIT(OLED_CTRL_PORT,OLED_RD);
 	SETBIT(OLED_CTRL_PORT,OLED_CS);
 
@@ -849,10 +849,10 @@ int	myXX, myYY;
 //*	Jan  1,	2009	<MLS> dispRectangle -  Fixed overflow problem on large rectangles
 //*	Jan  3,	2009	<MLS> dispRectangle, changed xLoc, yLoc back to signed ints
 //*******************************************************************************
-void	dispRectangle(int  xLoc,  int  yLoc,   int rectWidth,   int  rectHeight) 
+void	dispRectangle(int  xLoc,  int  yLoc,   int rectWidth,   int  rectHeight)
 {
 //int32_t len	=	(width*height);	//*	if width or height get modified, this is messed up
-long	len;			
+long	len;
 long	myWidth;
 long	myHeight;
 boolean	okToContinue;
@@ -879,7 +879,7 @@ boolean	okToContinue;
 			{
 				myWidth	=	(kSCREEN_Y_size - 1) - xLoc;
 			}
-			if ((yLoc + myHeight) >= kSCREEN_X_size) 
+			if ((yLoc + myHeight) >= kSCREEN_X_size)
 			{
 				myHeight	=	(kSCREEN_X_size - 1) - yLoc;
 			}
@@ -890,7 +890,7 @@ boolean	okToContinue;
 			{
 				myWidth	=	(kSCREEN_X_size - 1) - xLoc;
 			}
-			if ((yLoc + myHeight) >= kSCREEN_Y_size) 
+			if ((yLoc + myHeight) >= kSCREEN_Y_size)
 			{
 				myHeight	=	(kSCREEN_Y_size - 1) - yLoc;
 			}
@@ -901,7 +901,7 @@ boolean	okToContinue;
 	{
 		myWidth	=	(kSCREEN_X_size - 1) - xLoc;
 	}
-	if ((yLoc + myHeight) >= kSCREEN_Y_size) 
+	if ((yLoc + myHeight) >= kSCREEN_Y_size)
 	{
 		myHeight	=	(kSCREEN_Y_size - 1) - yLoc;
 	}
@@ -909,7 +909,7 @@ boolean	okToContinue;
 
 
 
-	
+
 	//*	Set XY location
 	okToContinue	=	dispSetWindow(xLoc, yLoc, myWidth, myHeight);
 	if (okToContinue)
@@ -964,7 +964,7 @@ void	dispStandby(uint8_t bStandby)
 void	dispClearScreen()
 {
 	unsigned int i=2400;
-  
+
 	/* Set XY location   */
 	dispCommand(kOLEDcmd_GRAMaddressSetX);	//Specify the x address in RAM
 	dispData(0);
@@ -982,7 +982,7 @@ void	dispClearScreen()
 	OLED_DATA_LOW	=	GraphicsColor.blue;
 	OLED_DATA_MED	=	GraphicsColor.green;
 	OLED_DATA_HIGH	=	GraphicsColor.red;
-  
+
 	/* Start the clocking of the WR pin */
 
 #ifndef __MWERKS__

@@ -1,7 +1,7 @@
 //*******************************************************************************
-//*		
-//*	
-//*	
+//*
+//*
+//*
 //*******************************************************************************
 //*	Detailed Edit History
 //*		PLEASE put comments here every time you work on this code
@@ -70,32 +70,8 @@ do { \
     } \
 } while (0)
 
-#ifndef _USING_GRAPHICS_H_
-//*	Jan  3,	2009	Moved to graphics.ht
-//	typedef struct Color
-//		{
-//		unsigned char red;
-//		unsigned char green;
-//		unsigned char blue;
-//		} COLOR;
-//	
-//	typedef struct
-//	{
-//		unsigned int left;
-//		unsigned int top;
-//		unsigned int right;
-//		unsigned int bottom;
-//	} RECT;		//* was RECT_T;
-//	
-//	typedef struct
-//	{
-//	    int width;
-//	    int height;
-//	} SCREEN ;	//*	was SCREEN_T
-#endif
 
-
-typedef struct Lcd_rect	
+typedef struct Lcd_rect
 {
 	unsigned char left; 	/*!< The left side of the rectangle */
 	unsigned char top; 		/*!< The top position of the rectangle */
@@ -140,29 +116,17 @@ void lcd_rectangle(int x1, int y1, int x2, int y2, COLOR outline_color, COLOR fi
 
 void lcd_putc(unsigned char ch, int x_pos, int y_pos,COLOR fc, COLOR bc);
 //void lcd_puts(char * string, int x_pos, int y_pos, COLOR fc, COLOR bc);
-void lcd_dimWindow(unsigned char left, unsigned char top, unsigned char right, unsigned char bottom);  
+void lcd_dimWindow(unsigned char left, unsigned char top, unsigned char right, unsigned char bottom);
 
 void lcd_rect(LCD_RECT r, COLOR outline_color, COLOR fill_color);
 
 char pointInRect(POINT p, LCD_RECT r);
 
-#ifndef _USING_GRAPHICS_H_
-	//*	this routines have been moved to graphics.h
-	void dispClearScreen();
-	void dispColor(COLOR c);
-	void dispLine( int x1,  int y1, int x2,  int y2);
-	void dispPixel(int x, int y);
-	void dispRectangle( int  x,  int  y,  int width,  int  height);
-#endif
-
-
-
 void dispBrightness(uint8_t brightnessLevel);
-//void dispPutC(unsigned char ch, unsigned int x_pos,unsigned int y_pos,COLOR fc, COLOR bc);
-//void dispPutS(char * string,unsigned int x_pos, unsigned int y_pos, COLOR fc, COLOR bc);
 void dispClip(int width, int height);
 int dispGetClipWidth();
 int dispGetClipHeight();
+unsigned char dispSetWindow(int x, int y, int width, int height);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -10,26 +10,16 @@
 //*	Jan  2,	2009	<MLS> Added negitive checking to w/h of dispRectangle
 //*	Jan 9,	2009	<MLS/TWH> Adding TWHs clipping code pluse _ENABLE_CLIPPING_
 //*******************************************************************************
-//#include	"graphics.h"
 
-
-#ifndef __STDINT_H_
-	#include	<stdint.h>
-#endif
-
-#ifndef Wiring_h
-	#include	"wiring.h"
-#endif
-
-
+#include	"wiring.h"
 
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+
 #ifndef _HARDWARE_DEF_H_
 	#include	"HardwareDef.h"
 #endif
-
 
 #ifdef __cplusplus
 	extern "C"{
@@ -67,7 +57,7 @@ void	dispData(unsigned int data);
 void	dispPixel(int xx, int yy);
 void	dispRead(COLOR *buffer, int xx, int yy);
 void	dispRectangle(int  xLoc,  int  yLoc,   int rectWidth,   int  rectHeight);
-boolean	dispSetWindow(int xx, int yy, int argWidth, int argHeight);
+unsigned char	dispSetWindow(int xx, int yy, int argWidth, int argHeight);
 
 //-void	dispFillRect();
 void	dispPix();
@@ -80,7 +70,7 @@ void	dispStandby(uint8_t bStandby);
 	//*	added by Mark Sproul Dec 2009
 	int		GetScreenWidth(void);
 	int		GetScreenHeight(void);
-	
+
 	//*	THW clipping should only be needed for the touchSlide
 //	#define	_ENABLE_CLIPPING_
 	//*	THW scroll only works on the touchSlide

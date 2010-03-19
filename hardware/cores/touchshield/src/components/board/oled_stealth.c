@@ -1,7 +1,7 @@
 //*******************************************************************************
-//*		
-//*	
-//*	
+//*
+//*
+//*
 //*******************************************************************************
 //*	Detailed Edit History
 //*		PLEASE put comments here every time you work on this code
@@ -56,7 +56,7 @@ void dispPix()
     lcd_write_C(0x5C);      //enable write RAM
 
     SETBIT(LCD_CTRL_PORT,LCD_DC);
-//LCD_CTRL_PORT ^= (1 << LCD_CS) | (1 << LCD_WR); 
+//LCD_CTRL_PORT ^= (1 << LCD_CS) | (1 << LCD_WR);
     CLRBIT(LCD_CTRL_PORT,LCD_CS);
     CLRBIT(LCD_CTRL_PORT,LCD_WR);
 
@@ -65,7 +65,7 @@ void dispPix()
     LCD_DATA_MED	=	GraphicsColor.green;
     LCD_DATA_LOW	=	GraphicsColor.blue;
 
-//LCD_CTRL_PORT ^= (1 << LCD_CS) | (1 << LCD_WR); 
+//LCD_CTRL_PORT ^= (1 << LCD_CS) | (1 << LCD_WR);
 
     SETBIT(LCD_CTRL_PORT,LCD_WR);
     SETBIT(LCD_CTRL_PORT,LCD_CS);
@@ -95,7 +95,7 @@ void lcd_clear(unsigned char x1,unsigned char y1,unsigned char x2,unsigned char 
         dispPix();
 
     lcd_setColumn(0, 127);  //set column start/ end
-    lcd_setRow(0,127);  //set row start /end		
+    lcd_setRow(0,127);  //set row start /end
 
 }
 
@@ -115,7 +115,7 @@ void lcd_dimWindow(unsigned char x1, unsigned char y1, unsigned char x2, unsigne
 void lcd_pixel(int x, int y, COLOR pixel_color)
 {
     /* Bounds clipping */
-    if ((x<0) || (x>=128) || 
+    if ((x<0) || (x>=128) ||
         (y<0) || (y>=128))
     {
         return;
@@ -144,7 +144,7 @@ void lcd_rectangle(int x1, int y1, int x2, int y2, COLOR  outline_color, COLOR  
     lcd_setRow(y1, y2);
 
     /* Enable write of gram */
-    lcd_write_C(0x5C);       
+    lcd_write_C(0x5C);
 
     /* Clear the screen */
     SETBIT(LCD_CTRL_PORT,LCD_DC);
@@ -159,7 +159,7 @@ void lcd_rectangle(int x1, int y1, int x2, int y2, COLOR  outline_color, COLOR  
 
     /* Start the clocking of the WR pin */
 
-    DUFF_DEVICE_8(len, 
+    DUFF_DEVICE_8(len,
                   PING |= (1 << LCD_CS); PING |= (1 << LCD_CS);
                  PING |= (1 << LCD_CS); PING |= (1 << LCD_CS););
 
@@ -173,20 +173,20 @@ void lcd_rectangle(int x1, int y1, int x2, int y2, COLOR  outline_color, COLOR  
 //color format = RGB
 /*
 lcd_write_C(0x84);
-lcd_write_D(x1); 
+lcd_write_D(x1);
 lcd_write_D(y1);
-lcd_write_D(x2); 
+lcd_write_D(x2);
 lcd_write_D(y2);
 
 //line color
-lcd_write_D( (outline_color.red & B11111000) | (outline_color.green >> 5));  
+lcd_write_D( (outline_color.red & B11111000) | (outline_color.green >> 5));
 lcd_write_D( ((outline_color.green<<3) & B11100000) | (outline_color.blue>>3) );
 
 //fill color
-lcd_write_D( (fill_color.red & B11111000) | (fill_color.green >> 5));  
+lcd_write_D( (fill_color.red & B11111000) | (fill_color.green >> 5));
 lcd_write_D( ((fill_color.green<<3) & B11100000) | (fill_color.blue>>3) );
 
-delay_ms(1); 
+delay_ms(1);
 */
 
 
@@ -350,7 +350,7 @@ void lcd_init()
     lcd_write_C(0xAE); //display off
 
     lcd_write_C(0xca); // Duty
-    lcd_write_D(0x7f); // 1/128 
+    lcd_write_D(0x7f); // 1/128
 
     lcd_write_C(0xA1); //Set display start line
     lcd_write_D(0);    //0x00 start
@@ -426,7 +426,7 @@ void lcd_clearScreen(COLOR c)
     lcd_setRow(0, 127);
 
     /* Enable write of gram */
-    lcd_write_C(0x5C);       
+    lcd_write_C(0x5C);
 
     /* Clear the screen */
     SETBIT(LCD_CTRL_PORT,LCD_DC);
@@ -582,7 +582,7 @@ void dispPixel(int x, int y)
 }
 
 //*******************************************************************************
-void dispRectangle( int  x,  int  y,  int width,  int  height) 
+void dispRectangle( int  x,  int  y,  int width,  int  height)
 {
     int32_t len	=	width*height;
 
@@ -590,7 +590,7 @@ void dispRectangle( int  x,  int  y,  int width,  int  height)
     dispSetWindow(x,y,width,height);
 
     /* Enable write of gram */
-    lcd_write_C(0x5C);       
+    lcd_write_C(0x5C);
 
     /* Clear the screen */
     SETBIT(LCD_CTRL_PORT,LCD_DC);
@@ -603,7 +603,7 @@ void dispRectangle( int  x,  int  y,  int width,  int  height)
     LCD_DATA_HIGH	=	GraphicsColor.red;
 
     /* Start the clocking of the WR pin */
-    DUFF_DEVICE_8(len, 
+    DUFF_DEVICE_8(len,
                   PING |= (1 << LCD_CS); PING |= (1 << LCD_CS);
                   PING |= (1 << LCD_CS); PING |= (1 << LCD_CS););
 
@@ -634,10 +634,10 @@ int dispGetClipHeight()
 }
 
 //*******************************************************************************
-void dispSetWindow(int x, int y, int width, int height)
+unsigned char dispSetWindow(int x, int y, int width, int height)
 {
     uint16_t temp;
-    
+
     /* Bounds clipping */
     if (x < 0 ){ width += x-0; x = 0;  }
     if (y < 0 ){ height += y-0; y = 0; }

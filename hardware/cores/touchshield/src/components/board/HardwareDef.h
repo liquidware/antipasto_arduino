@@ -29,9 +29,9 @@
 	#error Unable to determine hardware platform (_TOUCH_STEALTH_ / _TOUCH_SLIDE_)
 #endif
 
-#ifdef __AVR_ATmega128__
+#ifdef __AVR_ATmega645__
 	#define	_TOUCH_STEALTH_
-	#warning __AVR_ATmega128__ defined
+	#warning __AVR_ATmega645__ defined
 #endif
 #ifdef __AVR_ATmega2560__
 	#define	_TOUCH_SLIDE_
@@ -67,18 +67,18 @@
 
 //	#define	_ENABLE_SCREEN_ROTATION_
 	#ifdef _ENABLE_SCREEN_ROTATION_
-	
+
 	enum	{	kScreenOrientation_Landscape	=	0,
 				kScreenOrientation_Portrait,
 				kScreenOrientation_Landscape180,
 				kScreenOrientation_Portrait180,
-				
+
 				kScreenOrientation_Last
 			};
 		extern char	gScreenOrientation;
 		#define	kDefaultOrienation	kScreenOrientation_Landscape
 	#endif
-	
+
 #endif
 
 #endif
@@ -120,7 +120,7 @@
 	void		dtostrf(int a, int b, int c, char *out);
 //	int			srand(int seed);
 //	int			rand();
-	
+
 //	#undef		CLRBIT
 //	#define		CLRBIT(x,y)	x=y
 

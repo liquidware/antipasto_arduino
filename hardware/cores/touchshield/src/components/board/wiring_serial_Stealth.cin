@@ -54,18 +54,23 @@ SIGNAL(SIG_USART1_RECV)
 }
 */
 
+void beginSerial(unsigned long baud)
+{
+    serialBegin(baud);
+}
+
 void serialBegin(unsigned long baud)
 {
-	
+
 	//disable hardware UART
-	CLRBIT(UCSR0B,RXEN0);	
+	CLRBIT(UCSR0B,RXEN0);
 	CLRBIT(UCSR0B,TXEN0);
 
 
 	SETBIT(RXTX_PORT, TX_PIN);  //idle state
 	SETBIT(RXTX_DDR, TX_PIN);	//output
 	CLRBIT(RXTX_DDR, RX_PIN);	//input
-	sei(); 
+	sei();
 }
 
 void serialWrite(unsigned char c)
@@ -74,18 +79,18 @@ void serialWrite(unsigned char c)
 
 volatile unsigned int x;
 volatile unsigned char bits=0;
-	
+
 cli();
 
-CLRBIT(RXTX_PORT, TX_PIN); 
+CLRBIT(RXTX_PORT, TX_PIN);
 
 for(x=0; x<90; x++) {;}
 
 for (bits = 0; bits<8; bits++)
 	{
 
-	
-	if ( CHECKBIT(c,bits) )		
+
+	if ( CHECKBIT(c,bits) )
 		{
 		SETBIT(RXTX_PORT,TX_PIN); //bit is a '1'
 		}
@@ -110,8 +115,8 @@ int serialAvailable()
 {
     //return(RX_BUFFER_SIZE + rx_buffer_head - rx_buffer_tail) % RX_BUFFER_SIZE;
 
-    return 1; //always return 1, serialAvailable is usually followed by a serialRead(), 
-              //and since because we don't support interrupt based software serial. 
+    return 1; //always return 1, serialAvailable is usually followed by a serialRead(),
+              //and since because we don't support interrupt based software serial.
               //This forces the application into a blocking read.
 }
 
@@ -140,7 +145,7 @@ for (bits = 0; bits<8; bits++)
 	for(x=0; x<90; x++) {;}
 
 	rx_msg >>= 1; //shift over one bit
-	if (CHECKBIT(RXTX_PIN, RX_PIN))		
+	if (CHECKBIT(RXTX_PIN, RX_PIN))
 		rx_msg |= B10000000;	//bit is a '1'
 	}
 
@@ -183,15 +188,15 @@ void printString(const char *s)
 }
 
 void printIntegerInBase(unsigned long n, unsigned long base)
-{ 
-	unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
+{
+	unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars.
 	unsigned long i = 0;
 
     if (n == 0)
     {
 		printByte('0');
 		return;
-	} 
+	}
 
     while (n > 0)
     {

@@ -55,9 +55,7 @@
 #endif
 
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+
 
 
 
@@ -81,7 +79,9 @@ extern "C"{
 typedef uint8_t boolean;
 typedef uint8_t byte;
 
-
+#ifdef __cplusplus
+extern "C"{
+#endif
 
 void			init(void);
 void			setup(void);
@@ -118,6 +118,9 @@ int analogRead(uint8_t);
 void			arduinoReset(); //holds the arduino in reset
 void			arduinoRun();   //brings arduino out of reset
 
+void bitbang_init();
+void bitbang_putc(unsigned char c);
+unsigned char bitbang_receive();
 
 #ifdef __cplusplus
 } // extern "C"

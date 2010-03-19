@@ -58,7 +58,7 @@
 	#include "touchscreen.h"
 #endif
 #ifdef _TOUCH_STEALTH_
-	#include "touchscreen_stealth.h"
+	#include "touchscreen.h"
 #endif
 
 unsigned int dataflash_buff_size = 0;	//!< The size of the on-chip buffer
@@ -233,12 +233,12 @@ void dataflash_erase()
 while(block_counter < DATAFLASH_BLOCK_COUNT)
 	{
 	CLRBIT(DATAFLASH_PORT,DATAFLASH_CS); //select dataflash
-	
+
 	dataflash_out(0x50);
 	dataflash_out((unsigned char)(block_counter>>4));
 	dataflash_out((unsigned char)(block_counter<<4));
 	dataflash_out(0x00);
-	
+
 	SETBIT(DATAFLASH_PORT,DATAFLASH_CS); //deselect dataflash
 
 	block_counter++;
@@ -259,7 +259,7 @@ void dataflash_out(unsigned char cData)
 	SPDR = cData;
 	/* Wait for transmission complete */
 #ifndef __MWERKS__
-	while(!CHECKBIT(SPSR,SPIF)) 
+	while(!CHECKBIT(SPSR,SPIF))
 		{
 		;
 		}
@@ -271,18 +271,18 @@ void dataflash_out(unsigned char cData)
 //*******************************************************************************
 unsigned char dataflash_checkStatus()
 {
-	
+
 	unsigned char result=0;
 	unsigned char temp = 0;
 
 	SETBIT(DATAFLASH_PORT,DATAFLASH_CS); //Deselect flash chip
 	CLRBIT(DATAFLASH_PORT,DATAFLASH_CS); //select flash chip
-	
-	dataflash_out(0x57); //read status register	
-	
+
+	dataflash_out(0x57); //read status register
+
 	dataflash_out(0); //to get the data
 
-	result = SPDR; //bits 7-1	
+	result = SPDR; //bits 7-1
 
 	temp = (result & 0x38) >> 3;
 	SETBIT(DATAFLASH_PORT,DATAFLASH_CS); //Deselect flash chip
@@ -327,9 +327,9 @@ dataflash_clear_buff();
 
 		dataflash_out(0xFF);
 		in	=	SPDR;
-		
+
 	for (i=0; i<size; i++)
-	{	
+	{
 		dataflash_out(0xFF);
 		in	=	SPDR;
 		storage_buff[i]=in;
@@ -378,9 +378,9 @@ dataflash_clear_buff();
 
 		dataflash_out(0xFF);
 		in = SPDR;
-		
+
 	for (i=0; i<size; i++)
-		{	
+		{
 		dataflash_out(0xFF);
 		in = SPDR;
 		storage_buff[i]=in;
