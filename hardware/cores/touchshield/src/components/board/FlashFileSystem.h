@@ -41,20 +41,9 @@ typedef struct {
 					long	checksum;				//*	32 bit checksum
 				} FlashFileBlock;
 
-
-
-#ifdef __cplusplus
-extern "C"{
-#endif
-
-	void DebugRectPrintText(char * msg);
-	void FlashFileSystemComm(void);
-	void open(ProgramEx p);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
-
+void DebugRectPrintText(char * msg);
+void FlashFileSystemComm(void);
+void open(ProgramEx p);
 
 #endif
 

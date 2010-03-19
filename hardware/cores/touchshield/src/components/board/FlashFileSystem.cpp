@@ -410,6 +410,11 @@ void FlashFile_open(ProgramEx p)
 	}
 }
 
+//*************************************
+// A wrapper to launch an executable program
+void open(ProgramEx p) {
+	FlashFile_open(p);
+}
 
 #endif	//	_ENABLE_FLASH_FILE_SYSTEM_
 
