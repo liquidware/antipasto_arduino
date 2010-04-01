@@ -22,6 +22,7 @@ is supported by the Antipasto Arduino IDE:
 * [JeeNodes Platform][9]
 * [Temperature Sensor][10]
 * [HMC6352 Compass Module][11]
+* [Wind Sensor][12]
 
 If you have a question about support for a specific platform or device, get
 in touch through Github or at the blog.
@@ -58,3 +59,4 @@ sometimes on the [Illuminato X Machina Mailing List][5].
 [9]: http://www.moderndevice.com/products/jeenode-kit
 [10]: http://www.moderndevice.com/products/tmp421-temperature-sensor
 [11]: http://www.moderndevice.com/products/hmc6352-breakout-compass-sensor
+[12]: http://www.moderndevice.com/products/wind-sensor
