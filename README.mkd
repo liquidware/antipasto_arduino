@@ -11,7 +11,7 @@ Most likely, you want use this IDE to work with the [Arduino][2],
 [TouchShield][3], or [Illuminato X Machina][4].  If you just want to do
 development for those modules and don't want to work on the actual IDE
 itself, you can *download the Antipasto Arduino IDE as a binary for
-Windows, Mac OSX, or Linux at:
+Windows, Mac OSX, or Linux at:*
 
 * [http://www.illuminatolabs.com/IlluminatoDownloads.htm][1]
 
