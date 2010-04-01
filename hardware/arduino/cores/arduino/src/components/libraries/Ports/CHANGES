@@ -1,0 +1,124 @@
+2010-03-23 jcw
+- Added magnetometer access, but it's not working properly / predictably yet.
+
+2010-03-22 jcw
+- Added new HeadingPlug class and heading_demo example sketch.
+
+2010-03-19 jcw
+- Added new GravityPlug class and gravity_demo example sketch.
+
+2010-03-18 jcw
+- Added new SMDdemo sketch, as pre-loaded on the JeeSMD kit ATmega's.
+- Added new DimmerPlug class and dimmer_demo example sketch.
+- Added new LuxPlug class and lux_demo example sketch.
+
+2010-03-13 jcw
+- Support hardware I2C pins via software-based PortI2C, using pseudo port "0".
+
+2010-02-22 jcw
+- Replaced PCA8574A with MCP23008 code, as used on the Expander Plug.
+
+2010-02-12 jcw
+- Adjusted comment in PortsBMP085.cpp to explain change to b3 calculation.
+
+2010-01-22 jcw
+- Added backlight() and noBacklight() to LiquidCrystalI2C for LCD Plug.
+- Simplified and removed some duplicate code.
+
+2009-12-29 jcw
+- Added static mode3(), digiRead3(), and digiWrite3() to access the IRQ pin.
+- Added rx buffering in UartPlug to support higher baudrates without data loss.
+
+2009-12-18 jcw
+- Added options delayFun are to SHT11::measure to support low-power uses.
+- Added UartPlug class, and updated the uart_demo example sketch.
+
+2009-12-11 jcw
+- Added memory_demo example for the MemoryPlug and MemoryStream classes.
+
+2009-12-10 jcw
+- Added BlinkPlug, MemoryPlug, and MemoryStream classes.
+- Added a "isPresent()" member to the DeviceI2C class.
+- Added blink_demo example using the new BlinkPlug class.
+
+2009-12-08 jcw
+- Added a "remaining()" member to the MilliTimer class.
+- Added a "setAddress()" member to the DeviceI2C class.
+
+2009-11-12 jcw
+- Added the "output_stepper" demo, using an Output Plug with I2C.
+
+2009-11-09 jcw
+- Forgot to check in thermo_demo and lcd_demo examples - fixed.
+
+2009-11-05 jcw
+- Added include <RF12.h> to avoid linker problems in bmp085demo and exxpander.
+
+2009-10-31 jcw
+- Added PortsLCD.h and PortsLCD.cpp with LiquidCrystalLCD class, and lcd_demo.
+
+2009-10-25 jcw
+- Fix blink_recv demo, node 0 is special now (used for OOK), changed to 'A'.
+
+2009-10-02 jcw
+- Added MilliTimer class and code to the Ports library.
+
+2009-10-01 jcw
+- Added "uart_demo", uses SC16IS740 via I2C as extra serial port.
+
+2009-09-17 jcw
+- Added <RF12.h> include to eemem demo to avoid a linker problem :(
+- Added "rtc_demo", connects to the DS1307 real-time clock.
+
+2009-07-03 jcw
+- Added "eemem" and "expander" demos, both using I2C.
+
+2009-06-12 jcw
+- Adjust calculation constants for SHT11 sensor to latest docs.
+
+2009-05-13 jcw
+- Change BMP085 API a bit to better support low-power readouts.
+- BMP085 changes confirmed to work properly above 25C.
+
+2009-05-06 jcw
+- Fix remote ports to support other freq's than 868 MHz, with fixed blink demo.
+- Added $Id comment lines to all source files so filenames are shown in files.
+
+2009-02-27 jcw
+- Added dcf77demo with decoding logic for the DCF clock signal from Frankfurt.
+- Added recv433demo for separate OOK receiver with a KlikAanKlikUit decoder.
+
+2009-02-21 jcw
+- Added SparkFun TSL230 light sensor demo (frequency output).
+- Add frequency band spec to rf12_initialize() call due to change in RF12.
+
+2009-02-19 jcw
+- Added shiftRead() and replaced shift() by more general shiftWrite().
+- Added Parallax HM55B compass module demo (this runs on a 5V Arduino).
+- Added Parallax H48C 3-axis accelerometer demo (this runs on a 5V Arduino).
+
+2009-02-18 jcw
+- Added I2C support via new PortI2C class. Uses bit-banging, master mode only.
+- Added DeviceI2C class to support multiple I2C devices on a single port.
+- Added BMP085 pressure sensor support with "bmt085demo" example sketch.
+- Added very simple demo of digital and analog IO with "pir_demo" sketch.
+- Added demo for the Nintendo "Nunchuk" controller, which is an I2C device.
+- Added "combi_demo" which merges 4 other demos, all running in parallel.
+- Added pulse() and pulse2() methods to the Port class, to call pulseIn().
+- Added shift() method to the Port class, to call shiftOut().
+- Added "qti_demo" interfacing to the Parallax QTI sensor #27401.
+- Added "accel2125_demo" interfacing to the Parallax accelerometer #28017.
+
+2009-02-16 jcw
+- Subversion repository moved to Google code.
+- New SHT11 humidity sensor support with "sht11demo" example sketch.
+
+2009-02-14 jcw
+- New RemotePort class plus PortsRF12.cpp interface for the RF12 radio.
+  Also added RemoteNode and RemoteHandler classes to separate responsibilities.
+- Added "blink_xmit" and "blink_recv" example sketches to demonstrate
+  a simple case of continuously sending packets to update remote ports.
+- The digiPin(), digiPin2(), and anaPin() members are now protected.
+
+2009-02-13 jcw
+- Public release.

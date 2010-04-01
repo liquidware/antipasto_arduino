@@ -1,0 +1,101 @@
+2010-03-20 jcw
+- Added DATAFLASH #define to build RF12demo with or without DF detect code.
+
+2010-02-26 jcw
+- RF12 patches to clean up the code, many thx to Marius Kintel.
+
+2010-02-22 jcw
+- Fixed argument order on command line for FS20 and KAKU commands in RF12demo.
+- Changed greeting to [RF12demo] i.s.o. [RF12DEMO].
+
+2010-01-09 jcw
+- Added support for low-battery detection, threshold set to 3.1V.
+
+2009-12-26 jcw
+- Added RSSI listen-before-send carrier detection.
+
+2009-12-14 jcw
+- Same timing changes applied to KAKU, code streamlined a bit more.
+
+2009-12-13 jcw
+- Improved FS20 timing with RFM12B in OOK mode (thx JGJ Veken).
+
+2009-12-09 jcw
+- Updated README to match new RF12demo commands and syntax.
+
+2009-12-03 jcw
+- Fix the "rf12_easySend(0,0)" special case, so it resends a full packet.
+
+2009-12-01 jcw
+- Added new rf12_easyInit(), rf12_easyPoll(), and rf12_easySend() functions.
+
+2009-11-30 jcw
+- Fixed problem when handling an aborted replay and add "DF E" at end of replay.
+
+2009-11-20 jcw
+- Added "DF R" output (and fixed it). To be flashed into ATmega's from now on.
+
+2009-11-19 jcw
+- Several fixes to new RF12demo code, added replay and ack-suppress code.
+
+2009-11-18 jcw
+- Started implementing support for the JeeLink v2's flash memory.
+
+2009-10-18 jcw
+- Added FS20/KAKU remote control cmds to RF12demo and activity LED on/off.
+- Added <Ports.h> includes to all the examples, due to new dependency :(
+- Detach interrupt in OOK mode to allow switching between OOK and FSK modes.
+
+2009-10-02 jcw
+- MilliTimer is now in the Ports library, so it has been removed from RF12sio.
+
+2009-06-04 jcw
+- Made v2 protocol the default, i.e. crc includes group. Incompatible with v1!
+- Cleanups, remove some recent new ack code which won't be used after all.
+
+2009-05-17 jcw
+- Added new rf12_recvAcked() code to take care of ack-sending as 0-byte reply.
+- Added new rf12_sleep() to manage RF12 power-down, with optional wakeup period.
+
+2009-05-07 jcw
+- Added first basic version of the new streaming I/O layer as "RF12sio.{h,c}".
+- Added rf12serial and rf12stream demo sketches to the RF12 library.
+
+2009-05-06 jcw
+- Changed the default group to 0xD4, other values only supported by RFM12B's.
+- Extended the RF12demo into a general RF12 EEPROM configuration utility.
+- Added rf12_config() to initialize the RF12 hardware from settings in EEPROM.
+- Added $Id comment lines to all source files so filenames are shown in files.
+
+2009-04-16 jcw
+- Added support for v2 protocol, with group added to crc and default group 0x51.
+- Removed rf12_group(), it's now an optional arg of rf12_initialize() instead.
+
+2009-03-22 jcw
+- Added README to "RF12demo" sketch with instructions on how to run some tests.
+- Added rf12_group() to allow changing the group from 0x50 to something else.
+
+2009-03-16 jcw
+- Extended RF12demo to also configure frequency band, not just the node id.
+
+2009-02-23 jcw
+- Regression fixed, failed to set up ack sending with proper source node id.
+
+2009-02-21 jcw
+- Changed rf12_initialize() args to node ID plus one of 3 frequency band codes.
+- Added rf12_onOff() for OOK emulation (must initialize with node ID zero).
+- Added new "fs20demo" example to control FS20 devices from the RFM12B.
+- Added new "kaku_demo" example to control KlikAanKlikUit devices at 433 MHz.
+- Replace EEPROM.h in "RF12.cpp" with eeprom_*() calls in "RF12demo.pde".
+
+2009-02-16 jcw
+- Subversion repository moved to Google code.
+
+2009-02-10 jcw
+- Comments added to RF12.h to describe each public function.
+- Made rf12_recvStart() private, this is handled by rf12_recvDone().
+- Replace ISR(INT0_vect) by call to attachInterrupt() to avoid duplicate
+  definition error. Code now also works with Arduino-0013.
+
+2009-02-09 jcw
+- Public release.
