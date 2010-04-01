@@ -22,7 +22,14 @@ is supported by the Antipasto Arduino IDE:
 * [JeeNodes Platform][9]
 * [Temperature Sensor][10]
 * [HMC6352 Compass Module][11]
+
+Code examples and documentation for the following is also included:
+
 * [Wind Sensor][12]
+* [ButtonPad][13]
+* [ButtonShield][14]
+* [InputShield][15]
+* [Modern Device LCD Displays][16]
 
 If you have a question about support for a specific platform or device, get
 in touch through Github or at the blog.
@@ -60,3 +67,7 @@ sometimes on the [Illuminato X Machina Mailing List][5].
 [10]: http://www.moderndevice.com/products/tmp421-temperature-sensor
 [11]: http://www.moderndevice.com/products/hmc6352-breakout-compass-sensor
 [12]: http://www.moderndevice.com/products/wind-sensor
+[13]: http://www.liquidware.com/shop/show/BUTP/ButtonPad
+[14]: http://www.liquidware.com/shop/show/BUT/ButtonShield
+[15]: http://www.liquidware.com/shop/show/INPT/InputShield
+[16]: http://www.moderndevice.com/collections/displays

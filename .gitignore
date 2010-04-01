@@ -7,6 +7,5 @@ plugins/antipasto_arduino_plugins
 build/macosx/work
 build/windows/work
 build/linux/work
-hardware/cores/arduino/src/components/library/LibCompass
-hardware/cores/arduino/src/components/library/LibTemperature
-hardware/cores/*/src/components/library/*/reference
+hardware/arduino/cores/*/src/components/libraries/*/reference/
+hardware/arduino/cores/*.zip
