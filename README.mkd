@@ -7,8 +7,8 @@ The Antipasto Arduino IDE is a fork from the original Arduino IDE at:
 
 This git repository contains the source for the IDE.
 
-*Ready-to-use binaries for the Antipasto Arduino IDE on Windows, Mac OSX,
-or Linux can be downloaded at:*
+**Ready-to-use binaries for the Antipasto Arduino IDE on Windows, Mac OSX,
+or Linux can be downloaded at:**
 
 * [http://www.illuminatolabs.com/IlluminatoDownloads.htm][1]
 
