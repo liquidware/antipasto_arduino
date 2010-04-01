@@ -5,11 +5,19 @@ The Antipasto Arduino IDE is a fork from the original Arduino IDE at:
 
 * [http://www.arduino.cc/en/Main/Software][0]
 
-This git repository contains the source for the IDE.  If you just want to work
-with the [Arduino], [TouchShield], or [Illuminato X Machina], you can download
-this IDE as a binary for Windows, Mac OSX, and Linux at:
+This git repository contains the source for the IDE.
+
+Most likely, you want use this IDE to work with the [Arduino][2],
+[TouchShield][3], or [Illuminato X Machina][4].  If you just want to do
+development for those modules and don't want to work on the actual IDE
+itself, you can *download the Antipasto Arduino IDE as a binary for
+Windows, Mac OSX, or Linux at:
 
 * [http://www.illuminatolabs.com/IlluminatoDownloads.htm][1]
+
+This fork is maintined by the team behind the [Antipasto Hardware Blog][6]. It
+adds support for [Liquidware][7] and [Modern Device][8] hardware to the traditional
+Arduino IDE, as well as extended documentation.
 
 Building the IDE
 ================
@@ -27,7 +35,9 @@ will build the IDE for your current OS (Windows, OSX, Linux).  To run the IDE:
 More Information
 ================
 
-The IDE is discussed here on github, on the [Antipasto Hardware Blog][6], and sometimes on the [Illuminato X Machina Mailing List][5].
+Bugs and feedback can be submitted through the "Issues" tab on Github.  News
+about the IDE can usually be found on the [Antipasto Hardware Blog][6], and
+sometimes on the [Illuminato X Machina Mailing List][5].
 
 [0]: http://www.arduino.cc/en/Main/Software "Arduino IDE"
 [1]: http://www.illuminatolabs.com/IlluminatoDownloads.htm "Antipasto Arduino IDE"
@@ -36,3 +46,5 @@ The IDE is discussed here on github, on the [Antipasto Hardware Blog][6], and so
 [4]: http://www.liquidware.com/shop/show/IXM/Illuminato+X+Machina "Illuminato X Machina at Liquidware"
 [5]: http://groups.google.com/group/illuminato?hl=en "Illuminato X Machina Mailing List"
 [6]: http://antipastohw.blogspot.com/ "Antipasto Hardware Blog"
+[7]: http://www.liquidware.com
+[8]: http://www.moderndevice.com
