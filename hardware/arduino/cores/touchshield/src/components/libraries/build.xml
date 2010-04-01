@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!--
+   ANT Buildfile - Builds the Arduino for Arduino
+   Copyright (C) 2009 Christopher Ladden, Omar Ayub  All rights reserved.
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+   USA
+-->
+<project default="build.all">
+
+    <!--
+        ===================================================================
+         Set the properties related to the target we're compiling
+        ===================================================================
+    -->
+    <basename property="base.name"     file="${basedir}" />
+    <property name="source.path"       value="."/>
+    <property name="base.dir"          value="../../.."/>
+    <property name="include.base.path" value="${base.dir}/src/include"/>
+    <property name="include.sub.path"  value="${base.dir}/src/components/board"/>
+
+    <!--
+        ===================================================================
+         Set the properties related to the Build area
+        ===================================================================
+    -->
+    <property name="host.obj.path" value="${build.dest}/targets/host/build"/>
+    <property name="body.obj.path" value="${build.dest}/targets/body/build"/>
+
+    <property name="host.bin.path"  value="${build.dest}/targets/host/bin"/>
+    <property name="body.bin.path"  value="${build.dest}/targets/body/bin"/>
+
+    <property name="host.lib.path"     value="${build.dest}/targets/host/lib"/>
+    <property name="body.lib.path"     value="${build.dest}/targets/body/lib"/>
+    <property name="lib.path"          value="${body.lib.path}"/>
+
+    <!--
+        ===================================================================
+         Compile the source
+        ===================================================================
+    -->
+    <target name="build.all"  depends="build.body"/>
+    <target name="build.body" depends="clean.body,
+                                       prepare.body,
+                                       assembler.body.assemble,
+                                       compile.body.c,
+                                       compile.body.cpp,
+                                       archiver.body.archive"/>
+
+    <target name="build.host" depends=""/>
+
+    <target name="prepare.body">
+        <!-- Body directories -->
+        <mkdir dir="${body.obj.path}"/>
+        <mkdir dir="${body.bin.path}"/>
+        <mkdir dir="${body.lib.path}"/>
+
+        <mkdir dir="${tmp.path}"/>
+
+        <!-- Copy the library directory structures -->
+        <copy todir="${body.obj.path}">
+            <dirset dir=".">
+                <include name="**/*"/>
+            </dirset>
+        </copy>
+
+        <!-- Copy the library include files to a common area -->
+        <copy todir="${body.lib.path}/include" flatten="true">
+            <fileset dir=".">
+                <include name="**/*.h"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean.body">
+     <!--  Nothing -->
+    </target>
+
+    <target name="assembler.body.assemble">
+        <!-- Compile Body -->
+        <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
+            src="*.S" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c"/>
+    </target>
+
+    <target name="compile.body.c">
+        <!-- Compile Body -->
+        <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
+            include="**/*.c"
+            src="*.c" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c" />
+    </target>
+
+    <target name="compile.body.cpp">
+        <!-- Compile Body -->
+        <cc name="${cross.gpp}" dest="*.o" destdir="${body.obj.path}"
+            include="**/*.cpp"
+            src="*.cpp" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -I${include.sub.path} -c" />
+    </target>
+
+    <target name="archiver.body.archive">
+        <!-- Archive Body -->
+        <ar name="${cross.ar}" to="${body.lib.path}/libcontrib.a"
+            dir="${body.obj.path}" includes="**/*.o" />
+    </target>
+
+</project>

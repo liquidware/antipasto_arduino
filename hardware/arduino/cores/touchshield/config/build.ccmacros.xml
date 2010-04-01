@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<!--
+   ANT Buildfile - Builds the Arduino for Arduino
+   Copyright (C) 2009 Christopher Ladden, Omar Ayub  All rights reserved.
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+   USA
+-->
+
+
+<project name="build.ccmacros" basedir="." default="...">
+    <!--
+        ===================================================================
+         Setup the ant-contrib plugin resource
+        ===================================================================
+    -->
+    <typedef resource="net/sf/antcontrib/antlib.xml">
+        <classpath>
+             <pathelement location="../ixm/tools/apache-ant/library/ant-contrib/ant-contrib-1.0b3.jar" />
+        </classpath>
+    </typedef>
+
+    <!--
+        ===================================================================
+         Generic Macros
+        ===================================================================
+    -->
+
+    <macrodef name="run">
+        <attribute name="name"/>
+        <attribute name="args"/>
+        <sequential>
+            <exec executable="@{name}" failonerror="true">
+                <arg line="@{args}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <!--
+        ===================================================================
+         GNU C++ Compiler Macros
+        ===================================================================
+    -->
+
+    <!--
+        ===================================================================
+         archive macro
+        ===================================================================
+    -->
+    <macrodef name="ar">
+        <attribute name="name"/>
+        <attribute name="to"/>
+        <attribute name="dir"/>
+        <attribute name="includes"/>
+        <sequential>
+            <apply executable="@{name}" parallel="true" failonerror="true">
+                <arg value="ruc"/>
+                <arg value="@{to}"/>
+                <fileset dir="@{dir}" includes="@{includes}"/>
+            </apply>
+        </sequential>
+    </macrodef>
+
+    <!--
+        ===================================================================
+         Compile macro
+        ===================================================================
+    -->
+    <macrodef name="cc">
+        <attribute name="name"/>
+        <attribute name="args"/>
+        <attribute name="src"/>
+        <attribute name="srcdir"/>
+        <attribute name="dest"/>
+        <attribute name="destdir"/>
+        <attribute name="exclude" default=""/>
+        <attribute name="force" default="false"/>
+        <attribute name="include" default=""/>
+        <sequential>
+            <apply executable="@{name}" dest="@{destdir}" parallel="false" failonerror="true" force="@{force}">
+                <env key="PATH" path="${cross.base}/bin;${native.base}/bin;"/>
+                <arg line="@{args}"/>
+                <srcfile/>
+                <arg line="-o"/>
+                <targetfile/>
+                <fileset dir="@{srcdir}" includes="@{src}">
+                    <exclude name="@{exclude}"/>
+                    <include name="@{include}"/>
+                </fileset>
+                <mapper type="glob" from="@{src}" to="@{dest}"/>
+            </apply>
+        </sequential>
+    </macrodef>
+
+    <!--
+        ===================================================================
+         Link macro
+        ===================================================================
+    -->
+    <macrodef name="link">
+        <attribute name="name"/>
+        <attribute name="args"/>
+        <attribute name="from"/>
+        <attribute name="linker.directive" default=""/>
+        <attribute name="to"/>
+        <sequential>
+            <exec executable="@{name}" failonerror="true">
+                <arg value="@{from}"/>
+                <arg line="@{args}"/>
+                <arg value="-nostdlib"/>
+                <arg value="-nostartfiles"/>
+                <arg value="--cref"/>
+                <arg value="-M"/>
+                <arg value="-Map"/>
+                <arg value="${tmp.path}/sketch.map"/>
+        <!--        <arg value="-T"/>
+                <arg value="@{linker.directive}"/> -->
+                <arg value="-o"/>
+                <arg value="@{to}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <!--
+        ===================================================================
+         Object Copy macro
+        ===================================================================
+    -->
+    <macrodef name="objcopy">
+        <attribute name="name"/>
+        <attribute name="args"/>
+        <attribute name="src"/>
+        <attribute name="dest"/>
+        <sequential>
+            <exec executable="@{name}" failonerror="true">
+                <arg line="@{args}"/>
+                <arg value="@{src}"/>
+                <arg value="@{dest}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <!--
+        ===================================================================
+         Size Macro
+        ===================================================================
+    -->
+    <macrodef name="size">
+        <attribute name="name"/>
+        <attribute name="args"/>
+        <attribute name="file"/>
+        <sequential>
+
+            <exec executable="@{name}" failonerror="true">
+                <arg line="@{args}"/>
+                <arg value="@{file}"/>
+                <!-- Snatch the output of the executable -->
+                <redirector outputproperty="redirector.out"
+                            errorproperty="redirector.err">
+                    <outputmapper type="merge" to="${tmp.path}/redirector.out"/>
+                    <errormapper type="merge" to="${tmp.path}/redirector.err"/>
+                </redirector>
+            </exec>
+
+            <!-- Tokenize the output of the executable.
+                 Iterate over the tokens stopping at the 7th token (the size) -->
+            <var name="counter" value="0"/>
+            <for list="${redirector.out}" param="token" delimiter=" " trim="true">
+                <sequential>
+                    <math result="counter" operand1="${counter}"
+                                              operation="+"
+                                              operand2="1"
+                                              datatype="int"/>
+                    <if>
+                        <equals arg1="${counter}" arg2="7"/>
+                        <then>
+                            <var name="size" value="@{token}"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+
+            <math result="fraction" operand1 = "${size}"
+                                    operation="/"
+                                    operand2="${sketch.maxsize}" datatype="float"/>
+            <math result="percent"  operand1 = "${fraction}"
+                                    operation="*"
+                                    operand2="100" datatype="float"/>
+
+            <!-- Display the following output to the user -->
+            <echo message="Binary Sketch (${size} of ${sketch.maxsize} bytes, ${percent}%)"/>
+        </sequential>
+    </macrodef>
+
+
+
+</project>

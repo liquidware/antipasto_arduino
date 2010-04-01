@@ -82,17 +82,17 @@
 
     <target name="clean.cores">
         <!-- Clean Illuminato X Machina -->
-        <delete dir="hardware/cores/ixm"/>
+        <delete dir="hardware/arduino/cores/ixm"/>
     </target>
 
     <target name="clean.libraries">
         <!--Delete the library reference -->
         <delete>
             <fileset dir=".">
-                <include name="hardware/cores/**/src/components/library/**/reference/*"/>
+                <include name="hardware/arduino/cores/**/src/components/libraries/**/reference/*"/>
             </fileset>
             <dirset dir=".">
-                <include name="hardware/cores/**/src/components/library/**/reference" />
+                <include name="hardware/arduino/cores/**/src/components/libraries/**/reference" />
             </dirset>
         </delete>
     </target>
@@ -114,20 +114,25 @@
     <target name="get.cores">
         <!-- Get Illuminato X Machina Core -->
         <get src="http://livingcomputation.com/ixm/pub/sfb-latest.zip"
-             dest="hardware/cores/sfb-latest.zip"/>
-        <unzip src="hardware/cores/sfb-latest.zip"
-               dest="hardware/cores"/>
-        <move file="hardware/cores/SFB" tofile="hardware/cores/ixm"/>
-        <delete file="hardware/cores/sfb-latest.zip"/>
-        <!-- Get Illuminato X Machina Docs -->
+             dest="hardware/arduino/cores/sfb-latest.zip"/>
+        <unzip src="hardware/arduino/cores/sfb-latest.zip"
+               dest="hardware/arduino/cores"/>
+        <move file="hardware/arduino/cores/SFB" tofile="hardware/arduino/cores/ixm"/>
+        <delete file="hardware/arduino/cores/sfb-latest.zip"/>
+        <!-- Get Illuminato X Machina Core Reference -->
         <get src="http://livingcomputation.com/ixm/pub/sfb-latest-html-docs.zip"
-             dest="hardware/cores/ixm/sfb-latest-html-docs.zip"/>
-        <unzip src="hardware/cores/ixm/sfb-latest-html-docs.zip"
-               dest="hardware/cores/ixm"/>
-        <move file="hardware/cores/ixm/html" tofile="hardware/cores/ixm/reference"/>
-        <delete file="hardware/cores/ixm/sfb-latest-html-docs.zip"/>
-    </target>
+             dest="hardware/arduino/cores/ixm/sfb-latest-html-docs.zip"/>
+        <unzip src="hardware/arduino/cores/ixm/sfb-latest-html-docs.zip"
+               dest="hardware/arduino/cores/ixm"/>
+        <move file="hardware/arduino/cores/ixm/html" tofile="hardware/arduino/cores/ixm/reference"/>
+        <delete file="hardware/arduino/cores/ixm/sfb-latest-html-docs.zip"/>
 
+        <!-- Create TouchShield Core Reference-->
+        <mkdir dir="hardware/arduino/cores/touchshield/reference"/>
+        <echo file="hardware/arduino/cores/touchshield/reference/index.html">
+            TouchShield Reference
+        </echo>
+    </target>
 
     <!-- A helper macro to get libraries from remote http urls -->
     <macrodef name="get-library-http">
@@ -137,10 +142,10 @@
         <sequential>
             <echo message="Getting @{file} library from '@{url}'"/>
             <get src="@{url}"
-                 dest="hardware/cores/@{core}/src/components/library/@{file}"/>
-            <unzip src="hardware/cores/@{core}/src/components/library/@{file}"
-                   dest="hardware/cores/@{core}/src/components/library"/>
-            <delete file="hardware/cores/@{core}/src/components/library/@{file}"/>
+                 dest="hardware/arduino/cores/@{core}/src/components/libraries/@{file}"/>
+            <unzip src="hardware/arduino/cores/@{core}/src/components/libraries/@{file}"
+                   dest="hardware/arduino/cores/@{core}/src/components/libraries"/>
+            <delete file="hardware/arduino/cores/@{core}/src/components/libraries/@{file}"/>
             <!-- TODO: Build Reference if it doesn't exist -->
         </sequential>
     </macrodef>
@@ -152,14 +157,14 @@
         <attribute name="core"/>
         <sequential>
             <!-- Clean the dir -->
-            <delete dir = "hardware/cores/@{core}/src/components/library/@{libName}"
+            <delete dir = "hardware/arduino/cores/@{core}/src/components/libraries/@{libName}"
                     failonerror = "false" />
 
             <echo message="Getting @{libName} library from '@{url}'"/>
-            <git action="clone" args="@{url}" dir="hardware/cores/@{core}/src/components/library" />
+            <git action="clone" args="@{url}" dir="hardware/arduino/cores/@{core}/src/components/libraries" />
 
             <!-- Clean the git directory -->
-            <delete dir = "hardware/cores/@{core}/src/components/library/@{libName}/.git"
+            <delete dir = "hardware/arduino/cores/@{core}/src/components/libraries/@{libName}/.git"
                     failonerror = "false" />
         </sequential>
     </macrodef>
@@ -216,15 +221,17 @@
         <property name="jar.dir"     value="${build.dir}/jar"/>
 
         <!-- Substitute the token with the build version -->
-        <replace file="processing/app/Base.java" token="@BUILD_VERSION" value="${build.version}"/>
+        <replace file="app/src/processing/app/Base.java" token="@BUILD_VERSION" value="${build.version}"/>
 
         <!--  Compile -->
-        <property name="src.java.antipasto"     value="antipasto"/>
-        <property name="src.java.processing"    value="processing"/>
+        <property name="src.java.antipasto"     value="app/src/antipasto"/>
+        <property name="src.java.processing"    value="app/src/processing"/>
+        <property name="src.java.core"          value="core/src/processing"/>
 
             <mkdir dir="${classes.dir}"/>
             <javac srcdir="${src.java.antipasto};
-                           ${src.java.processing};" destdir="${classes.dir}" classpathref="classpath"/>
+                           ${src.java.processing};
+                           ${src.java.core};" destdir="${classes.dir}" classpathref="classpath"/>
 
 
         <!-- Jar -->
@@ -293,13 +300,13 @@
             </copy>
 
             <!-- Extract the Arduino Reference -->
-            <unzip src="build/shared/reference.zip" dest="${build.dir}/hardware/cores/arduino">
+            <unzip src="build/shared/reference.zip" dest="${build.dir}/hardware/arduino/cores/arduino">
                 <patternset>
                     <exclude name="**/*.css"/>
                 </patternset>
             </unzip>
-
-            <unzip src="build/shared/jruby.zip"     dest="${build.dir}/hardware/tools" />
+            <!-- Slimming down the build, removing jruby -->
+            <!-- <unzip src="build/shared/jruby.zip"     dest="${build.dir}/hardware/tools" /> -->
         </sequential>
     </macrodef>
 
@@ -915,8 +922,8 @@ distribution.version=${build.version}</echo>
     <target name="build.reference">
         <for param="file">
             <path>
-                <dirset dir="hardware/cores/arduino/src/components/library" includes="*"/>
-                <dirset dir="hardware/cores/touchshield/src/components/library" includes="*"/>
+                <dirset dir="hardware/arduino/cores/arduino/src/components/libraries" includes="*"/>
+                <dirset dir="hardware/arduino/cores/touchshield/src/components/libraries" includes="*"/>
             </path>
             <sequential>
 
@@ -964,7 +971,7 @@ distribution.version=${build.version}</echo>
             <!-- For each library in board -->
             <for param="libraryPath">
                 <path>
-                    <dirset dir="${build.dir}/hardware/cores/@{core}/src/components/library" includes="*" />
+                    <dirset dir="${build.dir}/hardware/arduino/cores/@{core}/src/components/libraries" includes="*" />
                 </path>
                 <sequential>
                     <echo message="in '@{libraryPath}'"/>
@@ -994,7 +1001,7 @@ distribution.version=${build.version}</echo>
                             <mkdir dir="@{tmpBaseDir}/${library}/examples/${example}"/>
 
                             <!-- Create the cross compiler build -->
-                            <ant antfile="${build.dir}/hardware/cores/@{core}/build.xml"
+                            <ant antfile="${build.dir}/hardware/arduino/cores/@{core}/build.xml"
                                  inheritAll = "false"
                                  output = "@{tmpBaseDir}/test.libraries.txt">
 
