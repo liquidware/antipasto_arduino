@@ -128,10 +128,7 @@
         <delete file="hardware/arduino/cores/ixm/sfb-latest-html-docs.zip"/>
 
         <!-- Create TouchShield Core Reference-->
-        <mkdir dir="hardware/arduino/cores/touchshield/reference"/>
-        <echo file="hardware/arduino/cores/touchshield/reference/index.html">
-            TouchShield Reference
-        </echo>
+        <!-- TODO based on doxygen -->
     </target>
 
     <!-- A helper macro to get libraries from remote http urls -->
@@ -1047,7 +1044,7 @@ distribution.version=${build.version}</echo>
         <test-libraries core="genesis"
                         board.cpu="atmega645"/>
 
-        <echo message="Board tests COMPLETE and PASSED."/>
+        <echo message="All board tests COMPLETE and PASSED."/>
     </target>
 
 </project>
