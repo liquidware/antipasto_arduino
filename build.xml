@@ -295,9 +295,6 @@
             <copy todir="${build.dir}/hardware">
                 <fileset dir="hardware"/>
             </copy>
-            <copy todir="${build.dir}">
-                <fileset dir="build/shared/dist"/>
-            </copy>
 
             <!-- Extract the Arduino Reference -->
             <unzip src="build/shared/reference.zip" dest="${build.dir}/hardware/arduino/cores/arduino">
