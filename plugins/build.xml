@@ -66,6 +66,9 @@
         <!-- unzip the sources -->
         <unzip src="${file.name}.zip"
                dest="./"/>
+
+        <!--remove the source zip -->
+        <delete file="${file.name}.zip"/>
     </target>
 
     <target name="build.jar">

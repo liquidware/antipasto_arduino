@@ -295,9 +295,6 @@
             <copy todir="${build.dir}/hardware">
                 <fileset dir="hardware"/>
             </copy>
-            <copy todir="${build.dir}">
-                <fileset dir="build/shared/dist"/>
-            </copy>
 
             <!-- Extract the Arduino Reference -->
             <unzip src="build/shared/reference.zip" dest="${build.dir}/hardware/arduino/cores/arduino">
@@ -962,7 +959,7 @@ distribution.version=${build.version}</echo>
     <macrodef name="test-libraries">
         <attribute name="core"/>
         <attribute name="board.cpu"/>
-        <attribute name="tmpBaseDir" default="${user.home}/${ant.project.name}/test-library/@{core}-@{board.cpu}"/>
+        <attribute name="tmpBaseDir" default="${user.home}/sketchbook/test-library/@{core}-@{board.cpu}"/>
         <sequential>
 
             <delete dir="${tmpBaseDir}"/>   <!-- Clean tests -->
@@ -1039,9 +1036,15 @@ distribution.version=${build.version}</echo>
         <echo message="Testing libraries..."/>
         <test-libraries core="arduino"
                         board.cpu="atmega168"/>
+        <test-libraries core="arduino"
+                        board.cpu="atmega328p"/>
+        <test-libraries core="arduino"
+                        board.cpu="atmega1280"/>
         <test-libraries core="touchshield"
                         board.cpu="atmega2560"/>
         <test-libraries core="touchshield"
+                        board.cpu="atmega645"/>
+        <test-libraries core="genesis"
                         board.cpu="atmega645"/>
 
         <echo message="Board tests COMPLETE and PASSED."/>

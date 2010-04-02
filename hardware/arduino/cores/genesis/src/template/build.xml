@@ -68,6 +68,9 @@
         <!-- Use the sketch template in the first run from the command line -->
         <copy file="${base.dir}/src/template/sketch.pde.tmpl" tofile="${build.dest}/${sketch.name}.pde" />
 
+        <!-- rename any .pde files into .cpp for ant test build compatibility -->
+        <move file="${build.dest}/${sketch.name}.pde" tofile="${build.dest}/${sketch.name}.cpp"/>
+
         <!-- Copy the IDE generated sketch file to a known name
              so the sketch-wrapper can include it -->
         <move file="${build.dest}/${sketch.name}.cpp" tofile="${tmp.path}/${sketch.name}/sketch.pde"/>
