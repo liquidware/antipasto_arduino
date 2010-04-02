@@ -5,11 +5,34 @@ The Antipasto Arduino IDE is a fork from the original Arduino IDE at:
 
 * [http://www.arduino.cc/en/Main/Software][0]
 
-This git repository contains the source for the IDE.  If you just want to work
-with the [Arduino], [TouchShield], or [Illuminato X Machina], you can download
-this IDE as a binary for Windows, Mac OSX, and Linux at:
+This git repository contains the source for the IDE.
+
+**Ready-to-use binaries for the Antipasto Arduino IDE on Windows, Mac OSX,
+or Linux can be downloaded at:**
 
 * [http://www.illuminatolabs.com/IlluminatoDownloads.htm][1]
+
+This fork is maintined by the team behind the [Antipasto Hardware Blog][6]. It
+adds support for [Liquidware][7] and [Modern Device][8] hardware to the traditional Arduino IDE, as well as extended documentation.  The following hardware
+is supported by the Antipasto Arduino IDE:
+
+* [Arduino Platform][2] (and all hardware supported by the Ardunio IDE)
+* [TouchShield Slide][3]
+* [Illuminato X Machina][4]
+* [JeeNodes Platform][9]
+* [Temperature Sensor][10]
+* [HMC6352 Compass Module][11]
+
+Code examples and documentation for the following is also included:
+
+* [Wind Sensor][12]
+* [ButtonPad][13]
+* [ButtonShield][14]
+* [InputShield][15]
+* [Modern Device LCD Displays][16]
+
+If you have a question about support for a specific platform or device, get
+in touch through Github or at the blog.
 
 Building the IDE
 ================
@@ -27,7 +50,9 @@ will build the IDE for your current OS (Windows, OSX, Linux).  To run the IDE:
 More Information
 ================
 
-The IDE is discussed here on github, on the [Antipasto Hardware Blog][6], and sometimes on the [Illuminato X Machina Mailing List][5].
+Bugs and feedback can be submitted through the "Issues" tab on Github.  News
+about the IDE can usually be found on the [Antipasto Hardware Blog][6], and
+sometimes on the [Illuminato X Machina Mailing List][5].
 
 [0]: http://www.arduino.cc/en/Main/Software "Arduino IDE"
 [1]: http://www.illuminatolabs.com/IlluminatoDownloads.htm "Antipasto Arduino IDE"
@@ -36,3 +61,13 @@ The IDE is discussed here on github, on the [Antipasto Hardware Blog][6], and so
 [4]: http://www.liquidware.com/shop/show/IXM/Illuminato+X+Machina "Illuminato X Machina at Liquidware"
 [5]: http://groups.google.com/group/illuminato?hl=en "Illuminato X Machina Mailing List"
 [6]: http://antipastohw.blogspot.com/ "Antipasto Hardware Blog"
+[7]: http://www.liquidware.com
+[8]: http://www.moderndevice.com
+[9]: http://www.moderndevice.com/products/jeenode-kit
+[10]: http://www.moderndevice.com/products/tmp421-temperature-sensor
+[11]: http://www.moderndevice.com/products/hmc6352-breakout-compass-sensor
+[12]: http://www.moderndevice.com/products/wind-sensor
+[13]: http://www.liquidware.com/shop/show/BUTP/ButtonPad
+[14]: http://www.liquidware.com/shop/show/BUT/ButtonShield
+[15]: http://www.liquidware.com/shop/show/INPT/InputShield
+[16]: http://www.moderndevice.com/collections/displays

@@ -1,8 +1,11 @@
 .DS_Store
+.classpath
+.project
 build/.DS_Store
 external/AntRunner
 plugins/antipasto_arduino_plugins
 build/macosx/work
 build/windows/work
 build/linux/work
-
+hardware/arduino/cores/*/src/components/libraries/*/reference/
+hardware/arduino/cores/*.zip
