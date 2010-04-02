@@ -959,7 +959,7 @@ distribution.version=${build.version}</echo>
     <macrodef name="test-libraries">
         <attribute name="core"/>
         <attribute name="board.cpu"/>
-        <attribute name="tmpBaseDir" default="${user.home}/${ant.project.name}/test-library/@{core}-@{board.cpu}"/>
+        <attribute name="tmpBaseDir" default="${user.home}/sketchbook/test-library/@{core}-@{board.cpu}"/>
         <sequential>
 
             <delete dir="${tmpBaseDir}"/>   <!-- Clean tests -->
