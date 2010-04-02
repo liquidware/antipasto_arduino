@@ -1036,9 +1036,15 @@ distribution.version=${build.version}</echo>
         <echo message="Testing libraries..."/>
         <test-libraries core="arduino"
                         board.cpu="atmega168"/>
+        <test-libraries core="arduino"
+                        board.cpu="atmega328p"/>
+        <test-libraries core="arduino"
+                        board.cpu="atmega1280"/>
         <test-libraries core="touchshield"
                         board.cpu="atmega2560"/>
         <test-libraries core="touchshield"
+                        board.cpu="atmega645"/>
+        <test-libraries core="genesis"
                         board.cpu="atmega645"/>
 
         <echo message="Board tests COMPLETE and PASSED."/>
