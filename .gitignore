@@ -3,7 +3,8 @@
 .project
 build/.DS_Store
 external/AntRunner
-plugins/antipasto_arduino_plugins
+plugins/antipasto_arduino_plugins*
+plugins/liquidware-antipasto_arduino_plugins*
 build/macosx/work
 build/windows/work
 build/linux/work
