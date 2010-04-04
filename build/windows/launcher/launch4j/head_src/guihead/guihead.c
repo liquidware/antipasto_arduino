@@ -47,7 +47,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR     lpCmdLine,
                      int       nCmdShow) {
+
 	int result = prepare(lpCmdLine);
+	debug("prepare() result %d\n", result);
+
 	if (result == ERROR_ALREADY_EXISTS) {
 		HWND handle = getInstanceWindow();
 		ShowWindow(handle, SW_SHOW);
@@ -55,6 +58,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		closeLogFile();
 		return 2;
 	}
+
 	if (result != TRUE) {
 		signalError();
 		return 1;
@@ -86,6 +90,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 					0,								// desired height
 					LR_DEFAULTSIZE);
 			if (hImage == NULL) {
+				debug("hImage was NULL signalError(), exiting\n");
 				signalError();
 				return 1;
 			}
@@ -96,14 +101,17 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 			int y = (GetSystemMetrics(SM_CYSCREEN) - (rect.bottom - rect.top)) / 2;
 			SetWindowPos(hWnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 			ShowWindow(hWnd, nCmdShow);
+
 			UpdateWindow (hWnd);
 		}
 		if (!SetTimer (hWnd, ID_TIMER, 1000 /* 1s */, TimerProc)) {
+			debug("SetTimer() signalError(), exiting\n");
 			signalError();
 			return 1;
 		}
 	}
 	if (execute(FALSE) == -1) {
+		debug("execute(FALSE) signalError(), exiting\n");
 		signalError();
 		return 1;
 	}
@@ -127,7 +135,7 @@ HWND getInstanceWindow() {
 	char windowTitle[STR];
 	char instWindowTitle[STR] = {0};
 	if (loadString(INSTANCE_WINDOW_TITLE, instWindowTitle)) {
-		HWND handle = FindWindowEx(NULL, NULL, NULL, NULL); 
+		HWND handle = FindWindowEx(NULL, NULL, NULL, NULL);
 		while (handle != NULL) {
 			GetWindowText(handle, windowTitle, STR - 1);
 			if (strstr(windowTitle, instWindowTitle) != NULL) {
@@ -137,7 +145,7 @@ HWND getInstanceWindow() {
 			}
 		}
 	}
-	return NULL;   
+	return NULL;
 }
 
 BOOL CALLBACK enumwndfn(HWND hwnd, LPARAM lParam) {
@@ -159,7 +167,7 @@ VOID CALLBACK TimerProc(
 	UINT uMsg,			// WM_TIMER message
 	UINT idEvent,		// timer identifier
 	DWORD dwTime) {		// current system time
-	
+
 	if (splash) {
 		if (splashTimeout == 0) {
 			splash = FALSE;

@@ -422,11 +422,19 @@
             <os family="windows" />
             <then>
                 <!--- Windows -->
+                <property name="launch4j.dir" value="build/windows/launcher/launch4j/" />
+                <taskdef name="launch4j"
+            	     classname="net.sf.launch4j.ant.Launch4jTask"
+            	     classpath="${launch4j.dir}/launch4j.jar; ${launch4j.dir}/lib/xstream.jar" />
+                <launch4j configFile="build/windows/launcher/config.xml" />
 
-                 <!--Compile the windows launcher -->
-                <exec executable="./build/windows/launcher/launch4j/launch4j">
-                    <arg line="../config.xml"/>
-                </exec>
+                <copy todir="${build.dir}">
+                  <fileset dir="build/windows/launcher"
+            	       includes="about.bmp, application.ico, config.xml"/>
+                </copy>
+                <launch4j configFile="${build.dir}/config.xml" />
+                <delete dir="${build.dir}"
+            	    includes="about.bmp, application.ico, config.xml" />
             </then>
 
         <elseif>
