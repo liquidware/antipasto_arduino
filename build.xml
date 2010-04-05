@@ -197,6 +197,10 @@
                             url="http://github.com/liquidware/LibCompass.git"
                             core="arduino"/>
 
+        <get-library-github libName="LibHumidity"
+                            url="http://github.com/liquidware/LibHumidity.git"
+                            core="arduino"/>
+
     </target>
 
     <!--
