@@ -337,16 +337,16 @@ public class Base {
 
     // Create a new empty window (will be replaced with any files to be opened)
     if (!opened) {
-      System.err.println("about to handleNew()");
+      //System.err.println("about to handleNew()");
       handleNew();
-      System.err.println("done handleNew()");
+      //System.err.println("done handleNew()");
     }
 
     // check for updates
     if (Preferences.getBoolean("update.check")) {
-      System.err.println("about to UpdateCheck");
+      //System.err.println("about to UpdateCheck");
       new UpdateCheck(this);
-      System.err.println("done UpdateCheck");
+     // System.err.println("done UpdateCheck");
   }
   }
 

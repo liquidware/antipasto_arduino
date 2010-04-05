@@ -67,7 +67,7 @@ FILE* openLogFile(const char* exePath, const int pathLen) {
 
 void closeLogFile() {
 	if (hLog != NULL) {
-		fclose(hLog);	
+		fclose(hLog);
 	}
 }
 
@@ -78,7 +78,7 @@ void setWow64Flag() {
 	if (fnIsWow64Process != NULL) {
 		fnIsWow64Process(GetCurrentProcess(), &wow64);
 	}
-	debug("WOW64:\t\t%s\n", wow64 ? "yes" : "no"); 
+	debug("WOW64:\t\t%s\n", wow64 ? "yes" : "no");
 }
 
 void setConsoleFlag() {
@@ -131,8 +131,8 @@ BOOL loadString(const int resID, char* buffer) {
 	if (NULL != hResource) {
 		hResourceLoaded = LoadResource(hModule, hResource);
 		if (NULL != hResourceLoaded) {
-			lpBuffer = (LPBYTE) LockResource(hResourceLoaded);            
-			if (NULL != lpBuffer) {     
+			lpBuffer = (LPBYTE) LockResource(hResourceLoaded);
+			if (NULL != lpBuffer) {
 				int x = 0;
 				do {
 					buffer[x] = (char) lpBuffer[x];
@@ -140,7 +140,7 @@ BOOL loadString(const int resID, char* buffer) {
 				// debug("Resource %d:\t%s\n", resID, buffer);
 				return TRUE;
 			}
-		}    
+		}
 	} else {
 		SetLastError(0);
 	}
@@ -216,13 +216,13 @@ void regSearch(const HKEY hKey, const char* keyName, const int searchType) {
 				NULL,			// address of buffer for class string
 				NULL,			// address for size of class buffer
 				&time) == ERROR_SUCCESS) {
-		
+
 		if (strcmp(buffer, javaMinVer) >= 0
 				&& (!*javaMaxVer || strcmp(buffer, javaMaxVer) <= 0)
 				&& strcmp(buffer, foundJavaVer) > 0) {
 			strcpy(foundJavaVer, buffer);
 			strcpy(foundJavaKey, keyName);
-			appendPath(foundJavaKey, buffer);	
+			appendPath(foundJavaKey, buffer);
 			foundJava = searchType;
 			debug("Match:\t\t%s\\%s\n", keyName, buffer);
 		} else {
@@ -240,7 +240,7 @@ void regSearchWow(const char* keyName, const int searchType) {
 			0,
             KEY_READ | KEY_WOW64_64KEY,
 			&hKey) == ERROR_SUCCESS) {
-		
+
 		regSearch(hKey, keyName, searchType | KEY_WOW64_64KEY);
 		RegCloseKey(hKey);
 		if ((foundJava & KEY_WOW64_64KEY) != NO_JAVA_FOUND)
@@ -300,9 +300,9 @@ BOOL findJavaHome(char* path, const int jdkPreference) {
 				do {
 					path[i] = buffer[i];
 				} while (path[i++] != 0);
-				if (foundJava & FOUND_SDK) {
-					appendPath(path, "jre");
-				}
+                // (foundJava & FOUND_SDK) {  // removed by fry
+                //    appendPath(path, "jre");
+                //
 				RegCloseKey(hKey);
 				return TRUE;
 			}
@@ -422,12 +422,12 @@ BOOL isJrePathOk(const char* path) {
 		strcpy(javaw, path);
 		appendJavaw(javaw);
 		result = _stat(javaw, &statBuf) == 0;
-	}	
+	}
 	debug("Check launcher:\t%s %s\n", javaw, result ? "(OK)" : "(n/a)");
 	return result;
 }
 
-/* 
+/*
  * Expand environment %variables%
  */
 BOOL expandVars(char *dst, const char *src, const char *exePath, const int pathLen) {
@@ -484,7 +484,7 @@ void appendHeapSizes(char *dst) {
 
 void appendHeapSize(char *dst, const int absID, const int percentID,
 		const DWORD freeMemory, const char *option) {
-	
+
 	const int mb = 1048576;		// 1 MB
 	int abs = loadInt(absID);
 	int percent = loadInt(percentID);
@@ -513,7 +513,7 @@ int prepare(const char *lpCmdLine) {
 		return FALSE;
 	}
 
-	// Initialize logging 
+	// Initialize logging
     if (strstr(lpCmdLine, "--l4j-debug") != NULL) {
 		hLog = openLogFile(exePath, pathLen);
 		if (hLog == NULL) {
@@ -528,7 +528,7 @@ int prepare(const char *lpCmdLine) {
 	loadString(SUPPORT_URL, errUrl);
 	loadString(ERR_TITLE, errTitle);
 	if (!loadString(STARTUP_ERR, errMsg)) {
-		return FALSE;			
+		return FALSE;
 	}
 
 	// Single instance
@@ -544,7 +544,7 @@ int prepare(const char *lpCmdLine) {
 			return ERROR_ALREADY_EXISTS;
 		}
 	}
-	
+
 	// Working dir
 	char tmp_path[_MAX_PATH] = {0};
 	GetCurrentDirectory(_MAX_PATH, oldPwd);
@@ -611,7 +611,7 @@ int prepare(const char *lpCmdLine) {
 		expandVars(tmp, varValue, exePath, pathLen);
 		debug("Set var:\t%s = %s\n", var, tmp);
 		SetEnvironmentVariable(var, tmp);
-		var = strtok(NULL, "\t"); 
+		var = strtok(NULL, "\t");
 	}
 	*tmp = 0;
 
@@ -623,11 +623,15 @@ int prepare(const char *lpCmdLine) {
 			&& strstr(lpCmdLine, "--l4j-default-proc") == NULL;
 	const BOOL wrapper = loadBool(WRAPPER);
 
+    char jdk_path[_MAX_PATH] = {0};  // fry
+    strcpy(jdk_path, cmd);
+    //msgBox(jdk_path);
+
 	appendLauncher(setProcName, exePath, pathLen, cmd);
 
 	// Heap sizes
 	appendHeapSizes(args);
-	
+
     // JVM options
 	if (loadString(JVM_OPTIONS, tmp)) {
 		strcat(tmp, " ");
@@ -688,6 +692,11 @@ int prepare(const char *lpCmdLine) {
 			appendAppClasspath(args, jar, exp);
 		}
 
+	// add tools.jar for JDK  [fry]
+	char tools[_MAX_PATH] = { 0 };
+	sprintf(tools, "%s\\lib\\tools.jar", jdk_path);
+	appendAppClasspath(args, tools, exp);
+
 		// Deal with wildcards or >> strcat(args, exp); <<
 		char* cp = strtok(exp, ";");
 		while(cp != NULL) {
@@ -713,7 +722,7 @@ int prepare(const char *lpCmdLine) {
 				strcat(args, ";");
 			}
 			cp = strtok(NULL, ";");
-		} 
+		}
 		*(args + strlen(args) - 1) = 0;
 
 		strcat(args, "\" ");
@@ -780,6 +789,8 @@ BOOL appendToPathVar(const char* path) {
 	return SetEnvironmentVariable("Path", chBuf);
 }
 
+// may need to ignore STILL_ACTIVE (error code 259) here
+// http://msdn.microsoft.com/en-us/library/ms683189(VS.85).aspx
 DWORD execute(const BOOL wait) {
 	STARTUPINFO si;
     memset(&pi, 0, sizeof(pi));

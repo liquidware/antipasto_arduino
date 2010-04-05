@@ -1464,10 +1464,9 @@ public class Sketch {
 //                       "name in the code was " + foundName, null);
 //      return false;
 //    }
-        boolean result = ((Base.getActiveEditor().getCompiler().size(appletFolder.getPath(), foundName,
-                                                           Base.getCurrentTarget(), foundName)) ||
-                          (Base.getActiveEditor().getCompiler().upload(appletFolder.getPath(), foundName,
-                                                           Base.getCurrentTarget())));
+        boolean result = (Base.getActiveEditor().getCompiler().upload(appletFolder.getPath(),
+                                                                      foundName,
+                                                                      Base.getCurrentTarget()));
         return result;
   }
 

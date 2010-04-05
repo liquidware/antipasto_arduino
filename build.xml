@@ -128,10 +128,7 @@
         <delete file="hardware/arduino/cores/ixm/sfb-latest-html-docs.zip"/>
 
         <!-- Create TouchShield Core Reference-->
-        <mkdir dir="hardware/arduino/cores/touchshield/reference"/>
-        <echo file="hardware/arduino/cores/touchshield/reference/index.html">
-            TouchShield Reference
-        </echo>
+        <!-- TODO based on doxygen -->
     </target>
 
     <!-- A helper macro to get libraries from remote http urls -->
@@ -185,12 +182,12 @@
     <!-- Get the user contributed hardware libraries -->
     <target name="get.libraries">
         <!-- JeeNode -->
-        <get-library-http file="Ports.zip"
+ <!--       <get-library-http file="Ports.zip"
                           url="http://jeefiles.equi4.com/Ports.zip"
                           core="arduino"/>
         <get-library-http file="RF12.zip"
                           url="http://jeefiles.equi4.com/RF12.zip"
-                          core="arduino"/>
+                          core="arduino"/> -->
 
         <get-library-github libName="LibTemperature"
                             url="http://github.com/liquidware/LibTemperature.git"
@@ -198,6 +195,10 @@
 
         <get-library-github libName="LibCompass"
                             url="http://github.com/liquidware/LibCompass.git"
+                            core="arduino"/>
+
+        <get-library-github libName="LibHumidity"
+                            url="http://github.com/liquidware/LibHumidity.git"
                             core="arduino"/>
 
     </target>
@@ -425,11 +426,19 @@
             <os family="windows" />
             <then>
                 <!--- Windows -->
+                <property name="launch4j.dir" value="build/windows/launcher/launch4j/" />
+                <taskdef name="launch4j"
+            	     classname="net.sf.launch4j.ant.Launch4jTask"
+            	     classpath="${launch4j.dir}/launch4j.jar; ${launch4j.dir}/lib/xstream.jar" />
+                <launch4j configFile="build/windows/launcher/config.xml" />
 
-                 <!--Compile the windows launcher -->
-                <exec executable="./build/windows/launcher/launch4j/launch4j">
-                    <arg line="../config.xml"/>
-                </exec>
+                <copy todir="${build.dir}">
+                  <fileset dir="build/windows/launcher"
+            	       includes="about.bmp, application.ico, config.xml"/>
+                </copy>
+                <launch4j configFile="${build.dir}/config.xml" />
+                <delete dir="${build.dir}"
+            	    includes="about.bmp, application.ico, config.xml" />
             </then>
 
         <elseif>
@@ -962,7 +971,7 @@ distribution.version=${build.version}</echo>
         <attribute name="tmpBaseDir" default="${user.home}/sketchbook/test-library/@{core}-@{board.cpu}"/>
         <sequential>
 
-            <delete dir="${tmpBaseDir}"/>   <!-- Clean tests -->
+            <delete dir="@{tmpBaseDir}"/>   <!-- Clean tests -->
             <mkdir dir="@{tmpBaseDir}"/>
 
             <!-- For each library in board -->
@@ -996,6 +1005,13 @@ distribution.version=${build.version}</echo>
                                            select="\0"/>
 
                             <mkdir dir="@{tmpBaseDir}/${library}/examples/${example}"/>
+
+                            <!-- Get a copy of the sketch -->
+                            <copy tofile="@{tmpBaseDir}/${library}/examples/${example}/${example}.cpp"
+                                  file="@{libraryPath}/examples/${example}/${example}.pde"/>
+                            <copy todir="@{tmpBaseDir}/${library}/examples/${example}">                     <!-- Copy all sketch source files -->
+                                <fileset dir="@{libraryPath}/examples/${example}" includes="**/*.*"/>
+                            </copy>
 
                             <!-- Create the cross compiler build -->
                             <ant antfile="${build.dir}/hardware/arduino/cores/@{core}/build.xml"
@@ -1047,7 +1063,7 @@ distribution.version=${build.version}</echo>
         <test-libraries core="genesis"
                         board.cpu="atmega645"/>
 
-        <echo message="Board tests COMPLETE and PASSED."/>
+        <echo message="All board tests COMPLETE and PASSED."/>
     </target>
 
 </project>

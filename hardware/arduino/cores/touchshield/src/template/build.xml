@@ -54,6 +54,11 @@
         <!-- Get a copy of the sketch-wrapper -->
         <copy tofile="${tmp.path}/${sketch.name}/sketch-wrapper.cpp" file="${base.dir}/src/template/sketch-wrapper.cpp.tmpl"/>
 
+        <!-- Tell the sketch wrapper to include the sketch by name -->
+        <echo file="${tmp.path}/${sketch.name}/sketch-wrapper.cpp"
+              append="true"
+              message="#include &quot;${sketch.name}.cpp&quot;"/>
+
         <!-- Find all source files in the base directory
              and move them into the tmp directory -->
         <move todir="${tmp.path}/${sketch.name}">
@@ -66,18 +71,20 @@
         </move>
 
         <!-- Use the sketch template in the first run from the command line -->
-        <copy file="${base.dir}/src/template/sketch.pde.tmpl" tofile="${build.dest}/${sketch.name}.pde" />
-
-        <!-- rename any .pde files into .cpp for ant test build compatibility -->
-        <move file="${build.dest}/${sketch.name}.pde" tofile="${build.dest}/${sketch.name}.cpp"/>
+        <copy file="${base.dir}/src/template/sketch.pde.tmpl" tofile="${tmp.path}/${sketch.name}/${sketch.name}.cpp" />
 
         <!-- Copy the IDE generated sketch file to a known name
              so the sketch-wrapper can include it -->
-        <move file="${build.dest}/${sketch.name}.cpp" tofile="${tmp.path}/${sketch.name}/sketch.pde"/>
+        <move file="${build.dest}/${sketch.name}.cpp" tofile="${tmp.path}/${sketch.name}/${sketch.name}.cpp"/>
 
         <!-- Create the folder for the sketch .o files -->
         <mkdir dir="${obj.path}" />
 
+    <!-- Recursively get all the library directories -->
+        <dirset dir="${lib.path}/include" id="lib.dirs" >
+            <include name="**/*"/>
+        </dirset>
+        <pathconvert pathsep=" -I" property="include.lib.dirs" refid="lib.dirs"/>
     </target>
 
     <target name="assembler.assemble">
@@ -87,7 +94,7 @@
             src="*.S" srcdir="${source.path}"
             args="${cross.opts} ${cross.cflags}
                   -I${include.base.path} -I${include.sub.path}
-                  -I${tmp.path}/${sketch.name}
+                  -I${tmp.path}/${sketch.name} -I${include.lib.dirs}
                   -c" />
     </target>
 
@@ -98,7 +105,7 @@
             src="*.c" srcdir="${source.path}"
             args="${cross.opts} ${cross.cflags}
                   -I${include.base.path} -I${include.sub.path}
-                  -I${tmp.path}/${sketch.name} -I${tmp.path}/${sketch.name}
+                  -I${tmp.path}/${sketch.name} -I${tmp.path}/${sketch.name} -I${include.lib.dirs}
                   -c" />
     </target>
 
@@ -109,7 +116,7 @@
             src="*.cpp" srcdir="${source.path}"
             args="${cross.opts} ${cross.cppflags}
                   -I${include.base.path} -I${include.sub.path}
-                  -I${tmp.path}/${sketch.name}
+                  -I${tmp.path}/${sketch.name} -I${include.lib.dirs}
                   -DSKETCH_BUILD_DATE=0x${sketch.build.date} -DSKETCH_BUILD_TIME=0x${sketch.build.time}
                   -c" />
     </target>
