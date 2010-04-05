@@ -1002,6 +1002,10 @@ distribution.version=${build.version}</echo>
 
                             <mkdir dir="@{tmpBaseDir}/${library}/examples/${example}"/>
 
+                            <!-- Get a copy of the sketch -->
+                            <copy tofile="@{tmpBaseDir}/${library}/examples/${example}/${example}.cpp"
+                                  file="@{libraryPath}/examples/${example}/${example}.pde"/>
+
                             <!-- Create the cross compiler build -->
                             <ant antfile="${build.dir}/hardware/arduino/cores/@{core}/build.xml"
                                  inheritAll = "false"
