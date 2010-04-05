@@ -182,12 +182,12 @@
     <!-- Get the user contributed hardware libraries -->
     <target name="get.libraries">
         <!-- JeeNode -->
-        <get-library-http file="Ports.zip"
+ <!--       <get-library-http file="Ports.zip"
                           url="http://jeefiles.equi4.com/Ports.zip"
                           core="arduino"/>
         <get-library-http file="RF12.zip"
                           url="http://jeefiles.equi4.com/RF12.zip"
-                          core="arduino"/>
+                          core="arduino"/> -->
 
         <get-library-github libName="LibTemperature"
                             url="http://github.com/liquidware/LibTemperature.git"
@@ -971,7 +971,7 @@ distribution.version=${build.version}</echo>
         <attribute name="tmpBaseDir" default="${user.home}/sketchbook/test-library/@{core}-@{board.cpu}"/>
         <sequential>
 
-            <delete dir="${tmpBaseDir}"/>   <!-- Clean tests -->
+            <delete dir="@{tmpBaseDir}"/>   <!-- Clean tests -->
             <mkdir dir="@{tmpBaseDir}"/>
 
             <!-- For each library in board -->
@@ -1009,6 +1009,9 @@ distribution.version=${build.version}</echo>
                             <!-- Get a copy of the sketch -->
                             <copy tofile="@{tmpBaseDir}/${library}/examples/${example}/${example}.cpp"
                                   file="@{libraryPath}/examples/${example}/${example}.pde"/>
+                            <copy todir="@{tmpBaseDir}/${library}/examples/${example}">                     <!-- Copy all sketch source files -->
+                                <fileset dir="@{libraryPath}/examples/${example}" includes="**/*.*"/>
+                            </copy>
 
                             <!-- Create the cross compiler build -->
                             <ant antfile="${build.dir}/hardware/arduino/cores/@{core}/build.xml"
