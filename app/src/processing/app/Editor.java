@@ -413,17 +413,17 @@ public class Editor extends JFrame implements RunnerListener {
 //    System.out.println("t3");
 
     // Bring back the general options for the editor
-    System.err.println("about to applyPreferences");
+    //System.err.println("about to applyPreferences");
     applyPreferences();
-    System.err.println("done applyPreferences");
+    //System.err.println("done applyPreferences");
 
 //    System.out.println("t4");
 
     // Open the document that was passed in
-    System.err.println("about to handleOpenInternal");
+    //System.err.println("about to handleOpenInternal");
     boolean loaded = handleOpenInternal(path);
     if (!loaded) sketch = null;
-    System.err.println("done handleOpenInternal with loaded=" + loaded);
+    //System.err.println("done handleOpenInternal with loaded=" + loaded);
 //    System.out.println("t5");
 
     // All set, now show the window
