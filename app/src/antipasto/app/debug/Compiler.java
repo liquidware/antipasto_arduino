@@ -157,8 +157,9 @@ public class Compiler implements MessageConsumer {
             }
 
             // Run
-            ant.run(buildFile, "size.all", new String[] { "build.dest",
-                        buildPath, "sketch.name", sketchName});
+            ant.run(buildFile, "size.all", new String[] {
+                        "build.dest", buildPath,
+                        "sketch.name", sketchName.substring(0, sketchName.lastIndexOf('.'))});
 
             // Wait to finish
             ant.waitForCompletion();
