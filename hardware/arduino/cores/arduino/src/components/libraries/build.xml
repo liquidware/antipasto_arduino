@@ -77,11 +77,17 @@
         </copy>
 
         <!-- Copy the library include files to a common area -->
-        <copy todir="${body.lib.path}/include" flatten="true">
+        <copy todir="${body.lib.path}/include" flatten="false">
             <fileset dir=".">
                 <include name="**/*.h"/>
             </fileset>
         </copy>
+
+        <!-- Recursively get all the library directories -->
+        <dirset dir="${lib.path}/include" id="lib.dirs" >
+            <include name="**/*"/>
+        </dirset>
+        <pathconvert pathsep=" -I" property="include.lib.dirs" refid="lib.dirs"/>
     </target>
 
     <target name="clean.body">
@@ -92,7 +98,7 @@
         <!-- Compile Body -->
         <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
             src="*.S" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c"/>
+            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -I${include.lib.dirs} -c"/>
     </target>
 
     <target name="compile.body.c">
@@ -100,7 +106,7 @@
         <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
             include="**/*.c"
             src="*.c" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -c" />
+            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -I${include.lib.dirs} -c" />
     </target>
 
     <target name="compile.body.cpp">
@@ -108,7 +114,7 @@
         <cc name="${cross.gpp}" dest="*.o" destdir="${body.obj.path}"
             include="**/*.cpp"
             src="*.cpp" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -I${include.sub.path} -c" />
+            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -I${include.sub.path} -I${include.lib.dirs} -c" />
     </target>
 
     <target name="archiver.body.archive">
