@@ -10,6 +10,8 @@ build/windows/work
 build/linux/work
 hardware/arduino/cores/*/src/components/libraries/*/reference/
 hardware/arduino/cores/arduino/src/components/libraries/LibHumidity
+hardware/arduino/cores/arduino/src/components/libraries/HardwareSensor
+hardware/arduino/cores/touchshield/src/components/libraries/HardwareSensor
 hardware/arduino/cores/*/src/components/libraries/Ports
 hardware/arduino/cores/*/src/components/libraries/RF12
 hardware/arduino/cores/*.zip
