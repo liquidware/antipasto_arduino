@@ -201,6 +201,13 @@
                             url="http://github.com/liquidware/LibHumidity.git"
                             core="arduino"/>
 
+        <get-library-github libName="HardwareSensor"
+                            url="http://github.com/liquidware/HardwareSensor.git"
+                            core="arduino"/>
+
+        <get-library-github libName="HardwareSensor"
+                            url="http://github.com/liquidware/HardwareSensor.git"
+                            core="touchshield"/>
     </target>
 
     <!--
