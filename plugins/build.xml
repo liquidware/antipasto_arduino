@@ -45,7 +45,6 @@
         <property name="github.user"      value="liquidware"/>
         <property name="github.repo"      value="antipasto_arduino_plugins"/>
         <property name="file.name"        value="${github.user}-${github.repo}"/>
-        <property name="file.checksum"    value="3f1d2c4"/>
     </target>
 
     <target name="clean.plugins">
@@ -57,21 +56,36 @@
           </delete>
     </target>
 
-    <!-- Get the IDE plugins from a remote github repository -->
+    <!-- Get the IDE plugins from a remote github repository (via zip) -->
     <target name="get.remote">
-        <!-- get from http -->
+
+        <!-- Fetch the zipfile over http -->
         <get src="http://github.com/${github.user}/${github.repo}/zipball/master"
              dest="${file.name}.zip"/>
 
-        <!-- unzip the sources -->
+        <!-- Unzip the source into ${file.name}-somehash -->
         <unzip src="${file.name}.zip"
                dest="./"/>
 
-        <!--remove the source zip -->
+        <!-- Delete the zipfile -->
         <delete file="${file.name}.zip"/>
+
+        <!-- Use a dirset trick to move the directory.  the dirset
+             must return only a single file though. -->
+        <path id="hashed_unzip_path">
+          <dirset dir=".">
+            <!-- Match ${file.name}-somehash -->
+            <include name="${file.name}-*"/>
+          </dirset>
+        </path>
+        
+        <!-- Set a property, then move the file -->
+        <property name="hashed_unzip_prop" refid="hashed_unzip_path" />
+        <move file="${hashed_unzip_prop}" tofile="${file.name}" />
+
     </target>
 
     <target name="build.jar">
-             <ant dir="${file.name}-${file.checksum}"  target="build.all" inheritAll="false"/>
+             <ant dir="${file.name}"  target="build.all" inheritAll="false"/>
     </target>
 </project>
