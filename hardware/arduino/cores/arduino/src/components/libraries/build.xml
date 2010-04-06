@@ -25,11 +25,10 @@
          Set the properties related to the target we're compiling
         ===================================================================
     -->
-    <basename property="base.name"     file="${basedir}" />
-    <property name="source.path"       value="."/>
-    <property name="base.dir"          value="../../.."/>
-    <property name="include.base.path" value="${base.dir}/src/include"/>
-    <property name="include.sub.path"  value="${base.dir}/src/components/board"/>
+    <basename property="base.name"      file="${basedir}" />
+    <property name="source.path"        value="."/>
+    <property name="base.dir"           value="../../.."/>
+    <property name="include.board.path" value="${base.dir}/src/components/board"/>
 
     <!--
         ===================================================================
@@ -54,14 +53,20 @@
     <target name="build.all"  depends="build.body"/>
     <target name="build.body" depends="clean.body,
                                        prepare.body,
-                                       assembler.body.assemble,
-                                       compile.body.c,
-                                       compile.body.cpp,
-                                       archiver.body.archive"/>
+                                       compile.body.sources"/>
 
     <target name="build.host" depends=""/>
 
+    <target name="clean.body">
+        <!--  Nothing -->
+    </target>
+
     <target name="prepare.body">
+        <property name="user.lib.dir" value="${user.home}/Arduino/libraries"/>
+
+        <!-- Create the user library folder if it doesn't exist -->
+        <mkdir dir="${user.lib.dir}/Template"/>
+
         <!-- Body directories -->
         <mkdir dir="${body.obj.path}"/>
         <mkdir dir="${body.bin.path}"/>
@@ -69,56 +74,74 @@
 
         <mkdir dir="${tmp.path}"/>
 
-        <!-- Copy the library directory structures -->
-        <copy todir="${body.obj.path}">
-            <dirset dir=".">
-                <include name="**/*"/>
-            </dirset>
-        </copy>
-
-        <!-- Copy the library include files to a common area -->
-        <copy todir="${body.lib.path}/include" flatten="false">
-            <fileset dir=".">
-                <include name="**/*.h"/>
-            </fileset>
-        </copy>
-
-        <!-- Recursively get all the library directories -->
-        <dirset dir="${lib.path}/include" id="lib.dirs" >
+        <!-- Create a pattern to match directies with source files -->
+        <patternset id="source.file.dirs">
             <include name="**/*"/>
+            <exclude name="**/examples/**"/>
+            <exclude name="**/reference/**"/>
+        </patternset>
+
+        <!-- Recursively find the core library directories -->
+        <dirset dir="${source.path}" id="lib.core.dirs">
+            <patternset refid="source.file.dirs"/>
         </dirset>
-        <pathconvert pathsep=" -I" property="include.lib.dirs" refid="lib.dirs"/>
+
+        <!-- Recursively find the user library directories -->
+        <dirset dir="${user.lib.dir}" id="lib.user.dirs">
+            <patternset refid="source.file.dirs"/>
+        </dirset>
+
+        <!-- Copy the library directory structures to the build folder -->
+        <copy todir="${body.obj.path}">
+            <dirset refid="lib.core.dirs"/>
+            <dirset refid="lib.user.dirs"/>
+        </copy>
+
+        <!-- A trick to format the library include
+            as -I//some/path -I//another/path for the GCC compiler -->
+        <pathconvert pathsep="&quot; -I&quot;" property="include.lib.core.dirs" refid="lib.core.dirs"/>
+        <pathconvert pathsep="&quot; -I&quot;" property="include.lib.user.dirs" refid="lib.user.dirs"/>
     </target>
 
-    <target name="clean.body">
-     <!--  Nothing -->
-    </target>
+    <target name="compile.body.sources">
+        <property name="include.dirs"
+                  value="-I&quot;${include.board.path}&quot;
+                         -I&quot;${include.lib.core.dirs}&quot;
+                         -I&quot;${include.lib.user.dirs}&quot;"/>
 
-    <target name="assembler.body.assemble">
-        <!-- Compile Body -->
-        <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
-            src="*.S" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -I${include.lib.dirs} -c"/>
-    </target>
-
-    <target name="compile.body.c">
-        <!-- Compile Body -->
+        <!-- Compile core .c sources -->
         <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
             include="**/*.c"
             src="*.c" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags} -I${include.base.path} -I${include.sub.path} -I${include.lib.dirs} -c" />
-    </target>
+            args="${cross.opts} ${cross.cflags}
+                  ${include.dirs}
+                  -c" />
 
-    <target name="compile.body.cpp">
-        <!-- Compile Body -->
+        <!-- Compile core .cpp sources -->
         <cc name="${cross.gpp}" dest="*.o" destdir="${body.obj.path}"
             include="**/*.cpp"
             src="*.cpp" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cppflags} -I${include.base.path} -I${include.sub.path} -I${include.lib.dirs} -c" />
-    </target>
+            args="${cross.opts} ${cross.cppflags}
+                  ${include.dirs}
+                  -c" />
 
-    <target name="archiver.body.archive">
-        <!-- Archive Body -->
+        <!-- Compile user .c sources -->
+        <cc name="${cross.gcc}" dest="*.o" destdir="${body.obj.path}"
+            include="**/*.c"
+            src="*.c" srcdir="${user.lib.dir}"
+            args="${cross.opts} ${cross.cflags}
+                  ${include.dirs}
+                  -c" />
+
+        <!-- Compile user .cpp sources -->
+        <cc name="${cross.gpp}" dest="*.o" destdir="${body.obj.path}"
+            include="**/*.cpp"
+            src="*.cpp" srcdir="${user.lib.dir}"
+            args="${cross.opts} ${cross.cppflags}
+                  ${include.dirs}
+                  -c" />
+
+        <!-- Archive the compiled objects -->
         <ar name="${cross.ar}" to="${body.lib.path}/libcontrib.a"
             dir="${body.obj.path}" includes="**/*.o" />
     </target>
