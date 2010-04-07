@@ -118,8 +118,8 @@
 
     <target name="build.libraries">
         <echo message="Building ${board.name} libraries..."/>
-        <ant dir="src/components/libraries" target="build.all" >
-            </target>
+        <ant dir="src/components/libraries" target="build.all" />
+    </target>
 
     <target name="build.bios">
         <echo message="Building ${board.name} bootloader target..."/>
@@ -134,7 +134,7 @@
     <target name="build.sketch">
         <echo message="Building ${sketch.name} for the ${board.name} core..."/>
         <ant dir="src/template"    target="build.all" />
-            </target>
+    </target>
 
     <target name="size.sketch">
         <echo message="Calculating ${sketch.name} size..."/>

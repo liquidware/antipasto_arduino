@@ -118,7 +118,7 @@
 
     <target name="build.libraries">
         <echo message="Building ${board.name} libraries..."/>
-        <ant dir="src/components/libraries" target="build.all">
+        <ant dir="src/components/libraries" target="build.all"/>
     </target>
 
     <target name="build.bios">
