@@ -71,7 +71,7 @@
         <!-- Tell the sketch wrapper to include the sketch by name -->
         <echo file="${tmp.path}/${sketch.name}/sketch-wrapper.cpp"
               append="true"
-              message="#include &quot;${sketch.name}.cpp&quot;"/>
+              message="#include &quot;${sketch.name}.pde&quot;"/>
 
         <!-- Find all source files in the base directory
              and move them into the tmp directory -->
@@ -85,11 +85,11 @@
         </move>
 
         <!-- Use the sketch template in the first run from the command line -->
-        <copy file="${base.dir}/src/template/sketch.pde.tmpl" tofile="${tmp.path}/${sketch.name}/${sketch.name}.cpp" />
+        <copy file="${base.dir}/src/template/sketch.pde.tmpl" tofile="${tmp.path}/${sketch.name}/${sketch.name}.pde" />
 
         <!-- Copy the IDE generated sketch file to a known name
              so the sketch-wrapper can include it -->
-        <move file="${build.dest}/${sketch.name}.cpp" tofile="${tmp.path}/${sketch.name}/${sketch.name}.cpp"/>
+        <move file="${build.dest}/${sketch.name}.cpp" tofile="${tmp.path}/${sketch.name}/${sketch.name}.pde"/>
 
         <!-- Create the folder for the sketch .o files -->
         <mkdir dir="${obj.path}" />
