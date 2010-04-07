@@ -1028,6 +1028,7 @@ distribution.version=${build.version}</echo>
                                 <!-- The sizer parsing seems to fail due to stdout differences
                                      from ant sub calls. So, lets run only the following targets -->
                                 <target name="set.body"/>
+                                <target name="find.libraries"/>
                                 <target name="build.libraries"/>
                                 <target name="build.board.src"/>
                                 <target name="build.sketch"/>
@@ -1057,18 +1058,21 @@ distribution.version=${build.version}</echo>
         <echo message="Board tests starting..."/>
 
         <echo message="Testing libraries..."/>
-        <test-libraries core="arduino"
-                        board.cpu="atmega168"/>
-        <test-libraries core="arduino"
-                        board.cpu="atmega328p"/>
-        <test-libraries core="arduino"
-                        board.cpu="atmega1280"/>
-        <test-libraries core="touchshield"
-                        board.cpu="atmega2560"/>
-        <test-libraries core="touchshield"
-                        board.cpu="atmega645"/>
-        <test-libraries core="genesis"
-                        board.cpu="atmega645"/>
+
+            <test-libraries core="arduino"
+                            board.cpu="atmega168"/>
+            <test-libraries core="arduino"
+                            board.cpu="atmega328p"/>
+            <test-libraries core="arduino"
+                            board.cpu="atmega1280"/>
+
+            <test-libraries core="touchshield"
+                            board.cpu="atmega2560"/>
+            <test-libraries core="touchshield"
+                            board.cpu="atmega645"/>
+
+            <test-libraries core="genesis"
+                            board.cpu="atmega645"/>
 
         <echo message="All board tests COMPLETE and PASSED."/>
     </target>
