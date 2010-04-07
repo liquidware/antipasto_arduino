@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
    ANT Buildfile - Builds the Arduino for Arduino
-   Copyright (C) 2009 Christopher Ladden, Omar Ayub  All rights reserved.
+   Copyright (C) 2010 Christopher Ladden, Omar Ayub  All rights reserved.
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@
          Set the properties related to the target we're compiling
         ===================================================================
     -->
+
     <basename property="base.name"      file="${basedir}" />
     <property name="source.path"        value="."/>
     <property name="base.dir"           value="../../.."/>
@@ -47,63 +48,44 @@
 
     <!--
         ===================================================================
-         Compile the source
+         Build Tasks - How we build this directory
         ===================================================================
     -->
-    <target name="build.all"  depends="build.body"/>
-    <target name="build.body" depends="clean.body,
-                                       prepare.body,
-                                       compile.body.sources"/>
+    <target name="build.all"  depends="compile.all"/>
+    <target name="compile.all" depends="clean,
+                                        prepare,
+                                        compile.sources"/>
 
-    <target name="build.host" depends=""/>
+    <!--
+        ===================================================================
+         Clean - clean the build
+        ===================================================================
+    -->
 
-    <target name="clean.body">
+    <target name="clean">
         <!--  Nothing -->
     </target>
 
-    <target name="prepare.body">
-        <property name="user.lib.dir" value="${user.home}/Arduino/libraries"/>
+    <!--
+        ===================================================================
+         Prepare - create build directories and grab folders
+        ===================================================================
+    -->
 
-        <!-- Create the user library folder if it doesn't exist -->
-        <mkdir dir="${user.lib.dir}/Template"/>
-
-        <!-- Body directories -->
+    <target name="prepare">
         <mkdir dir="${body.obj.path}"/>
         <mkdir dir="${body.bin.path}"/>
         <mkdir dir="${body.lib.path}"/>
-
         <mkdir dir="${tmp.path}"/>
-
-        <!-- Create a pattern to match directies with source files -->
-        <patternset id="source.file.dirs">
-            <include name="**/*"/>
-            <exclude name="**/examples/**"/>
-            <exclude name="**/reference/**"/>
-        </patternset>
-
-        <!-- Recursively find the core library directories -->
-        <dirset dir="${source.path}" id="lib.core.dirs">
-            <patternset refid="source.file.dirs"/>
-        </dirset>
-
-        <!-- Recursively find the user library directories -->
-        <dirset dir="${user.lib.dir}" id="lib.user.dirs">
-            <patternset refid="source.file.dirs"/>
-        </dirset>
-
-        <!-- Copy the library directory structures to the build folder -->
-        <copy todir="${body.obj.path}">
-            <dirset refid="lib.core.dirs"/>
-            <dirset refid="lib.user.dirs"/>
-        </copy>
-
-        <!-- A trick to format the library include
-            as -I//some/path -I//another/path for the GCC compiler -->
-        <pathconvert pathsep="&quot; -I&quot;" property="include.lib.core.dirs" refid="lib.core.dirs"/>
-        <pathconvert pathsep="&quot; -I&quot;" property="include.lib.user.dirs" refid="lib.user.dirs"/>
     </target>
 
-    <target name="compile.body.sources">
+    <!--
+        ===================================================================
+         Compile - compile the core and user source files
+        ===================================================================
+    -->
+
+    <target name="compile.sources">
         <property name="include.dirs"
                   value="-I&quot;${include.board.path}&quot;
                          -I&quot;${include.lib.core.dirs}&quot;
@@ -145,5 +127,4 @@
         <ar name="${cross.ar}" to="${body.lib.path}/libcontrib.a"
             dir="${body.obj.path}" includes="**/*.o" />
     </target>
-
 </project>

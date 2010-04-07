@@ -47,12 +47,11 @@
 
     <!--
         ===================================================================
-         The project's targets
+         Build Tasks - How we build this directory
         ===================================================================
     -->
     <target name="build.all"  depends="build.body"/>
-    <target name="build.body" depends="set.body, build.libraries, build.board.src, build.sketch, size.sketch"/>
-    <target name="build.host" depends="set.host, build.libraries, build.host.src"/>
+    <target name="build.body" depends="set.body, find.libraries, build.libraries, build.board.src, build.sketch, size.sketch"/>
     <target name="build.bootloader" depends="set.body, build.libraries, build.board.src, build.bios"/>
 
     <target name="size.all"   depends="size.sketch"/>
@@ -75,9 +74,54 @@
         <property name="target" value="host"/>
     </target>
 
+    <!--
+        ===================================================================
+         Find Libraries - Find the core and user libraries
+        ===================================================================
+    -->
+
+    <target name="find.libraries">
+        <property name="core.lib.dir" value="./src/components/libraries"/>
+        <property name="user.lib.dir" value="${user.home}/Arduino/libraries"/>
+
+        <!-- Create the user library folder if it doesn't exist -->
+        <mkdir dir="${user.lib.dir}/Template"/>
+
+        <!-- Create a pattern to match directies with source files -->
+        <patternset id="source.file.dirs">
+            <include name="**/*"/>
+            <exclude name="**/examples/**"/>
+            <exclude name="**/reference/**"/>
+        </patternset>
+
+        <!-- Recursively find the core library directories -->
+        <dirset dir="${core.lib.dir}" id="lib.core.dirs">
+            <patternset refid="source.file.dirs"/>
+        </dirset>
+
+        <!-- Recursively find the user library directories -->
+        <dirset dir="${user.lib.dir}" id="lib.user.dirs">
+            <patternset refid="source.file.dirs"/>
+        </dirset>
+
+        <!-- A trick to format the library include
+            as -I//some/path -I//another/path for the GCC compiler -->
+        <pathconvert pathsep="&quot; -I&quot;" property="include.lib.core.dirs" refid="lib.core.dirs"/>
+        <pathconvert pathsep="&quot; -I&quot;" property="include.lib.user.dirs" refid="lib.user.dirs"/>
+
+        <!-- Copy the library directory structures to the build folder -->
+        <copy todir="${build.dest}/targets/body/build">
+            <dirset refid="lib.core.dirs"/>
+            <dirset refid="lib.user.dirs"/>
+        </copy>
+    </target>
+
     <target name="build.libraries">
         <echo message="Building ${board.name} libraries..."/>
-        <ant dir="src/components/libraries" target="build.${target}"/>
+        <ant dir="src/components/libraries" target="build.all">
+            <reference refid="include.lib.core.dirs"/>
+            <reference refid="include.lib.user.dirs"/>
+        </ant>
     </target>
 
     <target name="build.bios">
@@ -85,19 +129,17 @@
         <ant dir="src/components/bios"    target="build.all" />
     </target>
 
-    <target name="build.host.src">
-        <echo message="Building ${board.name} host target..."/>
-        <ant dir="src/components/host"    target="build.all"/>
-    </target>
-
     <target name="build.board.src">
         <echo message="Building ${board.name} board target..."/>
-        <ant dir="src/components/board"   target="build.all" />
+        <ant dir="src/components/board"   target="build.all"/>
     </target>
 
     <target name="build.sketch">
         <echo message="Building ${sketch.name} for the ${board.name} core..."/>
-        <ant dir="src/template"    target="build.all" />
+        <ant dir="src/template"    target="build.all" >
+            <reference refid="include.lib.core.dirs"/>
+            <reference refid="include.lib.user.dirs"/>
+        </ant>
     </target>
 
     <target name="size.sketch">

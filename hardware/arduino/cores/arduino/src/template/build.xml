@@ -25,11 +25,10 @@
          Set the properties related to the target we're compiling.
         ===================================================================
     -->
-    <basename property="base.name"     file="${basedir}" />
-    <property name="source.path"       value="${build.dest}/tmp/${sketch.name}"/>
-    <property name="base.dir"          value="../../"/>
-    <property name="include.base.path" value="${base.dir}/src/include"/>
-    <property name="include.sub.path"  value="${base.dir}/src/components/board"/>
+    <basename property="base.name"       file="${basedir}" />
+    <property name="source.path"         value="${build.dest}/tmp/${sketch.name}"/>
+    <property name="base.dir"            value="../../"/>
+    <property name="include.board.path"  value="${base.dir}/src/components/board"/>
 
     <!--
         ===================================================================
@@ -42,13 +41,28 @@
 
     <!--
         ===================================================================
-         Compile the source
+         Build Tasks
         ===================================================================
     -->
-    <target name="compile.all" depends="prepare, assembler.assemble, compile.c, compile.cpp, archiver.archive"/>
-    <target name="linker.all" depends="linker.link"/>
     <target name="build.all" depends="compile.all, linker.all, hex.hexify"/>
+    <target name="compile.all" depends="clean, prepare, compile.sources"/>
+    <target name="linker.all" depends="linker.link"/>
 
+    <!--
+        ===================================================================
+         Clean - clean the build
+        ===================================================================
+    -->
+
+    <target name="clean">
+        <!-- Do nothing -->
+    </target>
+
+    <!--
+        ===================================================================
+         Prepare - create build directories and grab files/folders
+        ===================================================================
+    -->
     <target name="prepare">
 
         <!-- Get a copy of the sketch-wrapper -->
@@ -79,59 +93,46 @@
 
         <!-- Create the folder for the sketch .o files -->
         <mkdir dir="${obj.path}" />
-
-        <!-- Recursively get all the library directories -->
-        <dirset dir="${lib.path}/include" id="lib.dirs" >
-            <include name="**/*"/>
-        </dirset>
-        <pathconvert pathsep=" -I" property="include.lib.dirs" refid="lib.dirs"/>
-    </target>
-
-    <target name="assembler.assemble">
-        <cc name="${cross.gcc}"
-            force="true"
-            dest="*.o" destdir="${obj.path}"
-            src="*.S" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags}
-                  -I${include.base.path} -I${include.sub.path}
-                  -I${tmp.path}/${sketch.name} -I${include.lib.dirs}
-                  -c" />
-    </target>
-
-    <target name="compile.c">
-        <cc name="${cross.gcc}"
-            force="true"
-            dest="*.o" destdir="${obj.path}"
-            src="*.c" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cflags}
-                  -I${include.base.path} -I${include.sub.path}
-                  -I${tmp.path}/${sketch.name} -I${tmp.path}/${sketch.name} -I${include.lib.dirs}
-                  -c" />
-    </target>
-
-    <target name="compile.cpp">
-        <cc name="${cross.gpp}"
-            force="true"
-            dest="*.o" destdir="${obj.path}"
-            src="*.cpp" srcdir="${source.path}"
-            args="${cross.opts} ${cross.cppflags}
-                  -I${include.base.path} -I${include.sub.path}
-                  -I${tmp.path}/${sketch.name} -I${include.lib.dirs}
-                  -DSKETCH_BUILD_DATE=0x${sketch.build.date} -DSKETCH_BUILD_TIME=0x${sketch.build.time}
-                  -c" />
     </target>
 
     <!--
         ===================================================================
-        build the the sketch archive
+         Compile - compile the sketch sources
         ===================================================================
     -->
 
-    <target name="archiver.archive">
+    <target name="compile.sources">
+        <property name="include.dirs"
+                  value="-I&quot;${include.board.path}&quot;
+                         -I&quot;${include.lib.core.dirs}&quot;
+                         -I&quot;${include.lib.user.dirs}&quot;
+                         -I&quot;${tmp.path}/${sketch.name}&quot;"/>
+
+        <!-- Compile sketch .c sources --> <!-- remove the include argument? -->
+        <cc name="${cross.gcc}" dest="*.o" destdir="${obj.path}" force="true"
+            include="**/*.c"
+            src="*.c" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cflags}
+                  ${include.dirs}
+                  -c" />
+
+        <!-- Compile sketch .cpp sources --> <!-- remove the include argument? -->
+        <cc name="${cross.gpp}" dest="*.o" destdir="${obj.path}" force="true"
+            include="**/*.cpp"
+            src="*.cpp" srcdir="${source.path}"
+            args="${cross.opts} ${cross.cppflags}
+                  ${include.dirs}
+                  -c" />
+
+        <!-- Create the sketch archive -->
         <ar name="${cross.ar}" to="${lib.path}/libsketch.a" dir="${obj.path}" includes="*.o" />
     </target>
 
-
+    <!--
+        ===================================================================
+         Link - Link the sketch object with the board and library objects
+        ===================================================================
+    -->
 
     <target name="linker.link">
 
