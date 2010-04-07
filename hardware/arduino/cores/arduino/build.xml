@@ -119,9 +119,6 @@
     <target name="build.libraries">
         <echo message="Building ${board.name} libraries..."/>
         <ant dir="src/components/libraries" target="build.all">
-            <reference refid="include.lib.core.dirs"/>
-            <reference refid="include.lib.user.dirs"/>
-        </ant>
     </target>
 
     <target name="build.bios">
@@ -136,10 +133,7 @@
 
     <target name="build.sketch">
         <echo message="Building ${sketch.name} for the ${board.name} core..."/>
-        <ant dir="src/template"    target="build.all" >
-            <reference refid="include.lib.core.dirs"/>
-            <reference refid="include.lib.user.dirs"/>
-        </ant>
+        <ant dir="src/template"    target="build.all" />
     </target>
 
     <target name="size.sketch">
