@@ -853,15 +853,18 @@ public class Editor extends JFrame implements RunnerListener {
                                });
         menu.add(item);
 
-        item = new JMenuItem("Flash Transfer");
+        menu.addSeparator();
+
+        item = new JMenuItem("Image Uploader");
         item.addActionListener(new ActionListener() {
                                    public void actionPerformed(ActionEvent e) {
-                                      JFrame t = new JFrame("test");
-                                      ImageListPanel p = new ImageListPanel();
-                                      t.add(p);
-                                      t.add(new JButton("Hi!!"));
-                                      t.setPreferredSize(new Dimension(320,240));
-                                      t.setVisible(true);
+                                      JFrame f = new JFrame("Arduino Image Uploader");
+                                      f.setSize(400, 300);
+                                      f.setLayout(new BorderLayout());
+                                      f.setLocationRelativeTo(Base.getActiveEditor());
+                                      f.setVisible(true);
+                                      ImageListPanel p = new ImageListPanel(getSketch().getDataFolder());
+                                      f.add(p);
                                    }
                                });
         menu.add(item);

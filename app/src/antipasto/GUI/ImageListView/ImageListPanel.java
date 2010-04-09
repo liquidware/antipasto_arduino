@@ -11,10 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.io.*;
 
-//import antipasto.GUI.GadgetListView.GadgetPanel;
-//import antipasto.GUI.GadgetListView.GadgetPanelEvents.ActiveGadgetObject;
-//import antipasto.GUI.GadgetListView.GadgetPanelEvents.IActiveGadgetChangedEventListener;
-import antipasto.Interfaces.IModule;
+import antipasto.*;
 
 import processing.app.Base;
 import processing.app.Serial;
@@ -43,14 +40,12 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class ImageListPanel extends JPanel implements /*IActiveGadgetChangedEventListener,*/ ComponentListener {
+public class ImageListPanel extends JPanel implements ComponentListener {
 	private ImageListView list;
 	final FlashTransfer imageTransfer;
 	Serial mySerial = null;
 	private JButton removeButton;
 	private JButton transferButton;
-	//private GadgetPanel panel;
-	private IModule _module;
 	private JProgressBar progressBar;
 	boolean isTransfering = false;
 	private JLabel infoLabel;
@@ -63,14 +58,11 @@ public class ImageListPanel extends JPanel implements /*IActiveGadgetChangedEven
 	//we want to
 	private static boolean killTransfer = false;
 
-	//public ImageListPanel(GadgetPanel panel, FlashTransfer imageTransfer){
-	//	this.imageTransfer = imageTransfer;
-	//	this.init();
-	//}
-	public ImageListPanel(){
-		this.imageTransfer = new FlashTransfer();
-		this.init();
-
+	public ImageListPanel(File imagePath){
+		imageTransfer = new FlashTransfer();
+		initSubPanels();
+		setDirectory(imagePath);
+		setVisible(true);
 	}
 
 	//This function is used to kill any active transfer that may be hogging
@@ -80,7 +72,7 @@ public class ImageListPanel extends JPanel implements /*IActiveGadgetChangedEven
 		FlashTransfer.killTransfer();
 	}
 
-	private void init(){
+	private void initSubPanels(){
 		this.createTransferButton();
 		this.transferButton.setVisible(true);
 
@@ -145,58 +137,27 @@ public class ImageListPanel extends JPanel implements /*IActiveGadgetChangedEven
 		this.progressBar.setVisible(true);
 		this.progressLabel.setVisible(true);
 
+
+
 		this.setVisible(true);
 	}
 
-	public void setModule(IModule module){
-	     if(module != null){
+	public void setDirectory(File imagePath){
 	     	/* Build the center */
-	     	File[] files = _module.getData();
-	     	list = new ImageListView(_module);
+	     	list = new ImageListView(imagePath);
 	     	if(scrollPane != null){
 	     		this.remove(scrollPane);
 	     		scrollPane.setVisible(false);
 	     		scrollPane = null;				//let's take out the trash!
 	     	}
 	     	scrollPane = new JScrollPane(list);
-			this.add(scrollPane, BorderLayout.CENTER);
-			scrollPane.setSize(this.getWidth(), this.getHeight() - transferButton.getHeight());
-			scrollPane.setVisible(true);
-			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-			list.setVisible(true);
-
-		}
+		this.add(scrollPane, BorderLayout.CENTER);
+		scrollPane.setSize(this.getWidth(), this.getHeight() - transferButton.getHeight());
+		scrollPane.setVisible(true);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		list.setVisible(true);
 		this.transferButton.setVisible(true);
-
-	     _module = module;
 	  }
-
-	//public void setModule(IModule module){
-	//	if(module != null){
-	//		/* Build the center */
-	//		File[] files = module.getData();
-	//		list = new ImageListView(module);
-	//		if(scrollPane != null){
-	//			this.remove(scrollPane);
-	//			scrollPane.setVisible(false);
-	//			scrollPane = null;				//let's take out the trash!
-	//		}
-	//		scrollPane = new JScrollPane(list);
-	// 		this.add(scrollPane, BorderLayout.CENTER);
-	// 		scrollPane.setSize(this.getWidth(), this.getHeight() - transferButton.getHeight());
-	// 		scrollPane.setVisible(true);
-	// 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	// 		list.setVisible(true);
-	//
-	// 	}
-	// 	this.transferButton.setVisible(true);
-	//
-	//	_module = module;
-	//}
-
-	public IModule getModule(){
-		return this._module;
-	}
 
 	public void paint(java.awt.Graphics g){
 
@@ -204,14 +165,6 @@ public class ImageListPanel extends JPanel implements /*IActiveGadgetChangedEven
 		progressLabel.setText(" Files: " + totalFileCount);
 
 		super.paint(g);
-	}
-
-	private void setSizesOfComponents(){
-		Dimension parentSize = this.getParent().getSize();
-		Dimension btnSize = this.transferButton.getSize();
-		double height = this.getParent().getSize().getHeight() - this.transferButton.getSize().getHeight();
-		int heightI = (int)height;
-		this.repaint();
 	}
 
 	private JButton createRemoveButton(){
@@ -273,7 +226,7 @@ public class ImageListPanel extends JPanel implements /*IActiveGadgetChangedEven
     /*made public for api..soon depracted*/
 	public void transfer(){
 		try {
-			final File fileList[] = this._module.getData();
+			final File fileList[] = list.getDirectory().listFiles();
 			final FlashTransfer transfer = imageTransfer;
 
 			transferButton.setText("Sending...");
@@ -349,11 +302,6 @@ public class ImageListPanel extends JPanel implements /*IActiveGadgetChangedEven
 		   progressBar.setVisible(false);
 		   this.repaint();
 	}
-
-	//public void onActiveGadgetChanged(ActiveGadgetObject obj) {
-	//}
-
-
 
 	public void componentHidden(ComponentEvent e) {
 		// TODO Auto-generated method stub
