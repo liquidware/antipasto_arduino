@@ -70,19 +70,14 @@
         <!-- Delete the zipfile -->
         <delete file="${file.name}.zip"/>
 
-        <!-- Use a dirset trick to move the directory.  the dirset
-             must return only a single file though. -->
-        <path id="hashed_unzip_path_pl">
-          <dirset dir=".">
-            <!-- Match ${file.name}-somehash -->
-            <include name="${file.name}-*"/>
-          </dirset>
-        </path>
-        
-        <!-- Set a property, then move the file -->
-        <property name="hashed_unzip_prop_pl" refid="hashed_unzip_path_pl" />
-        <move file="${hashed_unzip_prop_pl}" tofile="${file.name}" />
+        <!-- Create the repo directory -->
+        <mkdir dir="${file.name}"/>
 
+        <!-- Move the files into a directory without 'somehash' -->
+        <move todir="${file.name}">
+          <fileset dir="." includes="**/*"/>
+          <mapper type="regexp" from="^${file.name}-[\da-f]+(.*)" to="\1"/>
+        </move>
     </target>
 
     <target name="build.jar">
