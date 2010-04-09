@@ -149,65 +149,127 @@
 
     <!-- A helper macro to get libraries from remote http urls -->
     <macrodef name="get-library-github">
-        <attribute name="libName"/>
-        <attribute name="url"/>
+        <attribute name="user"/>
+        <attribute name="repo"/>
         <attribute name="core"/>
+         
         <sequential>
+            <mkdir dir="hardware/arduino/cores/@{core}/src/components/libraries/" />
             <!-- Clean the dir -->
-            <delete dir = "hardware/arduino/cores/@{core}/src/components/libraries/@{libName}"
+            <delete dir = "hardware/arduino/cores/@{core}/src/components/libraries/@{repo}"
                     failonerror = "false" />
 
-            <echo message="Getting @{libName} library from '@{url}'"/>
-            <git action="clone" args="@{url}" dir="hardware/arduino/cores/@{core}/src/components/libraries" />
+            <echo message="Getting @{repo} library from 'http://github.com/@{user}/@{repo}/zipball/master'"/>
 
-            <!-- Clean the git directory -->
-            <delete dir = "hardware/arduino/cores/@{core}/src/components/libraries/@{libName}/.git"
-                    failonerror = "false" />
-        </sequential>
-    </macrodef>
+            <!-- Fetch the zipfile over http -->
+            <get src="http://github.com/@{user}/@{repo}/zipball/master"
+                 dest="hardware/arduino/cores/@{core}/src/components/libraries/@{user}-@{repo}.zip"/>
 
-    <!-- A helper macro to get github clones -->
-   <macrodef name="git">
-        <attribute name="action"/>
-        <attribute name="args"/>
-        <attribute name="dir"/>
-        <sequential>
-            <exec executable="git" dir="@{dir}" failonerror="true" searchpath="true">
-                <arg value="@{action}"/>
-                <arg line="@{args}"/>
-            </exec>
+            <!-- Unzip the source into ${libName}-somehash -->
+            <unzip src="hardware/arduino/cores/@{core}/src/components/libraries/@{user}-@{repo}.zip"
+                   dest="hardware/arduino/cores/@{core}/src/components/libraries/"/>
+
+            <!-- Delete the zipfile -->
+            <delete file="hardware/arduino/cores/@{core}/src/components/libraries/@{user}-@{repo}.zip"/>
         </sequential>
     </macrodef>
 
     <!-- Get the user contributed hardware libraries -->
     <target name="get.libraries">
         <!-- JeeNode -->
- <!--       <get-library-http file="Ports.zip"
+        <!--
+        <get-library-http file="Ports.zip"
                           url="http://jeefiles.equi4.com/Ports.zip"
                           core="arduino"/>
         <get-library-http file="RF12.zip"
                           url="http://jeefiles.equi4.com/RF12.zip"
-                          core="arduino"/> -->
+                          core="arduino"/>
+        -->
 
-        <get-library-github libName="LibTemperature"
-                            url="http://github.com/liquidware/LibTemperature.git"
+        <get-library-github user="liquidware"
+                            repo="LibTemperature"
                             core="arduino"/>
 
-        <get-library-github libName="LibCompass"
-                            url="http://github.com/liquidware/LibCompass.git"
+        <!-- Use a dirset trick to move the directory.  the dirset
+             must return only a single file though. -->
+        <path id="hashed_unzip_path_lt">
+          <dirset dir="hardware/arduino/cores/arduino/src/components/libraries/">
+            <!-- Match ${libName}-somehash -->
+            <include name="liquidware-LibTemperature-*"/>
+          </dirset>
+        </path>
+
+        <!-- Set a property, then move the file -->
+        <property name="hashed_unzip_prop_lt" refid="hashed_unzip_path_lt" />
+        <move file="${hashed_unzip_prop_lt}" tofile="hardware/arduino/cores/arduino/src/components/libraries/LibTemperature" />
+
+        <get-library-github user="liquidware"
+                            repo="LibCompass"
                             core="arduino"/>
 
-        <get-library-github libName="LibHumidity"
-                            url="http://github.com/liquidware/LibHumidity.git"
+        <!-- Use a dirset trick to move the directory.  the dirset
+             must return only a single file though. -->
+        <path id="hashed_unzip_path_lc">
+          <dirset dir="hardware/arduino/cores/arduino/src/components/libraries/">
+            <!-- Match ${libName}-somehash -->
+            <include name="liquidware-LibCompass-*"/>
+          </dirset>
+        </path>
+
+        <!-- Set a property, then move the file -->
+        <property name="hashed_unzip_prop_lc" refid="hashed_unzip_path_lc" />
+        <move file="${hashed_unzip_prop_lc}" tofile="hardware/arduino/cores/arduino/src/components/libraries/LibCompass" />
+
+        <get-library-github user="liquidware"
+                            repo="LibHumidity"
                             core="arduino"/>
 
-        <get-library-github libName="HardwareSensor"
-                            url="http://github.com/liquidware/HardwareSensor.git"
+        <!-- Use a dirset trick to move the directory.  the dirset
+             must return only a single file though. -->
+        <path id="hashed_unzip_path_lh">
+          <dirset dir="hardware/arduino/cores/arduino/src/components/libraries/">
+            <!-- Match ${libName}-somehash -->
+            <include name="liquidware-LibHumidity-*"/>
+          </dirset>
+        </path>
+
+        <!-- Set a property, then move the file -->
+        <property name="hashed_unzip_prop_lh" refid="hashed_unzip_path_lh" />
+        <move file="${hashed_unzip_prop_lh}" tofile="hardware/arduino/cores/arduino/src/components/libraries/LibHumidity" />
+
+        <get-library-github user="liquidware"
+                            repo="HardwareSensor"
                             core="arduino"/>
 
-        <get-library-github libName="HardwareSensor"
-                            url="http://github.com/liquidware/HardwareSensor.git"
+        <!-- Use a dirset trick to move the directory.  the dirset
+             must return only a single file though. -->
+        <path id="hashed_unzip_path_ah">
+          <dirset dir="hardware/arduino/cores/arduino/src/components/libraries/">
+            <!-- Match ${libName}-somehash -->
+            <include name="liquidware-HardwareSensor-*"/>
+          </dirset>
+        </path>
+
+        <!-- Set a property, then move the file -->
+        <property name="hashed_unzip_prop_ah" refid="hashed_unzip_path_ah" />
+        <move file="${hashed_unzip_prop_ah}" tofile="hardware/arduino/cores/arduino/src/components/libraries/HardwareSensor" />
+
+        <get-library-github user="liquidware"
+                            repo="HardwareSensor"
                             core="touchshield"/>
+
+        <!-- Use a dirset trick to move the directory.  the dirset
+             must return only a single file though. -->
+        <path id="hashed_unzip_path_th">
+          <dirset dir="hardware/arduino/cores/touchshield/src/components/libraries/">
+            <!-- Match ${libName}-somehash -->
+            <include name="liquidware-HardwareSensor-*"/>
+          </dirset>
+        </path>
+
+        <!-- Set a property, then move the file -->
+        <property name="hashed_unzip_prop_th" refid="hashed_unzip_path_th" />
+        <move file="${hashed_unzip_prop_th}" tofile="hardware/arduino/cores/touchshield/src/components/libraries/HardwareSensor" />
     </target>
 
     <!--

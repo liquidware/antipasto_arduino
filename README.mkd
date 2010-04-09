@@ -37,7 +37,7 @@ in touch through Github or at the blog.
 Building the IDE
 ================
 
-Required packages: apache-ant, java-1.6, doxygen, git
+Required packages: apache-ant, java-1.6, and doxygen
 
 The IDE is best built using the built-in ant scripts.  Running:
 
