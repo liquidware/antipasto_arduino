@@ -5,9 +5,12 @@ build/.DS_Store
 external/AntRunner
 plugins/antipasto_arduino_plugins*
 plugins/liquidware-antipasto_arduino_plugins*
+build/macosx/package
 build/macosx/work
-build/windows/work
 build/windows/launcher/launch4j/build
+build/windows/package
+build/windows/work
+build/linux/package
 build/linux/work
 hardware/arduino/cores/*/src/components/libraries/*/reference/
 hardware/arduino/cores/arduino/src/components/libraries/LibHumidity
