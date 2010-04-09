@@ -853,6 +853,19 @@ public class Editor extends JFrame implements RunnerListener {
                                });
         menu.add(item);
 
+        item = new JMenuItem("Flash Transfer");
+        item.addActionListener(new ActionListener() {
+                                   public void actionPerformed(ActionEvent e) {
+                                      JFrame t = new JFrame("test");
+                                      ImageListPanel p = new ImageListPanel();
+                                      t.add(p);
+                                      t.add(new JButton("Hi!!"));
+                                      t.setPreferredSize(new Dimension(320,240));
+                                      t.setVisible(true);
+                                   }
+                               });
+        menu.add(item);
+
         return menu;
     }
 
