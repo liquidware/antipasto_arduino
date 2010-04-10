@@ -79,7 +79,7 @@ public class FlashTransfer {
 	 * @return Returns true if device found.
 	 */
 	private boolean identifyFlash() {
-		String id;
+		String id = " ";
 
 		serialPort.clear(); //purge
 
@@ -97,10 +97,12 @@ public class FlashTransfer {
 			return false; //not ready
 		}
 
-			if (id.indexOf("Flasher") < 0) {
-				System.out.println("Arduino Flasher: Device not ready");
-			    return false;
-			}
+		System.out.println("Flasher ID:" + id);
+
+		if (id.indexOf("Flasher") < 0) {
+			System.out.println("Arduino Image Uploader: Device not ready");
+		    return false;
+		}
 
 		/* We found something */
 		return true;

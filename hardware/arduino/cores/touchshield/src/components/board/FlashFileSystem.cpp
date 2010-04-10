@@ -1,7 +1,7 @@
 //*******************************************************************************
 //*	Flsh Memory File System
 //*		by Mark Sproul
-//*		this source code is part of the liquid ware drivers for the 
+//*		this source code is part of the liquid ware drivers for the
 //*		TouchShield and TouchSlide
 //*		it is public domain under the the GPL as is the rest of the Arduino family
 //*
@@ -46,7 +46,7 @@
 COLOR black = { 0,0,0};
 COLOR textColor = {255,255,255};
 COLOR white = {255,255,255};
-uint16_t gPageIndex = 0; 
+uint16_t gPageIndex = 0;
 
 
 //************************************************************************
@@ -55,7 +55,7 @@ uint16_t gPageIndex = 0;
 static void DebugRectPrintTextLocal(char * msg)
 {
 	static int line;
-	
+
 	dispColor(black);
 	dispRectangle(0,line,319,line+8);
 	dispPutS(msg,10,line,textColor, black);
@@ -106,7 +106,7 @@ static void	SendAck(void)
 	DebugRectPrintTextLocal("sending ACK +++");
 	usart_putc(kAscii_ACK);
 	usart_puts("ACK");
-	
+
 }
 
 //*******************************************************************************
@@ -116,7 +116,7 @@ static void	SendNAK(void)
 
 	usart_putc(kAscii_NAK);
 	usart_puts("NAK");
-	
+
 }
 
 //*******************************************************************************
@@ -163,13 +163,13 @@ long			longByte4;
 		longByte2	=	buff[2] & 0x0ff;
 		longByte3	=	buff[3] & 0x0ff;
 		longByte4	=	buff[4] & 0x0ff;
-		
+
 		newFileSize	=	(longByte1 << 24) +
 						(longByte2 << 16) +
 						(longByte3 << 8) +
 						longByte4;
-						
-		page_count	=	newFileSize / DATAFLASH_PAGESIZE;		//*	number of pages			
+
+		page_count	=	newFileSize / DATAFLASH_PAGESIZE;		//*	number of pages
 		if ((newFileSize % DATAFLASH_PAGESIZE) > 0)
 		{
 			page_count++;
@@ -177,16 +177,16 @@ long			longByte4;
 
 		strncpy((char*)newFileName, (const char*)buff + 5, 12);
 		newFileName[12]	=	0;
-		
+
 		sprintf(msgBuff, "File=%s, size=%ld pages=%d", newFileName, newFileSize, page_count);
 		DebugRectPrintTextLocal(msgBuff);
-		
+
 		bmp_store((char*)dataBuff,(char*)newFileName,(uint32_t)gPageIndex*DATAFLASH_PAGESIZE); //save the file name and offset
-				
+
 		usart_putc(IMAGE_INTERFACE_PAGE_DONE); //respond
 
 		for (ii=gPageIndex; ii< gPageIndex+page_count; ii++)
-		{ 
+		{
 		unsigned int buffer_count	=	0;
 		unsigned char outChecksum = 0;
 		unsigned char inChecksum = 0;
@@ -197,13 +197,13 @@ long			longByte4;
 			//program the whole page
 			for(xx=0; xx<DATAFLASH_PAGESIZE; xx++)
 			{
-				dataBuff[xx]	=	buff[xx];	
+				dataBuff[xx]	=	buff[xx];
 				inChecksum += buff[xx];					//increment the checksum
 			}
 
 			inChecksum = (inChecksum ^ 0xFF) + 1;		// two's compliment
 			dataflash_program_page(&dataBuff[0], ii); 	//program the page
-	
+
 			/* Clear the buffer */
 			for(xx=0; xx<DATAFLASH_PAGESIZE; xx++)
 			{
@@ -233,7 +233,7 @@ long			longByte4;
 				DebugRectPrintTextLocal("checksum fail");
 				usart_putc(0); 									//error
 			}
-			
+
 		} //end for
 
 		/* Incremement the page index*/
@@ -243,7 +243,7 @@ long			longByte4;
 	{
 		usart_putc(kAscii_NAK);
 	}
-	
+
 #ifdef _USE_DBBUG_RECT_STATUS_
 	DebugRectPrintTextLocal("--DONE");
 #endif
@@ -262,7 +262,7 @@ static void	FlashFileInfo(void)
 //	usart_puts("\nTouchShield/Slide Flash File System Ver 0.1\n");
 	usart_puts("Flasher v0.2");
 	usart_putc(0);
-	
+
 #if 0
 	ii			=	0;
 	validImage	=	TRUE;
@@ -298,7 +298,7 @@ unsigned char	*buff;
 	//give us the number of pages you're sending
 	usart_read_bytes(2);
 	page_num	=	(buff[0] << 8) + buff[1];  //number of pages
-	
+
 
 	dataflash_cont_read(&out[0], page_num, DATAFLASH_PAGESIZE);
 
@@ -324,7 +324,7 @@ char			commandString[8];
 
 
 	DebugRectPrintTextLocal("FlashFileSystemComm()");
-
+	DebugRectPrintTextLocal("Waiting for images");
 
 	arduinoReset();
 
@@ -384,14 +384,14 @@ char			commandString[8];
 
 				keepGoing	=	FALSE;
 				break;
-				
+
 			default:
 				DebugRectPrintTextLocal("Unknown Command");
 				break;
 
 		}
 	}//end while
-	
+
 } //end function
 
 //*************************************
@@ -399,12 +399,12 @@ char			commandString[8];
 void FlashFile_open(ProgramEx p)
 {
 	/* Determine the program */
-	switch (p) 
+	switch (p)
 	{
 		case FlashTransfer:
 			FlashFileSystemComm();
 			break;
-		
+
 		default:
 			break;
 	}
