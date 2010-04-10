@@ -866,6 +866,7 @@ public class Editor extends JFrame implements RunnerListener {
                                       d.setVisible(true);
                                       ImageListPanel p = new ImageListPanel(getSketch().getDataFolder());
                                       d.add(p);
+                                      p.revalidate(); //force a redraw
                                    }
                                });
         menu.add(item);
