@@ -33,6 +33,7 @@ import java.awt.event.*;
 import java.awt.print.*;
 import java.io.*;
 import java.net.*;
+import javax.swing.JDialog;
 import java.util.*;
 import java.util.zip.*;
 
@@ -858,13 +859,13 @@ public class Editor extends JFrame implements RunnerListener {
         item = new JMenuItem("Image Uploader");
         item.addActionListener(new ActionListener() {
                                    public void actionPerformed(ActionEvent e) {
-                                      JFrame f = new JFrame("Arduino Image Uploader");
-                                      f.setSize(400, 300);
-                                      f.setLayout(new BorderLayout());
-                                      f.setLocationRelativeTo(Base.getActiveEditor());
-                                      f.setVisible(true);
+                                      JDialog d = new JDialog(Base.getActiveEditor(), "Image Uploader");
+                                      d.setSize(400, 300);
+                                      d.setLayout(new BorderLayout());
+                                      d.setLocationRelativeTo(Base.getActiveEditor());
+                                      d.setVisible(true);
                                       ImageListPanel p = new ImageListPanel(getSketch().getDataFolder());
-                                      f.add(p);
+                                      d.add(p);
                                    }
                                });
         menu.add(item);
