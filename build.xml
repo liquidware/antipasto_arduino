@@ -816,7 +816,7 @@ distribution.version=${build.version}</echo>
             <os family="unix" />
             <then>
                 <!--- Linux -->
-                <property name="remote.dir" value="/var/www/liquidware/public/appfiles/??/original"/>
+                <property name="remote.dir" value="/var/www/liquidware/public/appfiles/81/original"/>
             </then>
         </elseif>
         </if>
