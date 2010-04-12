@@ -167,7 +167,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     private EventListenerList activeBoardChangedEventList = new EventListenerList();
 
-    public PluginPanel pluginPanel = new PluginPanel(Base.pluginloader);
+    //public PluginPanel pluginPanel = new PluginPanel(Base.pluginloader); disabled until mac can find plugins
     public JPanel centerPanel;
     public ImageListPanel imageListPanel;
     JPanel rightWing;
@@ -845,14 +845,14 @@ public class Editor extends JFrame implements RunnerListener {
                                  }
                              });
 
-
-        item = new JMenuItem("Plugins");
-        item.addActionListener(new ActionListener() {
-                                   public void actionPerformed(ActionEvent e) {
-                                       pluginPanel.showPluginPanel();
-                                   }
-                               });
-        menu.add(item);
+		//disabled until mac can find plugins
+        //item = new JMenuItem("Plugins");
+        //item.addActionListener(new ActionListener() {
+        //                           public void actionPerformed(ActionEvent e) {
+        //                               pluginPanel.showPluginPanel();
+		//                          }
+        //                       });
+        //menu.add(item);
 
         menu.addSeparator();
 

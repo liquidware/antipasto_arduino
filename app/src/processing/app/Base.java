@@ -105,7 +105,7 @@ public class Base {
 //  ArrayList editors = Collections.synchronizedList(new ArrayList<Editor>());
   static Editor activeEditor;
 
-  static public PluginLoader pluginloader;
+  //static public PluginLoader pluginloader; //diabled until mac can find plugins
 
 //  int nextEditorX;
 //  int nextEditorY;
@@ -212,7 +212,7 @@ public class Base {
     untitledFolder = createTempFolder("untitled");
     untitledFolder.deleteOnExit();
 
-    pluginloader = new PluginLoader();
+    //pluginloader = new PluginLoader(); disabled until mac can find plugins
     new Base(args);
   }
 
