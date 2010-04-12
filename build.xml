@@ -441,15 +441,15 @@
                 </fileset>
             </copy>
             
-            <!-- Copy the FTDI drivers into the build -->
-            <copy todir="${build.dir}/drivers">
+            <!-- Copy the FTDI drivers into the work directory -->
+            <copy todir="${work.dir}">
                 <fileset dir="build/macosx/dist/drivers" />
             </copy>
             
             <!-- Unzip the avr tools -->
             <exec executable="unzip" searchpath="true">
                 <arg value="-X" />
-                <arg value="build/macosx/dist/tools/tools-universal.zip" />
+                <arg value="build/macosx/dist/tools/avr_tools_macosx.zip" />
                 <arg value="-d" />
                 <arg value="${build.dir}/hardware" />
             </exec>
@@ -760,110 +760,34 @@ distribution.version=${build.version}</echo>
             <property name="package.macosx.name" value="Arduino_macosx" />
 
             <delete dir="${package.dir}" />
-
             <mkdir  dir="${package.dir}" />
-            <mkdir  dir="${package.dir}/Package_Root"/>
-            <mkdir  dir="${package.dir}/Package_Root/Applications"/>
-            <mkdir  dir="${package.dir}/Package_Root/usr/local"/>
-            <mkdir  dir="${package.dir}/Resources"/>
-
-            <exec executable="unzip" searchpath="true">
-                <arg value="-X" />
-                <arg value="${dist.dir}/tools/avr_tools_macosx.zip" />
-                <arg value="-d" />
-                <arg value="${package.dir}/Package_Root/usr/local" />
+            
+            <!-- Remove the symbolic link, if it exists -->
+            <exec executable="rm" failonerror="false">
+                <arg line="build/macosx/work/Applications"/>
+            </exec>
+            <!--Create a Applications symbolic link -->
+            <symlink link="build/macosx/work/Applications" resource="/Applications"/>
+            
+            <!-- Build the dmg image -->
+            <exec executable="build/macosx/yoursway-create-dmg-1.0.0.2/create-dmg">
+              <arg line="--volname Arduino
+                         --window-size 425 300
+                         --background ${package.dir}/../dist/dmg-background.jpg
+                         --icon-size 96
+                         --icon 'Applications' 380 205
+                         --icon 'Arduino' 110 205
+                         ${package.dir}/${package.macosx.name}.dmg
+                         build/macosx/work" />
             </exec>
 
-            <exec executable="unzip" searchpath="true">
-                <arg value="-X" />
-                <arg value="${dist.dir}/tools/osx_libraries.zip" />
-                <arg value="-d" />
-                <arg value="${package.dir}/Package_Root/usr/local" />
-            </exec>
-
-            <exec executable="mv" searchpath="true">
-                <arg value="${build.dir}" />
-                <arg value="${package.dir}/Package_Root/Applications/Arduino" />
-            </exec>
-
-
-            <copy file="build/macosx/dist/Info.plist"        todir="${package.dir}/Resources" />
-            <copy file="build/macosx/dist/Description.plist" todir="${package.dir}/Resources" />
-
-            <!-- Substitute the token with the build version -->
-            <replace file="${package.dir}/Resources/Info.plist"
-                     token="@BUILD_VERSION" value="${build.version}"/>
-            <replace file="${package.dir}/Resources/Description.plist"
-                     token="@BUILD_VERSION" value="${build.version}"/>
-
-            <set-perm  dir="${package.dir}" mode="777" />
-            <set-owner dir="${package.dir}" user="root" group="wheel" />
-            <set-owner dir="${package.dir}/Package_Root/Applications" user="root" group="admin" />
-
-            <exec executable="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker">
-                <arg value="-build" />
-                <arg value="-ds" />
-                <arg value="-p"/>
-                <arg value="${package.dir}/${package.macosx.name}.pkg"/>
-                <arg value="-f" />
-                <arg value="${package.dir}/Package_Root"/>
-                <arg value="-r" />
-                <arg value="${package.dir}/Resources"/>
-                <arg value="-i" />
-                <arg value="${package.dir}/Resources/Info.plist"/>
-                <arg value="-d" />
-                <arg value="${package.dir}/Resources/Description.plist"/>
-            </exec>
-
-
-            <!-- Remove instances of the IFPkgFlagRelocatable   -->
-            <replace file="${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"
-                     token="IFPkgFlagRelocatable"
-                     value="IFPkgFlagOverwritePermissions"/>
-
-              <!-- Strip off the package mapping tags, this sucks. -->
-              <!-- Get the head -->
-              <exec executable="head" searchpath="true" append="true">
-                <arg line="-42
-                            ${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
-
-                <redirector outputproperty="redirector.out"
-                            errorproperty="redirector.err">
-                    <outputmapper type="merge" to="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt"/>
-                </redirector>
-              </exec>
-              <!-- Get the tail -->
-              <exec executable="tail" searchpath="true" append="true">
-                <arg line="-2
-                           ${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
-
-                <redirector outputproperty="redirector.out"
-                            errorproperty="redirector.err">
-                    <outputmapper type="merge" to="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt"/>
-                </redirector>
-              </exec>
-
-              <!-- Overwrite the Info.plist file -->
-              <move file="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist.txt"
-                    tofile="${basedir}/${package.dir}/Arduino_macosx.pkg/Contents/Info.plist"/>
-
-
-            <!-- Build the .dmg image -->
-            <exec executable="mv" searchpath="true">
-                <arg value="${package.dir}/Package_Root/Applications/Arduino" />
-                <arg value="${build.dir}" />
-            </exec>
-
-            <exec executable="hdiutil" searchpath="true">
-                <arg value="create" />
-                <arg value="-srcfolder" />
-                <arg value="${package.dir}/${package.macosx.name}.pkg" />
-                <arg value="${package.dir}/${package.macosx.name}.dmg" />
-            </exec>
+            
+            
+<!--
             <echo file="${package.dir}/${package.macosx.name}.dmg.txt">
 distribution.name=Antipasto Arduino
 distribution.file=${package.macosx.name}
-distribution.version=${build.version}</echo>
+distribution.version=${build.version}</echo> -->
         </sequential>
     </macrodef>
 
