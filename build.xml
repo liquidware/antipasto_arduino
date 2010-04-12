@@ -76,6 +76,7 @@
         <echo message="Deleting package directories ${package.dir}" />
         <delete includeEmptyDirs="true" failonerror="false">
              <fileset dir="${build.dir}"   includes="**/*" followsymlinks="false" />
+             <fileset dir="${work.dir}"   includes="**/*" followsymlinks="false" />
              <fileset dir="${package.dir}" includes="**/*" followsymlinks="false" />
         </delete>
     </target>
@@ -301,7 +302,7 @@
             <mkdir dir="${classes.dir}"/>
             <javac srcdir="${src.java.antipasto};
                            ${src.java.processing};
-                           ${src.java.core};" destdir="${classes.dir}" classpathref="classpath"/>
+                           ${src.java.core};" destdir="${classes.dir}" classpathref="classpath" target="1.5"/>
 
 
         <!-- Jar -->
@@ -421,28 +422,39 @@
 
     <macrodef name="setup-macosx">
         <sequential>
+            <!-- Get a copy of the MacOS App structure -->
+            <copy todir="${work.dir}/Arduino.app" >
+                <fileset dir="build/macosx/dist/Arduino.app" />
+            </copy>
+            
+            <!-- Copy Architecture specific jar files into the build -->
             <copy todir="${build.dir}/lib">
                 <fileset dir="build/macosx/dist">
                     <include name="*.jar"/>
                 </fileset>
+            </copy>
+            
+             <!-- Copy Architecture specific jni files into the build -->
+            <copy todir="${build.dir}">
                 <fileset dir="build/macosx/dist">
                     <include name="*.jnilib"/>
                 </fileset>
             </copy>
-            <copy todir="${build.dir}/Arduino.app">
-                <fileset dir="build/macosx/dist/Arduino.app" />
-            </copy>
-
+            
+            <!-- Copy the FTDI drivers into the build -->
             <copy todir="${build.dir}/drivers">
                 <fileset dir="build/macosx/dist/drivers" />
             </copy>
-
+            
+            <!-- Unzip the avr tools -->
             <exec executable="unzip" searchpath="true">
                 <arg value="-X" />
                 <arg value="build/macosx/dist/tools/tools-universal.zip" />
                 <arg value="-d" />
                 <arg value="${build.dir}/hardware" />
             </exec>
+            
+            <!-- Unzip the arm tools -->
             <unzip src="build/macosx/dist/tools/arm_tools_macosx.zip"    dest="${build.dir}/hardware/tools"/>
             <copy file="build/macosx/dist/tools/sfbdl"  todir="${build.dir}/hardware/uploaders/bin"/>
             <copy file="build/macosx/dist/tools/sfbprog"  todir="${build.dir}/hardware/uploaders/bin"/>
@@ -514,30 +526,8 @@
             <os family="mac" />
             <then>
                 <!--- Mac -->
-
-                <copy todir="${build.dir}/Arduino.app/Contents/Resources" >
-                    <fileset dir="${build.dir}/lib" >
-                        <include name="**/*" />
-                    </fileset>
-                    <fileset dir="${build.dir}/jar" >
-                        <include name="**/*" />
-                    </fileset>
-                </copy>
-
-                <!-- Overwrite using architecture specific distribution libraries -->
-                <copy todir="${build.dir}/Arduino.app/Contents/Resources" overwrite="true">
-                    <fileset dir="build/macosx/dist/Arduino.app/Contents/Resources/Java" >
-                        <include name="librxtxSerial.jnilib" />
-                    </fileset>
-                </copy>
-
-                <move todir="${build.dir}/Arduino.app/Contents/Resources/Java">
-                    <fileset dir="${build.dir}/Arduino.app/Contents/Resources">
-                        <include name="*.jnilib"/>
-                        <include name="*.jar"/>
-                    </fileset>
-                </move>
-                <set-permissions dir="${build.dir}" />
+    
+                <set-permissions dir="${work.dir}" />
 
                 <!-- Remove the x86_64 Slice, so we always run in 32 bit mode
                 <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="lipo" searchpath="true">
@@ -549,7 +539,7 @@
                 <exec dir="${build.dir}/Arduino.app/Contents/MacOS" executable="mv" searchpath="true">
                     <arg line="Arduino_32 Arduino"/>
                 </exec>
--->
+                -->
             </then>
         </elseif>
 
@@ -585,7 +575,7 @@
             <os family="mac" />
             <then>
                 <!--- Mac -->
-                <exec executable="./build/macosx/work/Arduino.app/Contents/MacOS/Arduino" />
+                <exec executable="./build/macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" />
             </then>
         </elseif>
 

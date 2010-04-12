@@ -40,6 +40,7 @@
         <then>
             <!--- Mac properties here -->
             <property name="build.arch" value="macosx" />
+            <property name="build.dir"  value="build/${build.arch}/work/Arduino.app/Contents/Resources/Java" /> <!-- overriding -->
         </then>
     </elseif>
 
@@ -58,6 +59,7 @@
                             Common Properties
         ===================================================================
     -->
+    <property name="work.dir"     value="build/${build.arch}/work" />
     <property name="build.dir"    value="build/${build.arch}/work" />
     <property name="dist.dir"     value="build/${build.arch}/dist" />
     <property name="package.dir"  value="build/${build.arch}/package" />

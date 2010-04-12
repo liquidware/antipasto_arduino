@@ -2,23 +2,40 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleName</key>
+	<string>Arduino</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
+	<key>CFBundleExecutable</key>
+	<string>JavaApplicationStub</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>Pde1</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>processing.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>cc.arduino.Arduino</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>pde</string>
+				<string>java</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>arduino.icns</string>
+			<string>pde.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Processing Source File</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>text/plain</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>Arduino Source File</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>TEXT</string>
@@ -27,88 +44,88 @@
 			<string>Editor</string>
 		</dict>
 	</array>
-	<key>CFBundleExecutable</key>
-	<string>Arduino</string>
-	<key>CFBundleIconFile</key>
-	<string>arduino.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>cc.arduino.Arduino</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>Arduino</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>0.0.1d1</string>
 	<key>Java</key>
 	<dict>
+		<key>javaroot</key>
+		<string>$JAVAROOT</string>
+		<key>MainClass</key>
+		<string>processing.app.Base</string>
 		<key>ClassPath</key>
 		<array>
-			<string>$JAVAROOT/antlr.jar</string>
-			<string>$JAVAROOT/oro.jar</string>
-			<string>$JAVAROOT/mrj.jar</string>
-			<string>$JAVAROOT/registry.jar</string>
-			<string>$JAVAROOT/RXTXcomm.jar</string>
-			<string>$JAVAROOT/quaqua.jar</string>
-			<string>$JAVAROOT/filterbuilder.jar</string>
-			<string>$JAVAROOT/htmllexer.jar</string>
-			<string>$JAVAROOT/htmlparser.jar</string>
-			<string>$JAVAROOT/junit.jar</string>
-			<string>$JAVAROOT/sax2.jar</string>
-			<string>$JAVAROOT/ant.jar</string>
-			<string>$JAVAROOT/ant-antlr.jar</string>
-			<string>$JAVAROOT/ant-apache-bcel.jar</string>
-			<string>$JAVAROOT/ant-apache-bsf.jar</string>
-			<string>$JAVAROOT/ant-apache-log4j.jar</string>
-			<string>$JAVAROOT/ant-apache-oro.jar</string>
-			<string>$JAVAROOT/ant-apache-regexp.jar</string>
-			<string>$JAVAROOT/ant-apache-resolver.jar</string>
-			<string>$JAVAROOT/ant-commons-logging.jar</string>
-			<string>$JAVAROOT/ant-commons-net.jar</string>
-			<string>$JAVAROOT/ant-jai.jar</string>
-			<string>$JAVAROOT/ant-javamail.jar</string>
-			<string>$JAVAROOT/ant-jdepend</string>
-			<string>$JAVAROOT/ant-jmf.jar</string>
-			<string>$JAVAROOT/ant-jsch.jar</string>
-			<string>$JAVAROOT/ant-junit.jar</string>
-			<string>$JAVAROOT/ant-launcher.jar</string>
-			<string>$JAVAROOT/ant-netrexx.jar</string>
-			<string>$JAVAROOT/ant-nodeps.jar</string>
-			<string>$JAVAROOT/ant-starteam.jar</string>
-			<string>$JAVAROOT/ant-stylebook.jar</string>
-			<string>$JAVAROOT/ant-swing.jar</string>
-			<string>$JAVAROOT/ant-testutil.jar</string>
-			<string>$JAVAROOT/ant-trax.jar</string>
-			<string>$JAVAROOT/ant-weblogic.jar</string>
-			<string>$JAVAROOT/xercesImpl.jar</string>
-			<string>$JAVAROOT/xml-apis.jar</string>
-			<string>$JAVAROOT/bcel-5.1.jar</string>
-			<string>$JAVAROOT/commons-httpclient-3.0.1.jar</string>
-			<string>$JAVAROOT/commons-logging-1.0.4.jar</string>
-			<string>$JAVAROOT/ivy-1.3.1.jar</string>
-			<string>$JAVAROOT/ant-contrib-1.0b3.jar</string>
-			<string>$JAVAROOT/log4j.jar</string>
-			<string>$JAVAROOT/jpf.jar</string>
-			<string>$JAVAROOT/jpf-boot.jar</string>
-			<string>$JAVAROOT/jpf-tools.jar</string>
-			<string>$JAVAROOT/jxp.jar</string>
-			<string>$JAVAROOT/AntRunner.jar</string>
-			<string>$JAVAROOT/Antipasto_Arduino.jar</string>
-			<string>/System/Library/Java</string>
+			<string>$JAVAROOT/lib/antlr.jar</string>
+			<string>$JAVAROOT/lib/oro.jar</string>
+			<string>$JAVAROOT/lib/mrj.jar</string>
+			<string>$JAVAROOT/lib/registry.jar</string>
+			<string>$JAVAROOT/lib/RXTXcomm.jar</string>
+			<string>$JAVAROOT/lib/quaqua.jar</string>
+			<string>$JAVAROOT/lib/filterbuilder.jar</string>
+			<string>$JAVAROOT/lib/htmllexer.jar</string>
+			<string>$JAVAROOT/lib/htmlparser.jar</string>
+			<string>$JAVAROOT/lib/junit.jar</string>
+			<string>$JAVAROOT/lib/sax2.jar</string>
+			<string>$JAVAROOT/lib/ant.jar</string>
+			<string>$JAVAROOT/lib/ant-antlr.jar</string>
+			<string>$JAVAROOT/lib/ant-apache-bcel.jar</string>
+			<string>$JAVAROOT/lib/ant-apache-bsf.jar</string>
+			<string>$JAVAROOT/lib/ant-apache-log4j.jar</string>
+			<string>$JAVAROOT/lib/ant-apache-oro.jar</string>
+			<string>$JAVAROOT/lib/ant-apache-regexp.jar</string>
+			<string>$JAVAROOT/lib/ant-apache-resolver.jar</string>
+			<string>$JAVAROOT/lib/ant-commons-logging.jar</string>
+			<string>$JAVAROOT/lib/ant-commons-net.jar</string>
+			<string>$JAVAROOT/lib/ant-jai.jar</string>
+			<string>$JAVAROOT/lib/ant-javamail.jar</string>
+			<string>$JAVAROOT/lib/ant-jdepend</string>
+			<string>$JAVAROOT/lib/ant-jmf.jar</string>
+			<string>$JAVAROOT/lib/ant-jsch.jar</string>
+			<string>$JAVAROOT/lib/ant-junit.jar</string>
+			<string>$JAVAROOT/lib/ant-launcher.jar</string>
+			<string>$JAVAROOT/lib/ant-netrexx.jar</string>
+			<string>$JAVAROOT/lib/ant-nodeps.jar</string>
+			<string>$JAVAROOT/lib/ant-starteam.jar</string>
+			<string>$JAVAROOT/lib/ant-stylebook.jar</string>
+			<string>$JAVAROOT/lib/ant-swing.jar</string>
+			<string>$JAVAROOT/lib/ant-testutil.jar</string>
+			<string>$JAVAROOT/lib/ant-trax.jar</string>
+			<string>$JAVAROOT/lib/ant-weblogic.jar</string>
+			<string>$JAVAROOT/lib/xercesImpl.jar</string>
+			<string>$JAVAROOT/lib/xml-apis.jar</string>
+			<string>$JAVAROOT/lib/bcel-5.1.jar</string>
+			<string>$JAVAROOT/lib/commons-httpclient-3.0.1.jar</string>
+			<string>$JAVAROOT/lib/commons-logging-1.0.4.jar</string>
+			<string>$JAVAROOT/lib/ivy-1.3.1.jar</string>
+			<string>$JAVAROOT/lib/ant-contrib-1.0b3.jar</string>
+			<string>$JAVAROOT/lib/log4j.jar</string>
+			<string>$JAVAROOT/lib/jpf.jar</string>
+			<string>$JAVAROOT/lib/jpf-boot.jar</string>
+			<string>$JAVAROOT/lib/jpf-tools.jar</string>
+			<string>$JAVAROOT/lib/jxp.jar</string>
+			<string>$JAVAROOT/lib/AntRunner.jar</string>
+			<string>$JAVAROOT/plugins</string>
+			<string>$JAVAROOT/jar/Antipasto_Arduino.jar</string>
 		</array>
 		<key>JVMVersion</key>
 		<string>1.6</string>
-		<key>MainClass</key>
-		<string>processing.app.Base</string>
 		<key>Properties</key>
 		<dict>
+			<key>javaroot</key>
+			<string>$JAVAROOT</string>
 			<key>apple.laf.useScreenMenuBar</key>
 			<string>true</string>
-			<key>Arduino.app-resources</key>
-			<string>$APP_PACKAGE/Contents/Resources</string>
+			<key>apple.awt.showGrowBox</key>
+			<string>false</string>
+			<key>com.apple.smallTabs</key>
+			<string>true</string>
+			<key>apple.awt.Antialiasing</key>
+			<string>false</string>
+			<key>apple.awt.TextAntialiasing</key>
+			<string>true</string>
+			<key>com.apple.hwaccel</key>
+			<string>true</string>
+			<key>apple.awt.use-file-dialog-packages</key>
+			<string>false</string>
+			<key>apple.awt.graphics.UseQuartz</key>
+			<string>true</string>
 		</dict>
 	</dict>
 </dict>
