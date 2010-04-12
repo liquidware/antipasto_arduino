@@ -780,14 +780,12 @@ distribution.version=${build.version}</echo>
                          ${package.dir}/${package.macosx.name}.dmg
                          build/macosx/work" />
             </exec>
-
             
-            
-<!--
+            <!-- Create a version file for upload -->
             <echo file="${package.dir}/${package.macosx.name}.dmg.txt">
 distribution.name=Antipasto Arduino
 distribution.file=${package.macosx.name}
-distribution.version=${build.version}</echo> -->
+distribution.version=${build.version}</echo>
         </sequential>
     </macrodef>
 
@@ -803,20 +801,14 @@ distribution.version=${build.version}</echo> -->
             <os family="windows" />
             <then>
                 <!--- Windows -->
-                <fileset id="upload.files" dir="${package.dir}">
-                    <include name="Arduino_win32.zip.txt"/>
-                    <include name="Arduino_win32.zip"/>
-                </fileset>
+                <property name="remote.dir" value="/var/www/liquidware/public/appfiles/43/original"/>
             </then>
 
         <elseif>
             <os family="mac" />
             <then>
                 <!--- Mac -->
-                <fileset id="upload.files" dir="${package.dir}">
-                    <include name="Arduino_macosx.dmg.txt"/>
-                    <include name="Arduino_macosx.dmg"/>
-                </fileset>
+                <property name="remote.dir" value="/var/www/liquidware/public/appfiles/49/original"/>
             </then>
         </elseif>
 
@@ -824,21 +816,16 @@ distribution.version=${build.version}</echo> -->
             <os family="unix" />
             <then>
                 <!--- Linux -->
-                <fileset id="upload.files" dir="${package.dir}">
-                    <include name="Arduino_linux.tgz.txt"/>
-                    <include name="Arduino_linux.tgz"/>
-                </fileset>
+                <property name="remote.dir" value="/var/www/liquidware/public/appfiles/??/original"/>
             </then>
         </elseif>
         </if>
-
+        
         <!-- Send the files -->
-        <ftp server="liquidware.org"
-             userid="${username}"
-             password="${password}"
-             remotedir="public_html/illuminatolabs/ide/">
-            <fileset refid="upload.files"/>
-        </ftp>
+        <echo message="Sending ${package.dir}/* to ${username}@liquidware.com:${remote.dir}"/>
+        <exec executable="scp" dir="${package.dir}">
+          <arg line="-r . ${username}@liquidware.com:${remote.dir}"/>
+        </exec>
     </target>
 
     <macrodef name="doc-arduino">
