@@ -153,7 +153,7 @@
         <attribute name="user"/>
         <attribute name="repo"/>
         <attribute name="core"/>
-         
+
         <sequential>
             <mkdir dir="hardware/arduino/cores/@{core}/src/components/libraries/" />
             <!-- Clean the dir -->
@@ -426,26 +426,26 @@
             <copy todir="${work.dir}/Arduino.app" >
                 <fileset dir="build/macosx/dist/Arduino.app" />
             </copy>
-            
+
             <!-- Copy Architecture specific jar files into the build -->
             <copy todir="${build.dir}/lib">
                 <fileset dir="build/macosx/dist">
                     <include name="*.jar"/>
                 </fileset>
             </copy>
-            
+
              <!-- Copy Architecture specific jni files into the build -->
             <copy todir="${build.dir}">
                 <fileset dir="build/macosx/dist">
                     <include name="*.jnilib"/>
                 </fileset>
             </copy>
-            
+
             <!-- Copy the FTDI drivers into the work directory -->
             <copy todir="${work.dir}">
                 <fileset dir="build/macosx/dist/drivers" />
             </copy>
-            
+
             <!-- Unzip the avr tools -->
             <exec executable="unzip" searchpath="true">
                 <arg value="-X" />
@@ -453,7 +453,7 @@
                 <arg value="-d" />
                 <arg value="${build.dir}/hardware" />
             </exec>
-            
+
             <!-- Unzip the arm tools -->
             <unzip src="build/macosx/dist/tools/arm_tools_macosx.zip"    dest="${build.dir}/hardware/tools"/>
             <copy file="build/macosx/dist/tools/sfbdl"  todir="${build.dir}/hardware/uploaders/bin"/>
@@ -526,7 +526,7 @@
             <os family="mac" />
             <then>
                 <!--- Mac -->
-    
+
                 <set-permissions dir="${work.dir}" />
 
                 <!-- Remove the x86_64 Slice, so we always run in 32 bit mode
@@ -664,30 +664,34 @@
 
     <macrodef name="package-windows-zip" >
         <sequential>
-            <property name="package.windows.name" value="Arduino_win32.zip" />
+            <property name="package.windows.name" value="Arduino_Antipasto_win32.zip" />
             <delete dir="${package.dir}" />
 
+
             <!-- Move into a temporary area to create the zip -->
-            <copy todir="build/windows/package/Arduino">
+            <copy todir="build/windows/package/Antipasto">
                 <fileset dir="build/windows/work" />
             </copy>
 
             <!-- Create the zip package -->
             <zip destfile="${package.dir}/${package.windows.name}"
                  basedir="${package.dir}"
-                 includes="Arduino/**/*"/>
+                 includes="Antipasto/**/*"/>
 
             <!-- Create the public version info file -->
             <echo file="${package.dir}/${package.windows.name}.txt">
-distribution.name=Antipasto Arduino
+distribution.name=Arduino Antipasto
 distribution.file=${package.windows.name}
 distribution.version=${build.version}</echo>
+
+            <!-- Delete intermediate files -->
+            <delete dir="${package.dir}/Antipasto"/>
         </sequential>
     </macrodef>
 
     <macrodef name="package-windows-msi" >
         <sequential>
-            <property name="package.windows.name" value="Arduino_win32.msi" />
+            <property name="package.windows.name" value="Arduino_Antipasto_win32.msi" />
 
             <delete dir="build/windows/package" />
 
@@ -733,57 +737,60 @@ distribution.version=${build.version}</echo>
 
     <macrodef name="package-linux">
         <sequential>
-            <property name="package.linux.name" value="Arduino_linux.tgz" />
+            <property name="package.linux.name" value="Arduino_Antipasto_linux.tgz" />
 
             <delete dir="${package.dir}" />
             <mkdir  dir="${package.dir}" />
 
-            <copy todir="${package.dir}/Arduino" >
+            <copy todir="${package.dir}/Antipasto" >
                 <fileset dir="${build.dir}" />
             </copy>
-            <set-permissions dir="${package.dir}/Arduino" />
+            <set-permissions dir="${package.dir}/Antipasto" />
             <exec executable="tar" searchpath="true" dir="${package.dir}">
                     <arg value="czvf" />
                     <arg value="${package.linux.name}" />
-                    <arg value="Arduino" />
+                    <arg value="Antipasto" />
             </exec>
             <echo file="${package.dir}/${package.linux.name}.txt">
-distribution.name=Antipasto Arduino
+distribution.name=Arduino Antipasto
 distribution.file=${package.linux.name}
 distribution.version=${build.version}</echo>
+
+            <!-- Delete intermediate files -->
+            <delete dir="${package.dir}/Antipasto" />
         </sequential>
     </macrodef>
 
     <macrodef name="package-macosx">
         <sequential>
 
-            <property name="package.macosx.name" value="Arduino_macosx" />
+            <property name="package.macosx.name" value="Arduino_Antipasto_macosx.dmg" />
 
             <delete dir="${package.dir}" />
             <mkdir  dir="${package.dir}" />
-            
+
             <!-- Remove the symbolic link, if it exists -->
             <exec executable="rm" failonerror="false">
                 <arg line="build/macosx/work/Applications"/>
             </exec>
             <!--Create a Applications symbolic link -->
             <symlink link="build/macosx/work/Applications" resource="/Applications"/>
-            
+
             <!-- Build the dmg image -->
             <exec executable="build/macosx/yoursway-create-dmg-1.0.0.2/create-dmg">
-              <arg line="--volname Arduino
+              <arg line="--volname Antipasto
                          --window-size 425 300
                          --background ${package.dir}/../dist/dmg-background.jpg
                          --icon-size 96
                          --icon 'Applications' 380 205
-                         --icon 'Arduino' 110 205
-                         ${package.dir}/${package.macosx.name}.dmg
+                         --icon 'Antipasto' 110 205
+                         ${package.dir}/${package.macosx.name}
                          build/macosx/work" />
             </exec>
-            
+
             <!-- Create a version file for upload -->
-            <echo file="${package.dir}/${package.macosx.name}.dmg.txt">
-distribution.name=Antipasto Arduino
+            <echo file="${package.dir}/${package.macosx.name}.txt">
+distribution.name=Arduino Antipasto
 distribution.file=${package.macosx.name}
 distribution.version=${build.version}</echo>
         </sequential>
@@ -801,14 +808,12 @@ distribution.version=${build.version}</echo>
             <os family="windows" />
             <then>
                 <!--- Windows -->
-                <property name="remote.dir" value="/var/www/liquidware/public/appfiles/43/original"/>
             </then>
 
         <elseif>
             <os family="mac" />
             <then>
                 <!--- Mac -->
-                <property name="remote.dir" value="/var/www/liquidware/public/appfiles/49/original"/>
             </then>
         </elseif>
 
@@ -816,11 +821,12 @@ distribution.version=${build.version}</echo>
             <os family="unix" />
             <then>
                 <!--- Linux -->
-                <property name="remote.dir" value="/var/www/liquidware/public/appfiles/81/original"/>
             </then>
         </elseif>
         </if>
-        
+
+        <property name="remote.dir" value="ide_builds"/>
+
         <!-- Send the files -->
         <echo message="Sending ${package.dir}/* to ${username}@liquidware.com:${remote.dir}"/>
         <exec executable="scp" dir="${package.dir}">
