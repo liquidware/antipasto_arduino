@@ -47,6 +47,12 @@ will build the IDE for your current OS (Windows, OSX, Linux).  To run the IDE:
 
     ant run.all
 
+
+Working with Git
+================
+
+Here are [some notes][17] that I wish someone told me when I was first learning how to use git and github effectively 
+
 More Information
 ================
 
@@ -71,3 +77,4 @@ sometimes on the [Illuminato X Machina Mailing List][5].
 [14]: http://www.liquidware.com/shop/show/BUT/ButtonShield
 [15]: http://www.liquidware.com/shop/show/INPT/InputShield
 [16]: http://www.moderndevice.com/collections/displays
+[17]: http://wiki.github.com/liquidware/antipasto_arduino
