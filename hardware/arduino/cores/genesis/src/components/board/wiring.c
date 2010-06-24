@@ -172,6 +172,7 @@ void init()
 	sbi(TCCR0, CS00);
 #elif defined(__AVR_ATmega645__)
 	sbi(TCCR0A, CS01);
+    sbi(TCCR0A, CS00);
 #else
 	sbi(TCCR0B, CS01);
 	sbi(TCCR0B, CS00);
@@ -204,11 +205,6 @@ void init()
 	// configure timer 2 for phase correct pwm (8-bit)
 #if defined(__AVR_ATmega8__)
 	sbi(TCCR2, WGM20);
-#elif defined(__AVR_ATmega645__)
-    sbi(TCCR2A, CS20);
-    sbi(TCCR2A, WGM20);
-    sbi(TCCR2A, COM2A0);
-    sbi(TCCR2A, COM2A1);
 #else
 	sbi(TCCR2A, WGM20);
 #endif
