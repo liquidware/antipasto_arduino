@@ -11,7 +11,7 @@
 #define __BMP_H_
 
 //*	this was the old system
-#define	_USE_7LETTER_NAMES_
+//#define	_USE_7LETTER_NAMES_
 
 #define	kLookupTablePage			4094
 #define	kLookupTableSize			DATAFLASH_PAGESIZE
@@ -46,7 +46,7 @@
 
 #endif
 
-typedef uint64_t PImage; 
+typedef uint64_t PImage;
 
 #ifdef __cplusplus
 extern "C"{
