@@ -17,6 +17,8 @@ hardware/arduino/cores/arduino/src/components/libraries/HardwareSensor
 hardware/arduino/cores/arduino/src/components/libraries/LibCompass
 hardware/arduino/cores/arduino/src/components/libraries/LibHumidity
 hardware/arduino/cores/arduino/src/components/libraries/LibTemperature
+hardware/arduino/cores/arduino/src/components/libraries/SoftwareSerial_NB
+hardware/arduino/cores/arduino/src/components/libraries/LibGeoShield
 hardware/arduino/cores/touchshield/src/components/libraries/HardwareSensor
 hardware/arduino/cores/*/src/components/libraries/Ports
 hardware/arduino/cores/*/src/components/libraries/RF12
