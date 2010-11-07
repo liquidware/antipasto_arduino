@@ -44,7 +44,7 @@
     <target name="set.properties">
         <property name="github.user"      value="liquidware"/>
         <property name="github.repo"      value="antipasto_arduino_plugins"/>
-        <property name="file.name"        value="${github.user}-${github.repo}"/>
+        <property name="file.name"        value="${github.repo}"/>
     </target>
 
     <target name="clean.plugins">
@@ -58,29 +58,24 @@
 
     <!-- Get the IDE plugins from a remote github repository (via zip) -->
     <target name="get.remote">
-
-        <!-- Fetch the zipfile over http -->
-        <get src="http://github.com/${github.user}/${github.repo}/zipball/master"
-             dest="${file.name}.zip"/>
-
-        <!-- Unzip the source into ${file.name}-somehash -->
-        <unzip src="${file.name}.zip"
-               dest="./"/>
-
-        <!-- Delete the zipfile -->
-        <delete file="${file.name}.zip"/>
-
-        <!-- Create the repo directory -->
-        <mkdir dir="${file.name}"/>
-
-        <!-- Move the files into a directory without 'somehash' -->
-        <move todir="${file.name}">
-          <fileset dir="." includes="**/*"/>
-          <mapper type="regexp" from="^${file.name}-[\da-f]+(.*)" to="\1"/>
-        </move>
+            <git action="clone" args="http://github.com/liquidware/antipasto_arduino_plugins.git" 
+				dir="./" />
     </target>
 
+    <!-- A helper macro to get github clones -->
+   <macrodef name="git">
+        <attribute name="action"/>
+        <attribute name="args"/>
+        <attribute name="dir"/>
+        <sequential>
+            <exec executable="git" dir="@{dir}" failonerror="true" searchpath="true">
+                <arg value="@{action}"/>
+                <arg line="@{args}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
     <target name="build.jar">
-             <ant dir="${file.name}"  target="build.all" inheritAll="false"/>
+	     <ant dir="${file.name}"  target="build.all" inheritAll="false"/>
     </target>
 </project>
