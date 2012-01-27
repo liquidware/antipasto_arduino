@@ -46,7 +46,7 @@ import processing.app.ExceptionHandler;
  */
 public class Base {
   public static final int REVISION = 18;
-  static String VERSION_NAME = "0018-Antipasto-0043";
+  static String VERSION_NAME = "0018-Antipasto-0044";
 
   static HashMap<Integer, String> platformNames = new HashMap<Integer, String>();
   static {
