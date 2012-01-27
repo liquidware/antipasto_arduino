@@ -42,12 +42,10 @@
     -->
 
     <target name="clean.external">
-          <delete includeemptydirs="true">
-              <fileset dir=".">
-                  <include name="**/*"/>
-                  <exclude name="build.xml"/>
-              </fileset>
-          </delete>
+        <delete dir="." includeemptydirs="yes" defaultexcludes="no">
+          <include name="**/*" />
+          <exclude name="build.xml" />
+        </delete>
     </target>
 
     <target name="get.remote">

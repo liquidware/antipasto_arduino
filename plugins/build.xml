@@ -48,17 +48,15 @@
     </target>
 
     <target name="clean.plugins">
-          <delete includeemptydirs="true">
-              <fileset dir=".">
-                  <include name="**/*"/>
-                  <exclude name="build.xml"/>
-              </fileset>
-          </delete>
+        <delete dir="." includeemptydirs="yes" defaultexcludes="no">
+          <include name="**/*" />
+          <exclude name="build.xml" />
+        </delete>
     </target>
 
     <!-- Get the IDE plugins from a remote github repository (via zip) -->
     <target name="get.remote">
-            <git action="clone" args="http://github.com/liquidware/antipasto_arduino_plugins.git" 
+            <git action="clone" args="http://github.com/liquidware/antipasto_arduino_plugins.git"
 				dir="./" />
     </target>
 
